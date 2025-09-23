@@ -1,16 +1,12 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, Platform } from "react-native";
+import { View, Text, StyleSheet, Platform } from "react-native";
 
 export default function HeroSection() {
   return (
     <>
       {/* Carte verte */}
       <View style={styles.hero}>
-        <Image
-          source={require("@/assets/images/white_logo_transparent_background.png")}
-          style={styles.brand}
-          resizeMode="contain"
-        />
+        <Text style={styles.brandText}>Zima</Text>
         <Text style={styles.heading}>
           Trouvez votre propriété idéale partout en Afrique
         </Text>
@@ -46,11 +42,13 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     position: "relative",
   },
-  brand: {
+  brandText: {
     alignSelf: "center",
-    height: 36,
-    width: "72%",
+    color: "#FFFFFF",
+    fontSize: 28,
+    fontWeight: "800",
     marginBottom: 10,
+    textAlign: "center",
   },
   heading: {
     color: "#FFFFFF",

@@ -9,7 +9,7 @@ export default function AppHeader() {
       <View style={styles.inner}>
         {/* Icône "Zi" (pas le gif) */}
         <Image
-          source={require("@/assets/images/customcolor_icon_transparent_background.png")}
+          source={require("@/assets/images/icon.png")}
           style={styles.logoMark}
           resizeMode="contain"
         />
