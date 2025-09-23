@@ -90,11 +90,15 @@ export default function RootLayout() {
   if (showSplash) {
     return (
       <View style={styles.container} onLayout={onLayoutRootView}>
-        <ZimaSplashScreen 
-          onComplete={handleSplashComplete}
-          minDuration={5000}
-          maxDuration={5000}
-        />
+        <QueryClientProvider client={queryClient}>
+          <AppProvider>
+            <ZimaSplashScreen 
+              onComplete={handleSplashComplete}
+              minDuration={5000}
+              maxDuration={5000}
+            />
+          </AppProvider>
+        </QueryClientProvider>
       </View>
     );
   }
