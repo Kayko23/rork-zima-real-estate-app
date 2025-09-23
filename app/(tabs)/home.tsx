@@ -138,27 +138,7 @@ export default function ExploreScreen() {
           />
         </View>
 
-        <View style={styles.section}>
-          <View style={styles.featuredPropertyCard}>
-            <Image 
-              source={{ uri: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800' }}
-              style={styles.featuredPropertyImage}
-              resizeMode="cover"
-            />
-            <View style={styles.featuredPropertyOverlay}>
-              <View style={styles.featuredPropertyInfo}>
-                <View style={styles.featuredPropertyDetails}>
-                  <Text style={styles.featuredPropertySpecs}>🛏️ 1  🛁 1  📐 45m²</Text>
-                  <View style={styles.featuredPropertyRating}>
-                    <Text style={styles.ratingIcon}>⭐</Text>
-                    <Text style={styles.ratingText}>4.8</Text>
-                    <Text style={styles.photoCount}>📷 2</Text>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </View>
-        </View>
+
 
         <View style={styles.section}>
           <SectionHeader 
@@ -335,56 +315,7 @@ const styles = StyleSheet.create({
   actionSpacer: {
     width: 16,
   },
-  featuredPropertyCard: {
-    marginHorizontal: 24,
-    height: 180,
-    borderRadius: 20,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  featuredPropertyImage: {
-    width: '100%',
-    height: '100%',
-  },
-  featuredPropertyOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 80,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    justifyContent: 'flex-end',
-  },
-  featuredPropertyInfo: {
-    padding: 16,
-  },
-  featuredPropertyDetails: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  featuredPropertySpecs: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  featuredPropertyRating: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  ratingIcon: {
-    fontSize: 14,
-  },
-  ratingText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  photoCount: {
-    fontSize: 12,
-    marginLeft: 8,
-  },
+
   categoryImageContainer: {
     marginHorizontal: 24,
     height: 160,
