@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { Plus, UserCheck } from 'lucide-react-native';
 import PropertyCard from '@/components/ui/PropertyCard';
 import SectionHeader from '@/components/ui/SectionHeader';
-import ActionTile from '@/components/ui/ActionTile';
 import ZimaBrand from '@/components/ui/ZimaBrand';
+import QuickActions from '@/components/home/QuickActions';
+import ActionDouble from '@/components/home/ActionDouble';
 import Filters, { FiltersState } from '@/components/ui/Filters';
 
 import { mockProperties } from '@/constants/data';
@@ -16,7 +16,6 @@ export default function ExploreScreen() {
   const insets = useSafeAreaInsets();
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<FiltersState>({ country: null, city: null, intent: "tous" });
-  const [activeChip, setActiveChip] = useState<'properties' | 'services'>('properties');
 
   const handlePropertyPress = (propertyId: string) => {
     console.log('Property pressed:', propertyId);
@@ -50,20 +49,7 @@ export default function ExploreScreen() {
     }
   };
 
-  const handlePublishPress = () => {
-    console.log('Publish property pressed');
-  };
 
-  const handleFindProPress = () => {
-    router.push('/services');
-  };
-
-  const handleChipPress = (chip: 'properties' | 'services') => {
-    setActiveChip(chip);
-    if (chip === 'services') {
-      router.push('/services');
-    }
-  };
 
   const displayProperties = mockProperties;
 
@@ -116,50 +102,15 @@ export default function ExploreScreen() {
       >
         <ZimaBrand />
 
+        {/* 3 cartes sur une ligne */}
+        <QuickActions />
+
         {showFilters && (
           <Filters onApply={(f) => {
             setFilters(f);
             setShowFilters(false);
           }} />
         )}
-
-        <View style={styles.chipsSection}>
-          <TouchableOpacity 
-            style={[
-              styles.chip,
-              activeChip === 'properties' && styles.chipActive
-            ]}
-            activeOpacity={0.8}
-            onPress={() => router.push('/(tabs)/categories')}
-          >
-            <Text style={styles.chipEmoji}>🏠</Text>
-            <Text style={styles.chipText}>Biens immobiliers</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[
-              styles.chip,
-              activeChip === 'services' && styles.chipActive
-            ]}
-            activeOpacity={0.8}
-            onPress={() => router.push('/services')}
-          >
-            <Text style={styles.chipEmoji}>💼</Text>
-            <Text style={styles.chipText}>Services</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[
-              styles.chip,
-              showFilters && styles.chipActive
-            ]}
-            activeOpacity={0.8}
-            onPress={() => setShowFilters(!showFilters)}
-          >
-            <Text style={styles.chipEmoji}>🔍</Text>
-            <Text style={styles.chipText}>Filtres</Text>
-          </TouchableOpacity>
-        </View>
 
         <View style={styles.section}>
           <SectionHeader 
@@ -274,23 +225,8 @@ export default function ExploreScreen() {
           ))}
         </View>
 
-        <View style={styles.section}>
-          <View style={styles.actionsContainer}>
-            <ActionTile
-              title="Publier un bien"
-              icon={<Plus size={24} color={Colors.primary} />}
-              onPress={handlePublishPress}
-              variant="primary"
-            />
-            <View style={styles.actionSpacer} />
-            <ActionTile
-              title="Trouver un pro"
-              icon={<UserCheck size={24} color={Colors.gold} />}
-              onPress={handleFindProPress}
-              variant="secondary"
-            />
-          </View>
-        </View>
+        {/* Bloc du bas : Publier un bien et Trouver un pro */}
+        <ActionDouble />
       </ScrollView>
     </View>
   );

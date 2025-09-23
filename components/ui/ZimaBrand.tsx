@@ -1,20 +1,10 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
-import { Image } from "expo-image";
-
-// Using the generated ZIMA logo
-const LOGO_URL = "https://r2-pub.rork.com/generated-images/0b1d6d6e-d682-4024-af47-dd716453a6ea.png";
+import { View, Text, StyleSheet } from "react-native";
 
 export default function ZimaBrand() {
   return (
     <View style={styles.wrap}>
-      <Image
-        source={{ uri: LOGO_URL }}
-        style={styles.img}
-        contentFit="contain"
-        transition={0}
-        tintColor={undefined as any}   // ✔️ empêche tout recoloriage iOS
-      />
+      <Text style={styles.wordmark}>ZIMA</Text>
     </View>
   );
 }
@@ -25,9 +15,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     alignItems: "center",
   },
-  img: {
-    width: "72%",         // ajuste 60–80% selon ton goût
-    height: 60,           // hauteur fixe pour un bon rendu
-    maxWidth: 300,
+  wordmark: {
+    marginTop: 6,
+    textAlign: "center",
+    fontSize: 34,
+    letterSpacing: 2,
+    fontWeight: "800",
+    color: "#1B4F45",   // vert sombre Zima
   },
 });

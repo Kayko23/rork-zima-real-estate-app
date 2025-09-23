@@ -50,6 +50,15 @@ export default function BrowseScreen() {
       case "commerces":
         data = data.filter((item) => item.category === "Commerce");
         break;
+      case "voyages":
+        data = data.filter((item) =>
+          item.category === "Hotel" ||
+          (item.features || []).some(f => {
+            const feature = String(f).toLowerCase().trim();
+            return ["hotel","daily","nightly","jour","nuit","location courte durée"].includes(feature);
+          })
+        );
+        break;
       default:
         // Show all
         break;
