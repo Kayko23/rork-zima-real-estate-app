@@ -63,12 +63,12 @@ export default function Filters({ onChange, initialFilters = {} }: FiltersProps)
       <Text style={styles.label}>Pays</Text>
       <View style={styles.pickerContainer}>
         <Picker
-          selectedValue={filters.pays}
+          selectedValue={filters.pays || ""}
           onValueChange={(value: string | null) => updateFilters({ pays: value || null, ville: null })}
           style={styles.picker}
           testID="pays-picker"
         >
-          <Picker.Item label="Sélectionner un pays" value={null} />
+          <Picker.Item label="Sélectionner un pays" value="" />
           {paysOptions.map((pays) => (
             <Picker.Item key={pays} label={pays} value={pays} />
           ))}
@@ -80,14 +80,14 @@ export default function Filters({ onChange, initialFilters = {} }: FiltersProps)
       <View style={styles.pickerContainer}>
         <Picker
           enabled={!!filters.pays}
-          selectedValue={filters.ville}
+          selectedValue={filters.ville || ""}
           onValueChange={(value: string | null) => updateFilters({ ville: value || null })}
           style={[styles.picker, !filters.pays && styles.pickerDisabled]}
           testID="ville-picker"
         >
           <Picker.Item
             label={filters.pays ? "Sélectionner une ville" : "Choisissez d'abord un pays"}
-            value={null}
+            value=""
           />
           {villesOptions.map((ville) => (
             <Picker.Item key={ville} label={ville} value={ville} />
