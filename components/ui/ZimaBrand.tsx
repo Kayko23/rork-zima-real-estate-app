@@ -3,9 +3,9 @@ import { View, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 
 // URL du logo ZIMA en couleur
-const SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/customcolor_logo_transparent_background.png' };
-// ratio du png joint: 1280x768
-const RATIO = 1280 / 768;
+const SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/gydph2t2pxfdbc9t3usqr' };
+// ratio approximatif du nouveau logo
+const RATIO = 16 / 9;
 
 export default function ZimaBrand() {
   return (
