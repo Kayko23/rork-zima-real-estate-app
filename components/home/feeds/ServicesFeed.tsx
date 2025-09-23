@@ -5,12 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  Platform,
 } from 'react-native';
-import { BlurView } from 'expo-blur';
 import {
-  Search,
-  X,
   ChevronDown,
   Grid,
   List,
@@ -22,17 +18,18 @@ import {
   Building2,
 } from 'lucide-react-native';
 import * as Linking from 'expo-linking';
-import FilterChips from '@/components/ui/FilterChips';
+import FusedSearch from '@/components/search/FusedSearch';
 import { useApp } from '@/hooks/useAppStore';
 import Colors from '@/constants/colors';
 import { mockProviders } from '@/constants/data';
 import { Provider } from '@/types';
+import { T } from '@/constants/typography';
 
 export default function ServicesFeed() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy] = useState<string>('Mieux notés');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
-  const { filters, updateFilters } = useApp();
+  const { filters } = useApp();
 
   const handleCall = (phone: string) => {
     if (phone && phone.trim()) {
@@ -56,8 +53,8 @@ export default function ServicesFeed() {
     console.log('View profile:', providerId);
   };
 
-  const handleFilterChipPress = (chipId: string) => {
-    console.log('Filter chip pressed:', chipId);
+  const handleSearchSubmit = (params: any) => {
+    console.log('Search params:', params);
   };
 
   const filteredProviders = useMemo(() => {
@@ -98,11 +95,7 @@ export default function ServicesFeed() {
     return filtered;
   }, [filters, searchQuery, sortBy]);
 
-  const filterChips = [
-    { id: 'country', label: 'Pays' },
-    { id: 'city', label: 'Ville' },
-    { id: 'category', label: 'Spécialité' },
-  ];
+
 
   const renderProviderCard = (provider: Provider) => (
     <TouchableOpacity
@@ -205,44 +198,11 @@ export default function ServicesFeed() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Services professionnels</Text>
-      <Text style={styles.subtitle}>
-        Connectez-vous avec des experts immobiliers vérifiés à travers l&apos;Afrique
-      </Text>
-
-      <View style={styles.searchSection}>
-        <View style={styles.searchBar}>
-          {Platform.OS === 'web' ? (
-            <View style={[styles.searchBarBackground, styles.webSearchBarBackground]} />
-          ) : (
-            <BlurView intensity={20} tint="light" style={styles.searchBarBackground} />
-          )}
-          <View style={styles.searchContent}>
-            <Search size={20} color={Colors.text.secondary} />
-            <Text style={styles.searchPlaceholder}>
-              Rechercher par nom, ville ou spécialité
-            </Text>
-            {searchQuery && (
-              <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <X size={20} color={Colors.text.secondary} />
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.filterRow}>
-        <FilterChips 
-          chips={filterChips}
-          onChipPress={handleFilterChipPress}
-          onFilterChange={updateFilters}
-          filters={filters}
-        />
-      </View>
+      <FusedSearch mode="services" onSubmit={handleSearchSubmit} />
+      <Text style={[T.h2, { marginTop: 18 }]}>2 professionnels trouvés</Text>
 
       <View style={styles.listHeader}>
         <View style={styles.listHeaderLeft}>
-          <Text style={styles.listTitle}>{filteredProviders.length} professionnels trouvés</Text>
           <Text style={styles.listSubtitle}>Afrique</Text>
         </View>
         <View style={styles.listHeaderRight}>
@@ -283,64 +243,7 @@ export default function ServicesFeed() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '600',
-    color: '#0E1E1B',
-    marginBottom: 8,
-    paddingHorizontal: 8,
-    marginTop: 16,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#5A6B65',
-    lineHeight: 22,
-    paddingHorizontal: 8,
-    marginBottom: 20,
-  },
-  searchSection: {
-    paddingHorizontal: 8,
-    marginBottom: 20,
-  },
-  searchBar: {
-    height: 56,
-    borderRadius: 20,
-    position: 'relative',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 24,
-    elevation: 8,
-  },
-  searchBarBackground: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 20,
-  },
-  webSearchBarBackground: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    backdropFilter: 'blur(20px)',
-    borderRadius: 20,
-  },
-  searchContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    gap: 12,
-  },
-  searchPlaceholder: {
-    flex: 1,
-    fontSize: 16,
-    color: Colors.text.secondary,
-  },
-  filterRow: {
-    marginBottom: 20,
+    paddingTop: 8,
   },
   listHeader: {
     flexDirection: 'row',
@@ -352,12 +255,7 @@ const styles = StyleSheet.create({
   listHeaderLeft: {
     flex: 1,
   },
-  listTitle: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: '#0E1E1B',
-    marginBottom: 4,
-  },
+
   listSubtitle: {
     fontSize: 14,
     color: Colors.text.secondary,

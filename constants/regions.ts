@@ -1,3 +1,34 @@
+export type Country = { code: string; name: string };
+
+const UEMOA: Country[] = [
+  { code: "BJ", name: "Bénin" }, { code: "BF", name: "Burkina Faso" },
+  { code: "CI", name: "Côte d'Ivoire" }, { code: "GW", name: "Guinée-Bissau" },
+  { code: "ML", name: "Mali" }, { code: "NE", name: "Niger" },
+  { code: "SN", name: "Sénégal" }, { code: "TG", name: "Togo" },
+];
+
+const ECOWAS: Country[] = [
+  { code: "BJ", name: "Bénin" }, { code: "BF", name: "Burkina Faso" },
+  { code: "CV", name: "Cap-Vert" }, { code: "CI", name: "Côte d'Ivoire" },
+  { code: "GM", name: "Gambie" }, { code: "GH", name: "Ghana" },
+  { code: "GN", name: "Guinée" }, { code: "GW", name: "Guinée-Bissau" },
+  { code: "LR", name: "Libéria" }, { code: "ML", name: "Mali" },
+  { code: "NE", name: "Niger" }, { code: "NG", name: "Nigéria" },
+  { code: "SN", name: "Sénégal" }, { code: "SL", name: "Sierra Leone" },
+  { code: "TG", name: "Togo" },
+];
+
+const CEMAC: Country[] = [
+  { code: "CM", name: "Cameroun" }, { code: "CF", name: "République centrafricaine" },
+  { code: "TD", name: "Tchad" }, { code: "CG", name: "Congo (Rép. du)" },
+  { code: "GQ", name: "Guinée équatoriale" }, { code: "GA", name: "Gabon" },
+];
+
+// union sans doublons
+export const AFRICA_TARGET_COUNTRIES: Country[] = Array.from(
+  new Map([...UEMOA, ...ECOWAS, ...CEMAC].map(c => [c.code, c])).values()
+).sort((a, b) => a.name.localeCompare(b.name));
+
 // UEMOA/BCEAO (Afrique de l'Ouest) + CEMAC/BEAC (Afrique centrale)
 export const BLOCS = {
   UEMOA: ["Bénin", "Burkina Faso", "Côte d'Ivoire", "Guinée-Bissau", "Mali", "Niger", "Sénégal", "Togo"],
