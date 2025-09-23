@@ -6,7 +6,7 @@ import SearchBar from '@/components/ui/SearchBar';
 import FilterChips from '@/components/ui/FilterChips';
 import NotificationBell from '@/components/ui/NotificationBell';
 import { categories } from '@/constants/data';
-import { useAppStore } from '@/hooks/useAppStore';
+import { useApp } from '@/hooks/useAppStore';
 import Colors from '@/constants/colors';
 import { FilterState } from '@/types';
 
@@ -20,7 +20,7 @@ const categoryIcons = {
 };
 
 export default function CategoriesScreen() {
-  const { hasUnreadNotifications, markNotificationsAsRead } = useAppStore();
+  const { hasUnreadNotifications, markNotificationsAsRead } = useApp();
   const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<FilterState>({
