@@ -20,7 +20,7 @@ export default function HeroSection() {
         <View style={styles.logoContainer}>
           {!imageError ? (
             <Image
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/6kl9gdfog1qcmvxe8ydse' }}
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/zy71wz6ro3q8k64p4r5hj' }}
               style={styles.logoImage}
               resizeMode="contain"
               onError={() => {
@@ -89,13 +89,15 @@ const styles = StyleSheet.create({
   /* Logo ZIMA avec image */
   logoContainer: {
     alignItems: "center",
+    justifyContent: "center",
     marginBottom: 20,
     zIndex: 3,
+    backgroundColor: 'transparent',
   },
   logoImage: {
-    width: 240,
-    height: 120,
-    // Suppression du tintColor qui peut causer des problèmes sur iOS
+    width: 280,
+    height: 140,
+    tintColor: '#FFFFFF',
   },
   
   // Styles pour le fallback logo
