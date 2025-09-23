@@ -2,31 +2,31 @@ import { Tabs, useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { 
-  Home, 
-  Heart, 
-  Grid3X3, 
+  BarChart3, 
+  Calendar, 
+  FileText, 
   MessageCircle, 
-  User
+  Settings
 } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 import Colors from '@/constants/colors';
 import { useApp } from '@/hooks/useAppStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export default function TabLayout() {
+export default function ProTabsLayout() {
   const { userMode } = useApp();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
-  // Redirect to provider tabs if in provider mode
+  // Redirect to user tabs if in user mode
   useEffect(() => {
-    if (userMode === 'provider') {
-      router.replace('/(proTabs)/dashboard');
+    if (userMode === 'user') {
+      router.replace('/');
     }
   }, [userMode, router]);
 
-  // If in provider mode, don't render user tabs
-  if (userMode === 'provider') {
+  // If in user mode, don't render provider tabs
+  if (userMode === 'user') {
     return null;
   }
 
@@ -64,31 +64,23 @@ export default function TabLayout() {
           marginBottom: 0,
         },
       }}
+      initialRouteName="dashboard"
     >
       <Tabs.Screen
-        name="index"
+        name="dashboard"
         options={{
-          title: 'Explorer',
+          title: 'Dashboard',
           tabBarIcon: ({ color, size }) => (
-            <Home size={size} color={color} testID="tab-icon-index" />
+            <BarChart3 size={size} color={color} testID="tab-icon-dashboard" />
           ),
         }}
       />
       <Tabs.Screen
-        name="favorites"
+        name="listings"
         options={{
-          title: 'Favoris',
+          title: 'Annonces',
           tabBarIcon: ({ color, size }) => (
-            <Heart size={size} color={color} testID="tab-icon-favorites" />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="categories"
-        options={{
-          title: 'Tout',
-          tabBarIcon: ({ color, size }) => (
-            <Grid3X3 size={size} color={color} testID="tab-icon-categories" />
+            <FileText size={size} color={color} testID="tab-icon-listings" />
           ),
         }}
       />
@@ -102,22 +94,21 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="agenda"
+        options={{
+          title: 'Agenda',
+          tabBarIcon: ({ color, size }) => (
+            <Calendar size={size} color={color} testID="tab-icon-agenda" />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profil',
           tabBarIcon: ({ color, size }) => (
-            <User size={size} color={color} testID="tab-icon-profile" />
+            <Settings size={size} color={color} testID="tab-icon-profile" />
           ),
-        }}
-      />
-      
-      {/* Hidden tabs - accessible via navigation but not shown in tab bar */}
-      <Tabs.Screen
-        name="services"
-        options={{
-          title: 'Services',
-          href: null,
-          // hidden from tab bar
         }}
       />
     </Tabs>
