@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, FlatList, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, Link } from 'expo-router';
 import { Plus, UserCheck } from 'lucide-react-native';
 import PropertyCard from '@/components/ui/PropertyCard';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -18,6 +18,10 @@ export default function ExploreScreen() {
 
   const handlePropertyPress = (propertyId: string) => {
     console.log('Property pressed:', propertyId);
+    router.push({
+      pathname: "/property/[id]",
+      params: { id: propertyId }
+    });
   };
 
   const handleToggleFavorite = (propertyId: string) => {
@@ -26,6 +30,22 @@ export default function ExploreScreen() {
 
   const handleSeeAllPress = (section: string) => {
     console.log('See all pressed:', section);
+    const sectionMap: Record<string, { title: string; kind: string }> = {
+      premium: { title: "Biens premium", kind: "premium" },
+      new: { title: "Nouveautés", kind: "nouveautes" },
+      residences: { title: "Résidences", kind: "residence" },
+      bureaux: { title: "Bureaux", kind: "bureaux" },
+      commerces: { title: "Commerces", kind: "commerces" },
+      terrains: { title: "Terrains", kind: "terrain" },
+    };
+    
+    const sectionData = sectionMap[section];
+    if (sectionData) {
+      router.push({
+        pathname: "/browse",
+        params: { title: sectionData.title, kind: sectionData.kind }
+      });
+    }
   };
 
   const handlePublishPress = () => {
@@ -101,29 +121,31 @@ export default function ExploreScreen() {
         
         {/* Chips below hero */}
         <View style={styles.chipsSection}>
-          <TouchableOpacity 
-            style={[
-              styles.chip,
-              activeChip === 'properties' && styles.chipActive
-            ]}
-            onPress={() => handleChipPress('properties')}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.chipEmoji}>🏠</Text>
-            <Text style={styles.chipText}>Biens immobiliers</Text>
-          </TouchableOpacity>
+          <Link href="/(tabs)/categories" asChild>
+            <TouchableOpacity 
+              style={[
+                styles.chip,
+                activeChip === 'properties' && styles.chipActive
+              ]}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.chipEmoji}>🏠</Text>
+              <Text style={styles.chipText}>Biens immobiliers</Text>
+            </TouchableOpacity>
+          </Link>
           
-          <TouchableOpacity 
-            style={[
-              styles.chip,
-              activeChip === 'services' && styles.chipActive
-            ]}
-            onPress={() => handleChipPress('services')}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.chipEmoji}>💼</Text>
-            <Text style={styles.chipText}>Services</Text>
-          </TouchableOpacity>
+          <Link href="/services" asChild>
+            <TouchableOpacity 
+              style={[
+                styles.chip,
+                activeChip === 'services' && styles.chipActive
+              ]}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.chipEmoji}>💼</Text>
+              <Text style={styles.chipText}>Services</Text>
+            </TouchableOpacity>
+          </Link>
         </View>
 
 
