@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import PropertyCard from '@/components/ui/PropertyCard';
 import SectionHeader from '@/components/ui/SectionHeader';
 
-import QuickActions from '@/components/home/QuickActions';
+import TopTabs from '@/components/home/TopTabs';
 import ActionDouble from '@/components/home/ActionDouble';
 
 
@@ -101,8 +101,8 @@ export default function ExploreScreen() {
         {/* Wordmark sans trait */}
         <Text style={styles.wordmark}>ZIMA</Text>
 
-        {/* 3 cartes sur une ligne */}
-        <QuickActions />
+        {/* 3 onglets Airbnb style */}
+        <TopTabs defaultTab="biens" />
 
         <View style={[styles.section, styles.firstSection]}>
           <SectionHeader 
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     color: "#1B4F45",
     letterSpacing: 1.5,
     marginTop: 4,
-    marginBottom: 8,
+    marginBottom: 16,
   },
 
   chipsSection: {
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   firstSection: {
-    marginTop: 32,
+    marginTop: 24,
   },
   horizontalList: {
     paddingHorizontal: 24,
