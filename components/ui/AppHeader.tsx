@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Platform } from "react-native";
+import { View, Image, StyleSheet, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function AppHeader() {
@@ -7,10 +7,12 @@ export default function AppHeader() {
   return (
     <View style={[styles.header, { paddingTop: insets.top }]}>
       <View style={styles.inner}>
-        {/* Logo Zima temporaire en texte */}
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>Zi</Text>
-        </View>
+        {/* Icône "Zi" (pas le gif) */}
+        <Image
+          source={require("@/assets/images/customcolor_icon_transparent_background.png")}
+          style={styles.logoMark}
+          resizeMode="contain"
+        />
         {/* Placeholder d'actions à droite (facultatif) */}
         <View style={styles.placeholder} />
       </View>
@@ -31,16 +33,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: Platform.OS === "web" ? 0 : StyleSheet.hairlineWidth,
     borderBottomColor: "#E6E8EB",
   },
-  logoContainer: {
-    backgroundColor: "#19715C",
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-  },
-  logoText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "bold",
+  logoMark: {
+    height: 24,
+    width: 56, // ratio large pour bien voir le "Zi"
   },
   placeholder: {
     width: 24,
