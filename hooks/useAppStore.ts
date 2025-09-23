@@ -46,7 +46,7 @@ const defaultFilters: FilterState = {
   sortBy: 'recent'
 };
 
-export const [AppProvider, useApp] = createContextHook(() => {
+export const [AppProvider, useAppStore] = createContextHook(() => {
   const [userMode, setUserMode] = useState<UserMode>('user');
   const [user, setUser] = useState<User>(defaultUser);
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
@@ -166,3 +166,31 @@ export const [AppProvider, useApp] = createContextHook(() => {
     completeOnboarding
   }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding]);
 });
+
+// Export a safe version of the hook that always returns a valid object
+export const useApp = () => {
+  const store = useAppStore();
+  
+  // Return default values if store is not yet initialized
+  if (!store) {
+    return {
+      userMode: 'user' as const,
+      user: defaultUser,
+      filters: defaultFilters,
+      hasUnreadNotifications: false,
+      isHydrated: false,
+      language: null as Language | null,
+      hasCompletedOnboarding: false,
+      switchMode: async () => {},
+      toggleAppMode: async () => {},
+      updateUser: async () => {},
+      updateFilters: () => {},
+      clearFilters: () => {},
+      markNotificationsAsRead: () => {},
+      setLanguage: async () => {},
+      completeOnboarding: async () => {}
+    };
+  }
+  
+  return store;
+};

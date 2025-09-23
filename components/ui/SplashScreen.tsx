@@ -15,7 +15,11 @@ interface SplashScreenProps {
 
 export default function SplashScreen({ onComplete, minDuration = 5000, maxDuration = 5000 }: SplashScreenProps) {
   const router = useRouter();
-  const { language, hasCompletedOnboarding } = useApp();
+  const appStore = useApp();
+  
+  // Safe destructuring with fallback values
+  const language = appStore?.language || null;
+  const hasCompletedOnboarding = appStore?.hasCompletedOnboarding || false;
 
   useEffect(() => {
     const t = setTimeout(() => {
