@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
-import { View, StyleSheet, Platform } from "react-native";
-import { Image } from "expo-image";
+import { View, Image, StyleSheet, Platform } from "react-native";
 import { useRouter } from "expo-router";
+import LiquidGlassView from "@/components/ui/LiquidGlassView";
 import { useApp } from "@/hooks/useAppStore";
 
-// Utilise l'animation GIF fournie
-const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/czyibo169zdm0kxik7zdr' };
+// Utilise un des GIFs fournis
+const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/iiq26c5ie8hzc056gkj5z' };
 
 interface SplashScreenProps {
   onComplete?: () => void;
@@ -16,20 +16,12 @@ interface SplashScreenProps {
 export default function SplashScreen({ onComplete, minDuration = 5000, maxDuration = 5000 }: SplashScreenProps) {
   const router = useRouter();
   const appStore = useApp();
-  const language = appStore?.language || null;
+  const language = appStore?.language;
 
   useEffect(() => {
     const t = setTimeout(() => {
       if (onComplete) {
         onComplete();
-        // Après le callback, on navigue selon la langue
-        setTimeout(() => {
-          if (!language) {
-            router.replace("/(onboarding)/language");
-          } else {
-            router.replace("/(tabs)");
-          }
-        }, 100);
       } else {
         // Si pas de callback onComplete, on gère la navigation ici
         if (!language) {
@@ -44,17 +36,16 @@ export default function SplashScreen({ onComplete, minDuration = 5000, maxDurati
 
   return (
     <View style={styles.screen}>
-      {/* Carte avec coins arrondis et effet liquid glass */}
-      <View style={styles.glassCard}>
+      {/* Carte vitrée + coins arrondis */}
+      <LiquidGlassView style={styles.glassCard}>
         <Image
           source={GIF_SRC}
-          contentFit="contain"
+          resizeMode="contain"
           style={styles.gif}
-          transition={0}
-          cachePolicy="none"
-          autoplay={true}
+          // Pour Android, forcer rendu hardware pour GIFs lourds
+          fadeDuration={0}
         />
-      </View>
+      </LiquidGlassView>
     </View>
   );
 }
@@ -76,23 +67,19 @@ const styles = StyleSheet.create({
     borderRadius: CARD_RADIUS,
     overflow: "hidden",
 
-    // "Liquid glass" look sur fond blanc : carte blanche translucide avec bords blancs
-    backgroundColor: "rgba(255,255,255,0.90)",
-    borderWidth: 4,
+    // "Liquid glass" look sur fond blanc : carte blanche avec bords blancs
+    backgroundColor: "#FFFFFF",
+    borderWidth: 2,
     borderColor: "#FFFFFF",
     ...Platform.select({
       ios: {
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 20 },
-        shadowOpacity: 0.15,
-        shadowRadius: 40,
+        shadowOffset: { width: 0, height: 12 },
+        shadowOpacity: 0.08,
+        shadowRadius: 24,
       },
       android: {
-        elevation: 15,
-      },
-      web: {
-        boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
-        backdropFilter: "blur(12px)",
+        elevation: 10,
       },
     }),
   },
