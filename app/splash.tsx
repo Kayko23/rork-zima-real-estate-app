@@ -1,38 +1,62 @@
-import React, { useEffect } from "react";
-import { View, Image, StyleSheet, Platform } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { View, Text, StyleSheet, Platform, Animated } from "react-native";
 import { useRouter } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useApp } from "@/hooks/useAppStore";
 import LiquidGlassView from "@/components/ui/LiquidGlassView";
-
-const GIF_SRC = require("@/assets/images/animation_sync_Default_r2f0nc64b.gif");
 
 export default function SplashScreen() {
   const router = useRouter();
   const { language } = useApp();
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
+  const opacityAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    // Start animation
+    Animated.parallel([
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacityAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
     const timer = setTimeout(() => {
       if (!language) {
         router.replace("/(onboarding)/language");
       } else {
-        router.replace("/home");
+        router.replace("/(tabs)/home");
       }
     }, 4000); // 4 secondes comme demandé
 
     return () => clearTimeout(timer);
-  }, [router, language]);
+  }, [router, language, scaleAnim, opacityAnim]);
 
   return (
-    <View style={styles.screen}>
-      <LiquidGlassView style={styles.glassCard}>
-        <Image
-          source={GIF_SRC}
-          resizeMode="contain"
-          style={styles.gif}
-          fadeDuration={0}
-        />
-      </LiquidGlassView>
-    </View>
+    <SafeAreaView style={styles.screen}>
+      <Animated.View 
+        style={[
+          styles.animatedContainer,
+          {
+            transform: [{ scale: scaleAnim }],
+            opacity: opacityAnim,
+          }
+        ]}
+      >
+        <LiquidGlassView style={styles.glassCard}>
+          <View style={styles.logoContainer}>
+            <Text style={styles.logoText}>Zi</Text>
+            <Text style={styles.brandText}>zima</Text>
+            <Text style={styles.tagline}>l&apos;Afrique à portée de main</Text>
+          </View>
+        </LiquidGlassView>
+      </Animated.View>
+    </SafeAreaView>
   );
 }
 
@@ -67,9 +91,34 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  gif: {
+  animatedContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  logoContainer: {
     flex: 1,
-    width: "100%",
-    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 40,
+  },
+  logoText: {
+    fontSize: 48,
+    fontWeight: "900",
+    color: "#19715C",
+    letterSpacing: -2,
+  },
+  brandText: {
+    fontSize: 32,
+    fontWeight: "700",
+    color: "#19715C",
+    marginTop: -8,
+    letterSpacing: 1,
+  },
+  tagline: {
+    fontSize: 14,
+    color: "#64748B",
+    marginTop: 12,
+    textAlign: "center",
+    fontWeight: "500",
   },
 });
