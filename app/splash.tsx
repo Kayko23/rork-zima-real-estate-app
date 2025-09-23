@@ -15,7 +15,7 @@ export default function SplashScreen() {
       if (!language) {
         router.replace("/(onboarding)/language");
       } else {
-        router.replace("/(tabs)");
+        router.replace("/home");
       }
     }, 4000); // 4 secondes comme demandé
 
