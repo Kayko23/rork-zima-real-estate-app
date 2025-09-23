@@ -1,20 +1,23 @@
 import React, { useEffect } from "react";
 import { View, Image, StyleSheet, Platform } from "react-native";
-import { useRouter } from "expo-router";
 import LiquidGlassView from "@/components/ui/LiquidGlassView";
 
 // Utilise un des GIFs fournis
 const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/iiq26c5ie8hzc056gkj5z' };
 
-export default function SplashScreen() {
-  const router = useRouter();
+interface SplashScreenProps {
+  onComplete?: () => void;
+  minDuration?: number;
+  maxDuration?: number;
+}
 
+export default function SplashScreen({ onComplete, minDuration = 5000, maxDuration = 5000 }: SplashScreenProps) {
   useEffect(() => {
     const t = setTimeout(() => {
-      router.replace("/(tabs)"); // page d'accueil après 5s
-    }, 5000);
+      onComplete?.();
+    }, maxDuration);
     return () => clearTimeout(t);
-  }, [router]);
+  }, [onComplete, maxDuration]);
 
   return (
     <View style={styles.screen}>
@@ -49,10 +52,10 @@ const styles = StyleSheet.create({
     borderRadius: CARD_RADIUS,
     overflow: "hidden",
 
-    // "Liquid glass" look sur fond blanc : carte blanche translucide + ombre douce
-    backgroundColor: "rgba(255,255,255,0.85)",
-    borderWidth: 1,
-    borderColor: "rgba(230,232,235,0.9)",
+    // "Liquid glass" look sur fond blanc : carte blanche avec bords blancs
+    backgroundColor: "#FFFFFF",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
     ...Platform.select({
       ios: {
         shadowColor: "#000",

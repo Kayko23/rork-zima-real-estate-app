@@ -1,20 +1,21 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AppProvider } from "@/hooks/useAppStore";
 import ZimaSplashScreen from "@/components/ui/SplashScreen";
 import RouteLoader from "@/components/ui/RouteLoader";
 
-SplashScreen.preventAutoHideAsync();
+// Empêche la fermeture auto du splash natif
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 const queryClient = new QueryClient();
 
 function RootLayoutNav() {
   return (
-    <Stack screenOptions={{ headerBackTitle: "Retour" }}>
+    <Stack screenOptions={{ headerBackTitle: "Retour", headerShown: false }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="services" options={{ headerShown: false }} />
       <Stack.Screen name="property/[id]" options={{ headerShown: false }} />
@@ -39,55 +40,74 @@ export default function RootLayout() {
   const [isLoading] = useState(false);
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
     const prepare = async () => {
       try {
-        // Simulate app preparation time
-        const timer = setTimeout(() => {
-          setIsAppReady(true);
-        }, 800);
+        // Précharge les assets critiques si nécessaire
+        // await preloadAssets();
         
-        return () => clearTimeout(timer);
-      } catch (e) {
-        console.warn(e);
+        // Petit délai pour s'assurer que tout est prêt
+        await new Promise<void>((resolve) => {
+          timeoutId = setTimeout(() => resolve(), 500);
+        });
+        
         setIsAppReady(true);
-      } finally {
-        // Hide native splash screen
-        SplashScreen.hideAsync();
+      } catch (e) {
+        console.warn('Error during app preparation:', e);
+        setIsAppReady(true);
       }
     };
 
-    const cleanup = prepare();
+    prepare();
+    
     return () => {
-      if (cleanup instanceof Promise) {
-        cleanup.then(cleanupFn => cleanupFn?.());
+      if (timeoutId) {
+        clearTimeout(timeoutId);
       }
     };
   }, []);
+
+  const onLayoutRootView = useCallback(async () => {
+    // Dès que le premier layout est prêt -> on cache le splash natif
+    if (isAppReady) {
+      await SplashScreen.hideAsync();
+    }
+  }, [isAppReady]);
 
   const handleSplashComplete = () => {
     setShowSplash(false);
   };
 
-  // Show custom splash screen until app is ready
-  if (!isAppReady || showSplash) {
+  // Tant que pas prêt : on laisse le splash natif affiché
+  if (!isAppReady) {
+    return null;
+  }
+
+  // Show custom splash screen
+  if (showSplash) {
     return (
-      <ZimaSplashScreen 
-        onComplete={handleSplashComplete}
-        minDuration={5000}
-        maxDuration={5000}
-      />
+      <View style={styles.container} onLayout={onLayoutRootView}>
+        <ZimaSplashScreen 
+          onComplete={handleSplashComplete}
+          minDuration={5000}
+          maxDuration={5000}
+        />
+      </View>
     );
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AppProvider>
-        <GestureHandlerRootView style={styles.container}>
-          <RootLayoutNav />
-          <RouteLoader visible={isLoading} />
-        </GestureHandlerRootView>
-      </AppProvider>
-    </QueryClientProvider>
+    <View style={styles.container} onLayout={onLayoutRootView}>
+      <QueryClientProvider client={queryClient}>
+        <AppProvider>
+          <GestureHandlerRootView style={styles.container}>
+            <RootLayoutNav />
+            <RouteLoader visible={isLoading} />
+          </GestureHandlerRootView>
+        </AppProvider>
+      </QueryClientProvider>
+    </View>
   );
 }
 
