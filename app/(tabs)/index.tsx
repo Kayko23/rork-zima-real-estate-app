@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, FlatList, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Plus, UserCheck } from 'lucide-react-native';
-import AppHeader from '@/components/ui/AppHeader';
-import HeroSection from '@/components/ui/HeroSection';
 import PropertyCard from '@/components/ui/PropertyCard';
 import SectionHeader from '@/components/ui/SectionHeader';
 import ActionTile from '@/components/ui/ActionTile';
@@ -12,6 +11,8 @@ import { mockProperties } from '@/constants/data';
 import Colors from '@/constants/colors';
 
 export default function ExploreScreen() {
+  const insets = useSafeAreaInsets();
+
   const [activeChip, setActiveChip] = useState<'properties' | 'services'>('properties');
 
   const handlePropertyPress = (propertyId: string) => {
@@ -89,13 +90,62 @@ export default function ExploreScreen() {
   ];
 
   return (
-    <View style={styles.container}>
-      <AppHeader />
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <ScrollView 
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={{ paddingBottom: 140 }}
       >
-        <HeroSection />
+        {/* Header with zi icon */}
+        <View style={styles.header}>
+          <Image 
+            source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/9x4bhbj6w010vuyrq7vcd' }}
+            style={styles.ziIcon}
+            resizeMode="contain"
+          />
+        </View>
+
+        {/* Hero Card with rounded bottom corners */}
+        <View style={styles.heroCard}>
+          <View style={styles.heroBackground}>
+            <View style={styles.heroBlob1} />
+            <View style={styles.heroBlob2} />
+          </View>
+          
+          <View style={styles.heroContent}>
+            <Image 
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/alk0nnhulsb6t76wytqya' }}
+              style={styles.heroLogo}
+              resizeMode="contain"
+            />
+          </View>
+        </View>
+        
+        {/* Chips below hero */}
+        <View style={styles.chipsSection}>
+          <TouchableOpacity 
+            style={[
+              styles.chip,
+              activeChip === 'properties' && styles.chipActive
+            ]}
+            onPress={() => handleChipPress('properties')}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.chipEmoji}>🏠</Text>
+            <Text style={styles.chipText}>Biens immobiliers</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[
+              styles.chip,
+              activeChip === 'services' && styles.chipActive
+            ]}
+            onPress={() => handleChipPress('services')}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.chipEmoji}>💼</Text>
+            <Text style={styles.chipText}>Services</Text>
+          </TouchableOpacity>
+        </View>
 
 
 
@@ -247,8 +297,103 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background.secondary,
   },
-  content: {
-    paddingBottom: 96,
+  header: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  ziIcon: {
+    height: 28,
+    width: 28,
+  },
+  heroCard: {
+    height: 220,
+    position: 'relative',
+    marginBottom: 16,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+    overflow: 'hidden',
+  },
+  heroBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: Colors.background.hero,
+  },
+  heroBlob1: {
+    position: 'absolute',
+    top: 20,
+    right: 30,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  heroBlob2: {
+    position: 'absolute',
+    bottom: 40,
+    left: 20,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  heroContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    zIndex: 1,
+  },
+  heroLogo: {
+    height: 60,
+    width: '72%',
+    maxWidth: 420,
+  },
+  chipsSection: {
+    flexDirection: 'row',
+    paddingHorizontal: 24,
+    gap: 12,
+    marginBottom: 32,
+  },
+  chip: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.78)',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 20,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.35)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.08,
+    shadowRadius: 30,
+    elevation: 8,
+    ...(Platform.OS === 'web' && {
+      backdropFilter: 'blur(26px)',
+    }),
+  },
+  chipActive: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderColor: Colors.primary,
+    borderWidth: 2,
+    shadowOpacity: 0.12,
+    transform: [{ scale: 1.02 }],
+  },
+  chipEmoji: {
+    fontSize: 16,
+  },
+  chipText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.text.primary,
   },
 
   section: {
