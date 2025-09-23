@@ -7,13 +7,23 @@ type Language = 'fr' | 'en' | 'pt';
 // Simple in-memory storage for demo purposes to avoid hydration issues
 const storage = {
   getItem: async (key: string): Promise<string | null> => {
-    // For now, return null to avoid hydration mismatch
-    // In production, implement proper storage with SSR considerations
-    return null;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+      return null;
+    } catch {
+      return null;
+    }
   },
   setItem: async (key: string, value: string): Promise<void> => {
-    // For now, just log to avoid hydration issues
-    console.log(`Storage: ${key} = ${value}`);
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, value);
+      }
+    } catch {
+      console.log(`Storage: ${key} = ${value}`);
+    }
   },
 };
 
@@ -51,13 +61,18 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const [user, setUser] = useState<User>(defaultUser);
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(true);
-  const [isHydrated, setIsHydrated] = useState(true); // Start as hydrated to prevent mismatch
+  const [isHydrated] = useState(true);
   const [language, setLanguageState] = useState<Language | null>(null);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // Load persisted data after component mount
-    loadPersistedData();
+    // Delay loading to avoid hydration mismatch
+    const timer = setTimeout(() => {
+      loadPersistedData();
+    }, 50);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const loadPersistedData = async () => {
@@ -75,18 +90,15 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       }
       if (savedLanguage && savedLanguage.trim()) {
         setLanguageState(savedLanguage as Language);
-      } else {
-        // Try to detect device language on first load
-        const deviceLang = getDeviceLanguage();
-        if (deviceLang) {
-          setLanguageState(deviceLang);
-        }
       }
       if (savedOnboarding === 'true') {
         setHasCompletedOnboarding(true);
       }
+      
+      setIsInitialized(true);
     } catch (error) {
       console.log('Error loading persisted data:', error);
+      setIsInitialized(true);
     }
   };
 
@@ -156,6 +168,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     isHydrated,
     language,
     hasCompletedOnboarding,
+    isInitialized,
     switchMode,
     toggleAppMode,
     updateUser,
@@ -164,7 +177,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     markNotificationsAsRead,
     setLanguage,
     completeOnboarding
-  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding]);
+  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding]);
 });
 
 // Export a safe version of the hook that always returns a valid object
@@ -181,6 +194,7 @@ export const useApp = () => {
       isHydrated: false,
       language: null as Language | null,
       hasCompletedOnboarding: false,
+      isInitialized: false,
       switchMode: async () => {},
       toggleAppMode: async () => {},
       updateUser: async () => {},
