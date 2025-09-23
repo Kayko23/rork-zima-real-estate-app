@@ -36,5 +36,5 @@ const s = StyleSheet.create({
       android: { elevation: 4 },
     }),
   },
-  bigText: { fontSize: 17, fontWeight: "800", color: "#0F172A" },
+  bigText: { fontSize: 15, fontWeight: "800", color: "#0F172A" },
 });

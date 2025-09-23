@@ -51,5 +51,5 @@ const s = StyleSheet.create({
     }),
   },
   outlined: { borderColor: GREEN, borderWidth: 2 },
-  label: { fontSize: 16, fontWeight: "700", color: "#0F172A", flexShrink: 1 },
+  label: { fontSize: 14, fontWeight: "700", color: "#0F172A", flexShrink: 1 },
 });

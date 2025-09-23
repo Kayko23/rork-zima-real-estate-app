@@ -240,8 +240,9 @@ const styles = StyleSheet.create({
   },
   wordmark: {
     marginTop: 6,
+    marginBottom: 24,
     textAlign: "center",
-    fontSize: 34,
+    fontSize: 28,
     letterSpacing: 2,
     fontWeight: "800",
     color: "#1B4F45",
