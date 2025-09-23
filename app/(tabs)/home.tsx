@@ -103,9 +103,7 @@ export default function ExploreScreen() {
         {/* 3 cartes sur une ligne */}
         <QuickActions />
 
-
-
-        <View style={styles.section}>
+        <View style={[styles.section, styles.firstSection]}>
           <SectionHeader 
             title="Biens premium" 
             onSeeAllPress={() => handleSeeAllPress('premium')}
@@ -283,6 +281,9 @@ const styles = StyleSheet.create({
 
   section: {
     marginBottom: 32,
+  },
+  firstSection: {
+    marginTop: 40,
   },
   horizontalList: {
     paddingHorizontal: 24,
