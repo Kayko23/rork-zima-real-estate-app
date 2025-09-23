@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, FlatList, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -6,14 +6,13 @@ import { Plus, UserCheck } from 'lucide-react-native';
 import PropertyCard from '@/components/ui/PropertyCard';
 import SectionHeader from '@/components/ui/SectionHeader';
 import ActionTile from '@/components/ui/ActionTile';
+import HeroSection from '@/components/ui/HeroSection';
 
 import { mockProperties } from '@/constants/data';
 import Colors from '@/constants/colors';
 
 export default function ExploreScreen() {
   const insets = useSafeAreaInsets();
-
-  const [activeChip, setActiveChip] = useState<'properties' | 'services'>('properties');
 
   const handlePropertyPress = (propertyId: string) => {
     console.log('Property pressed:', propertyId);
@@ -24,6 +23,7 @@ export default function ExploreScreen() {
   };
 
   const handleSeeAllPress = (section: string) => {
+    if (!section?.trim()) return;
     console.log('See all pressed:', section);
   };
 
@@ -33,13 +33,6 @@ export default function ExploreScreen() {
 
   const handleFindProPress = () => {
     router.push('/services');
-  };
-
-  const handleChipPress = (chip: 'properties' | 'services') => {
-    setActiveChip(chip);
-    if (chip === 'services') {
-      router.push('/services');
-    }
   };
 
 
@@ -95,57 +88,10 @@ export default function ExploreScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 140 }}
       >
-        {/* Header with zi icon */}
-        <View style={styles.header}>
-          <Image 
-            source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/9x4bhbj6w010vuyrq7vcd' }}
-            style={styles.ziIcon}
-            resizeMode="contain"
-          />
-        </View>
 
-        {/* Hero Card with rounded bottom corners */}
-        <View style={styles.heroCard}>
-          <View style={styles.heroBackground}>
-            <View style={styles.heroBlob1} />
-            <View style={styles.heroBlob2} />
-          </View>
-          
-          <View style={styles.heroContent}>
-            <Image 
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/alk0nnhulsb6t76wytqya' }}
-              style={styles.heroLogo}
-              resizeMode="contain"
-            />
-          </View>
-        </View>
-        
-        {/* Chips below hero */}
-        <View style={styles.chipsSection}>
-          <TouchableOpacity 
-            style={[
-              styles.chip,
-              activeChip === 'properties' && styles.chipActive
-            ]}
-            onPress={() => handleChipPress('properties')}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.chipEmoji}>🏠</Text>
-            <Text style={styles.chipText}>Biens immobiliers</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={[
-              styles.chip,
-              activeChip === 'services' && styles.chipActive
-            ]}
-            onPress={() => handleChipPress('services')}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.chipEmoji}>💼</Text>
-            <Text style={styles.chipText}>Services</Text>
-          </TouchableOpacity>
-        </View>
+
+        {/* Hero Section with logo and chips */}
+        <HeroSection />
 
 
 

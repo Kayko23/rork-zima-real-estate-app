@@ -3,9 +3,8 @@ import { View, Image, StyleSheet, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { useApp } from "@/hooks/useAppStore";
 
-// Utilise l'animation GIF fournie (première animation)
-const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/z1rnlgnzv2d56bsxd1j17' };
-// Alternative: const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/a7caxcbr40c63lha0hnpz' };
+// Utilise l'animation GIF fournie
+const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/czyibo169zdm0kxik7zdr' };
 
 interface SplashScreenProps {
   onComplete?: () => void;

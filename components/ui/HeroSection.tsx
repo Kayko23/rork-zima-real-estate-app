@@ -1,130 +1,104 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import LiquidGlassView from './LiquidGlassView';
-import Colors from '@/constants/colors';
+import React from "react";
+import { View, Text, Image, StyleSheet, Platform, Pressable } from "react-native";
+import { useRouter } from "expo-router";
 
-interface HeroSectionProps {
-  title: string;
-  subtitle: string;
-  children?: React.ReactNode;
-}
+const GREEN = "#19715C";
 
-export default function HeroSection({ title, subtitle, children }: HeroSectionProps) {
+export default function HeroSection() {
+  const router = useRouter();
+
   return (
-    <View style={styles.container}>
-      <LinearGradient
-        colors={[Colors.primary, Colors.primaryDark]}
-        style={styles.gradient}
-      >
-        {/* Background blobs */}
-        <View style={styles.blobContainer}>
-          <View style={[styles.blob, styles.blob1]} />
-          <View style={[styles.blob, styles.blob2]} />
-          <View style={[styles.blob, styles.blob3]} />
-        </View>
+    <>
+      {/* Carte verte (sans barre supérieure) */}
+      <View style={styles.hero}>
+        {/* Logo complet blanc au centre */}
+        <Image
+          source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/alk0nnhulsb6t76wytqya' }}
+          style={styles.brand}
+          resizeMode="contain"
+        />
 
-        <View style={styles.content}>
-          <View style={styles.header}>
-            <View style={styles.logoContainer}>
-              <Text style={styles.logoText}>ZIMA</Text>
-            </View>
-          </View>
+        <Text style={styles.heading}>
+          Trouvez votre propriété idéale partout en Afrique
+        </Text>
 
-          <LiquidGlassView style={styles.glassCard}>
-            <View style={styles.cardContent}>
-              <Text style={styles.title}>{title}</Text>
-              <Text style={styles.subtitle}>{subtitle}</Text>
-              {children}
-            </View>
-          </LiquidGlassView>
-        </View>
-      </LinearGradient>
-    </View>
+        {/* Décors ronds (optionnels) */}
+        <View style={[styles.bubble, { top: 18, left: 16, width: 72, height: 72, opacity: 0.14 }]} />
+        <View style={[styles.bubble, { top: 24, right: 18, width: 120, height: 120, opacity: 0.20 }]} />
+      </View>
+
+      {/* Boutons en dehors de la carte */}
+      <View style={styles.chipsRow}>
+        <Pressable 
+          style={[styles.chip, styles.chipPrimary]} 
+          onPress={() => router.push("/(tabs)/categories")}
+        >
+          <Text style={[styles.chipText, styles.chipTextPrimary]}>🏠  Biens immobiliers</Text>
+        </Pressable>
+        <Pressable 
+          style={styles.chip} 
+          onPress={() => router.push("/services")}
+        >
+          <Text style={styles.chipText}>💼  Services</Text>
+        </Pressable>
+      </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    height: 320,
-  },
-  gradient: {
-    flex: 1,
-    position: 'relative',
-  },
-  blobContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  blob: {
-    position: 'absolute',
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 9999,
-  },
-  blob1: {
-    width: 200,
-    height: 200,
-    top: -50,
-    right: -50,
-  },
-  blob2: {
-    width: 150,
-    height: 150,
-    bottom: -30,
-    left: -30,
-  },
-  blob3: {
-    width: 100,
-    height: 100,
-    top: 100,
-    left: '30%',
-  },
-  content: {
-    flex: 1,
+  hero: {
+    backgroundColor: GREEN,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
     paddingHorizontal: 16,
-    paddingTop: 60,
+    paddingTop: 18,
     paddingBottom: 20,
+    overflow: "hidden",
+    position: "relative",
   },
-  header: {
-    alignItems: 'flex-start',
-    marginBottom: 20,
+  brand: {
+    alignSelf: "center",
+    height: 36,
+    width: "72%",
+    marginBottom: 10,
   },
-  logoContainer: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  logoText: {
+  heading: {
+    color: "#FFFFFF",
+    textAlign: "center",
+    fontWeight: "700",
     fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
-    letterSpacing: 1,
+    lineHeight: 26,
   },
-  glassCard: {
-    flex: 1,
-    minHeight: 160,
+  bubble: {
+    position: "absolute",
+    borderRadius: 999,
+    backgroundColor: "#FFFFFF",
   },
-  cardContent: {
-    padding: 20,
-    flex: 1,
-    justifyContent: 'center',
+  chipsRow: {
+    marginTop: -12,
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    gap: 12,
+    justifyContent: "center",
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.text.primary,
-    marginBottom: 8,
+  chip: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.06,
+        shadowRadius: 14,
+      },
+      android: { elevation: 3 },
+      web: { boxShadow: "0 8px 16px rgba(0,0,0,0.06)" } as any,
+    }),
   },
-  subtitle: {
-    fontSize: 16,
-    color: Colors.text.secondary,
-    lineHeight: 22,
-    marginBottom: 20,
-  },
+  chipText: { color: "#0F172A", fontWeight: "600" },
+  chipPrimary: { borderWidth: 2, borderColor: GREEN },
+  chipTextPrimary: { color: GREEN },
 });
