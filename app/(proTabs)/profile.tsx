@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useApp } from '@/hooks/useAppStore';
+import { useAppStore } from '@/hooks/useAppStore';
 import Colors from '@/constants/colors';
 
 export default function ProfileScreen() {
-  const { userMode, toggleAppMode } = useApp();
+  const { userMode, toggleAppMode } = useAppStore();
   const insets = useSafeAreaInsets();
 
   const handleToggleMode = () => {

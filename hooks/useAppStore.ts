@@ -167,30 +167,5 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding]);
 });
 
-// Export a safe version of the hook that always returns a valid object
-export const useApp = () => {
-  const store = useAppStore();
-  
-  // Return default values if store is not yet initialized
-  if (!store) {
-    return {
-      userMode: 'user' as const,
-      user: defaultUser,
-      filters: defaultFilters,
-      hasUnreadNotifications: false,
-      isHydrated: false,
-      language: null as Language | null,
-      hasCompletedOnboarding: false,
-      switchMode: async () => {},
-      toggleAppMode: async () => {},
-      updateUser: async () => {},
-      updateFilters: () => {},
-      clearFilters: () => {},
-      markNotificationsAsRead: () => {},
-      setLanguage: async () => {},
-      completeOnboarding: async () => {}
-    };
-  }
-  
-  return store;
-};
+// Export types for external use
+export type { Language };

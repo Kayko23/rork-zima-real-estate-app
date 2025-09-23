@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { View, Image, StyleSheet, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import LiquidGlassView from "@/components/ui/LiquidGlassView";
-import { useApp } from "@/hooks/useAppStore";
+import { useAppStore } from "@/hooks/useAppStore";
 
 // Utilise un des GIFs fournis
 const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/iiq26c5ie8hzc056gkj5z' };
@@ -13,13 +13,9 @@ interface SplashScreenProps {
   maxDuration?: number;
 }
 
-export default function SplashScreen({ onComplete, minDuration = 5000, maxDuration = 5000 }: SplashScreenProps) {
+export default function SplashScreen({ onComplete, minDuration = 4000, maxDuration = 4000 }: SplashScreenProps) {
   const router = useRouter();
-  const appStore = useApp();
-  
-  // Safe destructuring with fallback values
-  const language = appStore?.language || null;
-  const hasCompletedOnboarding = appStore?.hasCompletedOnboarding || false;
+  const { language, hasCompletedOnboarding } = useAppStore();
 
   useEffect(() => {
     const t = setTimeout(() => {

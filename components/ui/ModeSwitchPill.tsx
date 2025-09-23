@@ -11,12 +11,12 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BlurView } from 'expo-blur';
 import { ArrowLeftRight } from 'lucide-react-native';
-import { useApp } from '@/hooks/useAppStore';
+import { useAppStore } from '@/hooks/useAppStore';
 import Colors from '@/constants/colors';
 import * as Haptics from 'expo-haptics';
 
 export default function ModeSwitchPill() {
-  const { userMode, toggleAppMode } = useApp();
+  const { userMode, toggleAppMode } = useAppStore();
   const insets = useSafeAreaInsets();
   const [isAnimating, setIsAnimating] = useState(false);
   const [rotateAnim] = useState(new Animated.Value(0));

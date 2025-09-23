@@ -17,11 +17,11 @@ import { router } from 'expo-router';
 import NotificationBell from '@/components/ui/NotificationBell';
 import LiquidGlassView from '@/components/ui/LiquidGlassView';
 import ModeSwitchPill from '@/components/ui/ModeSwitchPill';
-import { useApp } from '@/hooks/useAppStore';
+import { useAppStore } from '@/hooks/useAppStore';
 import Colors from '@/constants/colors';
 
 export default function ProfileScreen() {
-  const { user, userMode, hasUnreadNotifications, switchMode, markNotificationsAsRead } = useApp();
+  const { user, userMode, hasUnreadNotifications, switchMode, markNotificationsAsRead } = useAppStore();
   const insets = useSafeAreaInsets();
 
   const handleModeSwitch = () => {

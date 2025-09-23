@@ -10,11 +10,11 @@ import {
 } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 import Colors from '@/constants/colors';
-import { useApp } from '@/hooks/useAppStore';
+import { useAppStore } from '@/hooks/useAppStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
-  const { userMode } = useApp();
+  const { userMode } = useAppStore();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
