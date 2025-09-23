@@ -15,7 +15,8 @@ interface SplashScreenProps {
 
 export default function SplashScreen({ onComplete, minDuration = 5000, maxDuration = 5000 }: SplashScreenProps) {
   const router = useRouter();
-  const { language } = useApp();
+  const appStore = useApp();
+  const language = appStore?.language;
 
   useEffect(() => {
     const t = setTimeout(() => {
