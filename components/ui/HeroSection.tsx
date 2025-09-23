@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Platform, Pressable } from "react-native";
 import { useRouter } from "expo-router";
+import ZimaLogo from "@/components/ui/ZimaLogo";
 
 const GREEN = "#19715C";
 
@@ -15,15 +16,8 @@ export default function HeroSection() {
         <View style={[styles.bubble, { top: 20, left: 20, width: 60, height: 60, opacity: 0.1 }]} />
         <View style={[styles.bubble, { top: 30, right: 15, width: 100, height: 100, opacity: 0.15 }]} />
         
-        {/* Logo ZIMA textuel comme dans l'image */}
-        <View style={styles.logoContainer}>
-          <View style={styles.logoTextContainer}>
-            <Text style={styles.logoZi}>zi</Text>
-            <View style={styles.dash} />
-            <Text style={styles.logoZima}>zima</Text>
-          </View>
-          <Text style={styles.logoSubtext}>L&apos;agence de propriété de rêve</Text>
-        </View>
+        {/* Logo ZIMA de l'image jointe */}
+        <ZimaLogo style={styles.logoStyle} widthPct={0.85} />
 
         <Text style={styles.heading}>
           Trouvez votre propriété idéale partout{"\n"}en Afrique
@@ -69,43 +63,9 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   
-  /* Logo ZIMA textuel */
-  logoContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
+  logoStyle: {
+    marginBottom: 16,
     zIndex: 3,
-  },
-  logoTextContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 6,
-  },
-  logoZi: {
-    color: "#FFFFFF",
-    fontSize: 36,
-    fontWeight: "400",
-    fontStyle: "italic",
-    marginRight: 8,
-  },
-  dash: {
-    width: 30,
-    height: 2,
-    backgroundColor: "#FFFFFF",
-    marginHorizontal: 4,
-  },
-  logoZima: {
-    color: "#FFFFFF",
-    fontSize: 36,
-    fontWeight: "600",
-    marginLeft: 8,
-  },
-  logoSubtext: {
-    color: "#FFFFFF",
-    fontSize: 13,
-    opacity: 0.9,
-    fontStyle: "italic",
-    textAlign: "center",
   },
   
   heading: {
