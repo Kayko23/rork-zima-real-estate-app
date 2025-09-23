@@ -1,12 +1,11 @@
-import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, Platform, Pressable } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet, Platform, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 
 const GREEN = "#19715C";
 
 export default function HeroSection() {
   const router = useRouter();
-  const [imageError, setImageError] = useState(false);
 
   return (
     <>
@@ -16,30 +15,14 @@ export default function HeroSection() {
         <View style={[styles.bubble, { top: 20, left: 20, width: 60, height: 60, opacity: 0.1 }]} />
         <View style={[styles.bubble, { top: 30, right: 15, width: 100, height: 100, opacity: 0.15 }]} />
         
-        {/* Logo ZIMA avec image ou fallback */}
+        {/* Logo ZIMA textuel comme dans l'image */}
         <View style={styles.logoContainer}>
-          {!imageError ? (
-            <Image
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/zy71wz6ro3q8k64p4r5hj' }}
-              style={styles.logoImage}
-              resizeMode="contain"
-              onError={() => {
-                console.log('Logo loading error, switching to fallback');
-                setImageError(true);
-              }}
-              onLoad={() => console.log('Logo loaded successfully')}
-            />
-          ) : (
-            // Fallback avec texte stylisé
-            <View style={styles.logoFallback}>
-              <View style={styles.logoTextContainer}>
-                <Text style={styles.logoZi}>zi</Text>
-                <View style={styles.underline} />
-                <Text style={styles.logoZima}>zima</Text>
-              </View>
-              <Text style={styles.logoSubtext}>L&apos;agence de propriété de rêve</Text>
-            </View>
-          )}
+          <View style={styles.logoTextContainer}>
+            <Text style={styles.logoZi}>zi</Text>
+            <View style={styles.dash} />
+            <Text style={styles.logoZima}>zima</Text>
+          </View>
+          <Text style={styles.logoSubtext}>L&apos;agence de propriété de rêve</Text>
         </View>
 
         <Text style={styles.heading}>
@@ -86,52 +69,43 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   
-  /* Logo ZIMA avec image */
+  /* Logo ZIMA textuel */
   logoContainer: {
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
     zIndex: 3,
-    backgroundColor: 'transparent',
-  },
-  logoImage: {
-    width: 280,
-    height: 140,
-    tintColor: '#FFFFFF',
-  },
-  
-  // Styles pour le fallback logo
-  logoFallback: {
-    alignItems: "center",
   },
   logoTextContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 4,
+    marginBottom: 6,
   },
   logoZi: {
     color: "#FFFFFF",
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: "400",
     fontStyle: "italic",
     marginRight: 8,
   },
-  underline: {
-    width: 40,
-    height: 3,
+  dash: {
+    width: 30,
+    height: 2,
     backgroundColor: "#FFFFFF",
-    marginRight: 8,
+    marginHorizontal: 4,
   },
   logoZima: {
     color: "#FFFFFF",
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: "600",
+    marginLeft: 8,
   },
   logoSubtext: {
     color: "#FFFFFF",
-    fontSize: 12,
-    opacity: 0.8,
+    fontSize: 13,
+    opacity: 0.9,
     fontStyle: "italic",
+    textAlign: "center",
   },
   
   heading: {
