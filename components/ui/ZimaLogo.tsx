@@ -9,8 +9,8 @@ type Props = { style?: ViewStyle; widthPct?: number };
 
 export default function ZimaLogo({ style, widthPct = 0.70 }: Props) {
   const logoStyle = {
-    width: `${Math.round(widthPct * 100)}%` as const,
-    aspectRatio: 1 as const,
+    width: `${Math.round(widthPct * 100)}%`,
+    aspectRatio: 1,
   };
 
   return (
