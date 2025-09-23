@@ -2,14 +2,14 @@ import React from "react";
 import { Image } from "expo-image";
 import { StyleSheet, View, ViewStyle } from "react-native";
 
-// Logo ZIMA - using existing icon for now
-const LOGO_SRC = require("@/assets/images/icon.png");
+// Logo ZIMA avec fond transparent
+const LOGO_SRC = { uri: "https://r2-pub.rork.com/generated-images/ed3f0fbb-0aa3-4b35-8b97-4548615f5c1d.png" };
 
 type Props = { style?: ViewStyle; widthPct?: number };
 
 export default function ZimaLogo({ style, widthPct = 0.70 }: Props) {
   const logoStyle = {
-    width: `${Math.round(widthPct * 100)}%`,
+    width: `${Math.round(widthPct * 100)}%` as const,
     aspectRatio: 1,
   };
 
