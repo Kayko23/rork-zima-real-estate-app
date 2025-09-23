@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { View, Image, StyleSheet, Platform } from "react-native";
+import { View, StyleSheet, Platform } from "react-native";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useApp } from "@/hooks/useAppStore";
 
@@ -47,10 +48,10 @@ export default function SplashScreen({ onComplete, minDuration = 5000, maxDurati
       <View style={styles.glassCard}>
         <Image
           source={GIF_SRC}
-          resizeMode="contain"
+          contentFit="contain"
           style={styles.gif}
-          // Pour Android, forcer rendu hardware pour GIFs lourds
-          fadeDuration={0}
+          transition={0}
+          cachePolicy="none"
         />
       </View>
     </View>
