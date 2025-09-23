@@ -9,16 +9,10 @@ const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/atta
 
 export default function SplashScreen() {
   const router = useRouter();
-  const { language, hasCompletedOnboarding, isInitialized } = useApp();
+  const { language, hasCompletedOnboarding } = useApp();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      // Only proceed if store is initialized
-      if (!isInitialized) {
-        console.log('Store not yet initialized, waiting...');
-        return;
-      }
-      
       console.log('Splash complete, checking onboarding status');
       console.log('Language:', language);
       console.log('Has completed onboarding:', hasCompletedOnboarding);
@@ -33,22 +27,7 @@ export default function SplashScreen() {
     }, 4000); // 4 seconds as requested
     
     return () => clearTimeout(timer);
-  }, [router, language, hasCompletedOnboarding, isInitialized]);
-
-  // If store is initialized but we're still in splash duration, continue showing splash
-  useEffect(() => {
-    if (isInitialized) {
-      // Check immediately if we should skip splash (for returning users)
-      const quickCheck = setTimeout(() => {
-        if (language && hasCompletedOnboarding) {
-          console.log('Returning user detected, skipping to main app');
-          router.replace("/(tabs)/home");
-        }
-      }, 1000); // Quick check after 1 second for returning users
-      
-      return () => clearTimeout(quickCheck);
-    }
-  }, [isInitialized, language, hasCompletedOnboarding, router]);
+  }, [router, language, hasCompletedOnboarding]);
 
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>

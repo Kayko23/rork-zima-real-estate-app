@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router, Link } from 'expo-router';
+import { router } from 'expo-router';
 import { Plus, UserCheck } from 'lucide-react-native';
 import PropertyCard from '@/components/ui/PropertyCard';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -121,31 +121,29 @@ export default function ExploreScreen() {
         
         {/* Chips below hero */}
         <View style={styles.chipsSection}>
-          <Link href="/(tabs)/categories" asChild>
-            <TouchableOpacity 
-              style={[
-                styles.chip,
-                activeChip === 'properties' && styles.chipActive
-              ]}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.chipEmoji}>🏠</Text>
-              <Text style={styles.chipText}>Biens immobiliers</Text>
-            </TouchableOpacity>
-          </Link>
+          <TouchableOpacity 
+            style={[
+              styles.chip,
+              activeChip === 'properties' && styles.chipActive
+            ]}
+            activeOpacity={0.8}
+            onPress={() => router.push('/(tabs)/categories')}
+          >
+            <Text style={styles.chipEmoji}>🏠</Text>
+            <Text style={styles.chipText}>Biens immobiliers</Text>
+          </TouchableOpacity>
           
-          <Link href="/services" asChild>
-            <TouchableOpacity 
-              style={[
-                styles.chip,
-                activeChip === 'services' && styles.chipActive
-              ]}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.chipEmoji}>💼</Text>
-              <Text style={styles.chipText}>Services</Text>
-            </TouchableOpacity>
-          </Link>
+          <TouchableOpacity 
+            style={[
+              styles.chip,
+              activeChip === 'services' && styles.chipActive
+            ]}
+            activeOpacity={0.8}
+            onPress={() => router.push('/services')}
+          >
+            <Text style={styles.chipEmoji}>💼</Text>
+            <Text style={styles.chipText}>Services</Text>
+          </TouchableOpacity>
         </View>
 
 

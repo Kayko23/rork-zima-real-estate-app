@@ -64,7 +64,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const [isHydrated] = useState(true);
   const [language, setLanguageState] = useState<Language | null>(null);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(true);
 
   useEffect(() => {
     // Load data immediately but handle errors gracefully
@@ -91,10 +91,10 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
         setHasCompletedOnboarding(true);
       }
       
-      setIsInitialized(true);
+      // Already initialized
     } catch (error) {
       console.log('Error loading persisted data:', error);
-      setIsInitialized(true);
+      // Already initialized
     }
   };
 
