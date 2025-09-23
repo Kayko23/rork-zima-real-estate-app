@@ -50,8 +50,6 @@ function Tab({
       <View style={s.iconContainer}>{icon}</View>
       <Text
         numberOfLines={1}
-        adjustsFontSizeToFit
-        minimumFontScale={0.85}
         style={[s.tabLabel, active ? s.tabLabelActive : s.tabLabelInactive]}
       >
         {label}
@@ -86,8 +84,9 @@ const s = StyleSheet.create({
     paddingVertical: 6,
   },
   tabLabel: {
-    fontSize: 14, lineHeight: 18, fontWeight: "700",
+    fontSize: 13, lineHeight: 16, fontWeight: "700",
     marginTop: 6,
+    textAlign: "center",
   },
   tabLabelActive: { color: "#111827" },
   tabLabelInactive: { color: "#6B7280" },
