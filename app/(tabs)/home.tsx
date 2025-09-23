@@ -11,6 +11,7 @@ import ActionDouble from '@/components/home/ActionDouble';
 
 import { mockProperties } from '@/constants/data';
 import Colors from '@/constants/colors';
+import Type from '@/constants/typography';
 
 export default function ExploreScreen() {
   const insets = useSafeAreaInsets();
@@ -229,13 +230,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background.secondary,
   },
   wordmark: {
-    marginTop: 6,
-    marginBottom: 24,
-    textAlign: "center",
-    fontSize: 28,
-    letterSpacing: 2,
-    fontWeight: "800",
+    ...Type.h1,
+    textAlign: "center" as const,
     color: "#1B4F45",
+    letterSpacing: 1.5,
+    marginTop: 4,
+    marginBottom: 8,
   },
 
   chipsSection: {
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   firstSection: {
-    marginTop: 40,
+    marginTop: 32,
   },
   horizontalList: {
     paddingHorizontal: 24,

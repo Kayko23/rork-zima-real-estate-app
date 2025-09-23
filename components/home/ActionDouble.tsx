@@ -2,6 +2,7 @@ import React from "react";
 import { View, Pressable, Text, StyleSheet, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import Type from "@/constants/typography";
 
 export default function ActionDouble() {
   const r = useRouter();
@@ -36,5 +37,5 @@ const s = StyleSheet.create({
       android: { elevation: 4 },
     }),
   },
-  bigText: { fontSize: 15, fontWeight: "800", color: "#0F172A" },
+  bigText: { ...Type.h3, color: "#0F172A" },
 });

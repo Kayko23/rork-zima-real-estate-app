@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { ChevronRight } from 'lucide-react-native';
 import Colors from '@/constants/colors';
+import Type from '@/constants/typography';
 
 interface SectionHeaderProps {
   title: string;
@@ -44,9 +45,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '600',
-    color: Colors.text.primary,
+    ...Type.h2,
+    color: "#0F172A",
     marginBottom: 4,
   },
   subtitle: {
@@ -61,8 +61,7 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
   },
   seeAllText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: Colors.primary,
+    ...Type.body,
+    color: "#19715C",
   },
 });
