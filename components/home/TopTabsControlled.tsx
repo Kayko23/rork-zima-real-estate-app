@@ -10,7 +10,7 @@ export default function TopTabsControlled({
   return (
     <View style={s.pill}>
       <Tab k="biens" label="Propriétés" icon="home-outline" active={active} onChange={onChange} />
-      <Tab k="services" label="Services" icon="briefcase-outline" active={active} onChange={onChange} />
+      <Tab k="services" label="Professionnels" icon="briefcase-outline" active={active} onChange={onChange} />
       <Tab k="voyages" label="Voyages" icon="bed-outline" active={active} onChange={onChange} />
     </View>
   );
