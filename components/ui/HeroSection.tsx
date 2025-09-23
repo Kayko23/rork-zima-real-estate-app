@@ -11,20 +11,22 @@ export default function HeroSection() {
     <>
       {/* Carte verte (sans barre supérieure) */}
       <View style={styles.hero}>
-        {/* Logo complet blanc au centre */}
-        <Image
-          source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/alk0nnhulsb6t76wytqya' }}
-          style={styles.brand}
-          resizeMode="contain"
-        />
+        {/* Décors ronds (derrière le logo) */}
+        <View style={[styles.bubble, { top: 18, left: 16, width: 72, height: 72, opacity: 0.14 }]} />
+        <View style={[styles.bubble, { top: 24, right: 18, width: 120, height: 120, opacity: 0.20 }]} />
+        
+        {/* LOGO CENTRÉ, AU-DESSUS DES DÉCORS */}
+        <View style={styles.logoWrap}>
+          <Image
+            source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/0cg32vjm033aidki3duv3' }}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
 
         <Text style={styles.heading}>
           Trouvez votre propriété idéale partout en Afrique
         </Text>
-
-        {/* Décors ronds (optionnels) */}
-        <View style={[styles.bubble, { top: 18, left: 16, width: 72, height: 72, opacity: 0.14 }]} />
-        <View style={[styles.bubble, { top: 24, right: 18, width: 120, height: 120, opacity: 0.20 }]} />
       </View>
 
       {/* Boutons en dehors de la carte */}
@@ -52,30 +54,37 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
     paddingHorizontal: 16,
-    paddingTop: 24,
+    paddingTop: 18,
     paddingBottom: 24,
     overflow: "hidden",
     position: "relative",
-    alignItems: "center",
   },
-  brand: {
-    alignSelf: "center",
-    height: 48,
-    width: 200,
-    marginBottom: 16,
-    backgroundColor: "transparent",
+  
+  /* ---- CENTRAGE DU LOGO ---- */
+  logoWrap: {
+    alignItems: "center",          // centre horizontal
+    justifyContent: "center",
+    marginBottom: 10,
+    zIndex: 3,                      // passe au-dessus des bulles
+  },
+  logo: {
+    width: "70%",                   // largeur fluide
+    height: 36,                     // hauteur fixe pour un bon rendu
+    maxWidth: 200,                  // limite la taille sur grands écrans
   },
   heading: {
     color: "#FFFFFF",
     textAlign: "center",
     fontWeight: "700",
-    fontSize: 20,
-    lineHeight: 26,
+    fontSize: 18,
+    lineHeight: 24,
+    zIndex: 2,                      // au-dessus des bulles, sous le logo
   },
   bubble: {
     position: "absolute",
     borderRadius: 999,
     backgroundColor: "#FFFFFF",
+    zIndex: 1,                      // derrière le logo et le texte
   },
   chipsRow: {
     marginTop: -12,
