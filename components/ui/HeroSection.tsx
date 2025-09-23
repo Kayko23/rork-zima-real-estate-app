@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, Platform, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 
@@ -6,6 +6,7 @@ const GREEN = "#19715C";
 
 export default function HeroSection() {
   const router = useRouter();
+  const [imageError, setImageError] = useState(false);
 
   return (
     <>
@@ -15,13 +16,30 @@ export default function HeroSection() {
         <View style={[styles.bubble, { top: 20, left: 20, width: 60, height: 60, opacity: 0.1 }]} />
         <View style={[styles.bubble, { top: 30, right: 15, width: 100, height: 100, opacity: 0.15 }]} />
         
-        {/* Logo ZIMA avec image */}
+        {/* Logo ZIMA avec image ou fallback */}
         <View style={styles.logoContainer}>
-          <Image
-            source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/6kl9gdfog1qcmvxe8ydse' }}
-            style={styles.logoImage}
-            resizeMode="contain"
-          />
+          {!imageError ? (
+            <Image
+              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/6kl9gdfog1qcmvxe8ydse' }}
+              style={styles.logoImage}
+              resizeMode="contain"
+              onError={() => {
+                console.log('Logo loading error, switching to fallback');
+                setImageError(true);
+              }}
+              onLoad={() => console.log('Logo loaded successfully')}
+            />
+          ) : (
+            // Fallback avec texte stylisé
+            <View style={styles.logoFallback}>
+              <View style={styles.logoTextContainer}>
+                <Text style={styles.logoZi}>zi</Text>
+                <View style={styles.underline} />
+                <Text style={styles.logoZima}>zima</Text>
+              </View>
+              <Text style={styles.logoSubtext}>L&apos;agence de propriété de rêve</Text>
+            </View>
+          )}
         </View>
 
         <Text style={styles.heading}>
@@ -75,9 +93,43 @@ const styles = StyleSheet.create({
     zIndex: 3,
   },
   logoImage: {
-    width: 200,
-    height: 100,
-    tintColor: "#FFFFFF",
+    width: 240,
+    height: 120,
+    // Suppression du tintColor qui peut causer des problèmes sur iOS
+  },
+  
+  // Styles pour le fallback logo
+  logoFallback: {
+    alignItems: "center",
+  },
+  logoTextContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  logoZi: {
+    color: "#FFFFFF",
+    fontSize: 32,
+    fontWeight: "400",
+    fontStyle: "italic",
+    marginRight: 8,
+  },
+  underline: {
+    width: 40,
+    height: 3,
+    backgroundColor: "#FFFFFF",
+    marginRight: 8,
+  },
+  logoZima: {
+    color: "#FFFFFF",
+    fontSize: 32,
+    fontWeight: "600",
+  },
+  logoSubtext: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    opacity: 0.8,
+    fontStyle: "italic",
   },
   
   heading: {
