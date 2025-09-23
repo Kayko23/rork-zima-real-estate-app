@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import BackButton from "@/components/ui/BackButton";
 import Colors from "@/constants/colors";
 
 export default function SettingsScreen() {
@@ -8,16 +9,11 @@ export default function SettingsScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
+      <BackButton />
+      <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>Paramètres</Text>
-      </View>
-      
-      <View style={styles.content}>
-        <Text style={styles.subtitle}>Configuration de l&apos;application</Text>
-        <Text style={styles.description}>
-          Personnalisez votre expérience et gérez vos préférences.
-        </Text>
-      </View>
+        <Text style={styles.subtitle}>Configurez vos préférences et paramètres de l&apos;application.</Text>
+      </ScrollView>
     </View>
   );
 }

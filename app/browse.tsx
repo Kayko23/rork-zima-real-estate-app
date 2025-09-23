@@ -3,9 +3,9 @@ import { View, Text, StyleSheet, FlatList } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import PropertyCard from "@/components/ui/PropertyCard";
-import Filters from "@/components/ui/Filters";
+import BackButton from "@/components/ui/BackButton";
+import Filters, { FiltersState } from "@/components/ui/Filters";
 import { mockProperties } from "@/constants/data";
-import { FilterState } from "@/constants/regions";
 import Colors from "@/constants/colors";
 
 export default function BrowseScreen() {
@@ -16,11 +16,10 @@ export default function BrowseScreen() {
     kind?: string;
   }>();
   
-  const [filters, setFilters] = useState<FilterState>({
-    bloc: "TOUS",
-    pays: null,
-    ville: null,
-    type: "tous",
+  const [filters, setFilters] = useState<FiltersState>({
+    country: null,
+    city: null,
+    intent: "tous",
   });
 
   const filteredData = useMemo(() => {
@@ -57,20 +56,20 @@ export default function BrowseScreen() {
     }
 
     // Apply location filters
-    if (filters.pays) {
-      data = data.filter((item) => item.location.country === filters.pays);
+    if (filters.country) {
+      data = data.filter((item) => item.location.country === filters.country);
     }
-    if (filters.ville) {
-      data = data.filter((item) => item.location.city === filters.ville);
+    if (filters.city) {
+      data = data.filter((item) => item.location.city === filters.city);
     }
 
     // Apply transaction type filter
-    if (filters.type !== "tous") {
+    if (filters.intent !== "tous") {
       const typeMap = {
         "à vendre": "sale",
         "à louer": "rent",
       };
-      data = data.filter((item) => item.type === typeMap[filters.type as keyof typeof typeMap]);
+      data = data.filter((item) => item.type === typeMap[filters.intent as keyof typeof typeMap]);
     }
 
     return data;
@@ -100,6 +99,7 @@ export default function BrowseScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
+      <BackButton />
       <View style={styles.header}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.subtitle}>
@@ -107,7 +107,7 @@ export default function BrowseScreen() {
         </Text>
       </View>
 
-      <Filters onChange={setFilters} initialFilters={filters} />
+      <Filters onApply={setFilters} />
 
       <FlatList
         data={filteredData}

@@ -3,15 +3,16 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image } from 'rea
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   Heart, 
-  Search, 
   Globe, 
-  DollarSign, 
-  MapPin, 
   User, 
-  Shield, 
   FileText, 
   ChevronRight,
-  UserPlus
+  UserPlus,
+  MessageCircle,
+  CreditCard,
+  Settings,
+  HelpCircle,
+  LogOut
 } from 'lucide-react-native';
 import { router } from 'expo-router';
 import NotificationBell from '@/components/ui/NotificationBell';
@@ -24,11 +25,7 @@ export default function ProfileScreen() {
   const { user, userMode, hasUnreadNotifications, switchMode, markNotificationsAsRead } = useApp();
   const insets = useSafeAreaInsets();
 
-  const handleModeSwitch = () => {
-    const newMode = userMode === 'user' ? 'provider' : 'user';
-    switchMode(newMode);
-    console.log(`Mode ${newMode === 'provider' ? 'prestataire' : 'utilisateur'} activé`);
-  };
+
 
   const handleBecomeProvider = () => {
     console.log('Become provider pressed');
@@ -38,59 +35,71 @@ export default function ProfileScreen() {
     markNotificationsAsRead();
   };
 
-  const settingsItems = [
+  type SettingItem = {
+    id: string;
+    title: string;
+    subtitle?: string;
+    icon: any;
+    onPress: () => void;
+  };
+
+  const settingsItems: SettingItem[] = [
     {
-      id: 'mode',
-      title: 'Mode de compte',
-      subtitle: userMode === 'user' ? 'Utilisateur' : 'Prestataire',
-      icon: UserPlus,
-      onPress: handleModeSwitch,
-      showSwitch: true,
-    },
-    {
-      id: 'searches',
-      title: 'Recherches enregistrées',
-      icon: Search,
-      onPress: () => console.log('Saved searches'),
+      id: 'edit',
+      title: 'Éditer le profil',
+      icon: User,
+      onPress: () => router.push('/profile/edit'),
     },
     {
       id: 'favorites',
-      title: 'Favoris',
+      title: 'Mes favoris',
       icon: Heart,
-      onPress: () => console.log('Favorites pressed'),
+      onPress: () => router.push('/(tabs)/favorites'),
+    },
+    {
+      id: 'messages',
+      title: 'Messages',
+      icon: MessageCircle,
+      onPress: () => router.push('/(tabs)/messages'),
+    },
+    {
+      id: 'payments',
+      title: 'Paiements',
+      icon: CreditCard,
+      onPress: () => router.push('/profile/payments'),
+    },
+    {
+      id: 'settings',
+      title: 'Paramètres',
+      icon: Settings,
+      onPress: () => router.push('/profile/settings'),
     },
     {
       id: 'language',
       title: 'Langue',
       subtitle: user.preferences.language === 'fr' ? 'Français' : 'English',
       icon: Globe,
-      onPress: () => console.log('Language settings'),
+      onPress: () => router.push('/(onboarding)/language'),
     },
     {
-      id: 'currency',
-      title: 'Devise d\'affichage',
-      subtitle: user.preferences.currency,
-      icon: DollarSign,
-      onPress: () => console.log('Currency settings'),
+      id: 'mode',
+      title: userMode === 'user' ? 'Passer en mode prestataire' : 'Revenir au mode utilisateur',
+      icon: UserPlus,
+      onPress: () => {
+        if (userMode === 'user') {
+          switchMode('provider');
+          router.replace('/(proTabs)/dashboard');
+        } else {
+          switchMode('user');
+          router.replace('/(tabs)/home');
+        }
+      },
     },
     {
-      id: 'country',
-      title: 'Pays d\'accueil',
-      subtitle: user.preferences.country,
-      icon: MapPin,
-      onPress: () => console.log('Country settings'),
-    },
-    {
-      id: 'personal',
-      title: 'Informations personnelles',
-      icon: User,
-      onPress: () => console.log('Personal info'),
-    },
-    {
-      id: 'security',
-      title: 'Sécurité',
-      icon: Shield,
-      onPress: () => console.log('Security settings'),
+      id: 'support',
+      title: 'Aide & support',
+      icon: HelpCircle,
+      onPress: () => router.push('/support'),
     },
     {
       id: 'legal',
@@ -98,7 +107,34 @@ export default function ProfileScreen() {
       icon: FileText,
       onPress: () => router.push('/legal'),
     },
+    {
+      id: 'logout',
+      title: 'Déconnexion',
+      icon: LogOut,
+      onPress: () => {
+        console.log('Logout pressed');
+        router.replace('/(auth)/sign-in');
+      },
+    },
   ];
+
+  // Add provider-specific items if in provider mode
+  const providerItems: SettingItem[] = userMode === 'provider' ? [
+    {
+      id: 'listings',
+      title: 'Mes annonces',
+      icon: FileText,
+      onPress: () => router.push('/(proTabs)/listings'),
+    },
+    {
+      id: 'dashboard',
+      title: 'Tableau de bord',
+      icon: Settings,
+      onPress: () => router.push('/(proTabs)/dashboard'),
+    },
+  ] : [];
+
+  const allItems = [...settingsItems.slice(0, 7), ...providerItems, ...settingsItems.slice(7)];
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -143,7 +179,7 @@ export default function ProfileScreen() {
         <View style={styles.settingsSection}>
           <Text style={styles.sectionTitle}>Paramètres</Text>
           
-          {settingsItems.map((item) => (
+          {allItems.map((item) => (
             <TouchableOpacity
               key={item.id}
               style={styles.settingItem}
@@ -160,19 +196,7 @@ export default function ProfileScreen() {
                 )}
               </View>
               
-              {item.showSwitch ? (
-                <View style={[
-                  styles.switch,
-                  userMode === 'provider' && styles.switchActive
-                ]}>
-                  <View style={[
-                    styles.switchThumb,
-                    userMode === 'provider' && styles.switchThumbActive
-                  ]} />
-                </View>
-              ) : (
-                <ChevronRight size={20} color={Colors.text.secondary} />
-              )}
+              <ChevronRight size={20} color={Colors.text.secondary} />
             </TouchableOpacity>
           ))}
         </View>

@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import BackButton from "@/components/ui/BackButton";
 import Colors from "@/constants/colors";
 
 export default function ProfileEditScreen() {
@@ -8,16 +9,11 @@ export default function ProfileEditScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
+      <BackButton />
+      <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>Éditer le profil</Text>
-      </View>
-      
-      <View style={styles.content}>
-        <Text style={styles.subtitle}>Modifier vos informations</Text>
-        <Text style={styles.description}>
-          Cette page permettra de modifier vos informations personnelles.
-        </Text>
-      </View>
+        <Text style={styles.subtitle}>Cette page permettra de modifier les informations du profil utilisateur.</Text>
+      </ScrollView>
     </View>
   );
 }

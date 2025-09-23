@@ -7,13 +7,15 @@ import PropertyCard from '@/components/ui/PropertyCard';
 import SectionHeader from '@/components/ui/SectionHeader';
 import ActionTile from '@/components/ui/ActionTile';
 import ZimaBrand from '@/components/ui/ZimaBrand';
+import Filters, { FiltersState } from '@/components/ui/Filters';
 
 import { mockProperties } from '@/constants/data';
 import Colors from '@/constants/colors';
 
 export default function ExploreScreen() {
   const insets = useSafeAreaInsets();
-
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<FiltersState>({ country: null, city: null, intent: "tous" });
   const [activeChip, setActiveChip] = useState<'properties' | 'services'>('properties');
 
   const handlePropertyPress = (propertyId: string) => {
@@ -119,6 +121,14 @@ export default function ExploreScreen() {
         {/* Logo ZIMA en tête de page (remplace la carte verte) */}
         <ZimaBrand />
         
+        {/* Filters */}
+        {showFilters && (
+          <Filters onApply={(f) => {
+            setFilters(f);
+            setShowFilters(false);
+          }} />
+        )}
+        
         {/* Chips below hero */}
         <View style={styles.chipsSection}>
           <TouchableOpacity 
@@ -143,6 +153,18 @@ export default function ExploreScreen() {
           >
             <Text style={styles.chipEmoji}>💼</Text>
             <Text style={styles.chipText}>Services</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={[
+              styles.chip,
+              showFilters && styles.chipActive
+            ]}
+            activeOpacity={0.8}
+            onPress={() => setShowFilters(!showFilters)}
+          >
+            <Text style={styles.chipEmoji}>🔍</Text>
+            <Text style={styles.chipText}>Filtres</Text>
           </TouchableOpacity>
         </View>
 

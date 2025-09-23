@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import BackButton from "@/components/ui/BackButton";
 import { mockProperties } from "@/constants/data";
 import Colors from "@/constants/colors";
 
@@ -26,6 +27,7 @@ export default function PropertyDetailScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
+      <BackButton />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Image principale */}
         <Image 

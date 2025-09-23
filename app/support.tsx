@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import BackButton from "@/components/ui/BackButton";
 import Colors from "@/constants/colors";
 
 export default function SupportScreen() {
@@ -8,16 +9,11 @@ export default function SupportScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
+      <BackButton />
+      <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>Aide & Support</Text>
-      </View>
-      
-      <View style={styles.content}>
-        <Text style={styles.subtitle}>Centre d&apos;aide</Text>
-        <Text style={styles.description}>
-          Trouvez des réponses à vos questions ou contactez notre équipe support.
-        </Text>
-      </View>
+        <Text style={styles.subtitle}>Trouvez de l&apos;aide, contactez le support ou consultez la FAQ.</Text>
+      </ScrollView>
     </View>
   );
 }
