@@ -22,6 +22,14 @@ export default function SplashScreen({ onComplete, minDuration = 5000, maxDurati
     const t = setTimeout(() => {
       if (onComplete) {
         onComplete();
+        // Après le callback, on navigue selon la langue
+        setTimeout(() => {
+          if (!language) {
+            router.replace("/(onboarding)/language");
+          } else {
+            router.replace("/(tabs)");
+          }
+        }, 100);
       } else {
         // Si pas de callback onComplete, on gère la navigation ici
         if (!language) {
