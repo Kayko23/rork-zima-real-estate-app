@@ -28,10 +28,7 @@ const s = StyleSheet.create({
       },
       android: { elevation: 8 },
       web: {
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.08,
-        shadowRadius: 24,
+        boxShadow: "0 12px 24px rgba(0,0,0,0.08)",
       } as any,
     }),
   },

@@ -114,10 +114,9 @@ export default function ExploreScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 140 }}
       >
-        {/* Logo ZIMA en tête de page (remplace la carte verte) */}
         <ZimaBrand />
         
-        {/* Filters */}
+
         {showFilters && (
           <Filters onApply={(f) => {
             setFilters(f);
@@ -125,7 +124,7 @@ export default function ExploreScreen() {
           }} />
         )}
         
-        {/* Chips below hero */}
+
         <View style={styles.chipsSection}>
           <TouchableOpacity 
             style={[
@@ -164,7 +163,7 @@ export default function ExploreScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Premium Properties Section */}
+
         <View style={styles.section}>
           <SectionHeader 
             title="Biens premium" 
@@ -182,7 +181,7 @@ export default function ExploreScreen() {
           />
         </View>
 
-        {/* New Properties Section */}
+
         <View style={styles.section}>
           <SectionHeader 
             title="Nouveautés" 
@@ -200,7 +199,7 @@ export default function ExploreScreen() {
           />
         </View>
 
-        {/* Featured Property Card */}
+
         <View style={styles.section}>
           <View style={styles.featuredPropertyCard}>
             <Image 
@@ -223,7 +222,7 @@ export default function ExploreScreen() {
           </View>
         </View>
 
-        {/* Categories Section */}
+
         <View style={styles.section}>
           <SectionHeader 
             title="Par catégories" 
@@ -244,7 +243,7 @@ export default function ExploreScreen() {
                   <Text style={styles.seeAllText}>Voir tout ›</Text>
                 </TouchableOpacity>
               </View>
-              {/* Category Hero Image */}
+
               <View style={styles.categoryImageContainer}>
                 <Image 
                   source={{ uri: category.image }}
@@ -257,7 +256,7 @@ export default function ExploreScreen() {
                   </Text>
                 </View>
               </View>
-              {/* Category Properties */}
+
               {category.properties.length > 0 && (
                 <FlatList
                   data={category.properties}
@@ -281,7 +280,7 @@ export default function ExploreScreen() {
           ))}
         </View>
 
-        {/* Actions Section */}
+
         <View style={styles.section}>
           <View style={styles.actionsContainer}>
             <ActionTile
@@ -333,7 +332,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 30,
     elevation: 8,
-    // Removed backdropFilter for web compatibility
+
   },
   chipActive: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -399,7 +398,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.35)',
-    // Removed backdropFilter for web compatibility
+
   },
   actionSpacer: {
     width: 16,

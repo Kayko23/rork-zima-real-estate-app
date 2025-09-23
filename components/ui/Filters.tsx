@@ -24,7 +24,6 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
   };
 
   const handleIntentChange = (intent: "tous" | "à vendre" | "à louer") => {
-    if (!intent || !intent.trim()) return;
     setF({ ...f, intent });
   };
 
@@ -57,9 +56,12 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
 
       <View style={s.row}>
         {(["tous","à vendre","à louer"] as const).map(t => (
-          <GlassButton key={t} title={t}
+          <GlassButton 
+            key={t} 
+            title={t}
             onPress={() => handleIntentChange(t)}
-            style={[s.pill, f.intent === t && s.pillActive]} />
+            style={[s.pill, f.intent === t && s.pillActive]} 
+          />
         ))}
       </View>
 

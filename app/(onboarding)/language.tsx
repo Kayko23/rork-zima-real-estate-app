@@ -260,4 +260,7 @@ const styles = StyleSheet.create({
   hintBottom: {
     marginTop: 12,
   },
+  cardContent: {
+    flex: 1,
+  },
 });
