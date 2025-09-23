@@ -148,9 +148,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
-    ...(Platform.OS === 'web' && {
-      backdropFilter: 'blur(10px)',
-    }),
+    // Removed backdropFilter for web compatibility
   },
   statusText: {
     color: 'white',
@@ -169,9 +167,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    ...(Platform.OS === 'web' && {
-      backdropFilter: 'blur(10px)',
-    }),
+    // Removed backdropFilter for web compatibility
   },
   premiumText: {
     color: 'white',
@@ -190,9 +186,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.35)',
-    ...(Platform.OS === 'web' && {
-      backdropFilter: 'blur(14px)',
-    }),
+    // Removed backdropFilter for web compatibility
   },
   bottomOverlay: {
     position: 'absolute',
@@ -201,9 +195,7 @@ const styles = StyleSheet.create({
     right: 0,
     padding: 16,
     backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    ...(Platform.OS === 'web' && {
-      backdropFilter: 'blur(10px)',
-    }),
+    // Removed backdropFilter for web compatibility
   },
   titleSection: {
     marginBottom: 12,
@@ -225,9 +217,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.35)',
-    ...(Platform.OS === 'web' && {
-      backdropFilter: 'blur(14px)',
-    }),
+    // Removed backdropFilter for web compatibility
   },
   price: {
     fontSize: 16,
@@ -266,9 +256,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.35)',
-    ...(Platform.OS === 'web' && {
-      backdropFilter: 'blur(14px)',
-    }),
+    // Removed backdropFilter for web compatibility
   },
   ratingText: {
     fontSize: 11,
@@ -284,9 +272,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.35)',
-    ...(Platform.OS === 'web' && {
-      backdropFilter: 'blur(14px)',
-    }),
+    // Removed backdropFilter for web compatibility
   },
   cameraText: {
     fontSize: 11,

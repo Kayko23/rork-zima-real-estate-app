@@ -67,12 +67,8 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // Delay loading to avoid hydration mismatch
-    const timer = setTimeout(() => {
-      loadPersistedData();
-    }, 50);
-    
-    return () => clearTimeout(timer);
+    // Load data immediately but handle errors gracefully
+    loadPersistedData();
   }, []);
 
   const loadPersistedData = async () => {

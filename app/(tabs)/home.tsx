@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, FlatList, Platform } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, Link } from 'expo-router';
 import { Plus, UserCheck } from 'lucide-react-native';
@@ -322,9 +322,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 30,
     elevation: 8,
-    ...(Platform.OS === 'web' && {
-      backdropFilter: 'blur(26px)',
-    }),
+    // Removed backdropFilter for web compatibility
   },
   chipActive: {
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -390,9 +388,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.35)',
-    ...(Platform.OS === 'web' && {
-      backdropFilter: 'blur(22px)',
-    }),
+    // Removed backdropFilter for web compatibility
   },
   actionSpacer: {
     width: 16,

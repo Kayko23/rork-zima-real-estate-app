@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Colors from '@/constants/colors';
 
 interface ActionTileProps {
@@ -43,9 +43,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    ...(Platform.OS === 'web' && {
-      backdropFilter: 'blur(22px)',
-    }),
+    // Removed backdropFilter for web compatibility
   },
   primaryContainer: {
     backgroundColor: 'rgba(14, 90, 69, 0.1)',

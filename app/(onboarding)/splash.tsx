@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { View, Image, StyleSheet, Platform } from "react-native";
 import { useRouter } from "expo-router";
-import LiquidGlassView from "@/components/ui/LiquidGlassView";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useApp } from "@/hooks/useAppStore";
 
 // Use the GIF from the URL
@@ -51,16 +51,16 @@ export default function SplashScreen() {
   }, [isInitialized, language, hasCompletedOnboarding, router]);
 
   return (
-    <View style={styles.screen}>
-      <LiquidGlassView style={styles.glassCard}>
+    <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
+      <View style={styles.glassCard}>
         <Image
           source={GIF_SRC}
           resizeMode="contain"
           style={styles.gif}
           fadeDuration={0}
         />
-      </LiquidGlassView>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -79,9 +79,9 @@ const styles = StyleSheet.create({
     aspectRatio: 1.2,
     borderRadius: CARD_RADIUS,
     overflow: "hidden",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
     borderWidth: 2,
-    borderColor: "#FFFFFF",
+    borderColor: "rgba(255, 255, 255, 0.8)",
     ...Platform.select({
       ios: {
         shadowColor: "#000",

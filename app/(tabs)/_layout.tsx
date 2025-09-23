@@ -153,8 +153,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.35)',
   },
   webTabBarBackground: {
-    backgroundColor: 'rgba(255, 255, 255, 0.78)',
-    backdropFilter: 'blur(26px)',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 24,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.35)',

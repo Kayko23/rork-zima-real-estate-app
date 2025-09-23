@@ -17,11 +17,10 @@ export default function LiquidGlassView({
   tint = 'light' 
 }: LiquidGlassViewProps) {
   if (Platform.OS === 'web') {
+    // Simple fallback for web to avoid CSS issues
     return (
-      <View style={[styles.container, styles.webGlass, style]}>
-        <View style={styles.overlay}>
-          {children}
-        </View>
+      <View style={[styles.container, styles.webFallback, style]}>
+        {children}
       </View>
     );
   }
@@ -42,9 +41,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border.glass,
   },
-  webGlass: {
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    backdropFilter: 'blur(14px)',
+  webFallback: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
   },
   overlay: {
     backgroundColor: Colors.background.glass,
