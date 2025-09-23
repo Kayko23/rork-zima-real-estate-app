@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import PropertyCard from '@/components/ui/PropertyCard';
 import SectionHeader from '@/components/ui/SectionHeader';
-import ZimaBrand from '@/components/ui/ZimaBrand';
+
 import QuickActions from '@/components/home/QuickActions';
 import ActionDouble from '@/components/home/ActionDouble';
 import Filters, { FiltersState } from '@/components/ui/Filters';
@@ -88,7 +88,7 @@ export default function ExploreScreen() {
     { 
       id: 'terrains', 
       name: 'Terrains', 
-      emoji: '🌍',
+      emoji: '🗺️',
       image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=600&fit=crop',
       properties: mockProperties.filter(p => p.category === 'Terrain').slice(0, 3)
     },
@@ -100,7 +100,8 @@ export default function ExploreScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 140 }}
       >
-        <ZimaBrand />
+        {/* Wordmark sans trait */}
+        <Text style={styles.wordmark}>ZIMA</Text>
 
         {/* 3 cartes sur une ligne */}
         <QuickActions />
@@ -236,6 +237,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background.secondary,
+  },
+  wordmark: {
+    marginTop: 6,
+    textAlign: "center",
+    fontSize: 34,
+    letterSpacing: 2,
+    fontWeight: "800",
+    color: "#1B4F45",
   },
 
   chipsSection: {

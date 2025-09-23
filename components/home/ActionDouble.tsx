@@ -7,7 +7,7 @@ export default function ActionDouble() {
   const r = useRouter();
   return (
     <View style={s.row}>
-      <Pressable style={s.big} onPress={() => r.push("/services")} accessibilityRole="button">
+      <Pressable style={s.big} onPress={() => r.push("/(proTabs)/listings")} accessibilityRole="button">
         <Ionicons name="add-circle-outline" size={22} color="#19715C" />
         <Text style={s.bigText} numberOfLines={1} adjustsFontSizeToFit>Publier un bien</Text>
       </Pressable>

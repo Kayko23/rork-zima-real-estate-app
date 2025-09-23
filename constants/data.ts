@@ -296,7 +296,7 @@ export const categories = [
   { id: 'bureaux', name: 'Bureaux', icon: 'building', count: 340 },
   { id: 'commerce', name: 'Commerce & Retail', icon: 'store', count: 180 },
   { id: 'immeubles', name: 'Immeubles', icon: 'building-2', count: 95 },
-  { id: 'terrains', name: 'Terrains', icon: 'map-outline', count: 420 },
+  { id: 'terrains', name: 'Terrains', icon: 'layers-outline', count: 420 },
   { id: 'industriel', name: 'Industriel', icon: 'factory', count: 65 }
 ];
 
