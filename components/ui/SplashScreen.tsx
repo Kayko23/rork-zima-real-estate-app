@@ -32,10 +32,10 @@ export default function SplashScreen({ onComplete, minDuration = 4000, maxDurati
       
       if (!language || !hasCompletedOnboarding) {
         console.log('Redirecting to language selection');
-        router.replace("/(onboarding)/language" as any);
+        router.replace("/language");
       } else {
         console.log('Redirecting to main app');
-        router.replace("/(tabs)/home" as any);
+        router.replace("/home");
       }
       
       onComplete?.();
