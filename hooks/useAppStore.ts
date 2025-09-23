@@ -1,26 +1,17 @@
 import createContextHook from '@nkzw/create-context-hook';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { UserMode, User, FilterState } from '@/types';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-type Language = 'fr' | 'en' | 'pt';
-
-// Storage implementation with AsyncStorage
+// Simple in-memory storage for demo purposes to avoid hydration issues
 const storage = {
   getItem: async (key: string): Promise<string | null> => {
-    try {
-      return await AsyncStorage.getItem(key);
-    } catch (error) {
-      console.log(`Error getting ${key}:`, error);
-      return null;
-    }
+    // For now, return null to avoid hydration mismatch
+    // In production, implement proper storage with SSR considerations
+    return null;
   },
   setItem: async (key: string, value: string): Promise<void> => {
-    try {
-      await AsyncStorage.setItem(key, value);
-    } catch (error) {
-      console.log(`Error setting ${key}:`, error);
-    }
+    // For now, just log to avoid hydration issues
+    console.log(`Storage: ${key} = ${value}`);
   },
 };
 
@@ -47,7 +38,6 @@ export const [AppProvider, useApp] = createContextHook(() => {
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(true);
   const [isHydrated, setIsHydrated] = useState(true); // Start as hydrated to prevent mismatch
-  const [language, setLanguageState] = useState<Language | null>(null);
 
   useEffect(() => {
     // Load persisted data after component mount
@@ -58,16 +48,12 @@ export const [AppProvider, useApp] = createContextHook(() => {
     try {
       const savedMode = await storage.getItem('userMode');
       const savedUser = await storage.getItem('user');
-      const savedLanguage = await storage.getItem('language');
       
       if (savedMode && savedMode.trim()) {
         setUserMode(savedMode as UserMode);
       }
       if (savedUser && savedUser.trim()) {
         setUser(JSON.parse(savedUser));
-      }
-      if (savedLanguage && savedLanguage.trim()) {
-        setLanguageState(savedLanguage as Language);
       }
     } catch (error) {
       console.log('Error loading persisted data:', error);
@@ -111,35 +97,17 @@ export const [AppProvider, useApp] = createContextHook(() => {
     await switchMode(newMode);
   }, [userMode, switchMode]);
 
-  const setLanguage = useCallback(async (lang: Language) => {
-    setLanguageState(lang);
-    await storage.setItem('language', lang);
-    
-    // Update user preferences
-    const updatedUser = {
-      ...user,
-      preferences: {
-        ...user.preferences,
-        language: lang as 'fr' | 'en' | 'pt'
-      }
-    };
-    setUser(updatedUser);
-    await storage.setItem('user', JSON.stringify(updatedUser));
-  }, [user]);
-
   return useMemo(() => ({
     userMode,
     user,
     filters,
     hasUnreadNotifications,
     isHydrated,
-    language,
     switchMode,
     toggleAppMode,
     updateUser,
     updateFilters,
     clearFilters,
-    markNotificationsAsRead,
-    setLanguage
-  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage]);
+    markNotificationsAsRead
+  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead]);
 });

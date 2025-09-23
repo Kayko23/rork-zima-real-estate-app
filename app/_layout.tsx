@@ -16,9 +16,7 @@ const queryClient = new QueryClient();
 function RootLayoutNav() {
   return (
     <Stack screenOptions={{ headerBackTitle: "Retour", headerShown: false }}>
-      <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="(proTabs)" options={{ headerShown: false }} />
       <Stack.Screen name="services" options={{ headerShown: false }} />
       <Stack.Screen name="property/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="provider/[id]" options={{ headerShown: false }} />
@@ -42,7 +40,7 @@ export default function RootLayout() {
   const [isLoading] = useState(false);
 
   useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
+    let timeoutId: NodeJS.Timeout;
     
     const prepare = async () => {
       try {
@@ -86,23 +84,26 @@ export default function RootLayout() {
     return null;
   }
 
+  // Show custom splash screen
+  if (showSplash) {
+    return (
+      <View style={styles.container} onLayout={onLayoutRootView}>
+        <ZimaSplashScreen 
+          onComplete={handleSplashComplete}
+          minDuration={5000}
+          maxDuration={5000}
+        />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
       <QueryClientProvider client={queryClient}>
         <AppProvider>
           <GestureHandlerRootView style={styles.container}>
-            {showSplash ? (
-              <ZimaSplashScreen 
-                onComplete={handleSplashComplete}
-                minDuration={5000}
-                maxDuration={5000}
-              />
-            ) : (
-              <>
-                <RootLayoutNav />
-                <RouteLoader visible={isLoading} />
-              </>
-            )}
+            <RootLayoutNav />
+            <RouteLoader visible={isLoading} />
           </GestureHandlerRootView>
         </AppProvider>
       </QueryClientProvider>

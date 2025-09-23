@@ -76,7 +76,7 @@ export interface User {
   phone?: string;
   isProvider: boolean;
   preferences: {
-    language: 'fr' | 'en' | 'pt';
+    language: 'fr' | 'en';
     currency: string;
     country: string;
   };
