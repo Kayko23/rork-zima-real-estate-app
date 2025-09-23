@@ -5,14 +5,14 @@ import { UserMode, User, FilterState } from '@/types';
 type Language = 'fr' | 'en' | 'pt';
 
 // Simple in-memory storage for demo purposes to avoid hydration issues
+const memoryStorage: Record<string, string> = {};
+
 const storage = {
   getItem: async (key: string): Promise<string | null> => {
-    // For now, return null to avoid hydration mismatch
-    // In production, implement proper storage with SSR considerations
-    return null;
+    return memoryStorage[key] || null;
   },
   setItem: async (key: string, value: string): Promise<void> => {
-    // For now, just log to avoid hydration issues
+    memoryStorage[key] = value;
     console.log(`Storage: ${key} = ${value}`);
   },
 };
@@ -51,7 +51,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const [user, setUser] = useState<User>(defaultUser);
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(true);
-  const [isHydrated, setIsHydrated] = useState(true); // Start as hydrated to prevent mismatch
+  const [isHydrated, setIsHydrated] = useState(false); // Start as not hydrated
   const [language, setLanguageState] = useState<Language | null>(null);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
@@ -66,6 +66,13 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       const savedUser = await storage.getItem('user');
       const savedLanguage = await storage.getItem('language');
       const savedOnboarding = await storage.getItem('hasCompletedOnboarding');
+      
+      console.log('Loading persisted data:', {
+        savedMode,
+        savedUser: savedUser ? 'exists' : 'null',
+        savedLanguage,
+        savedOnboarding
+      });
       
       if (savedMode && savedMode.trim()) {
         setUserMode(savedMode as UserMode);
@@ -85,8 +92,11 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       if (savedOnboarding === 'true') {
         setHasCompletedOnboarding(true);
       }
+      
+      setIsHydrated(true);
     } catch (error) {
       console.log('Error loading persisted data:', error);
+      setIsHydrated(true);
     }
   };
 

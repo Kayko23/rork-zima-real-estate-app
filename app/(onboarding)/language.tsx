@@ -28,7 +28,7 @@ export default function LanguageScreen() {
     await completeOnboarding();
     
     console.log('Navigating to tabs');
-    router.replace("/home");
+    router.replace("/(tabs)/home" as any);
   }
 
   return (

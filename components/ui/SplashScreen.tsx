@@ -15,26 +15,33 @@ interface SplashScreenProps {
 
 export default function SplashScreen({ onComplete, minDuration = 4000, maxDuration = 4000 }: SplashScreenProps) {
   const router = useRouter();
-  const { language, hasCompletedOnboarding } = useAppStore();
+  const { language, hasCompletedOnboarding, isHydrated } = useAppStore();
 
   useEffect(() => {
+    // Wait for store to be hydrated before making navigation decisions
+    if (!isHydrated) {
+      console.log('Store not hydrated yet, waiting...');
+      return;
+    }
+    
     const t = setTimeout(() => {
       console.log('Splash complete, checking onboarding status');
       console.log('Language:', language);
       console.log('Has completed onboarding:', hasCompletedOnboarding);
+      console.log('Is hydrated:', isHydrated);
       
       if (!language || !hasCompletedOnboarding) {
         console.log('Redirecting to language selection');
-        router.replace("/(onboarding)/language");
+        router.replace("/(onboarding)/language" as any);
       } else {
         console.log('Redirecting to main app');
-        router.replace("/home");
+        router.replace("/(tabs)/home" as any);
       }
       
       onComplete?.();
     }, maxDuration);
     return () => clearTimeout(t);
-  }, [onComplete, maxDuration, router, language, hasCompletedOnboarding]);
+  }, [onComplete, maxDuration, router, language, hasCompletedOnboarding, isHydrated]);
 
   return (
     <View style={styles.screen}>

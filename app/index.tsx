@@ -1,13 +1,17 @@
-import { useEffect } from "react";
-import { useRouter } from "expo-router";
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import SplashScreen from "@/components/ui/SplashScreen";
 
 export default function Index() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Toujours commencer par le splash
-    router.replace("/splash");
-  }, [router]);
-
-  return null;
+  return (
+    <View style={styles.container}>
+      <SplashScreen />
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
