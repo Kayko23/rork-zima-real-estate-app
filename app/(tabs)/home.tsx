@@ -1,20 +1,19 @@
-import React, { useState } from "react";
-import { ScrollView, StatusBar, StyleSheet, View } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import HomeHeader from "@/components/home/HomeHeader";
-import BiensFeed from "@/components/home/feeds/BiensFeed";
-import ServicesFeed from "@/components/home/feeds/ServicesFeed";
-import VoyagesFeed from "@/components/home/feeds/VoyagesFeed";
+import React, { useState } from 'react';
+import { ScrollView, StatusBar, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import HomeHeader from '@/components/home/HomeHeader';
+import BiensFeed from '@/components/home/feeds/BiensFeed';
+import ServicesFeed from '@/components/home/feeds/ServicesFeed';
+import VoyagesFeed from '@/components/home/feeds/VoyagesFeed';
 
-type TabKey = "biens" | "services" | "voyages";
+type TabKey = 'biens' | 'services' | 'voyages';
 
 export default function HomeScreen() {
-  const [tab, setTab] = useState<TabKey>("biens");
-  const insets = useSafeAreaInsets();
+  const [tab, setTab] = useState<TabKey>('biens');
 
   const renderContent = () => {
-    if (tab === "services") return <ServicesFeed />;
-    if (tab === "voyages") return <VoyagesFeed />;
+    if (tab === 'services') return <ServicesFeed />;
+    if (tab === 'voyages') return <VoyagesFeed />;
     return <BiensFeed />;
   };
 
@@ -22,12 +21,10 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#F3F6F6" />
       <ScrollView
-        contentInsetAdjustmentBehavior="never"
-        contentContainerStyle={[styles.contentContainer, { paddingTop: insets.top }]}
-        stickyHeaderIndices={[1]}
+        contentContainerStyle={styles.contentContainer}
+        stickyHeaderIndices={[0]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.topSpacer} />
         <HomeHeader active={tab} onChange={setTab} />
         {renderContent()}
       </ScrollView>
@@ -38,14 +35,11 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F3F6F6",
+    backgroundColor: '#F3F6F6',
   },
   contentContainer: {
     paddingBottom: 96,
-    backgroundColor: "#F3F6F6",
-  },
-  topSpacer: {
-    backgroundColor: "#F3F6F6",
+    backgroundColor: '#F3F6F6',
   },
 });
 

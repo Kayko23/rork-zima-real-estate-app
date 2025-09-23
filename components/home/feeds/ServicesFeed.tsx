@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
 } from 'react-native';
 import {
   ChevronDown,
@@ -26,7 +25,7 @@ import { Provider } from '@/types';
 import { T } from '@/constants/typography';
 
 export default function ServicesFeed() {
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery] = useState<string>('');
   const [sortBy] = useState<string>('Mieux notés');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const { filters } = useApp();
@@ -54,6 +53,7 @@ export default function ServicesFeed() {
   };
 
   const handleSearchSubmit = (params: any) => {
+    if (!params || typeof params !== 'object') return;
     console.log('Search params:', params);
   };
 
@@ -106,7 +106,9 @@ export default function ServicesFeed() {
     >
       <View style={styles.providerHeader}>
         <View style={styles.avatarContainer}>
-          <Image source={{ uri: provider.avatar }} style={styles.avatar} />
+          <View style={styles.avatarPlaceholder}>
+            <Text style={styles.avatarText}>👤</Text>
+          </View>
           <View style={styles.onlineDot} />
         </View>
         
@@ -157,14 +159,15 @@ export default function ServicesFeed() {
       </View>
 
       <View style={styles.galleryRow}>
-        {provider.images.slice(0, 3).map((image, index) => (
-          <Image key={`${provider.id}-image-${index}`} source={{ uri: image }} style={styles.galleryImage} />
-        ))}
-        {provider.images.length > 3 && (
-          <View style={styles.galleryMore}>
-            <Text style={styles.galleryMoreText}>+{provider.images.length - 3}</Text>
-          </View>
-        )}
+        <View style={styles.galleryPlaceholder}>
+          <Text style={styles.galleryPlaceholderText}>📸</Text>
+        </View>
+        <View style={styles.galleryPlaceholder}>
+          <Text style={styles.galleryPlaceholderText}>🏠</Text>
+        </View>
+        <View style={styles.galleryPlaceholder}>
+          <Text style={styles.galleryPlaceholderText}>✨</Text>
+        </View>
       </View>
 
       <View style={styles.ctaRow}>
@@ -310,10 +313,16 @@ const styles = StyleSheet.create({
     position: 'relative',
     marginRight: 12,
   },
-  avatar: {
+  avatarPlaceholder: {
     width: 56,
     height: 56,
     borderRadius: 28,
+    backgroundColor: '#F6F7F8',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarText: {
+    fontSize: 24,
   },
   onlineDot: {
     position: 'absolute',
@@ -417,10 +426,16 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 16,
   },
-  galleryImage: {
+  galleryPlaceholder: {
     width: 88,
     height: 64,
     borderRadius: 12,
+    backgroundColor: '#F6F7F8',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  galleryPlaceholderText: {
+    fontSize: 24,
   },
   galleryMore: {
     width: 88,
