@@ -21,7 +21,7 @@ export default function TopTabs({ defaultTab = "biens" as TabKey }) {
     <View style={s.pill}>
       <Tab
         icon={<Ionicons name="home-outline" size={26} color={active === "biens" ? "#111827" : "#6B7280"} />}
-        label="Biens immobiliers"
+        label="Propriétés"
         active={active === "biens"}
         onPress={() => go("biens")}
       />
