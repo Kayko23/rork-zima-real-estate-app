@@ -15,20 +15,25 @@ const LANGUAGES: { code: Language; title: string; subtitle: string }[] = [
 
 export default function LanguageScreen() {
   const router = useRouter();
-  const { language, setLanguage } = useApp();
+  const { language, setLanguage, completeOnboarding } = useApp();
   const [selected, setSelected] = useState<Language | null>(language);
 
   const canContinue = useMemo(() => !!selected, [selected]);
 
-  function onContinue() {
+  async function onContinue() {
     if (!selected) return;
-    setLanguage(selected);
+    
+    console.log('Setting language:', selected);
+    await setLanguage(selected);
+    await completeOnboarding();
+    
+    console.log('Navigating to tabs');
     router.replace("/(tabs)");
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Top progress */}
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+      {/* Progress indicator */}
       <View style={styles.progressWrap}>
         <Text style={styles.progressLabel}>Configuration</Text>
         <Text style={styles.progressPct}>100%</Text>
@@ -171,7 +176,7 @@ const styles = StyleSheet.create({
     }),
   },
   cardTitle: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: "700",
     color: "#0F172A",
   },
@@ -253,6 +258,6 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   hintBottom: {
-    marginTop: 8,
+    marginTop: 12,
   },
 });

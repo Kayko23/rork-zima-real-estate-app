@@ -2,6 +2,8 @@ import createContextHook from '@nkzw/create-context-hook';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { UserMode, User, FilterState } from '@/types';
 
+type Language = 'fr' | 'en' | 'pt';
+
 // Simple in-memory storage for demo purposes to avoid hydration issues
 const storage = {
   getItem: async (key: string): Promise<string | null> => {
@@ -28,6 +30,18 @@ const defaultUser: User = {
   }
 };
 
+const getDeviceLanguage = (): Language | null => {
+  try {
+    const locale = Intl.DateTimeFormat().resolvedOptions().locale;
+    if (locale.startsWith('fr')) return 'fr';
+    if (locale.startsWith('pt')) return 'pt';
+    if (locale.startsWith('en')) return 'en';
+    return null;
+  } catch {
+    return null;
+  }
+};
+
 const defaultFilters: FilterState = {
   sortBy: 'recent'
 };
@@ -38,6 +52,8 @@ export const [AppProvider, useApp] = createContextHook(() => {
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(true);
   const [isHydrated, setIsHydrated] = useState(true); // Start as hydrated to prevent mismatch
+  const [language, setLanguageState] = useState<Language | null>(null);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
   useEffect(() => {
     // Load persisted data after component mount
@@ -48,12 +64,26 @@ export const [AppProvider, useApp] = createContextHook(() => {
     try {
       const savedMode = await storage.getItem('userMode');
       const savedUser = await storage.getItem('user');
+      const savedLanguage = await storage.getItem('language');
+      const savedOnboarding = await storage.getItem('hasCompletedOnboarding');
       
       if (savedMode && savedMode.trim()) {
         setUserMode(savedMode as UserMode);
       }
       if (savedUser && savedUser.trim()) {
         setUser(JSON.parse(savedUser));
+      }
+      if (savedLanguage && savedLanguage.trim()) {
+        setLanguageState(savedLanguage as Language);
+      } else {
+        // Try to detect device language on first load
+        const deviceLang = getDeviceLanguage();
+        if (deviceLang) {
+          setLanguageState(deviceLang);
+        }
+      }
+      if (savedOnboarding === 'true') {
+        setHasCompletedOnboarding(true);
       }
     } catch (error) {
       console.log('Error loading persisted data:', error);
@@ -97,17 +127,42 @@ export const [AppProvider, useApp] = createContextHook(() => {
     await switchMode(newMode);
   }, [userMode, switchMode]);
 
+  const setLanguage = useCallback(async (lang: Language) => {
+    setLanguageState(lang);
+    await storage.setItem('language', lang);
+    
+    // Update user preferences as well
+    const updatedUser = {
+      ...user,
+      preferences: {
+        ...user.preferences,
+        language: lang
+      }
+    };
+    setUser(updatedUser);
+    await storage.setItem('user', JSON.stringify(updatedUser));
+  }, [user]);
+
+  const completeOnboarding = useCallback(async () => {
+    setHasCompletedOnboarding(true);
+    await storage.setItem('hasCompletedOnboarding', 'true');
+  }, []);
+
   return useMemo(() => ({
     userMode,
     user,
     filters,
     hasUnreadNotifications,
     isHydrated,
+    language,
+    hasCompletedOnboarding,
     switchMode,
     toggleAppMode,
     updateUser,
     updateFilters,
     clearFilters,
-    markNotificationsAsRead
-  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead]);
+    markNotificationsAsRead,
+    setLanguage,
+    completeOnboarding
+  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding]);
 });

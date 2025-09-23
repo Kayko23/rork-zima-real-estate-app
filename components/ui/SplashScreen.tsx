@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { View, Image, StyleSheet, Platform } from "react-native";
+import { useRouter } from "expo-router";
 import LiquidGlassView from "@/components/ui/LiquidGlassView";
+import { useApp } from "@/hooks/useAppStore";
 
 // Utilise un des GIFs fournis
 const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/iiq26c5ie8hzc056gkj5z' };
@@ -12,12 +14,27 @@ interface SplashScreenProps {
 }
 
 export default function SplashScreen({ onComplete, minDuration = 5000, maxDuration = 5000 }: SplashScreenProps) {
+  const router = useRouter();
+  const { language, hasCompletedOnboarding } = useApp();
+
   useEffect(() => {
     const t = setTimeout(() => {
+      console.log('Splash complete, checking onboarding status');
+      console.log('Language:', language);
+      console.log('Has completed onboarding:', hasCompletedOnboarding);
+      
+      if (!language || !hasCompletedOnboarding) {
+        console.log('Redirecting to language selection');
+        router.replace("/(onboarding)/language");
+      } else {
+        console.log('Redirecting to main app');
+        router.replace("/(tabs)");
+      }
+      
       onComplete?.();
     }, maxDuration);
     return () => clearTimeout(t);
-  }, [onComplete, maxDuration]);
+  }, [onComplete, maxDuration, router, language, hasCompletedOnboarding]);
 
   return (
     <View style={styles.screen}>
