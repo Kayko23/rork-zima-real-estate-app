@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     paddingBottom: 28,
     overflow: "hidden",
     position: "relative",
-    minHeight: 180,
+    minHeight: 200,
   },
   
   bubble: {
@@ -71,12 +71,12 @@ const styles = StyleSheet.create({
   /* Logo ZIMA avec image */
   logoContainer: {
     alignItems: "center",
-    marginBottom: 16,
+    marginBottom: 20,
     zIndex: 3,
   },
   logoImage: {
-    width: 120,
-    height: 60,
+    width: 200,
+    height: 100,
     tintColor: "#FFFFFF",
   },
   
