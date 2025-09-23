@@ -52,6 +52,7 @@ export default function SplashScreen({ onComplete, minDuration = 5000, maxDurati
           style={styles.gif}
           transition={0}
           cachePolicy="none"
+          autoplay={true}
         />
       </View>
     </View>
