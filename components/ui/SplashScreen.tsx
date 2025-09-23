@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { View, Image, StyleSheet, Platform } from "react-native";
 import { useRouter } from "expo-router";
-import LiquidGlassView from "@/components/ui/LiquidGlassView";
 import { useApp } from "@/hooks/useAppStore";
 
 // Utilise un des GIFs fournis
@@ -16,7 +15,7 @@ interface SplashScreenProps {
 export default function SplashScreen({ onComplete, minDuration = 5000, maxDuration = 5000 }: SplashScreenProps) {
   const router = useRouter();
   const appStore = useApp();
-  const language = appStore?.language;
+  const language = appStore?.language || null;
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -36,8 +35,8 @@ export default function SplashScreen({ onComplete, minDuration = 5000, maxDurati
 
   return (
     <View style={styles.screen}>
-      {/* Carte vitrée + coins arrondis */}
-      <LiquidGlassView style={styles.glassCard}>
+      {/* Carte avec coins arrondis et effet liquid glass */}
+      <View style={styles.glassCard}>
         <Image
           source={GIF_SRC}
           resizeMode="contain"
@@ -45,7 +44,7 @@ export default function SplashScreen({ onComplete, minDuration = 5000, maxDurati
           // Pour Android, forcer rendu hardware pour GIFs lourds
           fadeDuration={0}
         />
-      </LiquidGlassView>
+      </View>
     </View>
   );
 }
@@ -67,19 +66,23 @@ const styles = StyleSheet.create({
     borderRadius: CARD_RADIUS,
     overflow: "hidden",
 
-    // "Liquid glass" look sur fond blanc : carte blanche avec bords blancs
-    backgroundColor: "#FFFFFF",
-    borderWidth: 2,
+    // "Liquid glass" look sur fond blanc : carte blanche translucide avec bords blancs
+    backgroundColor: "rgba(255,255,255,0.95)",
+    borderWidth: 3,
     borderColor: "#FFFFFF",
     ...Platform.select({
       ios: {
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 12 },
-        shadowOpacity: 0.08,
-        shadowRadius: 24,
+        shadowOffset: { width: 0, height: 16 },
+        shadowOpacity: 0.12,
+        shadowRadius: 32,
       },
       android: {
-        elevation: 10,
+        elevation: 12,
+      },
+      web: {
+        boxShadow: "0 16px 32px rgba(0,0,0,0.12)",
+        backdropFilter: "blur(10px)",
       },
     }),
   },
