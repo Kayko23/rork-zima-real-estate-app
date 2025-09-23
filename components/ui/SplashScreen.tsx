@@ -3,8 +3,9 @@ import { View, Image, StyleSheet, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { useApp } from "@/hooks/useAppStore";
 
-// Utilise l'animation GIF fournie
-const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/gvkbtqv7ge5m1gg7zl5o5' };
+// Utilise l'animation GIF fournie (première animation)
+const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/z1rnlgnzv2d56bsxd1j17' };
+// Alternative: const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/a7caxcbr40c63lha0hnpz' };
 
 interface SplashScreenProps {
   onComplete?: () => void;
@@ -67,22 +68,22 @@ const styles = StyleSheet.create({
     overflow: "hidden",
 
     // "Liquid glass" look sur fond blanc : carte blanche translucide avec bords blancs
-    backgroundColor: "rgba(255,255,255,0.95)",
-    borderWidth: 3,
+    backgroundColor: "rgba(255,255,255,0.90)",
+    borderWidth: 4,
     borderColor: "#FFFFFF",
     ...Platform.select({
       ios: {
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 16 },
-        shadowOpacity: 0.12,
-        shadowRadius: 32,
+        shadowOffset: { width: 0, height: 20 },
+        shadowOpacity: 0.15,
+        shadowRadius: 40,
       },
       android: {
-        elevation: 12,
+        elevation: 15,
       },
       web: {
-        boxShadow: "0 16px 32px rgba(0,0,0,0.12)",
-        backdropFilter: "blur(10px)",
+        boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
+        backdropFilter: "blur(12px)",
       },
     }),
   },
