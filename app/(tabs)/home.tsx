@@ -115,7 +115,6 @@ export default function ExploreScreen() {
         contentContainerStyle={{ paddingBottom: 140 }}
       >
         <ZimaBrand />
-        
 
         {showFilters && (
           <Filters onApply={(f) => {
@@ -123,7 +122,6 @@ export default function ExploreScreen() {
             setShowFilters(false);
           }} />
         )}
-        
 
         <View style={styles.chipsSection}>
           <TouchableOpacity 
@@ -163,7 +161,6 @@ export default function ExploreScreen() {
           </TouchableOpacity>
         </View>
 
-
         <View style={styles.section}>
           <SectionHeader 
             title="Biens premium" 
@@ -181,7 +178,6 @@ export default function ExploreScreen() {
           />
         </View>
 
-
         <View style={styles.section}>
           <SectionHeader 
             title="Nouveautés" 
@@ -198,7 +194,6 @@ export default function ExploreScreen() {
             decelerationRate="fast"
           />
         </View>
-
 
         <View style={styles.section}>
           <View style={styles.featuredPropertyCard}>
@@ -221,7 +216,6 @@ export default function ExploreScreen() {
             </View>
           </View>
         </View>
-
 
         <View style={styles.section}>
           <SectionHeader 
@@ -279,7 +273,6 @@ export default function ExploreScreen() {
             </View>
           ))}
         </View>
-
 
         <View style={styles.section}>
           <View style={styles.actionsContainer}>
