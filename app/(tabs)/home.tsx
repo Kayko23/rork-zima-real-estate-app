@@ -65,11 +65,7 @@ export default function ExploreScreen() {
     }
   };
 
-
-
   const displayProperties = mockProperties;
-
-
 
   const renderPropertyCard = ({ item, index }: { item: any; index: number }) => (
     <PropertyCard
@@ -168,8 +164,6 @@ export default function ExploreScreen() {
           </TouchableOpacity>
         </View>
 
-
-
         {/* Premium Properties Section */}
         <View style={styles.section}>
           <SectionHeader 
@@ -236,7 +230,6 @@ export default function ExploreScreen() {
             subtitle="Explorez par type de bien"
             showSeeAll={false}
           />
-          
           {categories.map((category) => (
             <View key={category.id} style={styles.categorySection}>
               <View style={styles.categoryHeader}>
@@ -251,7 +244,6 @@ export default function ExploreScreen() {
                   <Text style={styles.seeAllText}>Voir tout ›</Text>
                 </TouchableOpacity>
               </View>
-              
               {/* Category Hero Image */}
               <View style={styles.categoryImageContainer}>
                 <Image 
@@ -261,11 +253,10 @@ export default function ExploreScreen() {
                 />
                 <View style={styles.categoryImageOverlay}>
                   <Text style={styles.categoryImageText}>
-                    {category.properties.length} biens disponibles
+                    {`${category.properties.length} biens disponibles`}
                   </Text>
                 </View>
               </View>
-              
               {/* Category Properties */}
               {category.properties.length > 0 && (
                 <FlatList

@@ -68,11 +68,11 @@ export default function PropertyCard({ property, onPress, onToggleFavorite, widt
         <View style={styles.bottomOverlay}>
           <View style={styles.titleSection}>
             <Text style={styles.title} numberOfLines={1}>
-              {property.category} • {property.location.city}
+              {`${property.category} • ${property.location.city}`}
             </Text>
             <View style={styles.priceChip}>
               <Text style={styles.price}>
-                {formatPrice(property.price, property.currency)}{property.type === 'rent' ? '/mois' : ''}
+                {`${formatPrice(property.price, property.currency)}${property.type === 'rent' ? '/mois' : ''}`}
               </Text>
             </View>
           </View>
@@ -104,7 +104,7 @@ export default function PropertyCard({ property, onPress, onToggleFavorite, widt
                 <Text style={styles.ratingText}>⭐ 4.8</Text>
               </View>
               <View style={styles.cameraBadge}>
-                <Text style={styles.cameraText}>📷 {property.images.length}</Text>
+                <Text style={styles.cameraText}>{`📷 ${property.images.length}`}</Text>
               </View>
             </View>
           </View>
