@@ -3,8 +3,8 @@ import { View, Image, StyleSheet, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { useApp } from "@/hooks/useAppStore";
 
-// Utilise un des GIFs fournis
-const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/iiq26c5ie8hzc056gkj5z' };
+// Utilise l'animation GIF fournie
+const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/gvkbtqv7ge5m1gg7zl5o5' };
 
 interface SplashScreenProps {
   onComplete?: () => void;
