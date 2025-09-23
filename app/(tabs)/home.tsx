@@ -1,350 +1,42 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
-import PropertyCard from '@/components/ui/PropertyCard';
-import SectionHeader from '@/components/ui/SectionHeader';
+import HomeHeader from '@/components/home/HomeHeader';
+import BiensFeed from '@/components/home/feeds/BiensFeed';
+import ServicesFeed from '@/components/home/feeds/ServicesFeed';
+import VoyagesFeed from '@/components/home/feeds/VoyagesFeed';
 
-import TopTabs from '@/components/home/TopTabs';
-import ActionDouble from '@/components/home/ActionDouble';
+type TabKey = "biens" | "services" | "voyages";
 
-
-import { mockProperties } from '@/constants/data';
-import Colors from '@/constants/colors';
-import Type from '@/constants/typography';
-
-export default function ExploreScreen() {
+export default function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const [tab, setTab] = useState<TabKey>("biens");
 
-
-  const handlePropertyPress = (propertyId: string) => {
-    console.log('Property pressed:', propertyId);
-    router.push({
-      pathname: "/property/[id]",
-      params: { id: propertyId }
-    });
-  };
-
-  const handleToggleFavorite = (propertyId: string) => {
-    console.log('Toggle favorite:', propertyId);
-  };
-
-  const handleSeeAllPress = (section: string) => {
-    if (!section?.trim()) return;
-    console.log('See all pressed:', section);
-    const sectionMap: Record<string, { title: string; kind: string }> = {
-      premium: { title: "Biens premium", kind: "premium" },
-      new: { title: "Nouveautés", kind: "nouveautes" },
-      residences: { title: "Résidences", kind: "residence" },
-      bureaux: { title: "Bureaux", kind: "bureaux" },
-      commerces: { title: "Commerces", kind: "commerces" },
-      terrains: { title: "Terrains", kind: "terrain" },
-    };
-    
-    const sectionData = sectionMap[section];
-    if (sectionData) {
-      router.push(`/browse?title=${encodeURIComponent(sectionData.title)}&kind=${sectionData.kind}`);
-    }
-  };
-
-
-
-  const displayProperties = mockProperties;
-
-  const renderPropertyCard = ({ item, index }: { item: any; index: number }) => (
-    <PropertyCard
-      key={item.id}
-      property={item}
-      onPress={() => handlePropertyPress(item.id)}
-      onToggleFavorite={() => handleToggleFavorite(item.id)}
-      width={300}
-    />
-  );
-
-  const categories = [
-    { 
-      id: 'residences', 
-      name: 'Résidences', 
-      emoji: '🏠',
-      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop',
-      properties: mockProperties.filter(p => p.category === 'Appartement' || p.category === 'Maison' || p.category === 'Villa').slice(0, 3)
-    },
-    { 
-      id: 'bureaux', 
-      name: 'Bureaux', 
-      emoji: '🏢',
-      image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop',
-      properties: mockProperties.filter(p => p.category === 'Bureau').slice(0, 3)
-    },
-    { 
-      id: 'commerces', 
-      name: 'Commerces', 
-      emoji: '🏪',
-      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
-      properties: mockProperties.filter(p => p.category === 'Commerce').slice(0, 3)
-    },
-    { 
-      id: 'terrains', 
-      name: 'Terrains', 
-      emoji: '🗺️',
-      image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=600&fit=crop',
-      properties: mockProperties.filter(p => p.category === 'Terrain').slice(0, 3)
-    },
-  ];
+  const Content = useMemo(() => {
+    if (tab === "services") return <ServicesFeed />;
+    if (tab === "voyages") return <VoyagesFeed />;
+    return <BiensFeed />;
+  }, [tab]);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <ScrollView 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 140 }}
-      >
-        {/* Wordmark sans trait */}
-        <Text style={styles.wordmark}>ZIMA</Text>
-
-        {/* 3 onglets Airbnb style */}
-        <TopTabs defaultTab="biens" />
-
-        <View style={[styles.section, styles.firstSection]}>
-          <SectionHeader 
-            title="Biens premium" 
-            onSeeAllPress={() => handleSeeAllPress('premium')}
-          />
-          <FlatList
-            data={displayProperties.filter(p => p.isPremium)}
-            renderItem={renderPropertyCard}
-            keyExtractor={(item) => `premium-${item.id}`}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
-            snapToInterval={316}
-            decelerationRate="fast"
-          />
-        </View>
-
-        <View style={styles.section}>
-          <SectionHeader 
-            title="Nouveautés" 
-            onSeeAllPress={() => handleSeeAllPress('new')}
-          />
-          <FlatList
-            data={displayProperties.slice(0, 4)}
-            renderItem={renderPropertyCard}
-            keyExtractor={(item) => `new-${item.id}`}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
-            snapToInterval={316}
-            decelerationRate="fast"
-          />
-        </View>
-
-
-
-        <View style={styles.section}>
-          <SectionHeader 
-            title="Par catégories" 
-            subtitle="Explorez par type de bien"
-            showSeeAll={false}
-          />
-          {categories.map((category) => (
-            <View key={category.id} style={styles.categorySection}>
-              <View style={styles.categoryHeader}>
-                <View style={styles.categoryTitleRow}>
-                  <Text style={styles.categoryEmoji}>{category.emoji}</Text>
-                  <Text style={styles.categoryTitle}>{category.name}</Text>
-                </View>
-                <TouchableOpacity 
-                  style={styles.seeAllButton}
-                  onPress={() => handleSeeAllPress(category.id)}
-                >
-                  <Text style={styles.seeAllText}>Voir tout ›</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.categoryImageContainer}>
-                <Image 
-                  source={{ uri: category.image }}
-                  style={styles.categoryImage}
-                  resizeMode="cover"
-                />
-                <View style={styles.categoryImageOverlay}>
-                  <Text style={styles.categoryImageText}>
-                    {`${category.properties.length} biens disponibles`}
-                  </Text>
-                </View>
-              </View>
-
-              {category.properties.length > 0 && (
-                <FlatList
-                  data={category.properties}
-                  renderItem={({ item }) => (
-                    <PropertyCard
-                      property={item}
-                      onPress={() => handlePropertyPress(item.id)}
-                      onToggleFavorite={() => handleToggleFavorite(item.id)}
-                      width={280}
-                    />
-                  )}
-                  keyExtractor={(item) => `${category.id}-${item.id}`}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.categoryPropertiesList}
-                  snapToInterval={296}
-                  decelerationRate="fast"
-                />
-              )}
-            </View>
-          ))}
-        </View>
-
-        {/* Bloc du bas : Publier un bien et Trouver un pro */}
-        <ActionDouble />
-      </ScrollView>
-    </View>
+    <ScrollView
+      style={[styles.container, { paddingTop: insets.top }]}
+      contentContainerStyle={styles.contentContainer}
+      stickyHeaderIndices={[0]}
+      showsVerticalScrollIndicator={false}
+    >
+      <HomeHeader active={tab} onChange={setTab} />
+      {Content}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: Colors.background.secondary,
+    backgroundColor: "#F3F6F6",
   },
-  wordmark: {
-    ...Type.h1,
-    textAlign: "center" as const,
-    color: "#1B4F45",
-    letterSpacing: 1.5,
-    marginTop: 4,
-    marginBottom: 16,
-  },
-
-  chipsSection: {
-    flexDirection: 'row',
-    paddingHorizontal: 24,
-    gap: 12,
-    marginBottom: 32,
-  },
-  chip: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.78)',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 20,
-    gap: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.35)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.08,
-    shadowRadius: 30,
-    elevation: 8,
-
-  },
-  chipActive: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderColor: Colors.primary,
-    borderWidth: 2,
-    shadowOpacity: 0.12,
-    transform: [{ scale: 1.02 }],
-  },
-  chipEmoji: {
-    fontSize: 16,
-  },
-  chipText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.text.primary,
-  },
-
-  section: {
-    marginBottom: 32,
-  },
-  firstSection: {
-    marginTop: 24,
-  },
-  horizontalList: {
-    paddingHorizontal: 24,
-    gap: 16,
-  },
-  categorySection: {
-    marginBottom: 32,
-  },
-  categoryHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    marginBottom: 16,
-  },
-  categoryTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  categoryEmoji: {
-    fontSize: 20,
-  },
-  categoryTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: Colors.text.primary,
-  },
-  seeAllButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  seeAllText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: Colors.primary,
-  },
-  actionsContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    marginHorizontal: 24,
-    borderRadius: 20,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.35)',
-
-  },
-  actionSpacer: {
-    width: 16,
-  },
-
-  categoryImageContainer: {
-    marginHorizontal: 24,
-    height: 160,
-    borderRadius: 16,
-    overflow: 'hidden',
-    position: 'relative',
-    marginBottom: 16,
-  },
-  categoryImage: {
-    width: '100%',
-    height: '100%',
-  },
-  categoryImageOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 60,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-  },
-  categoryImageText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  categoryPropertiesList: {
-    paddingHorizontal: 24,
-    gap: 16,
+  contentContainer: {
+    paddingBottom: 96,
   },
 });
+
