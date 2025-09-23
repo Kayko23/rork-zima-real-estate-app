@@ -5,14 +5,14 @@ import { UserMode, User, FilterState } from '@/types';
 type Language = 'fr' | 'en' | 'pt';
 
 // Simple in-memory storage for demo purposes to avoid hydration issues
-const memoryStorage: Record<string, string> = {};
-
 const storage = {
   getItem: async (key: string): Promise<string | null> => {
-    return memoryStorage[key] || null;
+    // For now, return null to avoid hydration mismatch
+    // In production, implement proper storage with SSR considerations
+    return null;
   },
   setItem: async (key: string, value: string): Promise<void> => {
-    memoryStorage[key] = value;
+    // For now, just log to avoid hydration issues
     console.log(`Storage: ${key} = ${value}`);
   },
 };
@@ -51,7 +51,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const [user, setUser] = useState<User>(defaultUser);
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(true);
-  const [isHydrated, setIsHydrated] = useState(false); // Start as not hydrated
+  const [isHydrated, setIsHydrated] = useState(true); // Start as hydrated to prevent mismatch
   const [language, setLanguageState] = useState<Language | null>(null);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
 
@@ -66,13 +66,6 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       const savedUser = await storage.getItem('user');
       const savedLanguage = await storage.getItem('language');
       const savedOnboarding = await storage.getItem('hasCompletedOnboarding');
-      
-      console.log('Loading persisted data:', {
-        savedMode,
-        savedUser: savedUser ? 'exists' : 'null',
-        savedLanguage,
-        savedOnboarding
-      });
       
       if (savedMode && savedMode.trim()) {
         setUserMode(savedMode as UserMode);
@@ -92,11 +85,8 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       if (savedOnboarding === 'true') {
         setHasCompletedOnboarding(true);
       }
-      
-      setIsHydrated(true);
     } catch (error) {
       console.log('Error loading persisted data:', error);
-      setIsHydrated(true);
     }
   };
 
@@ -177,5 +167,30 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding]);
 });
 
-// Export types for external use
-export type { Language };
+// Export a safe version of the hook that always returns a valid object
+export const useApp = () => {
+  const store = useAppStore();
+  
+  // Return default values if store is not yet initialized
+  if (!store) {
+    return {
+      userMode: 'user' as const,
+      user: defaultUser,
+      filters: defaultFilters,
+      hasUnreadNotifications: false,
+      isHydrated: false,
+      language: null as Language | null,
+      hasCompletedOnboarding: false,
+      switchMode: async () => {},
+      toggleAppMode: async () => {},
+      updateUser: async () => {},
+      updateFilters: () => {},
+      clearFilters: () => {},
+      markNotificationsAsRead: () => {},
+      setLanguage: async () => {},
+      completeOnboarding: async () => {}
+    };
+  }
+  
+  return store;
+};

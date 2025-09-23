@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { View, Image, StyleSheet, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import LiquidGlassView from "@/components/ui/LiquidGlassView";
-import { useAppStore } from "@/hooks/useAppStore";
+import { useApp } from "@/hooks/useAppStore";
 
 // Utilise un des GIFs fournis
 const GIF_SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/iiq26c5ie8hzc056gkj5z' };
@@ -13,35 +13,32 @@ interface SplashScreenProps {
   maxDuration?: number;
 }
 
-export default function SplashScreen({ onComplete, minDuration = 4000, maxDuration = 4000 }: SplashScreenProps) {
+export default function SplashScreen({ onComplete, minDuration = 5000, maxDuration = 5000 }: SplashScreenProps) {
   const router = useRouter();
-  const { language, hasCompletedOnboarding, isHydrated } = useAppStore();
+  const appStore = useApp();
+  
+  // Safe destructuring with fallback values
+  const language = appStore?.language || null;
+  const hasCompletedOnboarding = appStore?.hasCompletedOnboarding || false;
 
   useEffect(() => {
-    // Wait for store to be hydrated before making navigation decisions
-    if (!isHydrated) {
-      console.log('Store not hydrated yet, waiting...');
-      return;
-    }
-    
     const t = setTimeout(() => {
       console.log('Splash complete, checking onboarding status');
       console.log('Language:', language);
       console.log('Has completed onboarding:', hasCompletedOnboarding);
-      console.log('Is hydrated:', isHydrated);
       
       if (!language || !hasCompletedOnboarding) {
         console.log('Redirecting to language selection');
-        router.replace("/language");
+        router.replace("/(onboarding)/language");
       } else {
         console.log('Redirecting to main app');
-        router.replace("/home");
+        router.replace("/(tabs)");
       }
       
       onComplete?.();
     }, maxDuration);
     return () => clearTimeout(t);
-  }, [onComplete, maxDuration, router, language, hasCompletedOnboarding, isHydrated]);
+  }, [onComplete, maxDuration, router, language, hasCompletedOnboarding]);
 
   return (
     <View style={styles.screen}>

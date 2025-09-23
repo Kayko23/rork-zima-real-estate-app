@@ -10,18 +10,18 @@ import {
 } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 import Colors from '@/constants/colors';
-import { useAppStore } from '@/hooks/useAppStore';
+import { useApp } from '@/hooks/useAppStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ProTabsLayout() {
-  const { userMode } = useAppStore();
+  const { userMode } = useApp();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
   // Redirect to user tabs if in user mode
   useEffect(() => {
     if (userMode === 'user') {
-      router.replace('/(tabs)/home');
+      router.replace('/');
     }
   }, [userMode, router]);
 

@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AppProvider } from "@/hooks/useAppStore";
+import ZimaSplashScreen from "@/components/ui/SplashScreen";
 import RouteLoader from "@/components/ui/RouteLoader";
 
 // Empêche la fermeture auto du splash natif
@@ -15,7 +16,6 @@ const queryClient = new QueryClient();
 function RootLayoutNav() {
   return (
     <Stack screenOptions={{ headerBackTitle: "Retour", headerShown: false }}>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="(proTabs)" options={{ headerShown: false }} />
@@ -38,6 +38,7 @@ function RootLayoutNav() {
 
 export default function RootLayout() {
   const [isAppReady, setIsAppReady] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
   const [isLoading] = useState(false);
 
   useEffect(() => {
@@ -76,9 +77,30 @@ export default function RootLayout() {
     }
   }, [isAppReady]);
 
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+  };
+
   // Tant que pas prêt : on laisse le splash natif affiché
   if (!isAppReady) {
     return null;
+  }
+
+  // Show custom splash screen
+  if (showSplash) {
+    return (
+      <View style={styles.container} onLayout={onLayoutRootView}>
+        <QueryClientProvider client={queryClient}>
+          <AppProvider>
+            <ZimaSplashScreen 
+              onComplete={handleSplashComplete}
+              minDuration={5000}
+              maxDuration={5000}
+            />
+          </AppProvider>
+        </QueryClientProvider>
+      </View>
+    );
   }
 
   return (

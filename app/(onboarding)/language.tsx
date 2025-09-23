@@ -3,9 +3,9 @@ import { View, Text, Pressable, StyleSheet, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Colors from "@/constants/colors";
-import { useAppStore, type Language } from "@/hooks/useAppStore";
+import { useApp } from "@/hooks/useAppStore";
 
-
+type Language = "fr" | "en" | "pt";
 
 const LANGUAGES: { code: Language; title: string; subtitle: string }[] = [
   { code: "fr", title: "Français", subtitle: "French" },
@@ -15,7 +15,7 @@ const LANGUAGES: { code: Language; title: string; subtitle: string }[] = [
 
 export default function LanguageScreen() {
   const router = useRouter();
-  const { language, setLanguage, completeOnboarding } = useAppStore();
+  const { language, setLanguage, completeOnboarding } = useApp();
   const [selected, setSelected] = useState<Language | null>(language);
 
   const canContinue = useMemo(() => !!selected, [selected]);
@@ -28,7 +28,7 @@ export default function LanguageScreen() {
     await completeOnboarding();
     
     console.log('Navigating to tabs');
-    router.replace("/home");
+    router.replace("/(tabs)");
   }
 
   return (
