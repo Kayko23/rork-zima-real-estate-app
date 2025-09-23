@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, Platform, Pressable } from "react-native";
+import { View, Text, StyleSheet, Platform, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 
 const GREEN = "#19715C";
@@ -15,13 +15,13 @@ export default function HeroSection() {
         <View style={[styles.bubble, { top: 20, left: 20, width: 60, height: 60, opacity: 0.1 }]} />
         <View style={[styles.bubble, { top: 30, right: 15, width: 100, height: 100, opacity: 0.15 }]} />
         
-        {/* Logo ZIMA avec image */}
+        {/* Logo ZIMA stylisé */}
         <View style={styles.logoContainer}>
-          <Image
-            source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/6kl9gdfog1qcmvxe8ydse' }}
-            style={styles.logoImage}
-            resizeMode="contain"
-          />
+          <View style={styles.logoRow}>
+            <Text style={styles.ziText}>zi</Text>
+            <Text style={styles.zimaText}>zima</Text>
+          </View>
+          <Text style={styles.tagline}>Logement de qualité des maisons</Text>
         </View>
 
         <Text style={styles.heading}>
@@ -68,16 +68,38 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   
-  /* Logo ZIMA avec image */
+  /* Logo ZIMA stylisé */
   logoContainer: {
     alignItems: "center",
     marginBottom: 16,
     zIndex: 3,
   },
-  logoImage: {
-    width: 120,
-    height: 60,
-    tintColor: "#FFFFFF",
+  logoRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    marginBottom: 4,
+  },
+  ziText: {
+    color: "#FFFFFF",
+    fontSize: 32,
+    fontWeight: "400",
+    fontStyle: "italic",
+    textDecorationLine: "underline",
+    textDecorationColor: "#FFFFFF",
+    marginRight: 8,
+  },
+  zimaText: {
+    color: "#FFFFFF",
+    fontSize: 32,
+    fontWeight: "700",
+    letterSpacing: 1,
+  },
+  tagline: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "400",
+    opacity: 0.9,
+    textAlign: "center",
   },
   
   heading: {
