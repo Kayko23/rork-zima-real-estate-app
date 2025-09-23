@@ -6,6 +6,7 @@ import { Plus, UserCheck } from 'lucide-react-native';
 import PropertyCard from '@/components/ui/PropertyCard';
 import SectionHeader from '@/components/ui/SectionHeader';
 import ActionTile from '@/components/ui/ActionTile';
+import ZimaBrand from '@/components/ui/ZimaBrand';
 
 import { mockProperties } from '@/constants/data';
 import Colors from '@/constants/colors';
@@ -95,30 +96,8 @@ export default function ExploreScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 140 }}
       >
-        {/* Header with zi icon */}
-        <View style={styles.header}>
-          <Image 
-            source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/9x4bhbj6w010vuyrq7vcd' }}
-            style={styles.ziIcon}
-            resizeMode="contain"
-          />
-        </View>
-
-        {/* Hero Card with rounded bottom corners */}
-        <View style={styles.heroCard}>
-          <View style={styles.heroBackground}>
-            <View style={styles.heroBlob1} />
-            <View style={styles.heroBlob2} />
-          </View>
-          
-          <View style={styles.heroContent}>
-            <Image 
-              source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/alk0nnhulsb6t76wytqya' }}
-              style={styles.heroLogo}
-              resizeMode="contain"
-            />
-          </View>
-        </View>
+        {/* Logo ZIMA en tête de page (remplace la carte verte) */}
+        <ZimaBrand />
         
         {/* Chips below hero */}
         <View style={styles.chipsSection}>
@@ -297,62 +276,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background.secondary,
   },
-  header: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  ziIcon: {
-    height: 28,
-    width: 28,
-  },
-  heroCard: {
-    height: 220,
-    position: 'relative',
-    marginBottom: 16,
-    borderBottomLeftRadius: 28,
-    borderBottomRightRadius: 28,
-    overflow: 'hidden',
-  },
-  heroBackground: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: Colors.background.hero,
-  },
-  heroBlob1: {
-    position: 'absolute',
-    top: 20,
-    right: 30,
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-  },
-  heroBlob2: {
-    position: 'absolute',
-    bottom: 40,
-    left: 20,
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-  },
-  heroContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    zIndex: 1,
-  },
-  heroLogo: {
-    height: 60,
-    width: '72%',
-    maxWidth: 420,
-  },
+
   chipsSection: {
     flexDirection: 'row',
     paddingHorizontal: 24,

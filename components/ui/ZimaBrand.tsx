@@ -2,16 +2,14 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 
-// URL du logo ZIMA en couleur
-const SRC = { uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/gydph2t2pxfdbc9t3usqr' };
-// ratio approximatif du nouveau logo
-const RATIO = 16 / 9;
+// Using the generated ZIMA logo
+const LOGO_URL = "https://r2-pub.rork.com/generated-images/0b1d6d6e-d682-4024-af47-dd716453a6ea.png";
 
 export default function ZimaBrand() {
   return (
     <View style={styles.wrap}>
       <Image
-        source={SRC}
+        source={{ uri: LOGO_URL }}
         style={styles.img}
         contentFit="contain"
         transition={0}
@@ -29,6 +27,7 @@ const styles = StyleSheet.create({
   },
   img: {
     width: "72%",         // ajuste 60–80% selon ton goût
-    aspectRatio: RATIO,   // conserve les proportions
+    height: 60,           // hauteur fixe pour un bon rendu
+    maxWidth: 300,
   },
 });

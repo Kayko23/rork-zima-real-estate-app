@@ -94,8 +94,8 @@ export default function RootLayout() {
           <AppProvider>
             <ZimaSplashScreen 
               onComplete={handleSplashComplete}
-              minDuration={5000}
-              maxDuration={5000}
+              minDuration={4000}
+              maxDuration={4000}
             />
           </AppProvider>
         </QueryClientProvider>

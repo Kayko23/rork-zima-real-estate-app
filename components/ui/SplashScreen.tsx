@@ -13,7 +13,7 @@ interface SplashScreenProps {
   maxDuration?: number;
 }
 
-export default function SplashScreen({ onComplete, minDuration = 5000, maxDuration = 5000 }: SplashScreenProps) {
+export default function SplashScreen({ onComplete, minDuration = 4000, maxDuration = 4000 }: SplashScreenProps) {
   const router = useRouter();
   const appStore = useApp();
   
@@ -32,7 +32,7 @@ export default function SplashScreen({ onComplete, minDuration = 5000, maxDurati
         router.replace("/(onboarding)/language");
       } else {
         console.log('Redirecting to main app');
-        router.replace("/(tabs)");
+        router.replace("/(tabs)/home");
       }
       
       onComplete?.();
