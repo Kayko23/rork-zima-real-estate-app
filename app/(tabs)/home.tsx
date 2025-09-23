@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -7,15 +7,14 @@ import SectionHeader from '@/components/ui/SectionHeader';
 
 import QuickActions from '@/components/home/QuickActions';
 import ActionDouble from '@/components/home/ActionDouble';
-import Filters, { FiltersState } from '@/components/ui/Filters';
+
 
 import { mockProperties } from '@/constants/data';
 import Colors from '@/constants/colors';
 
 export default function ExploreScreen() {
   const insets = useSafeAreaInsets();
-  const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState<FiltersState>({ country: null, city: null, intent: "tous" });
+
 
   const handlePropertyPress = (propertyId: string) => {
     console.log('Property pressed:', propertyId);
@@ -30,6 +29,7 @@ export default function ExploreScreen() {
   };
 
   const handleSeeAllPress = (section: string) => {
+    if (!section?.trim()) return;
     console.log('See all pressed:', section);
     const sectionMap: Record<string, { title: string; kind: string }> = {
       premium: { title: "Biens premium", kind: "premium" },
@@ -42,10 +42,7 @@ export default function ExploreScreen() {
     
     const sectionData = sectionMap[section];
     if (sectionData) {
-      router.push({
-        pathname: "/browse",
-        params: { title: sectionData.title, kind: sectionData.kind }
-      });
+      router.push(`/browse?title=${encodeURIComponent(sectionData.title)}&kind=${sectionData.kind}`);
     }
   };
 
@@ -106,12 +103,7 @@ export default function ExploreScreen() {
         {/* 3 cartes sur une ligne */}
         <QuickActions />
 
-        {showFilters && (
-          <Filters onApply={(f) => {
-            setFilters(f);
-            setShowFilters(false);
-          }} />
-        )}
+
 
         <View style={styles.section}>
           <SectionHeader 

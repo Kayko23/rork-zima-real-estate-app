@@ -24,7 +24,7 @@ export default function QuickActions() {
       {/* Voyages (nouvelle section) */}
       <Pressable
         style={s.card}
-        onPress={() => r.push({ pathname: "/browse", params: { title: "Voyages", kind: "voyages" } })}
+        onPress={() => r.push("/browse?title=Voyages&kind=voyages")}
         accessibilityRole="button"
       >
         <Ionicons name="bed-outline" size={20} color="#0F172A" />
