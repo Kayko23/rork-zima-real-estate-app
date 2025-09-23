@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, Platform, Pressable } from "react-native";
+import { View, Text, StyleSheet, Platform, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 
 const GREEN = "#19715C";
@@ -9,27 +9,28 @@ export default function HeroSection() {
 
   return (
     <>
-      {/* Carte verte (sans barre supérieure) */}
+      {/* Carte verte avec logo intégré */}
       <View style={styles.hero}>
-        {/* Décors ronds (derrière le logo) */}
-        <View style={[styles.bubble, { top: 18, left: 16, width: 72, height: 72, opacity: 0.14 }]} />
-        <View style={[styles.bubble, { top: 24, right: 18, width: 120, height: 120, opacity: 0.20 }]} />
+        {/* Décors ronds en arrière-plan */}
+        <View style={[styles.bubble, { top: 20, left: 20, width: 60, height: 60, opacity: 0.1 }]} />
+        <View style={[styles.bubble, { top: 30, right: 15, width: 100, height: 100, opacity: 0.15 }]} />
         
-        {/* LOGO CENTRÉ, AU-DESSUS DES DÉCORS */}
-        <View style={styles.logoWrap}>
-          <Image
-            source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/0cg32vjm033aidki3duv3' }}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+        {/* Logo ZIMA en texte stylisé */}
+        <View style={styles.logoContainer}>
+          <View style={styles.logoWrap}>
+            <Text style={styles.logoText}>zi</Text>
+            <View style={styles.logoUnderline} />
+          </View>
+          <Text style={styles.brandText}>zima</Text>
+          <Text style={styles.tagline}>Trouvez la qualité des services</Text>
         </View>
 
         <Text style={styles.heading}>
-          Trouvez votre propriété idéale partout en Afrique
+          Trouvez votre propriété idéale partout{"\n"}en Afrique
         </Text>
       </View>
 
-      {/* Boutons en dehors de la carte */}
+      {/* Chips en dessous de la carte */}
       <View style={styles.chipsRow}>
         <Pressable 
           style={[styles.chip, styles.chipPrimary]} 
@@ -53,39 +54,70 @@ const styles = StyleSheet.create({
     backgroundColor: GREEN,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    paddingHorizontal: 16,
-    paddingTop: 18,
-    paddingBottom: 24,
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 28,
     overflow: "hidden",
     position: "relative",
+    minHeight: 180,
   },
   
-  /* ---- CENTRAGE DU LOGO ---- */
+  bubble: {
+    position: "absolute",
+    borderRadius: 999,
+    backgroundColor: "#FFFFFF",
+    zIndex: 1,
+  },
+  
+  /* Logo ZIMA stylisé */
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 16,
+    zIndex: 3,
+  },
   logoWrap: {
-    alignItems: "center",          // centre horizontal
-    justifyContent: "center",
-    marginBottom: 10,
-    zIndex: 3,                      // passe au-dessus des bulles
+    flexDirection: "row",
+    alignItems: "center",
+    position: "relative",
   },
-  logo: {
-    width: "70%",                   // largeur fluide
-    height: 36,                     // hauteur fixe pour un bon rendu
-    maxWidth: 200,                  // limite la taille sur grands écrans
+  logoText: {
+    fontSize: 32,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    fontStyle: "italic",
   },
+  logoUnderline: {
+    position: "absolute",
+    bottom: 8,
+    left: 0,
+    right: 0,
+    height: 3,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 2,
+  },
+  brandText: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    marginLeft: 8,
+  },
+  tagline: {
+    fontSize: 11,
+    color: "#FFFFFF",
+    opacity: 0.9,
+    marginTop: 2,
+    fontStyle: "italic",
+  },
+  
   heading: {
     color: "#FFFFFF",
     textAlign: "center",
     fontWeight: "700",
     fontSize: 18,
     lineHeight: 24,
-    zIndex: 2,                      // au-dessus des bulles, sous le logo
+    zIndex: 2,
   },
-  bubble: {
-    position: "absolute",
-    borderRadius: 999,
-    backgroundColor: "#FFFFFF",
-    zIndex: 1,                      // derrière le logo et le texte
-  },
+  
   chipsRow: {
     marginTop: -12,
     paddingHorizontal: 16,
