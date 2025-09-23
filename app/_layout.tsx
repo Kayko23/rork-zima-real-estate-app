@@ -86,26 +86,23 @@ export default function RootLayout() {
     return null;
   }
 
-  // Show custom splash screen
-  if (showSplash) {
-    return (
-      <View style={styles.container} onLayout={onLayoutRootView}>
-        <ZimaSplashScreen 
-          onComplete={handleSplashComplete}
-          minDuration={5000}
-          maxDuration={5000}
-        />
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
       <QueryClientProvider client={queryClient}>
         <AppProvider>
           <GestureHandlerRootView style={styles.container}>
-            <RootLayoutNav />
-            <RouteLoader visible={isLoading} />
+            {showSplash ? (
+              <ZimaSplashScreen 
+                onComplete={handleSplashComplete}
+                minDuration={5000}
+                maxDuration={5000}
+              />
+            ) : (
+              <>
+                <RootLayoutNav />
+                <RouteLoader visible={isLoading} />
+              </>
+            )}
           </GestureHandlerRootView>
         </AppProvider>
       </QueryClientProvider>
