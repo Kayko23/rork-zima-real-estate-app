@@ -277,7 +277,7 @@ export default function ProviderProfileScreen() {
 
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             {pro.premium && (
-              <Badge color={palette.gold} label="Premium" icon={<Ionicons name="crown" as any size={14} color={palette.gold} />} />
+              <Badge color={palette.gold} label="Premium" icon={<Ionicons name="star" size={14} color={palette.gold} />} />
             )}
             {pro.verified && (
               <Badge color={palette.violet} label="Vérifié" icon={<Ionicons name="shield-checkmark" as any size={14} color={palette.violet} />} />
