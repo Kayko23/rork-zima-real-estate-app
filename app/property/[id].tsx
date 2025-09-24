@@ -414,8 +414,8 @@ function AgentCard({ agent, onProfile, onAll }: { agent: Agent; onProfile: () =>
         </View>
       </View>
       <View style={styles.agentStats}>
-        <Stat label="ÉVALUATIONS" value={String(agent.stats.reviews)} />
-        <Stat label="NOTE GLOBALE" value={agent.stats.rating.toFixed(2)} />
+        <Stat label="Évaluations" value={String(agent.stats.reviews)} />
+        <Stat label="Note Globale" value={agent.stats.rating.toFixed(2)} />
         <Stat label="ANNÉES D’ACTIVITÉ" value={String(agent.stats.years)} />
       </View>
       <View style={{ flexDirection: "row", gap: 10, marginTop: 8 }}>
