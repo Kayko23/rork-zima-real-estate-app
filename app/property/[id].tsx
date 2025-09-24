@@ -113,9 +113,11 @@ function PropertyDetailScreen() {
       rating: 4.8,
       reviewsCount: 23,
       images: [
-        "https://images.unsplash.com/photo-1502673530728-f79b4cab31b1?q=80&w=1600&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1560448075-bb4caa6c1e56?q=80&w=1600&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1505691723518-36a5ac3b2bba?q=80&w=1600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1600&auto=format&fit=crop",
       ],
       description:
         "Magnifique villa moderne avec vue imprenable sur la ville. Design contemporain, finitions de haute qualité, et excellent emplacement près du quartier des affaires.",
