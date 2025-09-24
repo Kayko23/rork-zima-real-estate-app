@@ -35,6 +35,7 @@ import {
   ChefHat,
   ArrowUp,
   Trees,
+  Mail,
 } from "lucide-react-native";
 import LiquidGlassView from "@/components/ui/LiquidGlassView";
 
@@ -382,12 +383,14 @@ function PropertyDetailScreen() {
         <View style={styles.sticky} testID="sticky-bar">
           <Text style={styles.price}>{data.price.toLocaleString('en-US')} {data.currency}</Text>
           <View style={styles.stickyActions}>
-            <Button label="Contacter" onPress={() => console.log("contact press")} />
+            <Pressable testID="mail" onPress={() => Linking.openURL("mailto:contact@zima.com?subject=Demande%20d'information%20-%20Appartement%20Moderne").catch(err => console.log("mail error", err))} style={styles.iconOnly}>
+              <Mail size={18} color="#0b3b35" />
+            </Pressable>
             <Pressable testID="call" onPress={() => Linking.openURL("tel:+221700000000").catch(err => console.log("call error", err))} style={styles.iconOnly}>
               <Phone size={18} color="#0b3b35" />
             </Pressable>
             <Pressable testID="whatsapp" onPress={() => Linking.openURL("https://wa.me/221700000000?text=Bonjour%20ZIMA").catch(err => console.log("wa error", err))} style={styles.iconOnly}>
-              <MessageCircle size={18} color="#0b3b35" />
+              <MessageCircle size={18} color="#25D366" />
             </Pressable>
           </View>
         </View>
