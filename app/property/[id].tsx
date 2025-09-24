@@ -317,6 +317,7 @@ function PropertyDetailScreen() {
           <Text style={styles.sectionTitle}>Détails du bien</Text>
           <View style={styles.detailCard}>
             <DetailRow label="Type" value="villa" />
+            <DetailRow label="Numéro Zima" value="#45782" />
             <DetailRow label="Étage" value="2ème étage" />
             <DetailRow label="Année" value="2020" />
             <DetailRow label="Charges" value="50 USD/mois" />
