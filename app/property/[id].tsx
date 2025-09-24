@@ -27,6 +27,14 @@ import {
   Bed,
   Bath,
   Maximize2,
+  Wifi,
+  Car,
+  Waves,
+  Shield,
+  Snowflake,
+  ChefHat,
+  ArrowUp,
+  Trees,
 } from "lucide-react-native";
 import LiquidGlassView from "@/components/ui/LiquidGlassView";
 
@@ -142,8 +150,24 @@ function PropertyDetailScreen() {
   );
 
   const [imgIndex, setImgIndex] = useState<number>(0);
+  const [showAllAmenities, setShowAllAmenities] = useState<boolean>(false);
   const listRef = useRef<FlatList<string> | null>(null);
   const heroH = Math.min(420, Math.round(width * 0.72));
+
+  const allAmenities = [
+    { label: "Wifi gratuit", icon: "wifi" },
+    { label: "Parking gratuit", icon: "car" },
+    { label: "Piscine", icon: "waves" },
+    { label: "Sécurité 24h", icon: "shield" },
+    { label: "Climatisation", icon: "snowflake" },
+    { label: "Balcon", icon: "home" },
+    { label: "Cuisine équipée", icon: "chef-hat" },
+    { label: "Ascenseur", icon: "arrow-up" },
+    { label: "Jardin privé", icon: "trees" }
+  ];
+
+  const displayedAmenities = showAllAmenities ? allAmenities : allAmenities.slice(0, 4);
+  const remainingCount = allAmenities.length - 4;
 
   const openMaps = () => {
     try {
@@ -247,12 +271,28 @@ function PropertyDetailScreen() {
         <View style={{ paddingHorizontal: CARD, gap: 12, marginTop: 20 }}>
           <Text style={styles.sectionTitle}>Points forts</Text>
           <View style={styles.amenitiesRow}>
-            <Amenity label="Wifi gratuit" />
-            <Amenity label="Parking gratuit" />
-            <Amenity label="Piscine" />
-            <Amenity label="Sécurité 24h" />
+            {displayedAmenities.map((amenity, index) => (
+              <Amenity key={index} label={amenity.label} iconType={amenity.icon} />
+            ))}
           </View>
-          <Pressable style={{ marginTop: 6 }} testID="show-amenities"><Text style={styles.linkText}>Afficher les 9 équipements</Text></Pressable>
+          {!showAllAmenities && remainingCount > 0 && (
+            <Pressable 
+              style={{ marginTop: 6 }} 
+              testID="show-amenities"
+              onPress={() => setShowAllAmenities(true)}
+            >
+              <Text style={styles.linkText}>Afficher les {allAmenities.length} équipements</Text>
+            </Pressable>
+          )}
+          {showAllAmenities && (
+            <Pressable 
+              style={{ marginTop: 6 }} 
+              testID="hide-amenities"
+              onPress={() => setShowAllAmenities(false)}
+            >
+              <Text style={styles.linkText}>Masquer les équipements</Text>
+            </Pressable>
+          )}
         </View>
 
         <View style={{ paddingHorizontal: CARD, gap: 12, marginTop: 24 }}>
@@ -475,10 +515,27 @@ function PopularCard({ item }: { item: PopularItem }) {
   );
 }
 
-function Amenity({ label }: { label: string }) {
+function Amenity({ label, iconType }: { label: string; iconType: string }) {
+  const getAmenityIcon = (type: string) => {
+    const iconProps = { size: 16, color: "#0f6b5e" };
+    switch (type) {
+      case "wifi": return <Wifi {...iconProps} />;
+      case "car": return <Car {...iconProps} />;
+      case "waves": return <Waves {...iconProps} />;
+      case "shield": return <Shield {...iconProps} />;
+      case "snowflake": return <Snowflake {...iconProps} />;
+      case "chef-hat": return <ChefHat {...iconProps} />;
+      case "arrow-up": return <ArrowUp {...iconProps} />;
+      case "trees": return <Trees {...iconProps} />;
+      default: return <Home {...iconProps} />;
+    }
+  };
+
   return (
     <View style={styles.amenity}>
-      <Text style={styles.amenityIcon}>•</Text>
+      <View style={styles.amenityIconContainer}>
+        {getAmenityIcon(iconType)}
+      </View>
       <Text style={styles.amenityText}>{label}</Text>
     </View>
   );
@@ -532,10 +589,10 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 18, fontWeight: "800", color: brand.text },
   body: { color: brand.deep, lineHeight: 20 },
 
-  amenitiesRow: { flexDirection: "row", flexWrap: "wrap", gap: 14, marginTop: 6 },
-  amenity: { flexDirection: "row", gap: 8, alignItems: "center", backgroundColor: "#f6f8f7", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8 },
-  amenityIcon: { fontSize: 18 },
-  amenityText: { color: brand.deep, fontWeight: "700" },
+  amenitiesRow: { flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 6 },
+  amenity: { flexDirection: "row", alignItems: "center", backgroundColor: "#f6f8f7", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, minHeight: 40 },
+  amenityIconContainer: { width: 20, alignItems: "center", marginRight: 8 },
+  amenityText: { color: brand.deep, fontWeight: "700", fontSize: 13, flex: 1 },
 
   agentCard: { backgroundColor: brand.card, borderRadius: 20, padding: 16, borderWidth: 1, borderColor: "#E7EFEA" },
   avatar: { height: 54, width: 54, borderRadius: 27 },
