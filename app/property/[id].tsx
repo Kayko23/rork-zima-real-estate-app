@@ -299,7 +299,10 @@ function PropertyDetailScreen() {
         <View style={{ paddingHorizontal: CARD, gap: 12, marginTop: 24 }}>
           <Text style={styles.sectionTitle}>Description</Text>
           <Text style={styles.body}>{data.description}</Text>
-          <Pressable testID="read-more"><Text style={styles.linkText}>Lire la suite</Text></Pressable>
+          <Pressable testID="read-more" onPress={() => {
+            console.log("Expanding description");
+            // Could implement modal or expanded view
+          }}><Text style={styles.linkText}>Lire la suite</Text></Pressable>
         </View>
 
         <View style={{ paddingHorizontal: CARD, marginTop: 24 }}>
@@ -349,7 +352,10 @@ function PropertyDetailScreen() {
         <View style={{ paddingHorizontal: CARD, marginTop: 24 }}>
           <View style={styles.rowBetween}>
             <Text style={styles.sectionTitle}>{data.rating.toFixed(1)} • {data.reviewsCount} avis</Text>
-            <Pressable testID="all-reviews"><Text style={styles.linkText}>Tous les avis</Text></Pressable>
+            <Pressable testID="all-reviews" onPress={() => {
+            console.log("Opening all reviews");
+            router.push(`/reviews?propertyId=${data.id}`);
+          }}><Text style={styles.linkText}>Tous les avis</Text></Pressable>
           </View>
           <ReviewCard name="Moussa Ba" date="15/11/2024" text="Excellent appartement, très bien situé et l’agent était très professionnel. Je recommande vivement !" />
         </View>
@@ -357,7 +363,10 @@ function PropertyDetailScreen() {
         <View style={{ paddingHorizontal: CARD, marginTop: 24 }}>
           <View style={styles.rowBetween}>
             <Text style={styles.sectionTitle}>Biens populaires • {data.city}</Text>
-            <Pressable testID="see-all-popular"><Text style={styles.linkText}>Voir tout</Text></Pressable>
+            <Pressable testID="see-all-popular" onPress={() => {
+            console.log("Opening all popular properties in", data.city);
+            router.push(`/browse?city=${encodeURIComponent(data.city)}`);
+          }}><Text style={styles.linkText}>Voir tout</Text></Pressable>
           </View>
         </View>
         <FlatList
@@ -381,7 +390,10 @@ function PropertyDetailScreen() {
                 </View>
               </View>
             ))}
-            <Pressable testID="report"><Text style={[styles.linkText, { marginTop: 8 }]}>Signaler cette annonce</Text></Pressable>
+            <Pressable testID="report" onPress={() => {
+              console.log("Opening report form");
+              router.push(`/report?propertyId=${data.id}`);
+            }}><Text style={[styles.linkText, { marginTop: 8 }]}>Signaler cette annonce</Text></Pressable>
           </View>
         </View>
       </ScrollView>
@@ -518,7 +530,10 @@ function PopularCard({ item }: { item: PopularItem }) {
         <Text style={styles.popBadge}>{item.info1}</Text>
         <Text style={styles.popBadge}>{item.info2}</Text>
       </View>
-      <Pressable style={styles.likeBtn} testID={`like-${item.id}`}>
+      <Pressable style={styles.likeBtn} testID={`like-${item.id}`} onPress={() => {
+        console.log("Toggling favorite for property:", item.id);
+        // Could implement favorite toggle functionality
+      }}>
         <Heart size={16} color="#fff" />
       </Pressable>
     </View>
