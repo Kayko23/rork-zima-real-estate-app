@@ -270,7 +270,7 @@ function PropertyDetailScreen() {
 
         <View style={{ paddingHorizontal: CARD, gap: 12, marginTop: 20 }}>
           <Text style={styles.sectionTitle}>Points forts</Text>
-          <View style={styles.amenitiesRow}>
+          <View style={styles.amenitiesGrid}>
             {displayedAmenities.map((amenity, index) => (
               <Amenity key={index} label={amenity.label} iconType={amenity.icon} />
             ))}
@@ -517,7 +517,7 @@ function PopularCard({ item }: { item: PopularItem }) {
 
 function Amenity({ label, iconType }: { label: string; iconType: string }) {
   const getAmenityIcon = (type: string) => {
-    const iconProps = { size: 16, color: "#0f6b5e" };
+    const iconProps = { size: 18, color: "#0f6b5e" };
     switch (type) {
       case "wifi": return <Wifi {...iconProps} />;
       case "car": return <Car {...iconProps} />;
@@ -589,9 +589,9 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 18, fontWeight: "800", color: brand.text },
   body: { color: brand.deep, lineHeight: 20 },
 
-  amenitiesRow: { flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 6 },
-  amenity: { flexDirection: "row", alignItems: "center", backgroundColor: "#f6f8f7", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, minHeight: 40 },
-  amenityIconContainer: { width: 20, alignItems: "center", marginRight: 8 },
+  amenitiesGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 6 },
+  amenity: { flexDirection: "row", alignItems: "center", backgroundColor: "#f6f8f7", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 12, width: "48%", minHeight: 44 },
+  amenityIconContainer: { width: 24, alignItems: "center", marginRight: 10 },
   amenityText: { color: brand.deep, fontWeight: "700", fontSize: 13, flex: 1 },
 
   agentCard: { backgroundColor: brand.card, borderRadius: 20, padding: 16, borderWidth: 1, borderColor: "#E7EFEA" },
