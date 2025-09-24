@@ -20,14 +20,14 @@ export type ProItem = {
   role: 'Agence' | 'Agent';
   city: string;
   country: string;
-  rating: number;          // 4.8
-  reviews: number;         // 67
-  listings: number;        // 34
-  specialties?: string[];  // ['Résidentiel','Commercial','Conseil']
-  gallery?: string[];      // urls d'images
-  phone?: string;          // +2250700000000
-  email?: string;          // pro@exemple.com
-  whatsapp?: string;       // 2250700000000 (sans +)
+  rating: number;
+  reviews: number;
+  listings: number;
+  specialties?: string[];
+  gallery?: string[];
+  phone?: string;
+  email?: string;
+  whatsapp?: string;
   online?: boolean;
 };
 
@@ -39,18 +39,18 @@ type Props = {
 
 const COLORS = {
   bg: '#FFFFFF',
-  text: '#0F172A',            // slate-900
-  sub: '#475569',             // slate-600
-  line: '#E2E8F0',            // slate-200
-  brand: '#0C5B47',           // vert ZIMA
-  brandSoft: '#E8F2EF',
-  gold: '#B58835',
-  green: '#1B9E6A',
-  chipBg: '#F1F5F9',
+  text: '#1F2937',
+  sub: '#6B7280',
+  line: '#E5E7EB',
+  brand: '#1F2937',
+  brandSoft: '#F3F4F6',
+  premium: '#F59E0B',
+  premiumBg: '#FEF3C7',
+  verified: '#10B981',
+  verifiedBg: '#D1FAE5',
+  chipBg: '#F3F4F6',
+  star: '#F59E0B',
 };
-
-const RADIUS = 18;
-const GAP = 12;
 
 const ProCard = memo<Props>(function ProCard({ item, onPressProfile, onPressCard }) {
   const openTel = () => {
@@ -69,49 +69,45 @@ const ProCard = memo<Props>(function ProCard({ item, onPressProfile, onPressCard
   };
 
   return (
-    <Pressable
-      onPress={(e) => onPressCard?.(item, e)}
-      style={({ pressed }) => [
-        styles.card,
-        pressed && { transform: [{ scale: 0.998 }], opacity: 0.98 },
-      ]}
-    >
-      {/* Header */}
+    <View style={styles.card}>
+      {/* Header avec avatar et infos */}
       <View style={styles.headerRow}>
-        <View style={styles.avatarWrap}>
+        <View style={styles.avatarContainer}>
           <Image
             source={{
-              uri: item.avatarUrl || 'https://via.placeholder.com/56x56/E2E8F0/475569?text=?'
+              uri: item.avatarUrl || 'https://via.placeholder.com/60x60/E5E7EB/6B7280?text=?'
             }}
             style={styles.avatar}
           />
           {item.online && <View style={styles.onlineDot} />}
         </View>
 
-        <View style={styles.contentWrap}>
-          <View style={styles.nameRow}>
+        <View style={styles.infoContainer}>
+          <View style={styles.nameAndBadges}>
             <Text numberOfLines={1} style={styles.name}>
               {item.name}
             </Text>
-            <View style={styles.badgesRow}>
+            <View style={styles.badges}>
               {item.isPremium && (
-                <Badge label="Premium" color={COLORS.gold} textColor="#fff" />
+                <View style={styles.premiumBadge}>
+                  <Text style={styles.premiumText}>Premium</Text>
+                </View>
               )}
               {item.isVerified && (
-                <Badge label="Vérifié" color={COLORS.green} textColor="#fff" />
+                <View style={styles.verifiedBadge}>
+                  <Text style={styles.verifiedText}>Vérifié</Text>
+                </View>
               )}
             </View>
           </View>
 
-          <View style={styles.metaRow}>
+          <View style={styles.roleAndLocation}>
             <MaterialCommunityIcons
               name={item.role === 'Agence' ? 'office-building' : 'account-tie'}
               size={16}
               color={COLORS.sub}
-              style={styles.roleIcon}
             />
-            <Text style={styles.metaText}>{item.role}</Text>
-            <Text style={styles.dot}> • </Text>
+            <Text style={styles.roleText}>{item.role}</Text>
             <Ionicons
               name="location-sharp"
               size={14}
@@ -124,250 +120,263 @@ const ProCard = memo<Props>(function ProCard({ item, onPressProfile, onPressCard
           </View>
 
           <View style={styles.ratingRow}>
-            <Ionicons name="star" size={14} color="#f59e0b" />
+            <Ionicons name="star" size={16} color={COLORS.star} />
             <Text style={styles.rating}>
-              {item.rating.toFixed(1)}{' '}
-              <Text style={styles.subText}>({item.reviews} avis)</Text>
+              {item.rating.toFixed(1)} <Text style={styles.reviewsText}>({item.reviews} avis)</Text>
             </Text>
-            <Text style={styles.dot}> • </Text>
-            <Text style={styles.subText}>{item.listings} annonces</Text>
+            <Text style={styles.separator}> • </Text>
+            <Text style={styles.listingsText}>{item.listings} annonces</Text>
           </View>
         </View>
       </View>
 
-      {/* Chips */}
+      {/* Spécialités */}
       {!!item.specialties?.length && (
-        <View style={styles.chipsRow}>
-          {item.specialties.slice(0, 3).map((ch) => (
-            <Chip key={ch} label={ch} />
+        <View style={styles.specialtiesRow}>
+          {item.specialties.map((specialty) => (
+            <View key={specialty} style={styles.specialtyChip}>
+              <Text style={styles.specialtyText}>{specialty}</Text>
+            </View>
           ))}
         </View>
       )}
 
-      {/* Mini-galerie */}
+      {/* Galerie d'images */}
       {!!item.gallery?.length && (
         <FlatList
-          data={item.gallery.slice(0, 3)}
-          keyExtractor={(u, idx) => `${item.id}-g-${idx}`}
+          data={item.gallery}
+          keyExtractor={(url, idx) => `${item.id}-img-${idx}`}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.galleryContainer}
-          style={styles.gallery}
-          renderItem={({ item: img }) => (
-            <Image source={{ uri: img }} style={styles.thumb} />
+          contentContainerStyle={styles.galleryContent}
+          renderItem={({ item: imageUrl }) => (
+            <Image source={{ uri: imageUrl }} style={styles.galleryImage} />
           )}
         />
       )}
 
-      {/* CTA */}
+      {/* Bouton Voir profil */}
       <Pressable
         onPress={() => onPressProfile?.(item)}
         style={({ pressed }) => [
-          styles.cta,
-          pressed && { opacity: 0.9, transform: [{ translateY: 1 }] },
+          styles.profileButton,
+          pressed && { opacity: 0.8 },
         ]}
-        accessibilityRole="button"
-        accessibilityLabel={`Voir le profil de ${item.name}`}
       >
-        <Text style={styles.ctaText}>Voir profil</Text>
+        <Text style={styles.profileButtonText}>Voir profil</Text>
       </Pressable>
 
-      {/* Actions */}
-      <View style={styles.actionsRow}>
-        <RoundAction
-          icon="call"
-          label="Appeler"
+      {/* Actions de contact */}
+      <View style={styles.contactActions}>
+        <Pressable
           onPress={openTel}
           disabled={!item.phone}
-        />
-        <RoundAction
-          icon="logo-whatsapp"
-          label="WhatsApp"
+          style={[styles.contactButton, !item.phone && styles.contactButtonDisabled]}
+        >
+          <Ionicons name="call" size={20} color={!item.phone ? COLORS.sub : COLORS.text} />
+        </Pressable>
+        
+        <Pressable
           onPress={openWhatsApp}
           disabled={!item.whatsapp}
-        />
-        <RoundAction
-          icon="mail"
-          label="Email"
+          style={[styles.contactButton, !item.whatsapp && styles.contactButtonDisabled]}
+        >
+          <Ionicons name="logo-whatsapp" size={20} color={!item.whatsapp ? COLORS.sub : '#25D366'} />
+        </Pressable>
+        
+        <Pressable
           onPress={openMail}
           disabled={!item.email}
-        />
+          style={[styles.contactButton, !item.email && styles.contactButtonDisabled]}
+        >
+          <Ionicons name="mail" size={20} color={!item.email ? COLORS.sub : COLORS.text} />
+        </Pressable>
       </View>
-    </Pressable>
+    </View>
   );
 });
 
-const Badge = ({ label, color, textColor }: { label: string; color: string; textColor: string }) => (
-  <View style={[styles.badge, { backgroundColor: color }]}>
-    <Text style={[styles.badgeText, { color: textColor }]}>{label}</Text>
-  </View>
-);
 
-Badge.displayName = 'Badge';
-
-const Chip = ({ label }: { label: string }) => (
-  <View style={styles.chip}>
-    <Text style={styles.chipText}>{label}</Text>
-  </View>
-);
-
-Chip.displayName = 'Chip';
-
-const RoundAction = ({
-  icon,
-  label,
-  onPress,
-  disabled,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  label: string;
-  onPress: () => void;
-  disabled?: boolean;
-}) => (
-  <Pressable
-    onPress={onPress}
-    disabled={disabled}
-    style={({ pressed }) => [
-      styles.actionBtn,
-      disabled && styles.actionBtnDisabled,
-      pressed && styles.actionBtnPressed,
-    ]}
-    accessibilityRole="button"
-    accessibilityLabel={label}
-  >
-    <Ionicons name={icon} size={20} color={COLORS.brand} />
-  </Pressable>
-);
-
-RoundAction.displayName = 'RoundAction';
 
 const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.bg,
-    borderRadius: RADIUS,
+    borderRadius: 16,
     padding: 16,
-    gap: GAP,
+    marginHorizontal: 16,
+    marginVertical: 8,
     shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
     elevation: 3,
   },
-  headerRow: { flexDirection: 'row', alignItems: 'flex-start' },
-  avatarWrap: { width: 56, height: 56 },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  avatarContainer: {
+    position: 'relative',
+  },
   avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: COLORS.line,
   },
   onlineDot: {
     position: 'absolute',
-    right: -1,
-    bottom: -1,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    backgroundColor: '#22c55e',
+    right: 2,
+    bottom: 2,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#10B981',
     borderWidth: 2,
     borderColor: COLORS.bg,
   },
-  nameRow: {
+  infoContainer: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  nameAndBadges: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   name: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     color: COLORS.text,
     flex: 1,
     marginRight: 8,
   },
-  badgesRow: { flexDirection: 'row', gap: 6 },
-  badge: {
+  badges: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  premiumBadge: {
+    backgroundColor: COLORS.premiumBg,
     paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 999,
+    paddingVertical: 3,
+    borderRadius: 12,
   },
-  badgeText: { fontSize: 11, fontWeight: '700' },
-  metaRow: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    marginBottom: 6,
+  premiumText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: COLORS.premium,
   },
-  metaText: { color: COLORS.sub, fontSize: 13, fontWeight: '500' },
-  dot: { color: COLORS.sub, fontSize: 13 },
-  ratingRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  rating: { color: COLORS.text, fontWeight: '700', fontSize: 14 },
-  subText: { color: COLORS.sub, fontWeight: '500' },
-  chipsRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  chip: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+  verifiedBadge: {
+    backgroundColor: COLORS.verifiedBg,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+  },
+  verifiedText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: COLORS.verified,
+  },
+  roleAndLocation: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  roleText: {
+    fontSize: 14,
+    color: COLORS.sub,
+    marginLeft: 4,
+  },
+  locationText: {
+    fontSize: 14,
+    color: COLORS.sub,
+    marginLeft: 4,
+    flex: 1,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rating: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginLeft: 4,
+  },
+  reviewsText: {
+    fontWeight: '400',
+    color: COLORS.sub,
+  },
+  separator: {
+    fontSize: 14,
+    color: COLORS.sub,
+    marginHorizontal: 6,
+  },
+  listingsText: {
+    fontSize: 14,
+    color: COLORS.sub,
+  },
+  specialtiesRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  specialtyChip: {
     backgroundColor: COLORS.chipBg,
-    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
   },
-  chipText: { fontSize: 12, color: COLORS.text, fontWeight: '600' },
-  thumb: {
-    width: 110,
-    height: 74,
+  specialtyText: {
+    fontSize: 13,
+    color: COLORS.text,
+    fontWeight: '500',
+  },
+  galleryContent: {
+    gap: 8,
+    paddingBottom: 12,
+  },
+  galleryImage: {
+    width: 120,
+    height: 80,
     borderRadius: 12,
     backgroundColor: COLORS.line,
   },
-  cta: {
-    marginTop: 4,
+  profileButton: {
     backgroundColor: COLORS.bg,
-    borderColor: COLORS.brand,
     borderWidth: 1.5,
+    borderColor: COLORS.text,
+    borderRadius: 24,
     paddingVertical: 12,
-    borderRadius: 999,
     alignItems: 'center',
+    marginBottom: 12,
   },
-  ctaText: { color: COLORS.brand, fontWeight: '800', fontSize: 16 },
-  actionsRow: {
+  profileButtonText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: COLORS.text,
+  },
+  contactActions: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 16,
-    marginTop: 2,
+    gap: 20,
   },
-  contentWrap: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  locationText: {
-    color: COLORS.sub,
-    fontSize: 13,
-    fontWeight: '500',
-    flex: 1,
-  },
-  galleryContainer: {
-    gap: 10,
-  },
-  gallery: {
-    marginTop: 8,
-  },
-  roleIcon: {
-    marginRight: 6,
-  },
-  locationIcon: {
-    marginRight: 2,
-  },
-  actionBtn: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+  contactButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: COLORS.brandSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  actionBtnDisabled: {
+  contactButtonDisabled: {
     opacity: 0.4,
   },
-  actionBtnPressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.98 }],
+  locationIcon: {
+    marginLeft: 8,
   },
 });
 

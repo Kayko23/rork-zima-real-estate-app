@@ -4,24 +4,19 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 import {
   ChevronDown,
   Grid,
   List,
-  Phone,
-  MessageCircle as WhatsAppIcon,
-  Mail,
-  Star,
-  MapPin,
-  Building2,
 } from 'lucide-react-native';
-import * as Linking from 'expo-linking';
 import FusedSearch from '@/components/search/FusedSearch';
+import ProCard, { ProItem } from '@/components/ui/ProCard';
 import { useApp } from '@/hooks/useAppStore';
 import Colors from '@/constants/colors';
 import { mockProviders } from '@/constants/data';
-import { Provider } from '@/types';
+
 import { T } from '@/constants/typography';
 
 export default function ServicesFeed() {
@@ -30,31 +25,20 @@ export default function ServicesFeed() {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const { filters } = useApp();
 
-  const handleCall = (phone: string) => {
-    if (phone && phone.trim()) {
-      Linking.openURL(`tel:${phone}`);
-    }
-  };
-
-  const handleWhatsApp = (phone: string) => {
-    if (phone && phone.trim()) {
-      Linking.openURL(`https://wa.me/${phone.replace('+', '')}`);
-    }
-  };
-
-  const handleEmail = (email: string) => {
-    if (email && email.trim()) {
-      Linking.openURL(`mailto:${email}`);
-    }
-  };
-
-  const handleViewProfile = (providerId: string) => {
-    console.log('View profile:', providerId);
+  const handleViewProfile = (item: ProItem) => {
+    console.log('View profile:', item.id);
   };
 
   const handleSearchSubmit = (params: any) => {
     if (!params || typeof params !== 'object') return;
-    console.log('Search params:', params);
+    // Validation des paramètres de recherche
+    if (params.country && typeof params.country === 'string' && params.country.trim().length > 0) {
+      console.log('Search country:', params.country.trim());
+    }
+    if (params.city && typeof params.city === 'string' && params.city.trim().length > 0) {
+      console.log('Search city:', params.city.trim());
+    }
+    // Traitement des paramètres validés
   };
 
   const filteredProviders = useMemo(() => {
@@ -95,109 +79,32 @@ export default function ServicesFeed() {
     return filtered;
   }, [filters, searchQuery, sortBy]);
 
-
-
-  const renderProviderCard = (provider: Provider) => (
-    <TouchableOpacity
-      key={provider.id}
-      style={styles.providerCard}
-      onPress={() => handleViewProfile(provider.id)}
-      activeOpacity={0.7}
-    >
-      <View style={styles.providerHeader}>
-        <View style={styles.avatarContainer}>
-          <View style={styles.avatarPlaceholder}>
-            <Text style={styles.avatarText}>👤</Text>
-          </View>
-          <View style={styles.onlineDot} />
-        </View>
-        
-        <View style={styles.providerInfo}>
-          <Text style={styles.providerName}>{provider.name}</Text>
-          <View style={styles.badgesRow}>
-            {provider.isPremium && (
-              <View style={[styles.badge, styles.premiumBadge]}>
-                <Text style={styles.premiumBadgeText}>Premium</Text>
-              </View>
-            )}
-            {provider.isVerified && (
-              <View style={[styles.badge, styles.verifiedBadge]}>
-                <Text style={styles.verifiedBadgeText}>Vérifié</Text>
-              </View>
-            )}
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.metaRow}>
-        <View style={styles.metaItem}>
-          <Building2 size={14} color={Colors.text.secondary} />
-          <Text style={styles.metaText}>{provider.type === 'agency' ? 'Agence' : 'Agent'}</Text>
-        </View>
-        <View style={styles.metaItem}>
-          <MapPin size={14} color={Colors.text.secondary} />
-          <Text style={styles.metaText}>{provider.location.city}, {provider.location.country}</Text>
-        </View>
-      </View>
-
-      <View style={styles.ratingRow}>
-        <View style={styles.ratingContainer}>
-          <Star size={14} color={Colors.gold} fill={Colors.gold} />
-          <Text style={styles.ratingText}>
-            {provider.rating} ({provider.reviewCount} avis)
-          </Text>
-        </View>
-        <Text style={styles.adsCount}>{provider.listingCount} annonces</Text>
-      </View>
-
-      <View style={styles.tagsRow}>
-        {provider.specialties.map((specialty, index) => (
-          <View key={`${provider.id}-specialty-${index}`} style={styles.tag}>
-            <Text style={styles.tagText}>{specialty}</Text>
-          </View>
-        ))}
-      </View>
-
-      <View style={styles.galleryRow}>
-        <View style={styles.galleryPlaceholder}>
-          <Text style={styles.galleryPlaceholderText}>📸</Text>
-        </View>
-        <View style={styles.galleryPlaceholder}>
-          <Text style={styles.galleryPlaceholderText}>🏠</Text>
-        </View>
-        <View style={styles.galleryPlaceholder}>
-          <Text style={styles.galleryPlaceholderText}>✨</Text>
-        </View>
-      </View>
-
-      <View style={styles.ctaRow}>
-        <TouchableOpacity style={styles.primaryButton}>
-          <Text style={styles.primaryButtonText}>Voir profil</Text>
-        </TouchableOpacity>
-        
-        <View style={styles.actionButtons}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => handleCall(provider.phone)}
-          >
-            <Phone size={20} color={Colors.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => handleWhatsApp(provider.whatsapp || provider.phone)}
-          >
-            <WhatsAppIcon size={20} color="#25D366" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => handleEmail(provider.email)}
-          >
-            <Mail size={20} color={Colors.primary} />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+  // Convertir les données Provider en ProItem
+  const proItems: ProItem[] = useMemo(() => {
+    return filteredProviders.map(provider => ({
+      id: provider.id,
+      name: provider.name,
+      avatarUrl: provider.avatar,
+      isVerified: provider.isVerified,
+      isPremium: provider.isPremium,
+      role: provider.type === 'agency' ? 'Agence' : 'Agent',
+      city: provider.location.city,
+      country: provider.location.country,
+      rating: provider.rating,
+      reviews: provider.reviewCount,
+      listings: provider.listingCount,
+      specialties: provider.specialties,
+      gallery: [
+        'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop',
+        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop',
+        'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop',
+      ],
+      phone: provider.phone,
+      email: provider.email,
+      whatsapp: provider.whatsapp || provider.phone,
+      online: Math.random() > 0.5, // Simuler le statut en ligne
+    }));
+  }, [filteredProviders]);
 
   return (
     <View style={styles.container}>
@@ -226,9 +133,18 @@ export default function ServicesFeed() {
         </View>
       </View>
 
-      <View style={styles.providerList}>
-        {filteredProviders.map(renderProviderCard)}
-      </View>
+      <FlatList
+        data={proItems}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <ProCard
+            item={item}
+            onPressProfile={handleViewProfile}
+          />
+        )}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.listContent}
+      />
 
       <View style={styles.joinCTA}>
         <Text style={styles.joinTitle}>Vous êtes un professionnel de l&apos;immobilier ?</Text>
@@ -245,6 +161,7 @@ export default function ServicesFeed() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     paddingHorizontal: 16,
     paddingTop: 16,
   },
@@ -258,7 +175,6 @@ const styles = StyleSheet.create({
   listHeaderLeft: {
     flex: 1,
   },
-
   listSubtitle: {
     fontSize: 14,
     color: Colors.text.secondary,
@@ -290,194 +206,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  providerList: {
-    gap: 16,
-  },
-  providerCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 24,
-    elevation: 8,
-  },
-  providerHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 12,
-  },
-  avatarContainer: {
-    position: 'relative',
-    marginRight: 12,
-  },
-  avatarPlaceholder: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#F6F7F8',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarText: {
-    fontSize: 24,
-  },
-  onlineDot: {
-    position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#0B5E55',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-  },
-  providerInfo: {
-    flex: 1,
-  },
-  providerName: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#0E1E1B',
-    marginBottom: 6,
-  },
-  badgesRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  badge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  premiumBadge: {
-    backgroundColor: '#8A641F',
-  },
-  premiumBadgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  verifiedBadge: {
-    backgroundColor: '#0B5E55',
-  },
-  verifiedBadgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-    gap: 16,
-  },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  metaText: {
-    fontSize: 14,
-    color: Colors.text.secondary,
-  },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  ratingText: {
-    fontSize: 14,
-    color: Colors.text.primary,
-    fontWeight: '500',
-  },
-  adsCount: {
-    fontSize: 14,
-    color: Colors.text.secondary,
-    marginLeft: 8,
-  },
-  tagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 12,
-  },
-  tag: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: '#F6F7F8',
-    borderRadius: 16,
-  },
-  tagText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: Colors.text.primary,
-  },
-  galleryRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 16,
-  },
-  galleryPlaceholder: {
-    width: 88,
-    height: 64,
-    borderRadius: 12,
-    backgroundColor: '#F6F7F8',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  galleryPlaceholderText: {
-    fontSize: 24,
-  },
-  galleryMore: {
-    width: 88,
-    height: 64,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  galleryMoreText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.text.primary,
-  },
-  ctaRow: {
-    gap: 12,
-  },
-  primaryButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 22,
-    borderWidth: 2,
-    borderColor: '#0B5E55',
-    backgroundColor: 'transparent',
-    alignItems: 'center',
-  },
-  primaryButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#0B5E55',
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
-  },
-  actionButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#F6F7F8',
-    justifyContent: 'center',
-    alignItems: 'center',
+  listContent: {
+    paddingBottom: 100,
   },
   joinCTA: {
     marginTop: 32,
