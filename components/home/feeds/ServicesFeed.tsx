@@ -11,6 +11,7 @@ import {
   Grid,
   List,
 } from 'lucide-react-native';
+import { router } from 'expo-router';
 import FusedSearch from '@/components/search/FusedSearch';
 import ProCard, { ProItem } from '@/components/ui/ProCard';
 import { useApp } from '@/hooks/useAppStore';
@@ -27,6 +28,7 @@ export default function ServicesFeed() {
 
   const handleViewProfile = (item: ProItem) => {
     console.log('View profile:', item.id);
+    router.push(`/provider/${item.id}`);
   };
 
   const handleSearchSubmit = (params: any) => {
@@ -109,7 +111,7 @@ export default function ServicesFeed() {
   return (
     <View style={styles.container}>
       <FusedSearch mode="services" onSubmit={handleSearchSubmit} />
-      <Text style={[T.h2, { marginTop: 18 }]}>2 professionnels trouvés</Text>
+      <Text style={[T.h2, { marginTop: 18 }]}>{filteredProviders.length} professionnels trouvés</Text>
 
       <View style={styles.listHeader}>
         <View style={styles.listHeaderLeft}>

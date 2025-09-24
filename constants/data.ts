@@ -263,6 +263,273 @@ export const mockProviders: Provider[] = [
       'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200',
       'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200'
     ]
+  },
+  {
+    id: 'p3',
+    name: 'Fatima Diallo Immobilier',
+    type: 'agency',
+    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
+    rating: 4.9,
+    reviewCount: 89,
+    location: { city: 'Dakar', country: 'Sénégal' },
+    specialties: ['Résidentiel', 'Luxe', 'Investissement'],
+    isVerified: true,
+    isPremium: true,
+    phone: '+221771234567',
+    email: 'contact@fatimadiallo.sn',
+    whatsapp: '+221771234567',
+    listingCount: 52,
+    images: [
+      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=200',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200',
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=200'
+    ]
+  },
+  {
+    id: 'p4',
+    name: 'Mohamed Traoré',
+    type: 'agent',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+    rating: 4.7,
+    reviewCount: 31,
+    location: { city: 'Abidjan', country: 'Côte d\'Ivoire' },
+    specialties: ['Location', 'Commercial', 'Résidentiel'],
+    isVerified: true,
+    isPremium: false,
+    phone: '+2250701234567',
+    email: 'mohamed.traore@gmail.com',
+    whatsapp: '+2250701234567',
+    listingCount: 19,
+    images: [
+      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200'
+    ]
+  },
+  {
+    id: 'p5',
+    name: 'Aisha Kone Properties',
+    type: 'agency',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
+    rating: 4.5,
+    reviewCount: 76,
+    location: { city: 'Bamako', country: 'Mali' },
+    specialties: ['Résidentiel', 'Terrain', 'Construction'],
+    isVerified: true,
+    isPremium: true,
+    phone: '+22370123456',
+    email: 'info@aishakone.ml',
+    whatsapp: '+22370123456',
+    listingCount: 41,
+    images: [
+      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200',
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=200'
+    ]
+  },
+  {
+    id: 'p6',
+    name: 'Emmanuel Mensah',
+    type: 'agent',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+    rating: 4.8,
+    reviewCount: 54,
+    location: { city: 'Kumasi', country: 'Ghana' },
+    specialties: ['Résidentiel', 'Luxe'],
+    isVerified: true,
+    isPremium: false,
+    phone: '+233501234567',
+    email: 'emmanuel.mensah@gmail.com',
+    whatsapp: '+233501234567',
+    listingCount: 23,
+    images: [
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200'
+    ]
+  },
+  {
+    id: 'p7',
+    name: 'Zara Ouattara Realty',
+    type: 'agency',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150',
+    rating: 4.6,
+    reviewCount: 92,
+    location: { city: 'Ouagadougou', country: 'Burkina Faso' },
+    specialties: ['Commercial', 'Industriel', 'Résidentiel'],
+    isVerified: true,
+    isPremium: true,
+    phone: '+22670123456',
+    email: 'contact@zaraouattara.bf',
+    whatsapp: '+22670123456',
+    listingCount: 38,
+    images: [
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200',
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=200'
+    ]
+  },
+  {
+    id: 'p8',
+    name: 'Ibrahim Sow',
+    type: 'agent',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+    rating: 4.4,
+    reviewCount: 27,
+    location: { city: 'Conakry', country: 'Guinée' },
+    specialties: ['Location', 'Résidentiel'],
+    isVerified: false,
+    isPremium: false,
+    phone: '+224621234567',
+    email: 'ibrahim.sow@gmail.com',
+    whatsapp: '+224621234567',
+    listingCount: 15,
+    images: [
+      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200'
+    ]
+  },
+  {
+    id: 'p9',
+    name: 'Mariam Keita Properties',
+    type: 'agency',
+    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
+    rating: 4.7,
+    reviewCount: 63,
+    location: { city: 'Niamey', country: 'Niger' },
+    specialties: ['Résidentiel', 'Commercial', 'Terrain'],
+    isVerified: true,
+    isPremium: false,
+    phone: '+22796123456',
+    email: 'contact@mariamkeita.ne',
+    whatsapp: '+22796123456',
+    listingCount: 29,
+    images: [
+      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200',
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=200'
+    ]
+  },
+  {
+    id: 'p10',
+    name: 'Kofi Asante',
+    type: 'agent',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+    rating: 4.9,
+    reviewCount: 45,
+    location: { city: 'Cape Coast', country: 'Ghana' },
+    specialties: ['Résidentiel', 'Luxe', 'Vue mer'],
+    isVerified: true,
+    isPremium: true,
+    phone: '+233241234567',
+    email: 'kofi.asante@gmail.com',
+    whatsapp: '+233241234567',
+    listingCount: 31,
+    images: [
+      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=200',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200',
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=200'
+    ]
+  },
+  {
+    id: 'p11',
+    name: 'Aminata Ba Immobilier',
+    type: 'agency',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
+    rating: 4.8,
+    reviewCount: 78,
+    location: { city: 'Thiès', country: 'Sénégal' },
+    specialties: ['Résidentiel', 'Investissement', 'Gestion'],
+    isVerified: true,
+    isPremium: true,
+    phone: '+221771234568',
+    email: 'contact@aminataba.sn',
+    whatsapp: '+221771234568',
+    listingCount: 46,
+    images: [
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200'
+    ]
+  },
+  {
+    id: 'p12',
+    name: 'Sekou Camara',
+    type: 'agent',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+    rating: 4.3,
+    reviewCount: 22,
+    location: { city: 'Bouaké', country: 'Côte d\'Ivoire' },
+    specialties: ['Location', 'Résidentiel', 'Commercial'],
+    isVerified: false,
+    isPremium: false,
+    phone: '+2250701234568',
+    email: 'sekou.camara@gmail.com',
+    whatsapp: '+2250701234568',
+    listingCount: 12,
+    images: [
+      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200'
+    ]
+  },
+  {
+    id: 'p13',
+    name: 'Grace Okafor Properties',
+    type: 'agency',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150',
+    rating: 4.7,
+    reviewCount: 85,
+    location: { city: 'Abuja', country: 'Nigeria' },
+    specialties: ['Luxe', 'Commercial', 'Résidentiel'],
+    isVerified: true,
+    isPremium: true,
+    phone: '+234901234567',
+    email: 'info@graceokafor.ng',
+    whatsapp: '+234901234567',
+    listingCount: 57,
+    images: [
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200',
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=200'
+    ]
+  },
+  {
+    id: 'p14',
+    name: 'Ousmane Diop',
+    type: 'agent',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+    rating: 4.5,
+    reviewCount: 38,
+    location: { city: 'Kaolack', country: 'Sénégal' },
+    specialties: ['Résidentiel', 'Terrain', 'Agriculture'],
+    isVerified: true,
+    isPremium: false,
+    phone: '+221771234569',
+    email: 'ousmane.diop@gmail.com',
+    whatsapp: '+221771234569',
+    listingCount: 21,
+    images: [
+      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200'
+    ]
+  },
+  {
+    id: 'p15',
+    name: 'Akosua Mensah Realty',
+    type: 'agency',
+    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
+    rating: 4.6,
+    reviewCount: 71,
+    location: { city: 'Tamale', country: 'Ghana' },
+    specialties: ['Résidentiel', 'Commercial', 'Développement'],
+    isVerified: true,
+    isPremium: false,
+    phone: '+233261234567',
+    email: 'contact@akosuamensah.gh',
+    whatsapp: '+233261234567',
+    listingCount: 33,
+    images: [
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200',
+      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200'
+    ]
   }
 ];
 
