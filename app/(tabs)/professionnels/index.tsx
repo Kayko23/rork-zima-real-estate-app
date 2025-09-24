@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,19 +7,30 @@ import {
   FlatList,
   ScrollView,
   Linking,
+  StatusBar,
 } from 'react-native';
 import {
   ChevronRight,
 } from 'lucide-react-native';
 import { router } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import FusedSearch from '@/components/search/FusedSearch';
 import ProviderCard, { Provider } from '@/components/professionals/ProviderCard';
 import { CATEGORY_ORDER, providers } from '@/constants/professionals';
+import HomeHeader from '@/components/home/HomeHeader';
+import { useApp } from '@/hooks/useAppStore';
 
 export default function ProfessionnelsScreen() {
-  const insets = useSafeAreaInsets();
+  const { activeHomeTab, setHomeTab } = useApp();
+  
+  // Automatically switch to services tab when this screen is focused
+  useEffect(() => {
+    if (activeHomeTab !== 'services') {
+      setHomeTab('services');
+    }
+  }, [activeHomeTab, setHomeTab]);
+  
   const grouped = useMemo(() => {
     const map: Record<string, Provider[]> = {};
     CATEGORY_ORDER.forEach(c => (map[c.key] = []));
@@ -67,19 +78,18 @@ export default function ProfessionnelsScreen() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Professionnels</Text>
-        <Text style={styles.subtitle}>Trouvez les meilleurs professionnels de l&apos;immobilier</Text>
-      </View>
-      
-      <FusedSearch mode="services" onSubmit={handleSearchSubmit} />
-      
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent} 
-        style={styles.scrollView}
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#F3F6F6" />
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        stickyHeaderIndices={[0]}
         showsVerticalScrollIndicator={false}
       >
+        <HomeHeader active={activeHomeTab} onChange={setHomeTab} />
+        
+        <View style={styles.searchContainer}>
+          <FusedSearch mode="services" onSubmit={handleSearchSubmit} />
+        </View>
         {CATEGORY_ORDER.map(({ key, title }) => {
           const data = grouped[key] || [];
           if (!data.length) return null;
@@ -129,30 +139,18 @@ export default function ProfessionnelsScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F4F7F6',
+    backgroundColor: '#F3F6F6',
   },
-  header: {
+  searchContainer: {
     paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 16,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#0F172A',
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#6B7280',
-    lineHeight: 22,
+    paddingBottom: 8,
   },
   section: { 
     marginTop: 18 
@@ -218,10 +216,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   scrollContent: {
-    paddingBottom: 120,
-  },
-  scrollView: {
-    flex: 1,
+    paddingBottom: 96,
+    backgroundColor: '#F3F6F6',
   },
   listContainer: {
     paddingHorizontal: 16,
