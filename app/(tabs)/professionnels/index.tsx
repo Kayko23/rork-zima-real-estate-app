@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import {
   ChevronRight,
 } from 'lucide-react-native';
 import { router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 import FusedSearch from '@/components/search/FusedSearch';
 import ProviderCard, { Provider } from '@/components/professionals/ProviderCard';
@@ -22,19 +22,13 @@ import HomeHeader from '@/components/home/HomeHeader';
 import { useApp } from '@/hooks/useAppStore';
 
 export default function ProfessionnelsScreen() {
-  const { activeHomeTab, setHomeTab } = useApp();
-  
-  // Automatically switch to services tab when this screen is focused
-  useEffect(() => {
-    if (activeHomeTab !== 'services') {
-      setHomeTab('services');
-    }
-  }, [activeHomeTab, setHomeTab]);
+  const { setHomeTab } = useApp();
   
   const grouped = useMemo(() => {
     const map: Record<string, Provider[]> = {};
     CATEGORY_ORDER.forEach(c => (map[c.key] = []));
     providers.forEach(p => {
+      if (!p?.category || typeof p.category !== 'string') return;
       if (!map[p.category]) map[p.category] = [];
       map[p.category].push(p);
     });
@@ -42,12 +36,15 @@ export default function ProfessionnelsScreen() {
   }, []);
 
   const goProfile = (p: Provider) => {
-    if (!p?.id || p.id.trim().length === 0) return;
-    console.log('View profile:', p.id);
-    router.push(`/(tabs)/professionnels/profile/${p.id}`);
+    if (!p?.id || typeof p.id !== 'string' || p.id.trim().length === 0) return;
+    const sanitizedId = p.id.trim();
+    if (sanitizedId.length > 50) return; // Reasonable ID length limit
+    console.log('View profile:', sanitizedId);
+    router.push(`/(tabs)/professionnels/profile/${sanitizedId}`);
   };
   
   const call = (p: Provider) => {
+    if (!p?.id || typeof p.id !== 'string') return;
     if (p.id === '1') { // Aminata Diallo
       Linking.openURL('tel:+221771234567');
     } else {
@@ -56,6 +53,7 @@ export default function ProfessionnelsScreen() {
   };
   
   const wa = (p: Provider) => {
+    if (!p?.id || typeof p.id !== 'string') return;
     if (p.id === '1') { // Aminata Diallo
       Linking.openURL('https://wa.me/221771234567');
     } else {
@@ -64,6 +62,7 @@ export default function ProfessionnelsScreen() {
   };
   
   const mail = (p: Provider) => {
+    if (!p?.id || typeof p.id !== 'string') return;
     if (p.id === '1') { // Aminata Diallo
       Linking.openURL('mailto:aminata@zimarealty.com');
     } else {
@@ -72,20 +71,21 @@ export default function ProfessionnelsScreen() {
   };
 
   const handleSearchSubmit = (params: any) => {
-    if (!params || typeof params !== 'object') return;
+    if (!params) return;
     if (typeof params === 'string' && params.trim().length === 0) return;
+    if (typeof params === 'object' && Object.keys(params).length === 0) return;
     console.log('Search params:', params);
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#F3F6F6" />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         stickyHeaderIndices={[0]}
         showsVerticalScrollIndicator={false}
       >
-        <HomeHeader active={activeHomeTab} onChange={setHomeTab} />
+        <HomeHeader active="services" onChange={setHomeTab} />
         
         <View style={styles.searchContainer}>
           <FusedSearch mode="services" onSubmit={handleSearchSubmit} />
@@ -139,7 +139,7 @@ export default function ProfessionnelsScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
