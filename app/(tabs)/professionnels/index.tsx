@@ -82,13 +82,11 @@ export default function ProfessionnelsScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#F3F6F6" />
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={styles.contentContainer}
         stickyHeaderIndices={[0]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.headerContainer}>
-          <HomeHeader active="services" onChange={setHomeTab} />
-        </View>
+        <HomeHeader active="services" onChange={setHomeTab} />
         
         <View style={styles.searchContainer}>
           <FusedSearch mode="services" onSubmit={handleSearchSubmit} />
@@ -149,9 +147,6 @@ export default function ProfessionnelsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F6F6',
-  },
-  headerContainer: {
     backgroundColor: '#F3F6F6',
   },
   searchContainer: {
@@ -222,7 +217,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FFFFFF',
   },
-  scrollContent: {
+  contentContainer: {
     paddingBottom: 96,
     backgroundColor: '#F3F6F6',
   },
