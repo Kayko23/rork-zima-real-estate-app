@@ -5,7 +5,7 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons, Feather } from '@expo/vector-icons';
-import { getProviderById } from '@/constants/data';
+import { providers } from '@/constants/professionals';
 
 type Listing = {
   id: string;
@@ -99,7 +99,7 @@ export default function ProviderProfileScreen() {
   const [faved, setFaved] = useState<boolean>(false);
 
   const pro: Pro = useMemo(() => {
-    const providerData = getProviderById(id || 'p16');
+    const providerData = providers.find(p => p.id === id);
     if (!providerData) {
       // Fallback data
       return {
@@ -117,8 +117,42 @@ export default function ProviderProfileScreen() {
         zones: ['Centre-ville', 'Résidentiel', 'Commercial'],
         rating: 4.9,
         ratingsCount: 156,
-        listings: [],
-        reviews: [],
+        listings: [
+          {
+            id: 'l1',
+            title: 'Villa moderne avec piscine',
+            city: 'Lagos',
+            area: 'Nigeria',
+            priceLabel: '$125,000',
+            badge: 'À vendre',
+            thumb: 'https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=800&auto=format&fit=crop',
+          },
+          {
+            id: 'l2',
+            title: 'Appartement centre-ville',
+            city: 'Lagos',
+            area: 'Nigeria',
+            priceLabel: '$850/mois',
+            badge: 'À louer',
+            thumb: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop',
+          },
+        ],
+        reviews: [
+          {
+            id: 'r1',
+            author: 'Client satisfait',
+            dateLabel: '20/11/2024',
+            rating: 5,
+            text: 'Excellent service ! Très professionnel et à l\'écoute. M\'a aidé à trouver la propriété parfaite.',
+          },
+          {
+            id: 'r2',
+            author: 'Autre client',
+            dateLabel: '15/10/2024',
+            rating: 5,
+            text: 'Service impeccable. Connaît très bien le marché local.',
+          },
+        ],
         phone: '+234901234568',
         whatsapp: '234901234568',
         email: 'chioma@okaforproperties.ng',
@@ -128,37 +162,57 @@ export default function ProviderProfileScreen() {
     return {
       id: providerData.id,
       name: providerData.name,
-      role: providerData.type === 'agency' ? 'Agence' as const : 'Agent' as const,
-      city: providerData.location.city,
-      country: providerData.location.country,
-      avatar: providerData.avatar,
-      cover: providerData.cover,
-      premium: providerData.isPremium,
-      verified: providerData.isVerified,
-      specialties: providerData.specialties,
-      languages: providerData.languages,
-      zones: providerData.zones,
+      role: providerData.category === 'agency' ? 'Agence' as const : 'Agent' as const,
+      city: providerData.city,
+      country: providerData.country,
+      avatar: providerData.avatar || 'https://i.pravatar.cc/150',
+      cover: providerData.cover || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1200&auto=format',
+      premium: providerData.badges?.includes('premium') || false,
+      verified: providerData.badges?.includes('verified') || false,
+      specialties: providerData.tags || [],
+      languages: ['Français', 'English'],
+      zones: ['Centre-ville', 'Résidentiel', 'Commercial'],
       rating: providerData.rating,
-      ratingsCount: providerData.reviewCount,
-      listings: providerData.listings.map(l => ({
-        id: l.id,
-        title: l.title,
-        city: l.city,
-        area: l.country,
-        priceLabel: l.price,
-        badge: l.status,
-        thumb: l.thumbnail,
-      })),
-      reviews: providerData.reviews.map(r => ({
-        id: r.id,
-        author: r.author,
-        dateLabel: r.date,
-        rating: r.rating,
-        text: r.text,
-      })),
-      phone: providerData.phone,
-      whatsapp: providerData.whatsapp?.replace(/[^0-9]/g, ''),
-      email: providerData.email,
+      ratingsCount: providerData.reviews,
+      listings: [
+        {
+          id: 'l1',
+          title: 'Villa moderne avec piscine',
+          city: providerData.city,
+          area: providerData.country,
+          priceLabel: '$125,000',
+          badge: 'À vendre',
+          thumb: 'https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=800&auto=format&fit=crop',
+        },
+        {
+          id: 'l2',
+          title: 'Appartement centre-ville',
+          city: providerData.city,
+          area: providerData.country,
+          priceLabel: '$850/mois',
+          badge: 'À louer',
+          thumb: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop',
+        },
+      ],
+      reviews: [
+        {
+          id: 'r1',
+          author: 'Client satisfait',
+          dateLabel: '20/11/2024',
+          rating: 5,
+          text: 'Excellent service ! Très professionnel et à l\'écoute. M\'a aidé à trouver la propriété parfaite.',
+        },
+        {
+          id: 'r2',
+          author: 'Autre client',
+          dateLabel: '15/10/2024',
+          rating: 5,
+          text: 'Service impeccable. Connaît très bien le marché local.',
+        },
+      ],
+      phone: '+221771234567',
+      whatsapp: '221771234567',
+      email: `${providerData.name.toLowerCase().replace(/\s+/g, '.')}@example.com`,
     };
   }, [id]);
 
@@ -223,10 +277,10 @@ export default function ProviderProfileScreen() {
 
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             {pro.premium && (
-              <Badge color={palette.gold} label="Premium" icon={<Ionicons name={"crown" as any} size={14} color={palette.gold} />} />
+              <Badge color={palette.gold} label="Premium" icon={<Ionicons name="crown" as any size={14} color={palette.gold} />} />
             )}
             {pro.verified && (
-              <Badge color={palette.violet} label="Vérifié" icon={<Ionicons name={"shield-checkmark" as any} size={14} color={palette.violet} />} />
+              <Badge color={palette.violet} label="Vérifié" icon={<Ionicons name="shield-checkmark" as any size={14} color={palette.violet} />} />
             )}
             <Chip label={pro.role} />
           </View>
