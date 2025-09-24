@@ -375,7 +375,14 @@ function PropertyDetailScreen() {
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ paddingHorizontal: CARD, paddingBottom: 8 }}
-          renderItem={({ item }) => <PopularCard item={item} />}
+          renderItem={({ item }) => (
+            <Pressable onPress={() => {
+              console.log("Opening property:", item.id);
+              router.push(`/property/${item.id}`);
+            }}>
+              <PopularCard item={item} />
+            </Pressable>
+          )}
         />
 
         <View style={{ paddingHorizontal: CARD, marginTop: 16, marginBottom: 24 }}>
@@ -520,9 +527,17 @@ function ReviewCard({ name, date, text }: { name: string; date: string; text: st
 }
 
 function PopularCard({ item }: { item: PopularItem }) {
+  const propertyImages = [
+    "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=400&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=400&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400&auto=format&fit=crop",
+  ];
+  
+  const randomImage = propertyImages[Math.floor(Math.random() * propertyImages.length)];
+  
   return (
     <View style={styles.popularCard}>
-      <View style={styles.popularImg} />
+      <Image source={{ uri: randomImage }} style={styles.popularImg} resizeMode="cover" />
       <View style={{ position: "absolute", left: 12, bottom: 46 }}>
         <Text style={styles.popularTitle}>{item.title}</Text>
       </View>
