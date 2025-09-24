@@ -1,780 +1,238 @@
-import React, { useMemo, useState } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  Image,
-  Pressable,
-  FlatList,
-  Dimensions,
-  Linking,
-  Platform,
-} from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import {
-  ChevronLeft,
-  Heart,
-  Share2,
-  Star,
-  MapPin,
-  Phone,
-  MessageCircle,
-  ChartBar,
-} from "lucide-react-native";
-
-const { width } = Dimensions.get("window");
-const CARD = 16;
-const R = 18;
-
-type Agent = {
-  name: string;
-  verified?: boolean;
-  stats: { reviews: number; rating: number; years: number };
-  role: string;
-  avatar: string;
-};
-
-type PopularItem = { id: string; title: string; info1: string; info2: string };
-
-type PropertyData = {
-  id: string | string[] | undefined;
-  title: string;
-  city: string;
-  country: string;
-  type: string;
-  chips: string[];
-  price: number;
-  currency: string;
-  premium: boolean;
-  rating: number;
-  reviewsCount: number;
-  images: string[];
-  features: { icon: string; label: string }[];
-  description: string;
-  agent: Agent;
-  safety: { title: string; subtitle: string }[];
-  popularInCity: PopularItem[];
-};
+import React from "react";
+import { View, Text, StyleSheet, ScrollView, Image } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import BackButton from "@/components/ui/BackButton";
+import { mockProperties } from "@/constants/data";
+import Colors from "@/constants/colors";
 
 export default function PropertyDetailScreen() {
-  const router = useRouter();
-  const { id } = useLocalSearchParams<{ id?: string }>();
+  const insets = useSafeAreaInsets();
+  const { id } = useLocalSearchParams<{ id: string }>();
+  
+  const property = mockProperties.find(p => p.id === id);
 
-  const data: PropertyData = useMemo(
-    () => ({
-      id,
-      title: "Appartement Moderne au Centre-ville de Dakar",
-      city: "Dakar",
-      country: "Senegal",
-      type: "villa",
-      chips: ["villa", "3 pièces", "2 SDB", "85 m²"],
-      price: 125000,
-      currency: "$US",
-      premium: true,
-      rating: 4.8,
-      reviewsCount: 23,
-      images: [
-        "https://images.unsplash.com/photo-1502673530728-f79b4cab31b1?q=80&w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1560448075-bb4caa6c1e56?q=80&w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1505691723518-36a5ac3b2bba?q=80&w=1200&auto=format&fit=crop",
-      ],
-      features: [
-        { icon: "🛏️", label: "4" },
-        { icon: "🛁", label: "3" },
-        { icon: "📐", label: "280m²" },
-      ],
-      description:
-        "Magnifique villa moderne avec vue imprenable sur la ville. Design contemporain, finitions de haute qualité, et excellent emplacement près du quartier des affaires.",
-      agent: {
-        name: "Aminata Diallo",
-        verified: true,
-        stats: { reviews: 150, rating: 4.78, years: 5 },
-        role: "Agent immobilier",
-        avatar:
-          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
-      },
-      safety: [
-        {
-          title: "Politique de vérification",
-          subtitle: "Tous nos agents sont vérifiés et certifiés",
-        },
-        {
-          title: "Sécurité des visites",
-          subtitle: "Visites accompagnées et sécurisées",
-        },
-      ],
-      popularInCity: [
-        { id: "p1", title: "appartement · Lagos", info1: "85 $ pour 2 nuits", info2: "4.6" },
-        { id: "p2", title: "boutique · Cotonou", info1: "400 $/mois", info2: "4.3" },
-      ],
-    }),
-    [id]
-  );
-
-  const [imgIndex, setImgIndex] = useState<number>(0);
-
-  const openMaps = () => {
-    try {
-      const q = encodeURIComponent(`${data.city}, ${data.country}`);
-      const url = Platform.OS === "ios" ? `http://maps.apple.com/?q=${q}` : `geo:0,0?q=${q}`;
-      console.log("openMaps", url);
-      Linking.openURL(url);
-    } catch (e) {
-      console.error("openMaps error", e);
-    }
-  };
-
-  const openItinerary = () => {
-    try {
-      const q = encodeURIComponent(`${data.city}, ${data.country}`);
-      const url =
-        Platform.OS === "ios"
-          ? `http://maps.apple.com/?daddr=${q}`
-          : `https://www.google.com/maps/dir/?api=1&destination=${q}`;
-      console.log("openItinerary", url);
-      Linking.openURL(url);
-    } catch (e) {
-      console.error("openItinerary error", e);
-    }
-  };
+  if (!property) {
+    return (
+      <View style={[styles.container, { paddingTop: insets.top }]}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Bien introuvable</Text>
+        </View>
+        <View style={styles.content}>
+          <Text style={styles.errorText}>Ce bien n&apos;existe pas ou a été supprimé.</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
-    <View style={styles.screen} testID="property-detail-screen">
-      <View style={styles.topBar}>
-        <IconBtn onPress={() => router.back()} testID="btn-back">
-          <ChevronLeft size={22} color="#0b3b35" />
-        </IconBtn>
-        <View style={{ flexDirection: "row", gap: 10 }}>
-          <IconBtn onPress={() => { console.log("share pressed"); }} testID="btn-share">
-            <Share2 size={20} color="#0b3b35" />
-          </IconBtn>
-          <IconBtn onPress={() => { console.log("favorite pressed"); }} testID="btn-fav">
-            <Heart size={20} color="#0b3b35" />
-          </IconBtn>
-        </View>
-      </View>
-
-      <FlatList
-        data={data.images}
-        keyExtractor={(_, i) => `img-${i}`}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={(e) => {
-          const idx = Math.round(e.nativeEvent.contentOffset.x / width);
-          setImgIndex(idx);
-        }}
-        renderItem={({ item }) => (
-          <Image source={{ uri: item }} style={styles.hero} />
-        )}
-      />
-
-      <View style={styles.imgPager}>
-        <Text style={styles.pagerText}>{imgIndex + 1} / {data.images.length}</Text>
-      </View>
-
-      <ScrollView
-        style={styles.content}
-        contentContainerStyle={{ paddingBottom: 140 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={{ paddingHorizontal: CARD, paddingTop: 10 }}>
-          <Text style={styles.title}>{data.title}</Text>
-          <View style={styles.chipsRow}>
-            {data.chips.map((c) => (
-              <Chip key={c} label={c} />
-            ))}
-          </View>
-
-          <Pressable style={styles.locationRow} onPress={openMaps} testID="btn-open-maps">
-            <MapPin size={18} color="#0f6b5e" />
-            <Text style={styles.locationText}>{data.city}, {data.country}</Text>
-          </Pressable>
-
-          <View style={styles.ratingRow}>
-            <Star size={16} color="#f0b429" fill="#f0b429" />
-            <Text style={styles.ratingText}>
-              {data.rating.toFixed(1)} • <Text style={styles.linkText}>{data.reviewsCount} avis</Text>
-            </Text>
-          </View>
-        </View>
-
-        <View style={{ paddingHorizontal: CARD, gap: 12, marginTop: 8 }}>
-          <Text style={styles.sectionTitle}>Description</Text>
-
-          <AppCard
-            title="Installer ZIMA"
-            subtitle="Installez l’app ZIMA pour un accès rapide et des notifications"
-          />
-
-          <Text style={styles.body}>{data.description}</Text>
-          <Pressable testID="btn-read-more"><Text style={styles.linkText}>Lire la suite</Text></Pressable>
-        </View>
-
-        <View style={{ paddingHorizontal: CARD, marginTop: 18 }}>
-          <Text style={styles.sectionTitle}>Faites connaissance avec votre conseiller</Text>
-          <AgentCard agent={data.agent} onProfile={() => { console.log("go profile"); }} onAll={() => { console.log("all listings"); }} />
-        </View>
-
-        <View style={{ paddingHorizontal: CARD, marginTop: 18, gap: 10 }}>
-          <Text style={styles.sectionTitle}>Détails du bien</Text>
-          <View style={styles.grid}>
-            <DetailCell label="TYPE" value="villa" />
-            <DetailCell label="ÉTAGE" value="2ème étage" />
-            <DetailCell label="ANNÉE" value="2020" />
-            <DetailCell label="CHARGES" value="50 USD/mois" />
-            <DetailCell label="TITRE FONCIER" value="Oui" />
-            <DetailCell label="ORIENTATION" value="Sud-Est" />
-          </View>
-        </View>
-
-        <View style={{ paddingHorizontal: CARD, marginTop: 18 }}>
-          <Text style={styles.sectionTitle}>Équipements</Text>
-          <View style={styles.amenities}>
-            <Amenity label="Wifi gratuit" />
-            <Amenity label="Parking gratuit" />
-            <Amenity label="Piscine" />
-            <Amenity label="Sécurité 24h" />
-          </View>
-          <Pressable style={{ marginTop: 6 }} testID="btn-show-amenities">
-            <Text style={styles.linkText}>Afficher les 9 équipements</Text>
-          </Pressable>
-        </View>
-
-        <View style={{ paddingHorizontal: CARD, marginTop: 18 }}>
-          <Text style={styles.sectionTitle}>Où se situe le bien</Text>
-          <View style={styles.mapCard}>
-            <View style={styles.mapInner}>
-              <MapPin size={28} color="#7da096" />
-              <Text style={styles.mapLabel}>Carte interactive</Text>
-            </View>
-            <View style={styles.mapActions}>
-              <ButtonOutline onPress={openItinerary} label="Itinéraire" />
-              <Button onPress={openMaps} label="Voir dans Maps" />
-            </View>
-          </View>
-        </View>
-
-        <View style={{ paddingHorizontal: CARD, marginTop: 18 }}>
-          <View style={styles.rowBetween}>
-            <Text style={styles.sectionTitle}>{data.rating.toFixed(1)} • {data.reviewsCount} avis</Text>
-            <Pressable testID="btn-all-reviews"><Text style={styles.linkText}>Tous les avis</Text></Pressable>
-          </View>
-
-          <ReviewCard
-            name="Moussa Ba"
-            date="15/11/2024"
-            text="Excellent appartement, très bien situé et l’agent était très professionnel. Je recommande vivement !"
-          />
-        </View>
-
-        <View style={{ paddingHorizontal: CARD, marginTop: 18 }}>
-          <View style={styles.rowBetween}>
-            <Text style={styles.sectionTitle}>Biens populaires • {data.city}</Text>
-            <Pressable testID="btn-see-all-popular"><Text style={styles.linkText}>Voir tout</Text></Pressable>
-          </View>
-        </View>
-        <FlatList
-          data={data.popularInCity}
-          keyExtractor={(i) => i.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: CARD, paddingBottom: 8 }}
-          renderItem={({ item }) => <PopularCard item={item} />}
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <BackButton />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Image principale */}
+        <Image 
+          source={{ uri: property.images[0] }}
+          style={styles.heroImage}
+          resizeMode="cover"
         />
 
-        <View style={{ paddingHorizontal: CARD, marginTop: 12, marginBottom: 24 }}>
-          <Text style={styles.sectionTitle}>Infos & sécurité</Text>
-          <View style={styles.infoSecCard}>
-            {data.safety.map((s, idx) => (
-              <View key={idx} style={styles.infoRow}>
-                <View style={styles.bullet}><Text>🛡️</Text></View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.infoTitle}>{s.title}</Text>
-                  <Text style={styles.infoSubtitle}>{s.subtitle}</Text>
+        <View style={styles.content}>
+          {/* En-tête */}
+          <View style={styles.header}>
+            <Text style={styles.title}>{property.title}</Text>
+            <Text style={styles.price}>
+              {property.price.toLocaleString()} {property.currency}
+              {property.type === 'rent' && '/mois'}
+            </Text>
+          </View>
+
+          {/* Localisation */}
+          <View style={styles.locationSection}>
+            <Text style={styles.location}>
+              📍 {property.location.address}, {property.location.city}, {property.location.country}
+            </Text>
+          </View>
+
+          {/* Caractéristiques */}
+          <View style={styles.specsSection}>
+            <View style={styles.specItem}>
+              <Text style={styles.specLabel}>🛏️ Chambres</Text>
+              <Text style={styles.specValue}>{property.bedrooms}</Text>
+            </View>
+            <View style={styles.specItem}>
+              <Text style={styles.specLabel}>🛁 Salles de bain</Text>
+              <Text style={styles.specValue}>{property.bathrooms}</Text>
+            </View>
+            <View style={styles.specItem}>
+              <Text style={styles.specLabel}>📐 Surface</Text>
+              <Text style={styles.specValue}>{property.area}m²</Text>
+            </View>
+          </View>
+
+          {/* Description */}
+          <View style={styles.descriptionSection}>
+            <Text style={styles.sectionTitle}>Description</Text>
+            <Text style={styles.description}>{property.description}</Text>
+          </View>
+
+          {/* Équipements */}
+          <View style={styles.featuresSection}>
+            <Text style={styles.sectionTitle}>Équipements</Text>
+            <View style={styles.featuresList}>
+              {property.features.map((feature) => (
+                <View key={feature} style={styles.featureItem}>
+                  <Text style={styles.featureText}>✓ {feature}</Text>
                 </View>
+              ))}
+            </View>
+          </View>
+
+          {/* Prestataire */}
+          <View style={styles.providerSection}>
+            <Text style={styles.sectionTitle}>Prestataire</Text>
+            <View style={styles.providerCard}>
+              <Image 
+                source={{ uri: property.provider.avatar }}
+                style={styles.providerAvatar}
+              />
+              <View style={styles.providerInfo}>
+                <Text style={styles.providerName}>{property.provider.name}</Text>
+                <Text style={styles.providerType}>
+                  {property.provider.type === 'agency' ? 'Agence' : 'Agent'}
+                </Text>
+                <Text style={styles.providerRating}>
+                  ⭐ {property.provider.rating} ({property.provider.reviewCount} avis)
+                </Text>
               </View>
-            ))}
-            <Pressable testID="btn-report">
-              <Text style={[styles.linkText, { marginTop: 8 }]}>Signaler cette annonce</Text>
-            </Pressable>
+            </View>
           </View>
         </View>
       </ScrollView>
-
-      <StickyBar
-        price={data.price}
-        currency={data.currency}
-        onContact={() => { console.log("contact agent"); }}
-        onCall={() => { console.log("call agent"); Linking.openURL("tel:+221700000000"); }}
-        onWhatsApp={() => {
-          const url = "https://wa.me/221700000000?text=Bonjour%20ZIMA";
-          console.log("open whatsapp", url);
-          Linking.openURL(url);
-        }}
-      />
     </View>
   );
 }
-
-function IconBtn({ children, onPress, testID }: { children: React.ReactNode; onPress: () => void; testID?: string }) {
-  return (
-    <Pressable onPress={onPress} style={styles.iconBtn} testID={testID}>{children}</Pressable>
-  );
-}
-
-function Chip({ label }: { label: string }) {
-  return (
-    <View style={styles.chip}>
-      <Text style={styles.chipText}>{label}</Text>
-    </View>
-  );
-}
-
-function Button({ label, onPress }: { label: string; onPress: () => void }) {
-  return (
-    <Pressable style={styles.btn} onPress={onPress} testID={`btn-${label.replace(/\s+/g, "-").toLowerCase()}`}>
-      <Text style={styles.btnText}>{label}</Text>
-    </Pressable>
-  );
-}
-
-function ButtonOutline({
-  label,
-  onPress,
-}: {
-  label: string;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable style={styles.btnOutline} onPress={onPress} testID={`btn-outline-${label.replace(/\s+/g, "-").toLowerCase()}`}>
-      <Text style={styles.btnOutlineText}>{label}</Text>
-    </Pressable>
-  );
-}
-
-function AppCard({ title, subtitle }: { title: string; subtitle: string }) {
-  return (
-    <View style={styles.appCard}>
-      <View style={styles.badgeZ}><Text style={{ color: "#fff", fontWeight: "700" }}>Z</Text></View>
-      <View style={{ flex: 1 }}>
-        <Text style={styles.appTitle}>{title}</Text>
-        <Text style={styles.appSubtitle}>{subtitle}</Text>
-      </View>
-    </View>
-  );
-}
-
-function AgentCard({
-  agent,
-  onProfile,
-  onAll,
-}: {
-  agent: Agent;
-  onProfile: () => void;
-  onAll: () => void;
-}) {
-  return (
-    <View style={styles.agentCard}>
-      <View style={{ flexDirection: "row", gap: 12, alignItems: "center" }}>
-        <Image source={{ uri: agent.avatar }} style={styles.avatar} />
-        <View style={{ flex: 1 }}>
-          <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
-            <Text style={styles.agentName}>{agent.name}</Text>
-            {agent.verified && (
-              <View style={styles.verified}>
-                <Text style={styles.verifiedText}>Vérifié</Text>
-              </View>
-            )}
-          </View>
-          <Text style={styles.agentRole}>{agent.role}</Text>
-        </View>
-      </View>
-
-      <View style={styles.agentStats}>
-        <Stat label="ÉVALUATIONS" value={String(agent.stats.reviews)} />
-        <Stat label="NOTE GLOBALE" value={agent.stats.rating.toFixed(2)} />
-        <Stat label="ANNÉES D’ACTIVITÉ" value={String(agent.stats.years)} />
-      </View>
-
-      <View style={{ flexDirection: "row", gap: 10, marginTop: 8 }}>
-        <ButtonOutline label="Voir le profil" onPress={onProfile} />
-        <Button label="Tous ses biens" onPress={onAll} />
-      </View>
-    </View>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={{ alignItems: "center", flex: 1 }}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
-
-function DetailCell({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.detailCell}>
-      <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={styles.detailValue}>{value}</Text>
-    </View>
-  );
-}
-
-function Amenity({ label }: { label: string }) {
-  return (
-    <View style={styles.amenity}>
-      <Text style={styles.amenityIcon}>•</Text>
-      <Text style={styles.amenityText}>{label}</Text>
-    </View>
-  );
-}
-
-function ReviewCard({
-  name,
-  date,
-  text,
-}: {
-  name: string;
-  date: string;
-  text: string;
-}) {
-  return (
-    <View style={styles.reviewCard}>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        <View style={styles.reviewAvatar} />
-        <View style={{ flex: 1 }}>
-          <Text style={styles.reviewName}>{name}</Text>
-          <Text style={styles.reviewDate}>{date}</Text>
-        </View>
-        <View style={{ flexDirection: "row", gap: 2 }}>
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} size={14} color="#f0b429" fill="#f0b429" />
-          ))}
-        </View>
-      </View>
-      <Text style={styles.reviewText}>{text}</Text>
-    </View>
-  );
-}
-
-function PopularCard({ item }: { item: PopularItem }) {
-  return (
-    <View style={styles.popularCard}>
-      <View style={styles.popularImg} />
-      <View style={{ position: "absolute", left: 12, bottom: 46 }}>
-        <Text style={styles.popularTitle}>{item.title}</Text>
-      </View>
-      <View style={styles.popularBadges}>
-        <Text style={styles.popBadge}>{item.info1}</Text>
-        <Text style={styles.popBadge}>{item.info2}</Text>
-      </View>
-      <Pressable style={styles.likeBtn} testID="btn-pop-like">
-        <Heart size={16} color="#fff" />
-      </Pressable>
-    </View>
-  );
-}
-
-function StickyBar({
-  price,
-  currency,
-  onContact,
-  onCall,
-  onWhatsApp,
-}: {
-  price: number;
-  currency: string;
-  onContact: () => void;
-  onCall: () => void;
-  onWhatsApp: () => void;
-}) {
-  return (
-    <View style={styles.sticky}>
-      <Text style={styles.price} testID="price">
-        {Intl.NumberFormat("en-US").format(price)} {currency}
-      </Text>
-      <View style={styles.stickyActions}>
-        <Button label="Contacter" onPress={onContact} />
-        <IconBtn onPress={onCall} testID="btn-call"><Phone size={18} color="#0b3b35" /></IconBtn>
-        <IconBtn onPress={onWhatsApp} testID="btn-whatsapp"><ChartBar size={18} color="#0b3b35" /></IconBtn>
-      </View>
-    </View>
-  );
-}
-
-const brand = {
-  bg: "#eef4f1",
-  deep: "#0b3b35",
-  primary: "#0f6b5e",
-  gold: "#9c7831",
-  card: "#ffffff",
-  text: "#0e1b18",
-  sub: "#5e726e",
-  chip: "#f0f3f2",
-} as const;
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: brand.bg },
-  topBar: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    right: 10,
-    zIndex: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background.secondary,
   },
-  iconBtn: {
-    height: 38,
-    width: 38,
-    borderRadius: 19,
-    backgroundColor: "rgba(255,255,255,0.92)",
-    justifyContent: "center",
-    alignItems: "center",
+  heroImage: {
+    width: "100%",
+    height: 300,
   },
-  hero: {
-    width,
-    height: width * 0.7,
-    resizeMode: "cover",
+  content: {
+    padding: 20,
   },
-  imgPager: {
-    position: "absolute",
-    right: 14,
-    top: width * 0.7 - 28,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+  header: {
+    marginBottom: 16,
   },
-  pagerText: { color: "#fff", fontWeight: "600" },
-
-  content: { flex: 1 },
   title: {
-    fontSize: 22,
-    lineHeight: 28,
+    fontSize: 24,
     fontWeight: "800",
-    color: brand.text,
+    color: "#0F172A",
     marginBottom: 8,
   },
-  chipsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  chip: {
-    backgroundColor: brand.chip,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
+  price: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: Colors.primary,
   },
-  chipText: { color: brand.deep, fontWeight: "600" },
-
-  locationRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 10 },
-  locationText: { color: brand.primary, fontWeight: "700" },
-
-  ratingRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 8 },
-  ratingText: { color: brand.deep, fontWeight: "700" },
-  linkText: { color: brand.primary, fontWeight: "700" },
-
+  locationSection: {
+    marginBottom: 20,
+  },
+  location: {
+    fontSize: 16,
+    color: "#64748B",
+    lineHeight: 22,
+  },
+  specsSection: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  },
+  specItem: {
+    alignItems: "center",
+  },
+  specLabel: {
+    fontSize: 14,
+    color: "#64748B",
+    marginBottom: 4,
+  },
+  specValue: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#0F172A",
+  },
+  descriptionSection: {
+    marginBottom: 20,
+  },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: "800",
-    color: brand.text,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginBottom: 12,
+  },
+  description: {
+    fontSize: 16,
+    color: "#475569",
+    lineHeight: 24,
+  },
+  featuresSection: {
+    marginBottom: 20,
+  },
+  featuresList: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+  },
+  featureItem: {
     marginBottom: 8,
   },
-  body: { color: brand.deep, lineHeight: 20 },
-
-  appCard: {
+  featureText: {
+    fontSize: 16,
+    color: "#475569",
+  },
+  providerSection: {
+    marginBottom: 20,
+  },
+  providerCard: {
     flexDirection: "row",
-    gap: 12,
-    padding: 12,
-    backgroundColor: brand.card,
-    borderRadius: R,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  badgeZ: {
-    height: 36, width: 36, borderRadius: 18,
-    backgroundColor: brand.primary,
-    justifyContent: "center", alignItems: "center",
-  },
-  appTitle: { fontWeight: "800", color: brand.text },
-  appSubtitle: { color: brand.sub, marginTop: 4 },
-
-  agentCard: {
-    backgroundColor: brand.card,
-    borderRadius: R,
-    padding: 14,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  avatar: { height: 54, width: 54, borderRadius: 27 },
-  agentName: { fontWeight: "800", color: brand.text, fontSize: 16 },
-  verified: {
-    backgroundColor: "#e9f3ff",
-    paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10,
-  },
-  verifiedText: { color: "#1d4ed8", fontWeight: "700", fontSize: 12 },
-  agentRole: { color: brand.sub, marginTop: 2 },
-  agentStats: {
-    flexDirection: "row",
-    gap: 10,
-    marginTop: 12,
-    backgroundColor: "#f6f8f7",
-    borderRadius: 12,
-    paddingVertical: 8,
-  },
-  statValue: { fontWeight: "800", color: brand.text },
-  statLabel: { color: brand.sub, fontSize: 12, marginTop: 2 },
-
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  detailCell: {
-    width: (width - CARD * 2 - 10) / 2,
-    backgroundColor: brand.card,
-    borderRadius: 14,
-    padding: 12,
-  },
-  detailLabel: { color: brand.sub, fontSize: 12, fontWeight: "700" },
-  detailValue: { color: brand.text, fontWeight: "800", marginTop: 6 },
-
-  amenities: { flexDirection: "row", flexWrap: "wrap", gap: 14, marginTop: 6 },
-  amenity: {
-    flexDirection: "row", gap: 8, alignItems: "center",
-    backgroundColor: "#f6f8f7",
-    borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8,
-  },
-  amenityIcon: { fontSize: 18 },
-  amenityText: { color: brand.deep, fontWeight: "700" },
-
-  mapCard: { backgroundColor: brand.card, borderRadius: R, overflow: "hidden" },
-  mapInner: {
-    height: 150,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#eef4f1",
-  },
-  mapLabel: { color: "#7da096", marginTop: 8, fontWeight: "700" },
-  mapActions: {
-    flexDirection: "row",
-    gap: 10,
-    padding: 12,
-    backgroundColor: "#e7efec",
-  },
-
-  btn: {
-    flex: 1,
-    backgroundColor: brand.primary,
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  btnText: { color: "#fff", fontWeight: "800" },
-  btnOutline: {
-    flex: 1,
-    borderWidth: 1.5,
-    borderColor: brand.primary,
-    borderRadius: 12,
-    paddingVertical: 12,
-    alignItems: "center",
     backgroundColor: "#fff",
-  },
-  btnOutlineText: { color: brand.primary, fontWeight: "800" },
-
-  rowBetween: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-
-  reviewCard: {
-    marginTop: 10,
-    backgroundColor: brand.card,
-    borderRadius: R,
-    padding: 12,
-    gap: 8,
-  },
-  reviewAvatar: { height: 36, width: 36, borderRadius: 18, backgroundColor: "#dfe7e4" },
-  reviewName: { fontWeight: "800", color: brand.text },
-  reviewDate: { color: brand.sub, fontSize: 12 },
-  reviewText: { color: brand.deep },
-
-  popularCard: {
-    height: 210,
-    width: 220,
-    borderRadius: R,
-    backgroundColor: "#dfe7e4",
-    marginRight: 12,
-    overflow: "hidden",
-  },
-  popularImg: { flex: 1, backgroundColor: "#cdd7d3" },
-  popularTitle: { color: "#fff", fontWeight: "800" },
-  popularBadges: {
-    position: "absolute",
-    left: 12,
-    bottom: 12,
-    flexDirection: "row",
-    gap: 8,
-  },
-  popBadge: {
-    backgroundColor: "rgba(0,0,0,0.65)",
-    color: "#fff",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
     borderRadius: 12,
-    overflow: "hidden",
+    padding: 16,
+    alignItems: "center",
+  },
+  providerAvatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 16,
+  },
+  providerInfo: {
+    flex: 1,
+  },
+  providerName: {
+    fontSize: 18,
     fontWeight: "700",
+    color: "#0F172A",
+    marginBottom: 4,
   },
-  likeBtn: {
-    position: "absolute",
-    right: 12,
-    top: 12,
-    height: 34,
-    width: 34,
-    backgroundColor: "rgba(0,0,0,0.35)",
-    borderRadius: 17,
-    alignItems: "center",
-    justifyContent: "center",
+  providerType: {
+    fontSize: 14,
+    color: "#64748B",
+    marginBottom: 4,
   },
-
-  infoSecCard: {
-    backgroundColor: brand.card,
-    borderRadius: R,
-    padding: 12,
-    gap: 10,
+  providerRating: {
+    fontSize: 14,
+    color: "#64748B",
   },
-  infoRow: { flexDirection: "row", gap: 12, alignItems: "center" },
-  bullet: {
-    height: 36,
-    width: 36,
-    borderRadius: 10,
-    backgroundColor: "#f1f5f4",
-    alignItems: "center",
-    justifyContent: "center",
+  errorText: {
+    fontSize: 16,
+    color: "#64748B",
+    textAlign: "center",
   },
-  infoTitle: { fontWeight: "800", color: brand.text },
-  infoSubtitle: { color: brand.sub, marginTop: 2 },
-
-  sticky: {
-    position: "absolute",
-    left: CARD,
-    right: CARD,
-    bottom: 16,
-    backgroundColor: "#ffffff",
-    borderRadius: 20,
-    padding: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 14,
-    elevation: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  price: { fontWeight: "900", color: brand.text, fontSize: 16 },
-  stickyActions: { flexDirection: "row", alignItems: "center", gap: 10 },
 });
