@@ -4,6 +4,7 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { 
   Home, 
   Heart, 
+  Grid3X3, 
   MessageCircle, 
   User
 } from 'lucide-react-native';
@@ -82,7 +83,15 @@ export default function TabLayout() {
           ),
         }}
       />
-
+      <Tabs.Screen
+        name="categories"
+        options={{
+          title: 'Tout',
+          tabBarIcon: ({ color, size }) => (
+            <Grid3X3 size={size} color={color} testID="tab-icon-categories" />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="messages"
         options={{
@@ -99,6 +108,16 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => (
             <User size={size} color={color} testID="tab-icon-profile" />
           ),
+        }}
+      />
+      
+      {/* Hidden tabs - accessible via navigation but not shown in tab bar */}
+      <Tabs.Screen
+        name="services"
+        options={{
+          title: 'Services',
+          href: null,
+          // hidden from tab bar
         }}
       />
     </Tabs>
