@@ -151,7 +151,8 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     paddingHorizontal: 16,
-    paddingBottom: 8,
+    paddingTop: 8,
+    paddingBottom: 16,
   },
   section: { 
     marginTop: 18 
