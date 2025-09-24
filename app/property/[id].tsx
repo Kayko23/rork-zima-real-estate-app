@@ -353,8 +353,8 @@ function PropertyDetailScreen() {
           <View style={styles.rowBetween}>
             <Text style={styles.sectionTitle}>{data.rating.toFixed(1)} • {data.reviewsCount} avis</Text>
             <Pressable testID="all-reviews" onPress={() => {
-            console.log("Opening all reviews");
-            router.push(`/reviews?propertyId=${data.id}`);
+            console.log("Opening all reviews for property:", data.id);
+            // TODO: Create reviews page or implement modal
           }}><Text style={styles.linkText}>Tous les avis</Text></Pressable>
           </View>
           <ReviewCard name="Moussa Ba" date="15/11/2024" text="Excellent appartement, très bien situé et l’agent était très professionnel. Je recommande vivement !" />
@@ -398,8 +398,8 @@ function PropertyDetailScreen() {
               </View>
             ))}
             <Pressable testID="report" onPress={() => {
-              console.log("Opening report form");
-              router.push(`/report?propertyId=${data.id}`);
+              console.log("Opening report form for property:", data.id);
+              // TODO: Create report page or implement modal
             }}><Text style={[styles.linkText, { marginTop: 8 }]}>Signaler cette annonce</Text></Pressable>
           </View>
         </View>
