@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -12,11 +12,23 @@ import {
   Platform,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { ChevronLeft, Heart, Share2, Star, MapPin, Phone, MessageCircle } from "lucide-react-native";
+import {
+  ChevronLeft,
+  Heart,
+  Share2,
+  Star,
+  MapPin,
+  Phone,
+  MessageCircle,
+  Camera,
+  ChevronRight,
+  ChevronLeft as ChevronLeftMini,
+} from "lucide-react-native";
+import LiquidGlassView from "@/components/ui/LiquidGlassView";
 
 const { width } = Dimensions.get("window");
 const CARD = 16;
-const R = 18;
+const R = 20;
 
 type SafetyItem = { title: string; subtitle: string };
 type Agent = {
@@ -97,9 +109,9 @@ function PropertyDetailScreen() {
       rating: 4.8,
       reviewsCount: 23,
       images: [
-        "https://images.unsplash.com/photo-1502673530728-f79b4cab31b1?q=80&w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1560448075-bb4caa6c1e56?q=80&w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1505691723518-36a5ac3b2bba?q=80&w=1200&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1502673530728-f79b4cab31b1?q=80&w=1600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1560448075-bb4caa6c1e56?q=80&w=1600&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1505691723518-36a5ac3b2bba?q=80&w=1600&auto=format&fit=crop",
       ],
       description:
         "Magnifique villa moderne avec vue imprenable sur la ville. Design contemporain, finitions de haute qualité, et excellent emplacement près du quartier des affaires.",
@@ -112,14 +124,8 @@ function PropertyDetailScreen() {
           "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
       },
       safety: [
-        {
-          title: "Politique de vérification",
-          subtitle: "Tous nos agents sont vérifiés et certifiés",
-        },
-        {
-          title: "Sécurité des visites",
-          subtitle: "Visites accompagnées et sécurisées",
-        },
+        { title: "Politique de vérification", subtitle: "Tous nos agents sont vérifiés et certifiés" },
+        { title: "Sécurité des visites", subtitle: "Visites accompagnées et sécurisées" },
       ],
       popularInCity: [
         { id: "p1", title: "appartement · Lagos", info1: "85 $ pour 2 nuits", info2: "4.6" },
@@ -130,6 +136,8 @@ function PropertyDetailScreen() {
   );
 
   const [imgIndex, setImgIndex] = useState<number>(0);
+  const listRef = useRef<FlatList<string> | null>(null);
+  const heroH = Math.min(420, Math.round(width * 0.72));
 
   const openMaps = () => {
     try {
@@ -155,46 +163,65 @@ function PropertyDetailScreen() {
 
   return (
     <View style={styles.screen} testID="property-detail-screen">
-      <View style={styles.topBar}>
-        <IconBtn testID="back" onPress={() => { console.log("back press"); router.back(); }}>
-          <ChevronLeft size={22} color="#0b3b35" />
-        </IconBtn>
-        <View style={{ flexDirection: "row", gap: 10 }}>
-          <IconBtn testID="share" onPress={() => console.log("share press")}> 
-            <Share2 size={20} color="#0b3b35" />
-          </IconBtn>
-          <IconBtn testID="fav" onPress={() => console.log("favorite press")}> 
-            <Heart size={20} color="#0b3b35" />
-          </IconBtn>
+      <View style={styles.heroWrap}>
+        <FlatList
+          ref={(r) => { listRef.current = r; }}
+          data={data.images}
+          keyExtractor={(uri, i) => `${uri}-${i}`}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={(e) => {
+            const idx = Math.round(e.nativeEvent.contentOffset.x / width);
+            setImgIndex(idx);
+            console.log("image index", idx);
+          }}
+          renderItem={({ item }) => (
+            <Image source={{ uri: item }} style={{ width, height: heroH }} resizeMode="cover" />
+          )}
+        />
+
+        <View style={styles.heroOverlays} pointerEvents="box-none">
+          <View style={styles.topActions}>
+            <LiquidGlassView style={styles.glassCircle} intensity={18} tint="light">
+              <Pressable testID="back" onPress={() => router.back()} style={styles.roundBtn}><ChevronLeft size={20} color="#0b3b35" /></Pressable>
+            </LiquidGlassView>
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <LiquidGlassView style={styles.glassCircle} intensity={18} tint="light">
+                <Pressable testID="share" onPress={() => console.log("share press")} style={styles.roundBtn}><Share2 size={18} color="#0b3b35" /></Pressable>
+              </LiquidGlassView>
+              <LiquidGlassView style={styles.glassCircle} intensity={18} tint="light">
+                <Pressable testID="fav" onPress={() => console.log("favorite press")} style={styles.roundBtn}><Heart size={18} color="#0b3b35" /></Pressable>
+              </LiquidGlassView>
+            </View>
+          </View>
+
+          <LiquidGlassView style={styles.pagerGlass} intensity={16} tint="light">
+            <View style={styles.pagerContent}>
+              <Camera size={14} color="#0b3b35" />
+              <Text style={styles.pagerText}>{imgIndex + 1} / {data.images.length}</Text>
+            </View>
+          </LiquidGlassView>
+
+          <Pressable accessibilityLabel="prev" testID="prev" style={styles.navLeft} onPress={() => {
+            const next = Math.max(0, imgIndex - 1);
+            listRef.current?.scrollToOffset({ offset: next * width, animated: true });
+            setImgIndex(next);
+          }}>
+            <LiquidGlassView style={styles.navBtn} intensity={14} tint="light"><ChevronLeftMini size={18} color="#0b3b35" /></LiquidGlassView>
+          </Pressable>
+          <Pressable accessibilityLabel="next" testID="next" style={styles.navRight} onPress={() => {
+            const next = Math.min(data.images.length - 1, imgIndex + 1);
+            listRef.current?.scrollToOffset({ offset: next * width, animated: true });
+            setImgIndex(next);
+          }}>
+            <LiquidGlassView style={styles.navBtn} intensity={14} tint="light"><ChevronRight size={18} color="#0b3b35" /></LiquidGlassView>
+          </Pressable>
         </View>
       </View>
 
-      <FlatList
-        data={data.images}
-        keyExtractor={(_, i) => `img-${i}`}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={(e) => {
-          const idx = Math.round(e.nativeEvent.contentOffset.x / width);
-          setImgIndex(idx);
-          console.log("image index", idx);
-        }}
-        renderItem={({ item }) => (
-          <Image source={{ uri: item }} style={styles.hero} />
-        )}
-      />
-
-      <View style={styles.imgPager}>
-        <Text style={styles.pagerText}>{imgIndex + 1} / {data.images.length}</Text>
-      </View>
-
-      <ScrollView
-        style={styles.content}
-        contentContainerStyle={{ paddingBottom: 140 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={{ paddingHorizontal: CARD, paddingTop: 20 }}>
+      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 140 }} showsVerticalScrollIndicator={false}>
+        <View style={{ paddingHorizontal: CARD, paddingTop: 14 }}>
           <Text style={styles.title}>{data.title}</Text>
           <View style={styles.chipsRow}>
             {data.chips.map((c) => (
@@ -207,15 +234,23 @@ function PropertyDetailScreen() {
           </Pressable>
           <View style={styles.ratingRow}>
             <Star size={16} color="#f0b429" fill="#f0b429" />
-            <Text style={styles.ratingText}>
-              {data.rating.toFixed(1)} • <Text style={styles.linkText}>{data.reviewsCount} avis</Text>
-            </Text>
+            <Text style={styles.ratingText}>{data.rating.toFixed(1)} • <Text style={styles.linkText}>{data.reviewsCount} avis</Text></Text>
           </View>
+        </View>
+
+        <View style={{ paddingHorizontal: CARD, gap: 12, marginTop: 20 }}>
+          <Text style={styles.sectionTitle}>Points forts</Text>
+          <View style={styles.amenitiesRow}>
+            <Amenity label="Wifi gratuit" />
+            <Amenity label="Parking gratuit" />
+            <Amenity label="Piscine" />
+            <Amenity label="Sécurité 24h" />
+          </View>
+          <Pressable style={{ marginTop: 6 }} testID="show-amenities"><Text style={styles.linkText}>Afficher les 9 équipements</Text></Pressable>
         </View>
 
         <View style={{ paddingHorizontal: CARD, gap: 12, marginTop: 24 }}>
           <Text style={styles.sectionTitle}>Description</Text>
-          <AppCard title="Installer ZIMA" subtitle="Installez l’app ZIMA pour un accès rapide et des notifications" />
           <Text style={styles.body}>{data.description}</Text>
           <Pressable testID="read-more"><Text style={styles.linkText}>Lire la suite</Text></Pressable>
         </View>
@@ -231,29 +266,16 @@ function PropertyDetailScreen() {
           />
         </View>
 
-        <View style={{ paddingHorizontal: CARD, marginTop: 24, gap: 12 }}>
-          <Text style={styles.sectionTitle}>Détails du bien</Text>
-          <View style={styles.grid}>
-            <DetailCell label="TYPE" value="villa" />
-            <DetailCell label="ÉTAGE" value="2ème étage" />
-            <DetailCell label="ANNÉE" value="2020" />
-            <DetailCell label="CHARGES" value="50 USD/mois" />
-            <DetailCell label="TITRE FONCIER" value="Oui" />
-            <DetailCell label="ORIENTATION" value="Sud-Est" />
-          </View>
-        </View>
-
         <View style={{ paddingHorizontal: CARD, marginTop: 24 }}>
-          <Text style={styles.sectionTitle}>Équipements</Text>
-          <View style={styles.amenities}>
-            <Amenity label="Wifi gratuit" />
-            <Amenity label="Parking gratuit" />
-            <Amenity label="Piscine" />
-            <Amenity label="Sécurité 24h" />
+          <Text style={styles.sectionTitle}>Détails du bien</Text>
+          <View style={styles.detailCard}>
+            <DetailRow label="Type" value="villa" />
+            <DetailRow label="Étage" value="2ème étage" />
+            <DetailRow label="Année" value="2020" />
+            <DetailRow label="Charges" value="50 USD/mois" />
+            <DetailRow label="Titre foncier" value="Oui" />
+            <DetailRow label="Orientation" value="Sud-Est" last />
           </View>
-          <Pressable style={{ marginTop: 6 }} testID="show-amenities">
-            <Text style={styles.linkText}>Afficher les 9 équipements</Text>
-          </Pressable>
         </View>
 
         <View style={{ paddingHorizontal: CARD, marginTop: 24 }}>
@@ -293,7 +315,7 @@ function PropertyDetailScreen() {
           renderItem={({ item }) => <PopularCard item={item} />}
         />
 
-        <View style={{ paddingHorizontal: CARD, marginTop: 12, marginBottom: 24 }}>
+        <View style={{ paddingHorizontal: CARD, marginTop: 16, marginBottom: 24 }}>
           <Text style={styles.sectionTitle}>Infos & sécurité</Text>
           <View style={styles.infoSecCard}>
             {data.safety.map((s, idx) => (
@@ -310,20 +332,21 @@ function PropertyDetailScreen() {
         </View>
       </ScrollView>
 
-      <StickyBar
-        price={data.price}
-        currency={data.currency}
-        onContact={() => console.log("contact press")}
-        onCall={() => Linking.openURL("tel:+221700000000").catch(err => console.log("call error", err))}
-        onWhatsApp={() => Linking.openURL("https://wa.me/221700000000?text=Bonjour%20ZIMA").catch(err => console.log("wa error", err))}
-      />
+      <LiquidGlassView style={styles.stickyGlass} intensity={26} tint="light">
+        <View style={styles.sticky} testID="sticky-bar">
+          <Text style={styles.price}>{Intl.NumberFormat("en-US").format(data.price)} {data.currency}</Text>
+          <View style={styles.stickyActions}>
+            <Button label="Contacter" onPress={() => console.log("contact press")} />
+            <Pressable testID="call" onPress={() => Linking.openURL("tel:+221700000000").catch(err => console.log("call error", err))} style={styles.iconOnly}>
+              <Phone size={18} color="#0b3b35" />
+            </Pressable>
+            <Pressable testID="whatsapp" onPress={() => Linking.openURL("https://wa.me/221700000000?text=Bonjour%20ZIMA").catch(err => console.log("wa error", err))} style={styles.iconOnly}>
+              <MessageCircle size={18} color="#0b3b35" />
+            </Pressable>
+          </View>
+        </View>
+      </LiquidGlassView>
     </View>
-  );
-}
-
-function IconBtn({ children, onPress, testID }: { children: React.ReactNode; onPress: () => void; testID?: string }) {
-  return (
-    <Pressable testID={testID} onPress={onPress} style={styles.iconBtn}>{children}</Pressable>
   );
 }
 
@@ -348,18 +371,6 @@ function ButtonOutline({ label, onPress }: { label: string; onPress: () => void 
     <Pressable style={styles.btnOutline} onPress={onPress} testID={`btn-outline-${label}`}>
       <Text style={styles.btnOutlineText}>{label}</Text>
     </Pressable>
-  );
-}
-
-function AppCard({ title, subtitle }: { title: string; subtitle: string }) {
-  return (
-    <View style={styles.appCard}>
-      <View style={styles.badgeZ}><Text style={{ color: "#fff", fontWeight: "700" }}>Z</Text></View>
-      <View style={{ flex: 1 }}>
-        <Text style={styles.appTitle}>{title}</Text>
-        <Text style={styles.appSubtitle}>{subtitle}</Text>
-      </View>
-    </View>
   );
 }
 
@@ -396,24 +407,6 @@ function Stat({ label, value }: { label: string; value: string }) {
     <View style={{ alignItems: "center", flex: 1 }}>
       <Text style={styles.statValue}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
-
-function DetailCell({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.detailCell}>
-      <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={styles.detailValue}>{value}</Text>
-    </View>
-  );
-}
-
-function Amenity({ label }: { label: string }) {
-  return (
-    <View style={styles.amenity}>
-      <Text style={styles.amenityIcon}>•</Text>
-      <Text style={styles.amenityText}>{label}</Text>
     </View>
   );
 }
@@ -456,54 +449,69 @@ function PopularCard({ item }: { item: PopularItem }) {
   );
 }
 
-function StickyBar({ price, currency, onContact, onCall, onWhatsApp }: { price: number; currency: string; onContact: () => void; onCall: () => void; onWhatsApp: () => void }) {
+function Amenity({ label }: { label: string }) {
   return (
-    <View style={styles.sticky} testID="sticky-bar">
-      <Text style={styles.price}>{Intl.NumberFormat("en-US").format(price)} {currency}</Text>
-      <View style={styles.stickyActions}>
-        <Button label="Contacter" onPress={onContact} />
-        <IconBtn testID="call" onPress={onCall}><Phone size={18} color="#0b3b35" /></IconBtn>
-        <IconBtn testID="whatsapp" onPress={onWhatsApp}><MessageCircle size={18} color="#0b3b35" /></IconBtn>
-      </View>
+    <View style={styles.amenity}>
+      <Text style={styles.amenityIcon}>•</Text>
+      <Text style={styles.amenityText}>{label}</Text>
+    </View>
+  );
+}
+
+function DetailRow({ label, value, last }: { label: string; value: string; last?: boolean }) {
+  return (
+    <View style={[styles.detailRow, last ? null : styles.detailDivider]}>
+      <Text style={styles.detailLabelRow}>{label}</Text>
+      <Text style={styles.detailValueRow}>{value}</Text>
     </View>
   );
 }
 
 const brand = {
-  bg: "#eef4f1",
+  bg: "#F3F7F5",
   deep: "#0b3b35",
   primary: "#0f6b5e",
-  gold: "#9c7831",
   card: "#ffffff",
   text: "#0e1b18",
   sub: "#5e726e",
-  chip: "#f0f3f2",
+  chip: "#eef2f1",
 } as const;
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: brand.bg },
-  topBar: { position: "absolute", top: 50, left: 16, right: 16, zIndex: 10, flexDirection: "row", justifyContent: "space-between" },
-  iconBtn: { height: 40, width: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.95)", justifyContent: "center", alignItems: "center", shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
-  hero: { width, height: width * 0.65, resizeMode: "cover" },
-  imgPager: { position: "absolute", right: 14, top: width * 0.65 - 32, backgroundColor: "rgba(0,0,0,0.6)", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16 },
-  pagerText: { color: "#fff", fontWeight: "700", fontSize: 13 },
-  content: { flex: 1, marginTop: -20 },
-  title: { fontSize: 24, lineHeight: 30, fontWeight: "900", color: brand.text, marginBottom: 12 },
+  heroWrap: { borderBottomLeftRadius: R, borderBottomRightRadius: R, overflow: "hidden", backgroundColor: "#e7efec" },
+  heroOverlays: { position: "absolute", left: 0, right: 0, top: 0, bottom: 0 },
+  topActions: { position: "absolute", top: 14, left: 14, right: 14, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  glassCircle: { borderRadius: 999 },
+  roundBtn: { height: 40, width: 40, alignItems: "center", justifyContent: "center" },
+  pagerGlass: { position: "absolute", right: 14, bottom: 12, borderRadius: 999 },
+  pagerContent: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 10, paddingVertical: 6 },
+  pagerText: { color: brand.deep, fontWeight: "800", fontSize: 12 },
+  navBtn: { borderRadius: 999, padding: 10 },
+  navLeft: { position: "absolute", left: 10, top: "48%" },
+  navRight: { position: "absolute", right: 10, top: "48%" },
+
+  content: { flex: 1 },
+  title: { fontSize: 22, lineHeight: 28, fontWeight: "900", color: brand.text, marginBottom: 8 },
   chipsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  chip: { backgroundColor: brand.chip, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 16, borderWidth: 1, borderColor: "#e1e8e5" },
-  chipText: { color: brand.deep, fontWeight: "700", fontSize: 13 },
-  locationRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 16 },
+  chip: { backgroundColor: brand.chip, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
+  chipText: { color: brand.deep, fontWeight: "700", fontSize: 12 },
+
+  locationRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 10 },
   locationText: { color: brand.primary, fontWeight: "700" },
-  ratingRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 12 },
+  ratingRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 8 },
   ratingText: { color: brand.deep, fontWeight: "700" },
   linkText: { color: brand.primary, fontWeight: "700" },
-  sectionTitle: { fontSize: 20, fontWeight: "900", color: brand.text, marginBottom: 12 },
-  body: { color: brand.deep, lineHeight: 24, fontSize: 15 },
-  appCard: { flexDirection: "row", gap: 12, padding: 12, backgroundColor: brand.card, borderRadius: R, shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
-  badgeZ: { height: 36, width: 36, borderRadius: 18, backgroundColor: brand.primary, justifyContent: "center", alignItems: "center" },
-  appTitle: { fontWeight: "800", color: brand.text },
-  appSubtitle: { color: brand.sub, marginTop: 4 },
-  agentCard: { backgroundColor: brand.card, borderRadius: 20, padding: 18, shadowColor: "#000", shadowOpacity: 0.08, shadowRadius: 12, elevation: 4 },
+
+  sectionTitle: { fontSize: 18, fontWeight: "800", color: brand.text },
+  body: { color: brand.deep, lineHeight: 20 },
+
+  amenitiesRow: { flexDirection: "row", flexWrap: "wrap", gap: 14, marginTop: 6 },
+  amenity: { flexDirection: "row", gap: 8, alignItems: "center", backgroundColor: "#f6f8f7", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8 },
+  amenityIcon: { fontSize: 18 },
+  amenityText: { color: brand.deep, fontWeight: "700" },
+
+  agentCard: { backgroundColor: brand.card, borderRadius: 20, padding: 16, borderWidth: 1, borderColor: "#E7EFEA" },
   avatar: { height: 54, width: 54, borderRadius: 27 },
   agentName: { fontWeight: "800", color: brand.text, fontSize: 16 },
   verified: { backgroundColor: "#e9f3ff", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
@@ -512,40 +520,46 @@ const styles = StyleSheet.create({
   agentStats: { flexDirection: "row", gap: 10, marginTop: 12, backgroundColor: "#f6f8f7", borderRadius: 12, paddingVertical: 8 },
   statValue: { fontWeight: "800", color: brand.text },
   statLabel: { color: brand.sub, fontSize: 12, marginTop: 2 },
-  grid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
-  detailCell: { width: (width - CARD * 2 - 12) / 2, backgroundColor: brand.card, borderRadius: 16, padding: 14, shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 6, elevation: 2 },
-  detailLabel: { color: brand.sub, fontSize: 12, fontWeight: "700" },
-  detailValue: { color: brand.text, fontWeight: "800", marginTop: 6 },
-  amenities: { flexDirection: "row", flexWrap: "wrap", gap: 14, marginTop: 6 },
-  amenity: { flexDirection: "row", gap: 8, alignItems: "center", backgroundColor: "#f6f8f7", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8 },
-  amenityIcon: { fontSize: 18 },
-  amenityText: { color: brand.deep, fontWeight: "700" },
-  mapCard: { backgroundColor: brand.card, borderRadius: 20, overflow: "hidden", shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 10, elevation: 3 },
-  mapInner: { height: 140, justifyContent: "center", alignItems: "center", backgroundColor: "#f8faf9" },
+
+  detailCard: { backgroundColor: brand.card, borderRadius: 20, borderWidth: 1, borderColor: "#E7EFEA", marginTop: 10 },
+  detailRow: { flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingVertical: 14, justifyContent: "space-between" },
+  detailDivider: { borderBottomWidth: 1, borderBottomColor: "#EDF3F0" },
+  detailLabelRow: { color: brand.sub, fontWeight: "700" },
+  detailValueRow: { color: brand.text, fontWeight: "800" },
+
+  mapCard: { backgroundColor: brand.card, borderRadius: 20, overflow: "hidden", borderWidth: 1, borderColor: "#E7EFEA" },
+  mapInner: { height: 180, justifyContent: "center", alignItems: "center", backgroundColor: "#F1F5F3" },
   mapLabel: { color: "#7da096", marginTop: 8, fontWeight: "700" },
   mapActions: { flexDirection: "row", gap: 10, padding: 12, backgroundColor: "#e7efec" },
+
   btn: { flex: 1, backgroundColor: brand.primary, borderRadius: 12, paddingVertical: 12, alignItems: "center" },
   btnText: { color: "#fff", fontWeight: "800" },
   btnOutline: { flex: 1, borderWidth: 1.5, borderColor: brand.primary, borderRadius: 12, paddingVertical: 12, alignItems: "center", backgroundColor: "#fff" },
   btnOutlineText: { color: brand.primary, fontWeight: "800" },
+
   rowBetween: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  reviewCard: { marginTop: 12, backgroundColor: brand.card, borderRadius: 18, padding: 16, gap: 10, shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
+  reviewCard: { marginTop: 12, backgroundColor: brand.card, borderRadius: 18, padding: 16, gap: 10, borderWidth: 1, borderColor: "#E7EFEA" },
   reviewAvatar: { height: 36, width: 36, borderRadius: 18, backgroundColor: "#dfe7e4" },
   reviewName: { fontWeight: "800", color: brand.text },
   reviewDate: { color: brand.sub, fontSize: 12 },
   reviewText: { color: brand.deep },
-  popularCard: { height: 200, width: 200, borderRadius: 18, backgroundColor: "#dfe7e4", marginRight: 14, overflow: "hidden", shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },
+
+  popularCard: { height: 200, width: 200, borderRadius: 18, backgroundColor: "#dfe7e4", marginRight: 14, overflow: "hidden" },
   popularImg: { flex: 1, backgroundColor: "#cdd7d3" },
   popularTitle: { color: "#fff", fontWeight: "800" },
   popularBadges: { position: "absolute", left: 12, bottom: 12, flexDirection: "row", gap: 8 },
   popBadge: { backgroundColor: "rgba(0,0,0,0.65)", color: "#fff", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, overflow: "hidden", fontWeight: "700" },
   likeBtn: { position: "absolute", right: 12, top: 12, height: 34, width: 34, backgroundColor: "rgba(0,0,0,0.35)", borderRadius: 17, alignItems: "center", justifyContent: "center" },
-  infoSecCard: { backgroundColor: brand.card, borderRadius: 20, padding: 18, gap: 14, shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 10, elevation: 3 },
+
+  infoSecCard: { backgroundColor: brand.card, borderRadius: 20, padding: 18, gap: 14, borderWidth: 1, borderColor: "#E7EFEA" },
   infoRow: { flexDirection: "row", gap: 12, alignItems: "center" },
   bullet: { height: 36, width: 36, borderRadius: 10, backgroundColor: "#f1f5f4", alignItems: "center", justifyContent: "center" },
   infoTitle: { fontWeight: "800", color: brand.text },
   infoSubtitle: { color: brand.sub, marginTop: 2 },
-  sticky: { position: "absolute", left: CARD, right: CARD, bottom: 20, backgroundColor: "#ffffff", borderRadius: 24, padding: 16, shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 20, elevation: 15, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
+
+  stickyGlass: { position: "absolute", left: CARD, right: CARD, bottom: 16, borderRadius: 24 },
+  sticky: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", padding: 14 },
   price: { fontWeight: "900", color: brand.text, fontSize: 18 },
   stickyActions: { flexDirection: "row", alignItems: "center", gap: 10 },
+  iconOnly: { width: 44, height: 44, borderRadius: 12, borderWidth: 1.5, borderColor: "#CFE1DA", alignItems: "center", justifyContent: "center", backgroundColor: "#fff" },
 });
