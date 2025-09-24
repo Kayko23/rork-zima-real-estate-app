@@ -117,7 +117,12 @@ export default function TabLayout() {
         options={{
           title: 'Services',
           href: null,
-          // hidden from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="professionnels"
+        options={{
+          href: null,
         }}
       />
     </Tabs>
