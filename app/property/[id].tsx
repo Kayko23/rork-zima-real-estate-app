@@ -23,6 +23,10 @@ import {
   Camera,
   ChevronRight,
   ChevronLeft as ChevronLeftMini,
+  Home,
+  Bed,
+  Bath,
+  Maximize2,
 } from "lucide-react-native";
 import LiquidGlassView from "@/components/ui/LiquidGlassView";
 
@@ -351,8 +355,28 @@ function PropertyDetailScreen() {
 }
 
 function Chip({ label }: { label: string }) {
+  const getChipIcon = (chipLabel: string) => {
+    const lowerLabel = chipLabel.toLowerCase();
+    if (lowerLabel.includes('villa') || lowerLabel.includes('maison') || lowerLabel.includes('appartement')) {
+      return <Home size={14} color="#0b3b35" />;
+    }
+    if (lowerLabel.includes('pièce') || lowerLabel.includes('chambre')) {
+      return <Bed size={14} color="#0b3b35" />;
+    }
+    if (lowerLabel.includes('sdb') || lowerLabel.includes('salle de bain')) {
+      return <Bath size={14} color="#0b3b35" />;
+    }
+    if (lowerLabel.includes('m²') || lowerLabel.includes('surface')) {
+      return <Maximize2 size={14} color="#0b3b35" />;
+    }
+    return null;
+  };
+
+  const icon = getChipIcon(label);
+  
   return (
     <View style={styles.chip}>
+      {icon && <View style={{ marginRight: 6 }}>{icon}</View>}
       <Text style={styles.chipText}>{label}</Text>
     </View>
   );
@@ -494,7 +518,7 @@ const styles = StyleSheet.create({
   content: { flex: 1 },
   title: { fontSize: 22, lineHeight: 28, fontWeight: "900", color: brand.text, marginBottom: 8 },
   chipsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  chip: { backgroundColor: brand.chip, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
+  chip: { backgroundColor: brand.chip, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, flexDirection: "row", alignItems: "center" },
   chipText: { color: brand.deep, fontWeight: "700", fontSize: 12 },
 
   locationRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 10 },
