@@ -65,6 +65,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const [language, setLanguageState] = useState<Language | null>('fr');
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [isInitialized, setIsInitialized] = useState(true);
+  const [activeHomeTab, setActiveHomeTab] = useState<'biens' | 'services' | 'voyages'>('biens');
 
   useEffect(() => {
     // Load persisted data after component mounts
@@ -157,6 +158,10 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     await storage.setItem('hasCompletedOnboarding', 'true');
   }, []);
 
+  const setHomeTab = useCallback((tab: 'biens' | 'services' | 'voyages') => {
+    setActiveHomeTab(tab);
+  }, []);
+
   return useMemo(() => ({
     userMode,
     user,
@@ -166,6 +171,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     language,
     hasCompletedOnboarding,
     isInitialized,
+    activeHomeTab,
     switchMode,
     toggleAppMode,
     updateUser,
@@ -173,8 +179,9 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     clearFilters,
     markNotificationsAsRead,
     setLanguage,
-    completeOnboarding
-  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding]);
+    completeOnboarding,
+    setHomeTab
+  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, activeHomeTab, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding, setHomeTab]);
 });
 
 // Export a safe version of the hook that always returns a valid object
@@ -192,6 +199,7 @@ export const useApp = () => {
       language: null as Language | null,
       hasCompletedOnboarding: false,
       isInitialized: false,
+      activeHomeTab: 'biens' as const,
       switchMode: async () => {},
       toggleAppMode: async () => {},
       updateUser: async () => {},
@@ -199,7 +207,8 @@ export const useApp = () => {
       clearFilters: () => {},
       markNotificationsAsRead: () => {},
       setLanguage: async () => {},
-      completeOnboarding: async () => {}
+      completeOnboarding: async () => {},
+      setHomeTab: () => {}
     };
   }
   

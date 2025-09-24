@@ -3,16 +3,23 @@ import { View, Pressable, Text, StyleSheet, Platform } from "react-native";
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import Type from "@/constants/typography";
+import { useApp } from "@/hooks/useAppStore";
 
 export default function ActionDouble() {
   const r = useRouter();
+  const { setHomeTab } = useApp();
   return (
     <View style={s.row}>
       <Pressable style={s.big} onPress={() => r.push("/(proTabs)/listings")} accessibilityRole="button">
         <Ionicons name="add-circle-outline" size={22} color="#19715C" />
         <Text style={s.bigText} numberOfLines={1} adjustsFontSizeToFit>Publier un bien</Text>
       </Pressable>
-      <Pressable style={s.big} onPress={() => r.push("/(tabs)/professionnels")} accessibilityRole="button">
+      <Pressable style={s.big} onPress={() => {
+        // Set the active tab to services first
+        setHomeTab('services');
+        // Navigate to home tab
+        r.push("/(tabs)/home");
+      }} accessibilityRole="button">
         <Ionicons name="person-outline" size={22} color="#8B6A2B" />
         <Text style={s.bigText} numberOfLines={1} adjustsFontSizeToFit>Trouver un pro</Text>
       </Pressable>

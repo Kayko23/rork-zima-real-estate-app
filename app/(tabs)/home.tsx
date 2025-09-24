@@ -5,11 +5,10 @@ import HomeHeader from '@/components/home/HomeHeader';
 import BiensFeed from '@/components/home/feeds/BiensFeed';
 import ServicesFeed from '@/components/home/feeds/ServicesFeed';
 import VoyagesFeed from '@/components/home/feeds/VoyagesFeed';
-
-type TabKey = 'biens' | 'services' | 'voyages';
+import { useApp } from '@/hooks/useAppStore';
 
 export default function HomeScreen() {
-  const [tab, setTab] = useState<TabKey>('biens');
+  const { activeHomeTab, setHomeTab } = useApp();
   const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
@@ -25,8 +24,8 @@ export default function HomeScreen() {
       );
     }
     
-    if (tab === 'services') return <ServicesFeed />;
-    if (tab === 'voyages') return <VoyagesFeed />;
+    if (activeHomeTab === 'services') return <ServicesFeed />;
+    if (activeHomeTab === 'voyages') return <VoyagesFeed />;
     return <BiensFeed />;
   };
 
@@ -38,7 +37,7 @@ export default function HomeScreen() {
         stickyHeaderIndices={[0]}
         showsVerticalScrollIndicator={false}
       >
-        <HomeHeader active={tab} onChange={setTab} />
+        <HomeHeader active={activeHomeTab} onChange={setHomeTab} />
         {renderContent()}
       </ScrollView>
     </SafeAreaView>

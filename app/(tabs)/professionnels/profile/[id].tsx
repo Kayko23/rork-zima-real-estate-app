@@ -280,7 +280,7 @@ export default function ProviderProfileScreen() {
               <Badge color={palette.gold} label="Premium" icon={<Ionicons name="star" size={14} color={palette.gold} />} />
             )}
             {pro.verified && (
-              <Badge color={palette.violet} label="Vérifié" icon={<Ionicons name="shield-checkmark" as any size={14} color={palette.violet} />} />
+              <Badge color={palette.violet} label="Vérifié" icon={<Ionicons name="shield-checkmark" size={14} color={palette.violet} />} />
             )}
             <Chip label={pro.role} />
           </View>
@@ -312,7 +312,7 @@ export default function ProviderProfileScreen() {
               }}
               testID={`tab-${t.key}`}
             >
-              <Ionicons name={t.icon as any} size={18} color={active ? '#FFF' : palette.text} />
+              <Ionicons name={t.icon as keyof typeof Ionicons.glyphMap} size={18} color={active ? '#FFF' : palette.text} />
               <Text style={{ color: active ? '#FFF' : palette.text, fontWeight: '700' }}>{t.label}</Text>
             </Pressable>
           );
@@ -359,7 +359,7 @@ export default function ProviderProfileScreen() {
             <View style={[styles.cardBlock, { flexDirection: 'row', justifyContent: 'space-between' }]}>
               {[
                 { icon: <Feather name="phone" size={20} color={palette.teal} />, onPress: openPhone },
-                { icon: <Ionicons name={"logo-whatsapp" as any} size={20} color={palette.teal} />, onPress: openWhatsApp },
+                { icon: <Ionicons name="logo-whatsapp" size={20} color={palette.teal} />, onPress: openWhatsApp },
                 { icon: <Feather name="mail" size={20} color={palette.teal} />, onPress: openMail },
               ].map((b, i) => (
                 <Pressable key={i} onPress={b.onPress} style={styles.actionIcon} testID={`contact-${i}`}>
@@ -384,7 +384,7 @@ export default function ProviderProfileScreen() {
                   {l.title}
                 </Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Ionicons name={"location-outline" as any} size={14} color={palette.muted} />
+                  <Ionicons name="location-outline" size={14} color={palette.muted} />
                   <Text style={{ color: palette.muted }}>{l.city}, {l.area}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
@@ -396,7 +396,7 @@ export default function ProviderProfileScreen() {
                   )}
                 </View>
               </View>
-              <Ionicons name={"chevron-forward" as any} size={18} color={palette.muted} />
+              <Ionicons name="chevron-forward" size={18} color={palette.muted} />
             </Pressable>
           )}
           ListEmptyComponent={
@@ -417,7 +417,7 @@ export default function ProviderProfileScreen() {
               <Text style={{ fontWeight: '800', color: palette.text, fontSize: 16 }}>{r.author}</Text>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginVertical: 6 }}>
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <Ionicons key={i} name={"star" as any} size={16} color={i < r.rating ? '#F5B400' : '#E5E5E5'} />
+                  <Ionicons key={i} name="star" size={16} color={i < r.rating ? '#F5B400' : '#E5E5E5'} />
                 ))}
                 <Text style={{ color: palette.muted, marginLeft: 6 }}>{r.dateLabel}</Text>
               </View>
