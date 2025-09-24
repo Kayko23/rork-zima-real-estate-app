@@ -194,7 +194,7 @@ function PropertyDetailScreen() {
         contentContainerStyle={{ paddingBottom: 140 }}
         showsVerticalScrollIndicator={false}
       >
-        <View style={{ paddingHorizontal: CARD, paddingTop: 10 }}>
+        <View style={{ paddingHorizontal: CARD, paddingTop: 20 }}>
           <Text style={styles.title}>{data.title}</Text>
           <View style={styles.chipsRow}>
             {data.chips.map((c) => (
@@ -213,14 +213,14 @@ function PropertyDetailScreen() {
           </View>
         </View>
 
-        <View style={{ paddingHorizontal: CARD, gap: 12, marginTop: 8 }}>
+        <View style={{ paddingHorizontal: CARD, gap: 12, marginTop: 24 }}>
           <Text style={styles.sectionTitle}>Description</Text>
           <AppCard title="Installer ZIMA" subtitle="Installez l’app ZIMA pour un accès rapide et des notifications" />
           <Text style={styles.body}>{data.description}</Text>
           <Pressable testID="read-more"><Text style={styles.linkText}>Lire la suite</Text></Pressable>
         </View>
 
-        <View style={{ paddingHorizontal: CARD, marginTop: 18 }}>
+        <View style={{ paddingHorizontal: CARD, marginTop: 24 }}>
           <Text style={styles.sectionTitle}>Faites connaissance avec votre conseiller</Text>
         </View>
         <View style={{ paddingHorizontal: CARD }}>
@@ -231,7 +231,7 @@ function PropertyDetailScreen() {
           />
         </View>
 
-        <View style={{ paddingHorizontal: CARD, marginTop: 18, gap: 10 }}>
+        <View style={{ paddingHorizontal: CARD, marginTop: 24, gap: 12 }}>
           <Text style={styles.sectionTitle}>Détails du bien</Text>
           <View style={styles.grid}>
             <DetailCell label="TYPE" value="villa" />
@@ -243,7 +243,7 @@ function PropertyDetailScreen() {
           </View>
         </View>
 
-        <View style={{ paddingHorizontal: CARD, marginTop: 18 }}>
+        <View style={{ paddingHorizontal: CARD, marginTop: 24 }}>
           <Text style={styles.sectionTitle}>Équipements</Text>
           <View style={styles.amenities}>
             <Amenity label="Wifi gratuit" />
@@ -256,7 +256,7 @@ function PropertyDetailScreen() {
           </Pressable>
         </View>
 
-        <View style={{ paddingHorizontal: CARD, marginTop: 18 }}>
+        <View style={{ paddingHorizontal: CARD, marginTop: 24 }}>
           <Text style={styles.sectionTitle}>Où se situe le bien</Text>
           <View style={styles.mapCard}>
             <View style={styles.mapInner}>
@@ -270,7 +270,7 @@ function PropertyDetailScreen() {
           </View>
         </View>
 
-        <View style={{ paddingHorizontal: CARD, marginTop: 18 }}>
+        <View style={{ paddingHorizontal: CARD, marginTop: 24 }}>
           <View style={styles.rowBetween}>
             <Text style={styles.sectionTitle}>{data.rating.toFixed(1)} • {data.reviewsCount} avis</Text>
             <Pressable testID="all-reviews"><Text style={styles.linkText}>Tous les avis</Text></Pressable>
@@ -278,7 +278,7 @@ function PropertyDetailScreen() {
           <ReviewCard name="Moussa Ba" date="15/11/2024" text="Excellent appartement, très bien situé et l’agent était très professionnel. Je recommande vivement !" />
         </View>
 
-        <View style={{ paddingHorizontal: CARD, marginTop: 18 }}>
+        <View style={{ paddingHorizontal: CARD, marginTop: 24 }}>
           <View style={styles.rowBetween}>
             <Text style={styles.sectionTitle}>Biens populaires • {data.city}</Text>
             <Pressable testID="see-all-popular"><Text style={styles.linkText}>Voir tout</Text></Pressable>
@@ -482,28 +482,28 @@ const brand = {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: brand.bg },
-  topBar: { position: "absolute", top: 10, left: 10, right: 10, zIndex: 10, flexDirection: "row", justifyContent: "space-between" },
-  iconBtn: { height: 38, width: 38, borderRadius: 19, backgroundColor: "rgba(255,255,255,0.92)", justifyContent: "center", alignItems: "center" },
-  hero: { width, height: 240, resizeMode: "cover" },
-  imgPager: { position: "absolute", right: 14, top: 212, backgroundColor: "rgba(0,0,0,0.4)", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
-  pagerText: { color: "#fff", fontWeight: "600" },
-  content: { flex: 1 },
-  title: { fontSize: 22, lineHeight: 28, fontWeight: "800", color: brand.text, marginBottom: 8 },
+  topBar: { position: "absolute", top: 50, left: 16, right: 16, zIndex: 10, flexDirection: "row", justifyContent: "space-between" },
+  iconBtn: { height: 40, width: 40, borderRadius: 20, backgroundColor: "rgba(255,255,255,0.95)", justifyContent: "center", alignItems: "center", shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
+  hero: { width, height: width * 0.65, resizeMode: "cover" },
+  imgPager: { position: "absolute", right: 14, top: width * 0.65 - 32, backgroundColor: "rgba(0,0,0,0.6)", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16 },
+  pagerText: { color: "#fff", fontWeight: "700", fontSize: 13 },
+  content: { flex: 1, marginTop: -20 },
+  title: { fontSize: 24, lineHeight: 30, fontWeight: "900", color: brand.text, marginBottom: 12 },
   chipsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
-  chip: { backgroundColor: brand.chip, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12 },
-  chipText: { color: brand.deep, fontWeight: "600" },
-  locationRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 10 },
+  chip: { backgroundColor: brand.chip, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 16, borderWidth: 1, borderColor: "#e1e8e5" },
+  chipText: { color: brand.deep, fontWeight: "700", fontSize: 13 },
+  locationRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 16 },
   locationText: { color: brand.primary, fontWeight: "700" },
-  ratingRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 8 },
+  ratingRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 12 },
   ratingText: { color: brand.deep, fontWeight: "700" },
   linkText: { color: brand.primary, fontWeight: "700" },
-  sectionTitle: { fontSize: 18, fontWeight: "800", color: brand.text, marginBottom: 8 },
-  body: { color: brand.deep, lineHeight: 20 },
+  sectionTitle: { fontSize: 20, fontWeight: "900", color: brand.text, marginBottom: 12 },
+  body: { color: brand.deep, lineHeight: 24, fontSize: 15 },
   appCard: { flexDirection: "row", gap: 12, padding: 12, backgroundColor: brand.card, borderRadius: R, shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
   badgeZ: { height: 36, width: 36, borderRadius: 18, backgroundColor: brand.primary, justifyContent: "center", alignItems: "center" },
   appTitle: { fontWeight: "800", color: brand.text },
   appSubtitle: { color: brand.sub, marginTop: 4 },
-  agentCard: { backgroundColor: brand.card, borderRadius: R, padding: 14, shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 8, elevation: 2 },
+  agentCard: { backgroundColor: brand.card, borderRadius: 20, padding: 18, shadowColor: "#000", shadowOpacity: 0.08, shadowRadius: 12, elevation: 4 },
   avatar: { height: 54, width: 54, borderRadius: 27 },
   agentName: { fontWeight: "800", color: brand.text, fontSize: 16 },
   verified: { backgroundColor: "#e9f3ff", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
@@ -513,15 +513,15 @@ const styles = StyleSheet.create({
   statValue: { fontWeight: "800", color: brand.text },
   statLabel: { color: brand.sub, fontSize: 12, marginTop: 2 },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
-  detailCell: { width: (width - CARD * 2 - 10) / 2, backgroundColor: brand.card, borderRadius: 14, padding: 12 },
+  detailCell: { width: (width - CARD * 2 - 12) / 2, backgroundColor: brand.card, borderRadius: 16, padding: 14, shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 6, elevation: 2 },
   detailLabel: { color: brand.sub, fontSize: 12, fontWeight: "700" },
   detailValue: { color: brand.text, fontWeight: "800", marginTop: 6 },
   amenities: { flexDirection: "row", flexWrap: "wrap", gap: 14, marginTop: 6 },
   amenity: { flexDirection: "row", gap: 8, alignItems: "center", backgroundColor: "#f6f8f7", borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8 },
   amenityIcon: { fontSize: 18 },
   amenityText: { color: brand.deep, fontWeight: "700" },
-  mapCard: { backgroundColor: brand.card, borderRadius: R, overflow: "hidden" },
-  mapInner: { height: 150, justifyContent: "center", alignItems: "center", backgroundColor: "#eef4f1" },
+  mapCard: { backgroundColor: brand.card, borderRadius: 20, overflow: "hidden", shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 10, elevation: 3 },
+  mapInner: { height: 140, justifyContent: "center", alignItems: "center", backgroundColor: "#f8faf9" },
   mapLabel: { color: "#7da096", marginTop: 8, fontWeight: "700" },
   mapActions: { flexDirection: "row", gap: 10, padding: 12, backgroundColor: "#e7efec" },
   btn: { flex: 1, backgroundColor: brand.primary, borderRadius: 12, paddingVertical: 12, alignItems: "center" },
@@ -529,23 +529,23 @@ const styles = StyleSheet.create({
   btnOutline: { flex: 1, borderWidth: 1.5, borderColor: brand.primary, borderRadius: 12, paddingVertical: 12, alignItems: "center", backgroundColor: "#fff" },
   btnOutlineText: { color: brand.primary, fontWeight: "800" },
   rowBetween: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  reviewCard: { marginTop: 10, backgroundColor: brand.card, borderRadius: R, padding: 12, gap: 8 },
+  reviewCard: { marginTop: 12, backgroundColor: brand.card, borderRadius: 18, padding: 16, gap: 10, shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 8, elevation: 2 },
   reviewAvatar: { height: 36, width: 36, borderRadius: 18, backgroundColor: "#dfe7e4" },
   reviewName: { fontWeight: "800", color: brand.text },
   reviewDate: { color: brand.sub, fontSize: 12 },
   reviewText: { color: brand.deep },
-  popularCard: { height: 210, width: 220, borderRadius: R, backgroundColor: "#dfe7e4", marginRight: 12, overflow: "hidden" },
+  popularCard: { height: 200, width: 200, borderRadius: 18, backgroundColor: "#dfe7e4", marginRight: 14, overflow: "hidden", shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },
   popularImg: { flex: 1, backgroundColor: "#cdd7d3" },
   popularTitle: { color: "#fff", fontWeight: "800" },
   popularBadges: { position: "absolute", left: 12, bottom: 12, flexDirection: "row", gap: 8 },
   popBadge: { backgroundColor: "rgba(0,0,0,0.65)", color: "#fff", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, overflow: "hidden", fontWeight: "700" },
   likeBtn: { position: "absolute", right: 12, top: 12, height: 34, width: 34, backgroundColor: "rgba(0,0,0,0.35)", borderRadius: 17, alignItems: "center", justifyContent: "center" },
-  infoSecCard: { backgroundColor: brand.card, borderRadius: R, padding: 12, gap: 10 },
+  infoSecCard: { backgroundColor: brand.card, borderRadius: 20, padding: 18, gap: 14, shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 10, elevation: 3 },
   infoRow: { flexDirection: "row", gap: 12, alignItems: "center" },
   bullet: { height: 36, width: 36, borderRadius: 10, backgroundColor: "#f1f5f4", alignItems: "center", justifyContent: "center" },
   infoTitle: { fontWeight: "800", color: brand.text },
   infoSubtitle: { color: brand.sub, marginTop: 2 },
-  sticky: { position: "absolute", left: CARD, right: CARD, bottom: 16, backgroundColor: "#ffffff", borderRadius: 20, padding: 12, shadowColor: "#000", shadowOpacity: 0.15, shadowRadius: 14, elevation: 12, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
-  price: { fontWeight: "900", color: brand.text, fontSize: 16 },
+  sticky: { position: "absolute", left: CARD, right: CARD, bottom: 20, backgroundColor: "#ffffff", borderRadius: 24, padding: 16, shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 20, elevation: 15, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 12 },
+  price: { fontWeight: "900", color: brand.text, fontSize: 18 },
   stickyActions: { flexDirection: "row", alignItems: "center", gap: 10 },
 });
