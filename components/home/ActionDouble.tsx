@@ -12,7 +12,7 @@ export default function ActionDouble() {
         <Ionicons name="add-circle-outline" size={22} color="#19715C" />
         <Text style={s.bigText} numberOfLines={1} adjustsFontSizeToFit>Publier un bien</Text>
       </Pressable>
-      <Pressable style={s.big} onPress={() => r.push("/(tabs)/services")} accessibilityRole="button">
+      <Pressable style={s.big} onPress={() => r.push("/(tabs)/professionnels")} accessibilityRole="button">
         <Ionicons name="person-outline" size={22} color="#8B6A2B" />
         <Text style={s.bigText} numberOfLines={1} adjustsFontSizeToFit>Trouver un pro</Text>
       </Pressable>
