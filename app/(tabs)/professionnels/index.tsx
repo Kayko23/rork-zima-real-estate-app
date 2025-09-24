@@ -16,7 +16,7 @@ import {
 import { router } from 'expo-router';
 
 
-import FusedSearch from '@/components/search/FusedSearch';
+
 import ProviderCard, { Provider } from '@/components/professionals/ProviderCard';
 import { CATEGORY_ORDER, providers } from '@/constants/professionals';
 import HomeHeader from '@/components/home/HomeHeader';
@@ -71,12 +71,7 @@ export default function ProfessionnelsScreen() {
     }
   };
 
-  const handleSearchSubmit = (params: any) => {
-    if (!params) return;
-    if (typeof params === 'string' && params.trim().length === 0) return;
-    if (typeof params === 'object' && Object.keys(params).length === 0) return;
-    console.log('Search params:', params);
-  };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -87,10 +82,6 @@ export default function ProfessionnelsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <HomeHeader active="services" onChange={setHomeTab} />
-        
-        <View style={styles.searchContainer}>
-          <FusedSearch mode="services" onSubmit={handleSearchSubmit} />
-        </View>
         {CATEGORY_ORDER.map(({ key, title }) => {
           const data = grouped[key] || [];
           if (!data.length) return null;
@@ -149,11 +140,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F3F6F6',
   },
-  searchContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 16,
-  },
+
   section: { 
     marginTop: 18 
   },
