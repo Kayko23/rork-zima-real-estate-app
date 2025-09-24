@@ -380,7 +380,7 @@ function PropertyDetailScreen() {
 
       <LiquidGlassView style={styles.stickyGlass} intensity={26} tint="light">
         <View style={styles.sticky} testID="sticky-bar">
-          <Text style={styles.price}>{Intl.NumberFormat("en-US").format(data.price)} {data.currency}</Text>
+          <Text style={styles.price}>{data.price.toLocaleString('en-US')} {data.currency}</Text>
           <View style={styles.stickyActions}>
             <Button label="Contacter" onPress={() => console.log("contact press")} />
             <Pressable testID="call" onPress={() => Linking.openURL("tel:+221700000000").catch(err => console.log("call error", err))} style={styles.iconOnly}>
