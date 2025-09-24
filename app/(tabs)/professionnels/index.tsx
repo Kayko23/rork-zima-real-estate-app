@@ -86,7 +86,9 @@ export default function ProfessionnelsScreen() {
         stickyHeaderIndices={[0]}
         showsVerticalScrollIndicator={false}
       >
-        <HomeHeader active="services" onChange={setHomeTab} />
+        <View style={styles.headerContainer}>
+          <HomeHeader active="services" onChange={setHomeTab} />
+        </View>
         
         <View style={styles.searchContainer}>
           <FusedSearch mode="services" onSubmit={handleSearchSubmit} />
@@ -147,6 +149,9 @@ export default function ProfessionnelsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F3F6F6',
+  },
+  headerContainer: {
     backgroundColor: '#F3F6F6',
   },
   searchContainer: {

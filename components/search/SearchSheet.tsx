@@ -1,115 +1,175 @@
-import React, { useState } from "react";
-import { View, Text, Modal, StyleSheet, TextInput, FlatList, Pressable } from "react-native";
-import { AFRICA_TARGET_COUNTRIES } from "@/constants/regions";
-import { useCities } from "@/hooks/useCities";
-import { T } from "@/constants/typography";
+import React, { useMemo, useState } from 'react';
+import { View, Text, TextInput, ScrollView, Pressable, StyleSheet } from 'react-native';
+import BottomSheet from '../BottomSheet';
+import CityPicker from '../CityPicker';
+import DateRangeSheet from '../DateRangeSheet';
+import { CalendarDays, Users, MapPin, X } from 'lucide-react-native';
+import { ALL_TARGET_COUNTRIES } from '@/data/regions';
 
-export default function SearchSheet({ open, onClose, onApply, mode }: {
-  open: boolean; onClose: () => void; onApply: (p: any) => void; mode: "biens" | "services" | "voyages";
-}) {
-  const [country, setCountry] = useState<string | undefined>(undefined);
-  const [cityQuery, setCityQuery] = useState("");
-  const [page, setPage] = useState(1);
-  const { cities, loading } = useCities(country, cityQuery, page);
+type Mode = 'biens' | 'services' | 'voyages';
+
+export type SearchSheetValue =
+  | { mode: 'biens'; where?: string; dates?: string; guests?: number }
+  | { mode: 'services'; where?: string; category?: string }
+  | { mode: 'voyages'; destination?: string; dates?: string; guests?: number };
+
+type Props = {
+  open: boolean;
+  mode: Mode;
+  initial?: Partial<SearchSheetValue>;
+  onClose: () => void;
+  onApply: (v: SearchSheetValue) => void;
+};
+
+const PRO_CATEGORIES = [
+  'Agent immobilier',
+  'Agence immobilière',
+  'Gestionnaire de biens',
+  'Réservation hôtel',
+  'Réservation résidence',
+  'Gestionnaire d\'espace évènementiel',
+];
+
+export default function SearchSheet({ open, mode, initial, onClose, onApply }: Props) {
+  const [where, setWhere] = useState('');
+  const [category, setCategory] = useState<string | undefined>(undefined);
+  const [dates, setDates] = useState<string | undefined>(undefined);
+  const [guests, setGuests] = useState<number>(mode === 'voyages' ? 2 : 1);
+  const [dateOpen, setDateOpen] = useState(false);
+
+  const allCountries = useMemo(() => {
+    return ALL_TARGET_COUNTRIES;
+  }, []);
+
+  const isCountry = ALL_TARGET_COUNTRIES.includes(where);
+
+  const submit = () => {
+    if (mode === 'biens') {
+      onApply({ mode, where: where || undefined, dates, guests });
+    } else if (mode === 'services') {
+      onApply({ mode, where: where || undefined, category });
+    } else {
+      onApply({ mode, destination: where || undefined, dates, guests });
+    }
+    onClose();
+  };
 
   return (
-    <Modal visible={open} animationType="slide" onRequestClose={onClose} transparent>
-      <View style={s.wrap}>
-        <View style={s.sheet}>
-          <View style={s.headerContainer}>
-            <View style={s.grabber} />
-          </View>
+    <>
+      <BottomSheet visible={open} onClose={onClose}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <Text style={styles.title}>Où ?</Text>
 
-          <Text style={[T.h1, { marginHorizontal: 16, marginBottom: 6 }]}>
-            {mode === "services" ? "Où exercer ?" : "Où ?"}
-          </Text>
-
-          {/* Pays */}
-          <View style={s.countrySection}>
-            <Text style={[T.muted, { marginBottom: 6 }]}>Pays</Text>
-            <Pressable style={s.select} onPress={() => {/* ouvre un picker si tu préfères */}}>
-              <TextInput
-                placeholder="Choisir un pays"
-                value={country ? AFRICA_TARGET_COUNTRIES.find(c => c.code === country)?.name : ""}
-                onFocus={() => { }}
-                style={s.selectInput}
-                readOnly
-              />
-            </Pressable>
-            <FlatList
-              data={AFRICA_TARGET_COUNTRIES}
-              keyExtractor={(i) => i.code}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={s.countryList}
-              renderItem={({ item }) => (
-                <Pressable
-                  onPress={() => { setCountry(item.code); setPage(1); }}
-                  style={[s.countryPill, country === item.code && s.countryPillActive]}
-                >
-                  <Text style={{ fontWeight: "700", color: country === item.code ? "#fff" : "#111827" }}>
-                    {item.name}
-                  </Text>
-                </Pressable>
-              )}
-            />
-          </View>
-
-          {/* Villes */}
-          <View style={s.citySection}>
-            <Text style={[T.muted, { marginBottom: 6 }]}>Ville</Text>
+          {/* Champ principal */}
+          <View style={styles.inputRow}>
+            <MapPin size={18} color="#475569" />
             <TextInput
-              placeholder="Rechercher une ville"
-              onChangeText={setCityQuery}
-              style={s.input}
-              autoCorrect={false}
+              style={styles.input}
+              placeholder={mode === 'services' ? 'Rechercher une ville ou un pays' : 'Rechercher une destination'}
+              placeholderTextColor="#475569"
+              value={where}
+              onChangeText={setWhere}
             />
-            <FlatList
-              data={cities}
-              keyExtractor={(i) => i.id}
-              keyboardShouldPersistTaps="handled"
-              onEndReached={() => setPage(p => p + 1)}
-              ListFooterComponent={loading ? <Text style={s.loadingText}>Chargement…</Text> : null}
-              renderItem={({ item }) => (
-                <Pressable style={s.cityRow} onPress={() => onApply({ country, cityId: item.id, cityName: item.name })}>
-                  <Text style={s.cityName}>{item.name}</Text>
-                  {item.admin ? <Text style={s.cityAdmin}>{item.admin}</Text> : null}
-                </Pressable>
-              )}
-              style={s.cityList}
-            />
+            {!!where && (
+              <Pressable onPress={() => setWhere('')}>
+                <X size={18} color="#475569" />
+              </Pressable>
+            )}
           </View>
 
-          <View style={s.bottomSpacer} />
-        </View>
-      </View>
-    </Modal>
+          {/* CityPicker si un pays est sélectionné */}
+          {isCountry && (
+            <View style={styles.cityPickerContainer}>
+              <CityPicker
+                country={where}
+                onSelect={(city) => setWhere(`${city}, ${where}`)}
+              />
+            </View>
+          )}
+
+          {/* Suggestions rapides pays régionaux */}
+          <Text style={styles.section}>Pays UEMOA / CEDEAO / CEMAC</Text>
+          <View style={styles.chips}>
+            {allCountries.map((c) => (
+              <Pressable key={c} onPress={() => setWhere(c)} style={[styles.chip, where === c && styles.chipActive]}>
+                <Text style={[styles.chipTxt, where === c && styles.chipTxtActive]}>{c}</Text>
+              </Pressable>
+            ))}
+          </View>
+
+          {/* Lignes spécifiques par mode */}
+          {mode !== 'services' && (
+            <>
+              <Text style={styles.section}>Dates</Text>
+              <Pressable onPress={() => setDateOpen(true)} style={styles.rowBtn}>
+                <CalendarDays size={18} color="#475569" />
+                <Text style={styles.rowBtnTxt}>{dates ?? 'Ajouter des dates'}</Text>
+              </Pressable>
+
+              <Text style={styles.section}>Voyageurs</Text>
+              <Pressable onPress={() => setGuests(Math.max(1, (guests ?? 1) + 1))} style={styles.rowBtn}>
+                <Users size={18} color="#475569" />
+                <Text style={styles.rowBtnTxt}>{guests} voyageur(s)</Text>
+              </Pressable>
+            </>
+          )}
+
+          {mode === 'services' && (
+            <>
+              <Text style={styles.section}>Catégorie de service</Text>
+              <View style={styles.chips}>
+                {PRO_CATEGORIES.map((c) => (
+                  <Pressable key={c} onPress={() => setCategory(c)}
+                    style={[styles.chip, category === c && styles.chipActive]}>
+                    <Text style={[styles.chipTxt, category === c && styles.chipTxtActive]}>{c}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </>
+          )}
+
+          {/* Actions */}
+          <View style={styles.actions}>
+            <Pressable onPress={() => { setWhere(''); setCategory(undefined); setDates(undefined); setGuests(mode === 'voyages' ? 2 : 1); }} >
+              <Text style={styles.clear}>Tout effacer</Text>
+            </Pressable>
+            <Pressable onPress={submit} style={styles.searchBtn}>
+              <Text style={styles.searchTxt}>Rechercher</Text>
+            </Pressable>
+          </View>
+        </ScrollView>
+      </BottomSheet>
+
+      <DateRangeSheet
+        visible={dateOpen}
+        onClose={() => setDateOpen(false)}
+        onSubmit={(label) => setDates(label)}
+      />
+    </>
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: "rgba(0,0,0,0.25)", justifyContent: "flex-end" },
-  sheet: {
-    backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20,
-    paddingBottom: 18,
+const styles = StyleSheet.create({
+  scrollContent: { paddingBottom: 24 },
+  title: { fontSize: 24, fontWeight: '900', marginHorizontal: 20, marginTop: 4, color: '#0F172A' },
+  section: { fontSize: 14, fontWeight: '800', marginHorizontal: 20, marginTop: 18, color: '#0F172A' },
+  inputRow: {
+    marginHorizontal: 20, marginTop: 10,
+    borderWidth: 1, borderColor: '#E6E8EC', borderRadius: 16,
+    paddingHorizontal: 12, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', gap: 10,
+    backgroundColor: '#fff',
   },
-  headerContainer: { alignItems: "center", paddingVertical: 6 },
-  grabber: { width: 44, height: 5, borderRadius: 3, backgroundColor: "rgba(0,0,0,0.15)" },
-  countrySection: { marginHorizontal: 16, marginBottom: 8 },
-  countryList: { gap: 8, paddingVertical: 8 },
-  citySection: { marginHorizontal: 16, marginBottom: 12 },
-  cityList: { maxHeight: 260, marginTop: 8 },
-  bottomSpacer: { height: 12 },
-  loadingText: { textAlign: "center", padding: 8 },
-  cityName: { fontSize: 16, fontWeight: "700" },
-  cityAdmin: { color: "#6B7280" },
-  input: {
-    height: 50, borderRadius: 12, paddingHorizontal: 14,
-    borderWidth: 1, borderColor: "rgba(0,0,0,0.08)", fontSize: 16, fontWeight: "600",
-  },
-  select: { borderRadius: 12, borderWidth: 1, borderColor: "rgba(0,0,0,0.08)" },
-  selectInput: { height: 46, paddingHorizontal: 14, fontSize: 16, fontWeight: "700", color: "#111827" },
-  cityRow: { paddingVertical: 10, borderBottomWidth: 1, borderColor: "rgba(0,0,0,0.05)" },
-  countryPill: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 999, backgroundColor: "#F3F4F6" },
-  countryPillActive: { backgroundColor: "#1B4F45" },
+  input: { flex: 1, fontWeight: '700', color: '#0F172A' },
+  cityPickerContainer: { marginHorizontal: 20, marginTop: 12 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginHorizontal: 20, marginTop: 10 },
+  chip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999, backgroundColor: '#F4F6F8', borderWidth: 1, borderColor: '#E6E8EC' },
+  chipActive: { backgroundColor: '#E9F4F1', borderColor: '#0E5A46' },
+  chipTxt: { color: '#475569', fontWeight: '700' },
+  chipTxtActive: { color: '#0E5A46' },
+  rowBtn: { marginHorizontal: 20, marginTop: 10, borderRadius: 16, borderWidth: 1, borderColor: '#E6E8EC', padding: 14, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  rowBtnTxt: { fontWeight: '700', color: '#475569' },
+  actions: { marginHorizontal: 20, marginTop: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  clear: { textDecorationLine: 'underline', fontWeight: '800', color: '#0F172A' },
+  searchBtn: { backgroundColor: '#FF2D55', paddingHorizontal: 18, paddingVertical: 12, borderRadius: 999 },
+  searchTxt: { color: '#fff', fontWeight: '900' },
 });
