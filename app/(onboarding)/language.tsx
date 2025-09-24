@@ -71,8 +71,6 @@ export default function LanguageScreen() {
         );
       })}
 
-      <Text style={styles.hint}>You can change this later in Settings</Text>
-
       <Pressable
         disabled={!canContinue}
         onPress={onContinue}
@@ -84,7 +82,7 @@ export default function LanguageScreen() {
         </Text>
       </Pressable>
 
-      <Text style={[styles.hint, styles.hintBottom]}>
+      <Text style={styles.hint}>
         You can change this later in Settings
       </Text>
     </SafeAreaView>
