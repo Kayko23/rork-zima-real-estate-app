@@ -4,17 +4,17 @@ import { UserMode, User, FilterState } from '@/types';
 
 type Language = 'fr' | 'en' | 'pt';
 
-// Simple in-memory storage for demo purposes to avoid hydration issues
+// Simple storage that doesn't cause hydration issues
 const storage = {
   getItem: async (key: string): Promise<string | null> => {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
         return window.localStorage.getItem(key);
       }
-      return null;
     } catch {
-      return null;
+      // Ignore errors
     }
+    return null;
   },
   setItem: async (key: string, value: string): Promise<void> => {
     try {
@@ -22,7 +22,7 @@ const storage = {
         window.localStorage.setItem(key, value);
       }
     } catch {
-      console.log(`Storage: ${key} = ${value}`);
+      // Ignore errors
     }
   },
 };
@@ -61,18 +61,22 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const [user, setUser] = useState<User>(defaultUser);
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(true);
-  const [isHydrated] = useState(true);
-  const [language, setLanguageState] = useState<Language | null>(null);
+  const [isHydrated, setIsHydrated] = useState(true);
+  const [language, setLanguageState] = useState<Language | null>('fr');
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [isInitialized, setIsInitialized] = useState(true);
 
   useEffect(() => {
-    // Load data immediately but handle errors gracefully
+    // Load persisted data after component mounts
     loadPersistedData();
   }, []);
 
   const loadPersistedData = async () => {
     try {
+      if (typeof window === 'undefined') {
+        return;
+      }
+      
       const savedMode = await storage.getItem('userMode');
       const savedUser = await storage.getItem('user');
       const savedLanguage = await storage.getItem('language');
@@ -90,11 +94,8 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       if (savedOnboarding === 'true') {
         setHasCompletedOnboarding(true);
       }
-      
-      // Already initialized
     } catch (error) {
       console.log('Error loading persisted data:', error);
-      // Already initialized
     }
   };
 

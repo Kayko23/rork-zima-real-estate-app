@@ -43,43 +43,41 @@ function RootLayoutNav() {
 }
 
 export default function RootLayout() {
-  const [isAppReady, setIsAppReady] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const prepare = async () => {
-      try {
-        // Minimal preparation to avoid hydration timeout
-        await new Promise(resolve => setTimeout(resolve, 100));
-        setIsAppReady(true);
-      } catch (e) {
-        console.warn('Error during app preparation:', e);
-        setIsAppReady(true);
-      }
-    };
-
-    prepare();
+    // Simple initialization without complex async operations
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const onLayoutRootView = useCallback(async () => {
-    if (isAppReady) {
-      await SplashScreen.hideAsync();
+    if (isReady) {
+      try {
+        await SplashScreen.hideAsync();
+      } catch (e) {
+        // Ignore splash screen errors
+      }
     }
-  }, [isAppReady]);
+  }, [isReady]);
 
-  if (!isAppReady) {
+  if (!isReady) {
     return null;
   }
 
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
-      <QueryClientProvider client={queryClient}>
-        <AppProvider>
-          <GestureHandlerRootView style={styles.container}>
+    <QueryClientProvider client={queryClient}>
+      <AppProvider>
+        <GestureHandlerRootView style={styles.container}>
+          <View style={styles.container} onLayout={onLayoutRootView}>
             <RootLayoutNav />
-          </GestureHandlerRootView>
-        </AppProvider>
-      </QueryClientProvider>
-    </View>
+          </View>
+        </GestureHandlerRootView>
+      </AppProvider>
+    </QueryClientProvider>
   );
 }
 

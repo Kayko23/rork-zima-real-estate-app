@@ -17,7 +17,7 @@ export default function SplashScreen() {
       console.log('Language:', language);
       console.log('Has completed onboarding:', hasCompletedOnboarding);
       
-      if (!language || !hasCompletedOnboarding) {
+      if (!hasCompletedOnboarding) {
         console.log('Redirecting to language selection');
         router.replace("/(onboarding)/language");
       } else {
