@@ -222,6 +222,8 @@ function PropertyDetailScreen() {
 
         <View style={{ paddingHorizontal: CARD, marginTop: 18 }}>
           <Text style={styles.sectionTitle}>Faites connaissance avec votre conseiller</Text>
+        </View>
+        <View style={{ paddingHorizontal: CARD }}>
           <AgentCard
             agent={data.agent}
             onProfile={() => console.log("open agent profile")}
