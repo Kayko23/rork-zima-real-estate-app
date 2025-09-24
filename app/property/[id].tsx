@@ -308,8 +308,14 @@ function PropertyDetailScreen() {
         <View style={{ paddingHorizontal: CARD }}>
           <AgentCard
             agent={data.agent}
-            onProfile={() => console.log("open agent profile")}
-            onAll={() => console.log("open agent listings")}
+            onProfile={() => {
+              console.log("Opening agent profile for:", data.agent.name);
+              router.push(`/provider/${data.agent.name.toLowerCase().replace(/\s+/g, '-')}`);
+            }}
+            onAll={() => {
+              console.log("Opening all listings for:", data.agent.name);
+              router.push(`/browse?agent=${encodeURIComponent(data.agent.name)}`);
+            }}
           />
         </View>
 
