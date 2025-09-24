@@ -15,7 +15,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ChevronLeft,
   Heart,
-  Share2,
   Star,
   MapPin,
   Phone,
@@ -37,6 +36,7 @@ import {
   Trees,
   Mail,
 } from "lucide-react-native";
+import { Ionicons } from '@expo/vector-icons';
 import LiquidGlassView from "@/components/ui/LiquidGlassView";
 
 const { width } = Dimensions.get("window");
@@ -219,7 +219,7 @@ function PropertyDetailScreen() {
             </LiquidGlassView>
             <View style={{ flexDirection: "row", gap: 10 }}>
               <LiquidGlassView style={styles.glassCircle} intensity={18} tint="light">
-                <Pressable testID="share" onPress={() => console.log("share press")} style={styles.roundBtn}><Share2 size={18} color="#0b3b35" /></Pressable>
+                <Pressable testID="share" onPress={() => console.log("share press")} style={styles.roundBtn}><Ionicons name="share-outline" size={20} color="#0E3B33" /></Pressable>
               </LiquidGlassView>
               <LiquidGlassView style={styles.glassCircle} intensity={18} tint="light">
                 <Pressable testID="fav" onPress={() => console.log("favorite press")} style={styles.roundBtn}><Heart size={18} color="#0b3b35" /></Pressable>
