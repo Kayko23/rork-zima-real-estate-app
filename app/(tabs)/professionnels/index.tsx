@@ -9,6 +9,7 @@ import {
   Linking,
   StatusBar,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   ChevronRight,
 } from 'lucide-react-native';
@@ -78,7 +79,7 @@ export default function ProfessionnelsScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#F3F6F6" />
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -139,7 +140,7 @@ export default function ProfessionnelsScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
