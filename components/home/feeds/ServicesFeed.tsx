@@ -28,7 +28,7 @@ export default function ServicesFeed() {
 
   const handleViewProfile = (item: ProItem) => {
     console.log('View profile:', item.id);
-    router.push(`/provider/${item.id}`);
+    router.push(`/(tabs)/professionnels/profile/${item.id}`);
   };
 
   const handleSearchSubmit = (params: any) => {

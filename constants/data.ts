@@ -530,8 +530,243 @@ export const mockProviders: Provider[] = [
       'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200',
       'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200'
     ]
+  },
+  {
+    id: 'p16',
+    name: 'Chioma Okafor',
+    type: 'agent',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150',
+    rating: 4.9,
+    reviewCount: 156,
+    location: { city: 'Lagos', country: 'Nigeria' },
+    specialties: ['Luxe', 'Investissement', 'Conseil'],
+    isVerified: true,
+    isPremium: true,
+    phone: '+234901234568',
+    email: 'chioma@okaforproperties.ng',
+    whatsapp: '+234901234568',
+    listingCount: 42,
+    images: [
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200',
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200',
+      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=200'
+    ]
+  },
+  {
+    id: 'p17',
+    name: 'Mamadou Keita Properties',
+    type: 'agency',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+    rating: 4.7,
+    reviewCount: 89,
+    location: { city: 'Bamako', country: 'Mali' },
+    specialties: ['Résidentiel', 'Commercial', 'Terrain'],
+    isVerified: true,
+    isPremium: true,
+    phone: '+22370123457',
+    email: 'contact@mamadoukeita.ml',
+    whatsapp: '+22370123457',
+    listingCount: 38,
+    images: [
+      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200'
+    ]
+  },
+  {
+    id: 'p18',
+    name: 'Awa Diop',
+    type: 'agent',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
+    rating: 4.8,
+    reviewCount: 124,
+    location: { city: 'Dakar', country: 'Sénégal' },
+    specialties: ['Résidentiel', 'Luxe', 'Vue mer'],
+    isVerified: true,
+    isPremium: true,
+    phone: '+221771234570',
+    email: 'awa.diop@gmail.com',
+    whatsapp: '+221771234570',
+    listingCount: 29,
+    images: [
+      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=200',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200'
+    ]
+  },
+  {
+    id: 'p19',
+    name: 'Koffi Asante Immobilier',
+    type: 'agency',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+    rating: 4.5,
+    reviewCount: 93,
+    location: { city: 'Abidjan', country: 'Côte d\'Ivoire' },
+    specialties: ['Commercial', 'Industriel', 'Bureaux'],
+    isVerified: true,
+    isPremium: false,
+    phone: '+2250701234569',
+    email: 'info@koffiasante.ci',
+    whatsapp: '+2250701234569',
+    listingCount: 47,
+    images: [
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200',
+      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200'
+    ]
+  },
+  {
+    id: 'p20',
+    name: 'Adama Traoré',
+    type: 'agent',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+    rating: 4.6,
+    reviewCount: 67,
+    location: { city: 'Ouagadougou', country: 'Burkina Faso' },
+    specialties: ['Résidentiel', 'Location', 'Gestion'],
+    isVerified: false,
+    isPremium: false,
+    phone: '+22670123457',
+    email: 'adama.traore@gmail.com',
+    whatsapp: '+22670123457',
+    listingCount: 18,
+    images: [
+      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200'
+    ]
+  },
+  {
+    id: 'p21',
+    name: 'Nana Akoto Properties',
+    type: 'agency',
+    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
+    rating: 4.9,
+    reviewCount: 178,
+    location: { city: 'Kumasi', country: 'Ghana' },
+    specialties: ['Luxe', 'Résidentiel', 'Investissement'],
+    isVerified: true,
+    isPremium: true,
+    phone: '+233501234568',
+    email: 'contact@nanaakoto.gh',
+    whatsapp: '+233501234568',
+    listingCount: 56,
+    images: [
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200',
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=200'
+    ]
+  },
+  {
+    id: 'p22',
+    name: 'Binta Sow',
+    type: 'agent',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150',
+    rating: 4.4,
+    reviewCount: 52,
+    location: { city: 'Conakry', country: 'Guinée' },
+    specialties: ['Résidentiel', 'Location', 'Conseil'],
+    isVerified: true,
+    isPremium: false,
+    phone: '+224621234568',
+    email: 'binta.sow@gmail.com',
+    whatsapp: '+224621234568',
+    listingCount: 23,
+    images: [
+      'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=200',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200'
+    ]
+  },
+  {
+    id: 'p23',
+    name: 'Youssouf Diallo Realty',
+    type: 'agency',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+    rating: 4.7,
+    reviewCount: 134,
+    location: { city: 'Niamey', country: 'Niger' },
+    specialties: ['Commercial', 'Résidentiel', 'Développement'],
+    isVerified: true,
+    isPremium: true,
+    phone: '+22796123457',
+    email: 'contact@youssoufdiallo.ne',
+    whatsapp: '+22796123457',
+    listingCount: 41,
+    images: [
+      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200',
+      'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=200'
+    ]
+  },
+  {
+    id: 'p24',
+    name: 'Amina Hassan',
+    type: 'agent',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
+    rating: 4.8,
+    reviewCount: 98,
+    location: { city: 'Abuja', country: 'Nigeria' },
+    specialties: ['Luxe', 'Commercial', 'Bureaux'],
+    isVerified: true,
+    isPremium: true,
+    phone: '+234901234569',
+    email: 'amina.hassan@gmail.com',
+    whatsapp: '+234901234569',
+    listingCount: 35,
+    images: [
+      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=200',
+      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=200'
+    ]
   }
 ];
+
+// Fonction pour obtenir un prestataire par ID avec données enrichies
+export const getProviderById = (id: string) => {
+  const provider = mockProviders.find(p => p.id === id);
+  if (!provider) return null;
+  
+  return {
+    ...provider,
+    cover: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1200&auto=format&fit=crop',
+    languages: ['Français', 'English'],
+    zones: ['Centre-ville', 'Résidentiel', 'Commercial'],
+    listings: [
+      {
+        id: 'l1',
+        title: 'Villa moderne avec piscine',
+        city: provider.location.city,
+        country: provider.location.country,
+        price: '$2,500/mois',
+        status: 'À louer' as const,
+        thumbnail: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
+      },
+      {
+        id: 'l2',
+        title: 'Penthouse centre-ville',
+        city: provider.location.city,
+        country: provider.location.country,
+        price: '$450,000',
+        status: 'À vendre' as const,
+        thumbnail: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
+      },
+    ],
+    reviews: [
+      {
+        id: 'r1',
+        author: 'Emeka Nwankwo',
+        rating: 5,
+        text: 'Excellent service ! Très professionnel et à l\'écoute.',
+        date: '30/10/2024',
+      },
+      {
+        id: 'r2',
+        author: 'Fatou Sall',
+        rating: 5,
+        text: 'Service impeccable. Connaît très bien le marché local.',
+        date: '15/10/2024',
+      },
+    ],
+  };
+};
+
 
 export const mockConversations: Conversation[] = [
   {

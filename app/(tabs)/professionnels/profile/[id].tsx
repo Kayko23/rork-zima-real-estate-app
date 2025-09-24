@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { SafeAreaView, View, Text, FlatList, Pressable, Share, Linking, Alert, Platform, StyleSheet } from 'react-native';
+import { SafeAreaView, View, Text, FlatList, Pressable, Share, Linking, Alert, Platform, StyleSheet, ScrollView } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons, Feather } from '@expo/vector-icons';
+import { getProviderById } from '@/constants/data';
 
 type Listing = {
   id: string;
@@ -97,64 +98,69 @@ export default function ProviderProfileScreen() {
   const [tab, setTab] = useState<'overview' | 'listings' | 'reviews'>('overview');
   const [faved, setFaved] = useState<boolean>(false);
 
-  const pro: Pro = useMemo(
-    () => ({
-      id: id || '1',
-      name: 'Aminata Diallo',
-      role: 'Agent',
-      city: 'Dakar',
-      country: 'Sénégal',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop',
-      cover: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1200&auto=format&fit=crop',
-      premium: true,
-      verified: true,
-      specialties: ['Vente', 'Location', 'Commercial', 'Conseil'],
-      languages: ['Français', 'English', 'Wolof'],
-      zones: ['Almadies', 'Mermoz', 'Point E', 'Fann'],
-      rating: 4.9,
-      ratingsCount: 156,
-      listings: [
-        {
-          id: 'l1',
-          title: 'Villa moderne avec piscine',
-          city: 'Almadies',
-          area: 'Dakar',
-          priceLabel: '$125,000',
-          badge: 'À vendre',
-          thumb: 'https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=800&auto=format&fit=crop',
-        },
-        {
-          id: 'l2',
-          title: 'Appartement centre-ville',
-          city: 'Plateau',
-          area: 'Dakar',
-          priceLabel: '$850/mois',
-          badge: 'À louer',
-          thumb: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=800&auto=format&fit=crop',
-        },
-      ],
-      reviews: [
-        {
-          id: 'r1',
-          author: 'Moussa Ba',
-          dateLabel: '20/11/2024',
-          rating: 5,
-          text: "Excellente agent ! Très professionnelle et à l'écoute. M'a aidé à trouver la maison parfaite.",
-        },
-        {
-          id: 'r2',
-          author: 'Fatou Sall',
-          dateLabel: '15/10/2024',
-          rating: 5,
-          text: 'Service impeccable. Aminata connaît très bien le marché dakarois.',
-        },
-      ],
-      phone: '+221771112233',
-      whatsapp: '221771112233',
-      email: 'aminata@example.com',
-    }),
-    [id]
-  );
+  const pro: Pro = useMemo(() => {
+    const providerData = getProviderById(id || 'p16');
+    if (!providerData) {
+      // Fallback data
+      return {
+        id: 'p16',
+        name: 'Chioma Okafor',
+        role: 'Agent' as const,
+        city: 'Lagos',
+        country: 'Nigeria',
+        avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=400&auto=format&fit=crop',
+        cover: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1200&auto=format&fit=crop',
+        premium: true,
+        verified: true,
+        specialties: ['Luxe', 'Investissement', 'Conseil'],
+        languages: ['Français', 'English'],
+        zones: ['Centre-ville', 'Résidentiel', 'Commercial'],
+        rating: 4.9,
+        ratingsCount: 156,
+        listings: [],
+        reviews: [],
+        phone: '+234901234568',
+        whatsapp: '234901234568',
+        email: 'chioma@okaforproperties.ng',
+      };
+    }
+    
+    return {
+      id: providerData.id,
+      name: providerData.name,
+      role: providerData.type === 'agency' ? 'Agence' as const : 'Agent' as const,
+      city: providerData.location.city,
+      country: providerData.location.country,
+      avatar: providerData.avatar,
+      cover: providerData.cover,
+      premium: providerData.isPremium,
+      verified: providerData.isVerified,
+      specialties: providerData.specialties,
+      languages: providerData.languages,
+      zones: providerData.zones,
+      rating: providerData.rating,
+      ratingsCount: providerData.reviewCount,
+      listings: providerData.listings.map(l => ({
+        id: l.id,
+        title: l.title,
+        city: l.city,
+        area: l.country,
+        priceLabel: l.price,
+        badge: l.status,
+        thumb: l.thumbnail,
+      })),
+      reviews: providerData.reviews.map(r => ({
+        id: r.id,
+        author: r.author,
+        dateLabel: r.date,
+        rating: r.rating,
+        text: r.text,
+      })),
+      phone: providerData.phone,
+      whatsapp: providerData.whatsapp?.replace(/[^0-9]/g, ''),
+      email: providerData.email,
+    };
+  }, [id]);
 
   const onShare = async () => {
     try {
@@ -184,7 +190,7 @@ export default function ProviderProfileScreen() {
           <Ionicons name="chevron-back" size={22} color={palette.text} />
         </Pressable>
 
-        <Text style={{ fontSize: 24, fontWeight: '800', color: palette.text }}> {pro.name.split(' ')[0]} </Text>
+        <Text style={{ fontSize: 24, fontWeight: '800', color: palette.text }}>{pro.name.split(' ')[0]}</Text>
 
         <View style={{ flexDirection: 'row', gap: 12 }}>
           <Pressable
@@ -260,62 +266,55 @@ export default function ProviderProfileScreen() {
       </View>
 
       {tab === 'overview' && (
-        <FlatList
-          contentContainerStyle={{ padding: 16, paddingBottom: 28 }}
-          ListHeaderComponent={<View />}
-          data={pro.specialties}
-          keyExtractor={(item, idx) => `${item}-${idx}`}
-          renderItem={() => (
-            <View style={{ gap: 16 }}>
-              <View style={styles.cardBlock}>
-                <Text style={styles.cardTitle}>À propos</Text>
-                <Text style={{ lineHeight: 22, color: palette.muted }}>
-                  Agent immobilier expérimenté spécialisé dans les propriétés résidentielles et commerciales à {pro.city}. Passionnée par l'accompagnement des clients dans leurs projets.
-                </Text>
-              </View>
+        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 28 }}>
+          <View style={{ gap: 16 }}>
+            <View style={styles.cardBlock}>
+              <Text style={styles.cardTitle}>À propos</Text>
+              <Text style={{ lineHeight: 22, color: palette.muted }}>
+                {pro.role} immobilier expérimenté spécialisé dans les propriétés résidentielles et commerciales à {pro.city}. Passionné par l'accompagnement des clients dans leurs projets.
+              </Text>
+            </View>
 
-              <View style={styles.cardBlock}>
-                <Text style={styles.cardTitle}>Spécialités</Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-                  {pro.specialties.map((s) => (
-                    <Chip key={s} label={s} tone="soft" />
-                  ))}
-                </View>
-              </View>
-
-              <View style={styles.cardBlock}>
-                <Text style={styles.cardTitle}>Langues parlées</Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-                  {pro.languages.map((s) => (
-                    <Chip key={s} label={s} />
-                  ))}
-                </View>
-              </View>
-
-              <View style={styles.cardBlock}>
-                <Text style={styles.cardTitle}>Zones d'intervention</Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-                  {pro.zones.map((s) => (
-                    <Chip key={s} label={s} tone="soft" />
-                  ))}
-                </View>
-              </View>
-
-              <View style={[styles.cardBlock, { flexDirection: 'row', justifyContent: 'space-between' }]}>
-                {[
-                  { icon: <Feather name="phone" size={20} color={palette.teal} />, onPress: openPhone },
-                  { icon: <Ionicons name={"logo-whatsapp" as any} size={20} color={palette.teal} />, onPress: openWhatsApp },
-                  { icon: <Feather name="mail" size={20} color={palette.teal} />, onPress: openMail },
-                ].map((b, i) => (
-                  <Pressable key={i} onPress={b.onPress} style={styles.actionIcon} testID={`contact-${i}`}>
-                    {b.icon}
-                  </Pressable>
+            <View style={styles.cardBlock}>
+              <Text style={styles.cardTitle}>Spécialités</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                {pro.specialties.map((s) => (
+                  <Chip key={s} label={s} tone="soft" />
                 ))}
               </View>
             </View>
-          )}
-          ListEmptyComponent={<Text style={{ textAlign: 'center', color: palette.muted, marginTop: 40 }}>Rien à afficher pour l’instant.</Text>}
-        />
+
+            <View style={styles.cardBlock}>
+              <Text style={styles.cardTitle}>Langues parlées</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                {pro.languages.map((s) => (
+                  <Chip key={s} label={s} />
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.cardBlock}>
+              <Text style={styles.cardTitle}>Zones d'intervention</Text>
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
+                {pro.zones.map((s) => (
+                  <Chip key={s} label={s} tone="soft" />
+                ))}
+              </View>
+            </View>
+
+            <View style={[styles.cardBlock, { flexDirection: 'row', justifyContent: 'space-between' }]}>
+              {[
+                { icon: <Feather name="phone" size={20} color={palette.teal} />, onPress: openPhone },
+                { icon: <Ionicons name={"logo-whatsapp" as any} size={20} color={palette.teal} />, onPress: openWhatsApp },
+                { icon: <Feather name="mail" size={20} color={palette.teal} />, onPress: openMail },
+              ].map((b, i) => (
+                <Pressable key={i} onPress={b.onPress} style={styles.actionIcon} testID={`contact-${i}`}>
+                  {b.icon}
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        </ScrollView>
       )}
 
       {tab === 'listings' && (
@@ -348,6 +347,11 @@ export default function ProviderProfileScreen() {
               <Ionicons name={"chevron-forward" as any} size={18} color={palette.muted} />
             </Pressable>
           )}
+          ListEmptyComponent={
+            <View style={{ alignItems: 'center', paddingVertical: 40 }}>
+              <Text style={{ textAlign: 'center', color: palette.muted }}>Aucune annonce pour le moment.</Text>
+            </View>
+          }
         />
       )}
 
@@ -368,6 +372,11 @@ export default function ProviderProfileScreen() {
               <Text style={{ color: palette.text, lineHeight: 22 }}>{r.text}</Text>
             </View>
           )}
+          ListEmptyComponent={
+            <View style={{ alignItems: 'center', paddingVertical: 40 }}>
+              <Text style={{ textAlign: 'center', color: palette.muted }}>Pas encore d'avis.</Text>
+            </View>
+          }
         />
       )}
 
