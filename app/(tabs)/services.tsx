@@ -25,7 +25,7 @@ import {
   Building2,
 } from 'lucide-react-native';
 import * as Linking from 'expo-linking';
-import { router } from 'expo-router';
+import { router, Link } from 'expo-router';
 import FilterChips from '@/components/ui/FilterChips';
 import { useApp } from '@/hooks/useAppStore';
 import Colors from '@/constants/colors';
@@ -77,6 +77,11 @@ export default function ServicesScreen() {
 
   const handleViewProfile = (providerId: string) => {
     console.log('View profile:', providerId);
+    try {
+      router.push({ pathname: '/(tabs)/professionnels/profile/[id]', params: { id: providerId } });
+    } catch (err) {
+      console.error('Navigation error', err);
+    }
   };
 
   const handleSectionSwitch = (section: 'properties' | 'services') => {
@@ -142,6 +147,7 @@ export default function ServicesScreen() {
       style={styles.providerCard}
       onPress={() => handleViewProfile(provider.id)}
       activeOpacity={0.7}
+      testID={`provider-card-${provider.id}`}
     >
       {/* Header Row */}
       <View style={styles.providerHeader}>
@@ -213,9 +219,14 @@ export default function ServicesScreen() {
 
       {/* CTA Row */}
       <View style={styles.ctaRow}>
-        <TouchableOpacity style={styles.primaryButton}>
-          <Text style={styles.primaryButtonText}>Voir profil</Text>
-        </TouchableOpacity>
+        <Link
+          href={{ pathname: '/(tabs)/professionnels/profile/[id]', params: { id: provider.id } }}
+          asChild
+        >
+          <TouchableOpacity style={styles.primaryButton} testID={`see-profile-${provider.id}`}>
+            <Text style={styles.primaryButtonText}>Voir profil</Text>
+          </TouchableOpacity>
+        </Link>
         
         <View style={styles.actionButtons}>
           <TouchableOpacity
