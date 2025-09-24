@@ -130,9 +130,10 @@ export default function ServicesFeed() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
     paddingTop: 16,
     backgroundColor: '#F4F7F6',
+    gap: 16,
   },
   section: { 
     marginTop: 18 

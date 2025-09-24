@@ -77,7 +77,7 @@ function Chip({ label, tone = 'default' as const, icon }: { label: string; tone?
       }}
       testID={`chip-${label}`}
     >
-      {icon}
+      {icon ? icon : null}
       <Text style={{ color: palette.text, fontSize: 15 }}>{label}</Text>
     </View>
   );
@@ -86,7 +86,7 @@ function Chip({ label, tone = 'default' as const, icon }: { label: string; tone?
 function Badge({ label, color = palette.gold, icon }: { label: string; color?: string; icon?: React.ReactNode }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#FFF', borderRadius: 999, borderWidth: 1, borderColor: palette.border }}>
-      {icon}
+      {icon ? icon : null}
       <Text style={{ color: palette.text, fontWeight: '600' }}>{label}</Text>
     </View>
   );
@@ -363,7 +363,7 @@ export default function ProviderProfileScreen() {
                 { icon: <Feather name="mail" size={20} color={palette.teal} />, onPress: openMail },
               ].map((b, i) => (
                 <Pressable key={i} onPress={b.onPress} style={styles.actionIcon} testID={`contact-${i}`}>
-                  {b.icon}
+                  <View>{b.icon}</View>
                 </Pressable>
               ))}
             </View>
