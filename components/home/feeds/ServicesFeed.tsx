@@ -246,7 +246,7 @@ export default function ServicesFeed() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 16,
   },
   listHeader: {
     flexDirection: 'row',
@@ -291,7 +291,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   providerList: {
-    paddingHorizontal: 8,
     gap: 16,
   },
   providerCard: {
