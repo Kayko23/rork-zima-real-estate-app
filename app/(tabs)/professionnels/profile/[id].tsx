@@ -325,7 +325,7 @@ export default function ProviderProfileScreen() {
             <View style={styles.cardBlock}>
               <Text style={styles.cardTitle}>À propos</Text>
               <Text style={{ lineHeight: 22, color: palette.muted }}>
-                {pro.role} immobilier expérimenté spécialisé dans les propriétés résidentielles et commerciales à {pro.city}. Passionné par l'accompagnement des clients dans leurs projets.
+                {pro.role} immobilier expérimenté spécialisé dans les propriétés résidentielles et commerciales à {pro.city}. Passionné par l&apos;accompagnement des clients dans leurs projets.
               </Text>
             </View>
 
@@ -348,7 +348,7 @@ export default function ProviderProfileScreen() {
             </View>
 
             <View style={styles.cardBlock}>
-              <Text style={styles.cardTitle}>Zones d'intervention</Text>
+              <Text style={styles.cardTitle}>Zones d&apos;intervention</Text>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
                 {pro.zones.map((s) => (
                   <Chip key={s} label={s} tone="soft" />
@@ -385,9 +385,7 @@ export default function ProviderProfileScreen() {
                 </Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                   <Ionicons name={"location-outline" as any} size={14} color={palette.muted} />
-                  <Text style={{ color: palette.muted }}>
-                    {l.city}, {l.area}
-                  </Text>
+                  <Text style={{ color: palette.muted }}>{l.city}, {l.area}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}>
                   <Text style={{ color: palette.teal, fontWeight: '800' }}>{l.priceLabel}</Text>
@@ -428,7 +426,7 @@ export default function ProviderProfileScreen() {
           )}
           ListEmptyComponent={
             <View style={{ alignItems: 'center', paddingVertical: 40 }}>
-              <Text style={{ textAlign: 'center', color: palette.muted }}>Pas encore d'avis.</Text>
+              <Text style={{ textAlign: 'center', color: palette.muted }}>Pas encore d&apos;avis.</Text>
             </View>
           }
         />
