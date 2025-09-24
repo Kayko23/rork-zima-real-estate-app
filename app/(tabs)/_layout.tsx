@@ -110,16 +110,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      
-      {/* Hidden tabs - accessible via navigation but not shown in tab bar */}
-      <Tabs.Screen
-        name="services"
-        options={{
-          title: 'Services',
-          href: null,
-          // hidden from tab bar
-        }}
-      />
     </Tabs>
   );
 }
