@@ -64,30 +64,20 @@ const palette = {
 function Chip({ label, tone = 'default' as const, icon }: { label: string; tone?: 'default' | 'soft'; icon?: React.ReactNode }) {
   return (
     <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        paddingHorizontal: 14,
-        paddingVertical: 10,
-        borderRadius: 14,
-        backgroundColor: tone === 'soft' ? palette.chip : palette.card,
-        borderWidth: tone === 'soft' ? 0 : 1,
-        borderColor: palette.border,
-      }}
+      style={styles.chipContainer}
       testID={`chip-${label}`}
     >
-      {icon ? icon : null}
-      <Text style={{ color: palette.text, fontSize: 15 }}>{label}</Text>
+      {icon}
+      <Text style={styles.chipText}>{label}</Text>
     </View>
   );
 }
 
 function Badge({ label, color = palette.gold, icon }: { label: string; color?: string; icon?: React.ReactNode }) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#FFF', borderRadius: 999, borderWidth: 1, borderColor: palette.border }}>
-      {icon ? icon : null}
-      <Text style={{ color: palette.text, fontWeight: '600' }}>{label}</Text>
+    <View style={styles.badgeContainer}>
+      {icon}
+      <Text style={styles.badgeText}>{label}</Text>
     </View>
   );
 }
@@ -363,7 +353,7 @@ export default function ProviderProfileScreen() {
                 { icon: <Feather name="mail" size={20} color={palette.teal} />, onPress: openMail },
               ].map((b, i) => (
                 <Pressable key={i} onPress={b.onPress} style={styles.actionIcon} testID={`contact-${i}`}>
-                  <View>{b.icon}</View>
+                  {b.icon}
                 </Pressable>
               ))}
             </View>
@@ -504,5 +494,35 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.6)',
     // @ts-ignore web-only CSS
     backdropFilter: 'blur(12px)',
+  },
+  chipContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 14,
+    backgroundColor: palette.chip,
+    borderWidth: 1,
+    borderColor: palette.border,
+  },
+  chipText: {
+    color: palette.text,
+    fontSize: 15,
+  },
+  badgeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#FFF',
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: palette.border,
+  },
+  badgeText: {
+    color: palette.text,
+    fontWeight: '600',
   },
 });
