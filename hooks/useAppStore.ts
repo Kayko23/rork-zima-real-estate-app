@@ -87,16 +87,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
         setUserMode(savedMode as UserMode);
       }
       if (savedUser && savedUser.trim()) {
-        try {
-          const parsedUser = JSON.parse(savedUser);
-          if (parsedUser && typeof parsedUser === 'object' && parsedUser.id) {
-            setUser(parsedUser);
-          }
-        } catch (error) {
-          console.log('Error parsing saved user data:', error);
-          // Reset to default user if parsing fails
-          await storage.setItem('user', JSON.stringify(defaultUser));
-        }
+        setUser(JSON.parse(savedUser));
       }
       if (savedLanguage && savedLanguage.trim()) {
         setLanguageState(savedLanguage as Language);
