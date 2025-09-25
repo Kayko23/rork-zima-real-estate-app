@@ -31,7 +31,7 @@ const shadowSoft = Platform.select({
 export default function FavoritesScreen() {
   const { top } = useSafeAreaInsets();
   const router = useRouter();
-  const { hasUnreadNotifications, markNotificationsAsRead } = useApp();
+  const { hasUnreadNotifications } = useApp();
 
   const [activeTab, setActiveTab] = useState<TabType>('properties');
   const [viewType, setViewType] = useState<ViewType>('list');
@@ -97,7 +97,10 @@ export default function FavoritesScreen() {
     <View style={[styles.screen, { paddingTop: top + 8 }]} testID="favorites-screen">
       <View style={styles.headerRow}>
         <Text style={styles.title} testID="favorites-title">Favoris</Text>
-        <NotificationBell hasUnread={hasUnreadNotifications} onPress={markNotificationsAsRead} />
+        <NotificationBell hasUnread={hasUnreadNotifications} onPress={() => {
+          console.log('[Favorites] Opening notifications');
+          router.push('/notifications');
+        }} />
       </View>
 
       <BlurView intensity={30} tint="light" style={styles.tabsWrap}>
