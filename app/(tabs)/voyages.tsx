@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, Pressable, StyleSheet, StatusBar } from "react-native";
 import { Stack } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import HomeHeader from "@/components/home/HomeHeader";
 import { VoyageSearchBar, VoyageQuery } from "@/components/voyages/VoyageSearchBar";
 import { VoyageCarousel } from "@/components/voyages/VoyageCarousel";
@@ -12,7 +13,8 @@ import FilterSheet from "@/components/sheets/FilterSheet";
 import type { TripsSearch, TripsFilters } from "@/lib/search-types";
 
 export default function VoyagesScreen() {
-  const [q, setQ] = useState<VoyageQuery>(() => ({ type: "all" }));
+  const insets = useSafeAreaInsets();
+  const [q] = useState<VoyageQuery>(() => ({ type: "all" }));
   const [search, setSearch] = useState<Partial<TripsSearch>>({});
   const [filters, setFilters] = useState<Partial<TripsFilters>>({});
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
@@ -39,14 +41,18 @@ export default function VoyagesScreen() {
           headerShown: false,
         }}
       />
+      
+      {/* Header avec logo et navigation */}
+      <View style={[styles.headerContainer, { paddingTop: insets.top + 8 }]}>
+        <Text style={styles.brand}>ZIMA</Text>
+        <HomeHeader active="voyages" onChange={setHomeTab} />
+      </View>
+      
       <ScrollView 
         style={styles.scrollView} 
-        contentContainerStyle={styles.content}
-        stickyHeaderIndices={[0]}
+        contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + 96 }]}
         showsVerticalScrollIndicator={false}
       >
-        <HomeHeader active="voyages" onChange={setHomeTab} />
-        
         <View style={styles.pageContent}>
           <View style={styles.header}>
             <Text style={styles.title}>Voyages</Text>
@@ -144,7 +150,7 @@ export default function VoyagesScreen() {
         section="trips"
         initial={search}
         onApply={(v) => {
-          console.log('Search applied', v);
+          console.log('Search applied:', v);
           setSearch(v);
         }}
       />
@@ -153,7 +159,7 @@ export default function VoyagesScreen() {
         onClose={() => setIsFilterOpen(false)}
         initial={filters}
         onApply={(v) => {
-          console.log('Filters applied', v);
+          console.log('Filters applied:', v);
           setFilters(v);
         }}
       />
@@ -166,11 +172,24 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F3F6F6",
   },
+  headerContainer: {
+    backgroundColor: "#F3F6F6",
+    paddingHorizontal: 20,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(0,0,0,0.05)",
+  },
+  brand: {
+    fontSize: 28,
+    fontWeight: "800",
+    letterSpacing: 2,
+    color: "#123B2B",
+    marginBottom: 12,
+  },
   scrollView: {
     flex: 1,
   },
   content: {
-    paddingBottom: 96,
     backgroundColor: "#F3F6F6",
   },
   pageContent: {
