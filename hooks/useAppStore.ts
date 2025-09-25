@@ -25,28 +25,6 @@ const storage = {
       // Ignore errors
     }
   },
-  removeItem: async (key: string): Promise<void> => {
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.removeItem(key);
-      }
-    } catch {
-      // Ignore errors
-    }
-  },
-  clear: async (): Promise<void> => {
-    try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        // Only clear app-specific keys to avoid affecting other apps
-        const keysToRemove = ['userMode', 'user', 'language', 'hasCompletedOnboarding'];
-        keysToRemove.forEach(key => {
-          window.localStorage.removeItem(key);
-        });
-      }
-    } catch {
-      // Ignore errors
-    }
-  },
 };
 
 const defaultUser: User = {
@@ -105,30 +83,14 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       const savedLanguage = await storage.getItem('language');
       const savedOnboarding = await storage.getItem('hasCompletedOnboarding');
       
-      // If any data seems corrupted, clear all and start fresh
-      if (savedUser && (!savedUser.startsWith('{') || !savedUser.endsWith('}'))) {
-        console.log('Detected corrupted localStorage data, clearing all app data');
-        await storage.clear();
-        return;
-      }
-      
       if (savedMode && savedMode.trim()) {
         setUserMode(savedMode as UserMode);
       }
       if (savedUser && savedUser.trim()) {
         try {
-          // Check if the saved data looks like valid JSON
-          if (savedUser.startsWith('{') && savedUser.endsWith('}')) {
-            const parsedUser = JSON.parse(savedUser);
-            if (parsedUser && typeof parsedUser === 'object' && parsedUser.id) {
-              setUser(parsedUser);
-            } else {
-              console.log('Invalid user data structure, resetting to default');
-              await storage.setItem('user', JSON.stringify(defaultUser));
-            }
-          } else {
-            console.log('Invalid JSON format in saved user data, resetting to default');
-            await storage.setItem('user', JSON.stringify(defaultUser));
+          const parsedUser = JSON.parse(savedUser);
+          if (parsedUser && typeof parsedUser === 'object' && parsedUser.id) {
+            setUser(parsedUser);
           }
         } catch (error) {
           console.log('Error parsing saved user data:', error);
@@ -162,14 +124,9 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   }, [userMode]);
 
   const updateUser = useCallback(async (updates: Partial<User>) => {
-    try {
-      const updatedUser = { ...user, ...updates };
-      setUser(updatedUser);
-      const userJson = JSON.stringify(updatedUser);
-      await storage.setItem('user', userJson);
-    } catch (error) {
-      console.log('Error updating user data:', error);
-    }
+    const updatedUser = { ...user, ...updates };
+    setUser(updatedUser);
+    await storage.setItem('user', JSON.stringify(updatedUser));
   }, [user]);
 
   const updateFilters = useCallback((newFilters: Partial<FilterState>) => {
@@ -194,20 +151,15 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     await storage.setItem('language', lang);
     
     // Update user preferences as well
-    try {
-      const updatedUser = {
-        ...user,
-        preferences: {
-          ...user.preferences,
-          language: lang
-        }
-      };
-      setUser(updatedUser);
-      const userJson = JSON.stringify(updatedUser);
-      await storage.setItem('user', userJson);
-    } catch (error) {
-      console.log('Error updating user language:', error);
-    }
+    const updatedUser = {
+      ...user,
+      preferences: {
+        ...user.preferences,
+        language: lang
+      }
+    };
+    setUser(updatedUser);
+    await storage.setItem('user', JSON.stringify(updatedUser));
   }, [user]);
 
   const completeOnboarding = useCallback(async () => {

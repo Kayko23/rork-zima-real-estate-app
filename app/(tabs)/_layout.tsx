@@ -1,6 +1,6 @@
-import { Tabs, useRouter, usePathname } from 'expo-router';
+import { Tabs, useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
-import { Platform, StyleSheet, View, Pressable } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { 
   Home, 
   Heart, 
@@ -14,29 +14,9 @@ import { useApp } from '@/hooks/useAppStore';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
-  const { userMode, activeHomeTab, setHomeTab } = useApp();
+  const { userMode } = useApp();
   const router = useRouter();
-  const pathname = usePathname();
   const insets = useSafeAreaInsets();
-
-  const handleHomePress = () => {
-    // If we're already on home, don't navigate but ensure correct tab is active
-    if (pathname === '/home') {
-      // Already on home, just ensure the correct tab is shown
-      return;
-    }
-    
-    // Navigate to home and set the appropriate tab
-    router.push('/home');
-  };
-
-  const TabBarIcon = ({ color, size, focused }: { color: string; size: number; focused: boolean }) => {
-    return (
-      <Pressable onPress={handleHomePress}>
-        <Home size={size} color={color} testID="tab-icon-home" />
-      </Pressable>
-    );
-  };
 
   // Redirect to provider tabs if in provider mode
   useEffect(() => {
@@ -89,8 +69,8 @@ export default function TabLayout() {
         name="home"
         options={{
           title: 'Explorer',
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabBarIcon color={color} size={size} focused={focused} />
+          tabBarIcon: ({ color, size }) => (
+            <Home size={size} color={color} testID="tab-icon-home" />
           ),
         }}
       />
@@ -142,12 +122,6 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="professionnels"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="voyages"
         options={{
           href: null,
         }}

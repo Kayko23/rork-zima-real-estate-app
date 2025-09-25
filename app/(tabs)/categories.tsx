@@ -1,74 +1,188 @@
-import React, { useMemo, useState } from 'react';
-import { View, Pressable, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ChevronRight, Home, Building, Store, Building2, Map, Factory } from 'lucide-react-native';
+import SearchBar from '@/components/ui/SearchBar';
+import FilterChips from '@/components/ui/FilterChips';
+import NotificationBell from '@/components/ui/NotificationBell';
+import { categories } from '@/constants/data';
+import { useApp } from '@/hooks/useAppStore';
+import Colors from '@/constants/colors';
+import { FilterState } from '@/types';
 
-import AllSearchBar from '@/components/browse/AllSearchBar';
-import FilterSheet from '@/components/sheets/FilterSheet';
-import SearchSheet from '@/components/sheets/SearchSheet';
-import { useAllFeed } from '@/hooks/useAllFeed';
-import GroupedList from '@/components/browse/GroupedList';
-import { groupItems, type GroupMode } from '@/lib/grouping';
-import { PanelsTopLeft, List as ListIcon } from 'lucide-react-native';
-import type { Kind } from '@/lib/all-api';
+const categoryIcons = {
+  home: Home,
+  building: Building,
+  store: Store,
+  'building-2': Building2,
+  map: Map,
+  factory: Factory,
+};
 
-export default function BrowseTab() {
+export default function CategoriesScreen() {
+  const { hasUnreadNotifications, markNotificationsAsRead } = useApp();
   const insets = useSafeAreaInsets();
-  const feed = useAllFeed();
-  const [searchVisible, setSearchVisible] = useState(false);
-  const [filtersVisible, setFiltersVisible] = useState(false);
-  const [mode, setMode] = useState<GroupMode>('category');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState<FilterState>({
+    sortBy: 'recent'
+  });
 
-  const sections = useMemo(() => groupItems(feed.items, mode), [feed.items, mode]);
+  const filterChips = [
+    { id: 'country', label: 'Pays', value: 'Tous les pays' },
+    { id: 'city', label: 'Ville', value: 'Toutes les villes' },
+  ];
+
+  const handleFilterChipPress = (chipId: string) => {
+    console.log('Filter chip pressed:', chipId);
+  };
+
+  const handleFilterChange = (newFilters: Partial<FilterState>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+  };
+
+  const handleFilterPress = () => {
+    console.log('Filter button pressed');
+  };
+
+  const handleCategoryPress = (categoryId: string) => {
+    console.log('Category pressed:', categoryId);
+  };
+
+  const handleNotificationPress = () => {
+    markNotificationsAsRead();
+  };
 
   return (
-    <View style={[s.container, { paddingBottom: insets.bottom }]}>
-      <AllSearchBar
-        scope={feed.query.only as Kind | undefined}
-        onScope={(k) => feed.setQuery({ only: k, page: 1 })}
-        onOpenSearch={() => setSearchVisible(true)}
-        onOpenFilters={() => setFiltersVisible(true)}
-      />
-
-      <View style={s.toolbar}>
-        <Pressable onPress={() => setMode('category')} style={[s.btn, mode==='category' && s.btnActive]} testID="group-toggle-category">
-          <PanelsTopLeft size={16} color={mode==='category' ? '#fff' : '#0F172A'} />
-          <Text style={[s.btnLabel, mode==='category' && s.btnLabelActive]}>Par catégorie</Text>
-        </Pressable>
-        <Pressable onPress={() => setMode('location')} style={[s.btn, mode==='location' && s.btnActive]} testID="group-toggle-location">
-          <ListIcon size={16} color={mode==='location' ? '#fff' : '#0F172A'} />
-          <Text style={[s.btnLabel, mode==='location' && s.btnLabelActive]}>Par ville/pays</Text>
-        </Pressable>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Recherche par catégorie</Text>
+        <NotificationBell 
+          hasUnread={hasUnreadNotifications}
+          onPress={handleNotificationPress}
+        />
       </View>
 
-      <GroupedList
-        sections={sections}
-        loading={feed.loading}
-        onEndReached={feed.loadMore}
-        onRefresh={feed.refresh}
-      />
+      <View style={styles.searchSection}>
+        <SearchBar
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          onFilterPress={handleFilterPress}
+          placeholder="Rechercher une catégorie..."
+        />
+        
+        <FilterChips 
+          chips={filterChips} 
+          onChipPress={handleFilterChipPress}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+        />
+      </View>
 
-      <SearchSheet
-        section={'trips'}
-        visible={searchVisible}
-        onClose={()=>setSearchVisible(false)}
-        initial={{ destination: feed.query.q, startDate: feed.query.startDate, endDate: feed.query.endDate, guests: feed.query.guests }}
-        onApply={(q)=>{ feed.setQuery({ q: q.destination, startDate: q.startDate, endDate: q.endDate, guests: q.guests, page: 1 }); }}
-      />
-      <FilterSheet
-        visible={filtersVisible}
-        onClose={()=>setFiltersVisible(false)}
-        value={{}}
-        onChange={(f)=>{}}
-      />
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        <Text style={styles.sectionTitle}>Catégories</Text>
+        
+        <View style={styles.categoriesGrid}>
+          {categories.map((category) => {
+            const IconComponent = categoryIcons[category.icon as keyof typeof categoryIcons];
+            
+            return (
+              <TouchableOpacity
+                key={category.id}
+                style={styles.categoryCard}
+                onPress={() => handleCategoryPress(category.id)}
+              >
+                <View style={styles.categoryIcon}>
+                  <IconComponent size={24} color={Colors.primary} />
+                </View>
+                
+                <View style={styles.categoryInfo}>
+                  <Text style={styles.categoryName}>{category.name}</Text>
+                  <Text style={styles.categoryCount}>{category.count} biens</Text>
+                </View>
+                
+                <ChevronRight size={20} color={Colors.text.secondary} />
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
     </View>
   );
 }
 
-const s = StyleSheet.create({
-  container: { flex: 1 },
-  toolbar: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, paddingTop: 6, paddingBottom: 8 },
-  btn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#EEF2F7', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999 },
-  btnActive: { backgroundColor: '#0B3B2E' },
-  btnLabel: { fontWeight: '800', color: '#0F172A' },
-  btnLabelActive: { color: '#fff' },
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background.secondary,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: Colors.text.primary,
+  },
+  searchSection: {
+    paddingHorizontal: 16,
+    gap: 12,
+    marginBottom: 24,
+  },
+  content: {
+    flex: 1,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: Colors.text.primary,
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  categoriesGrid: {
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  categoryCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.background.primary,
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  categoryIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(14, 90, 69, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  categoryInfo: {
+    flex: 1,
+  },
+  categoryName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text.primary,
+    marginBottom: 4,
+  },
+  categoryCount: {
+    fontSize: 14,
+    color: Colors.text.secondary,
+  },
+  bottomSpacer: {
+    height: 100,
+  },
 });
