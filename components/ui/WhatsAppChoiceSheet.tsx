@@ -14,7 +14,12 @@ type Props = {
   providerId: string;
 };
 
-
+const quickMessages = [
+  "Puis-je voir la documentation ?",
+  "Puis-je avoir un rendez-vous ?",
+  "Quels sont vos tarifs ?",
+  "Êtes-vous disponible cette semaine ?"
+];
 
 export default function WhatsAppChoiceSheet({ 
   visible, 
@@ -34,18 +39,29 @@ export default function WhatsAppChoiceSheet({
     }
   };
 
-  const handleZiMessagePress = () => {
+  const handleZiMessagePress = (quickMessage?: string) => {
     onClose();
     
     // Create a conversation ID based on provider
     const conversationId = `conv-${providerId}`;
     
-    // Navigate directly to chat with this provider
-    router.push(`/chat/${conversationId}` as any);
+    if (!quickMessage?.trim()) {
+      // Navigate directly to chat with this provider
+      router.push(`/chat/${conversationId}` as any);
+    } else {
+      // Navigate to chat and the quick message will be handled there
+      router.push({
+        pathname: `/chat/${conversationId}` as any,
+        params: {
+          quickMessage: quickMessage.trim(),
+          providerName,
+        },
+      });
+    }
   };
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} height={0.5}>
+    <BottomSheet visible={visible} onClose={onClose} height={0.8}>
       <View style={styles.header}>
         <Text style={styles.title}>Contacter {providerName}</Text>
         <Text style={styles.subtitle}>Choisissez votre méthode de contact</Text>
@@ -71,17 +87,33 @@ export default function WhatsAppChoiceSheet({
           </Pressable>
 
           {/* Zi-Message Option */}
-          <Pressable style={styles.option} onPress={handleZiMessagePress}>
+          <Pressable style={styles.option} onPress={() => handleZiMessagePress()}>
             <View style={[styles.iconContainer, { backgroundColor: Colors.primary }]}>
               <Send size={24} color="white" />
             </View>
             <View style={styles.optionContent}>
-              <Text style={styles.optionTitle}>Échanger via la messagerie ZIMA</Text>
+              <Text style={styles.optionTitle}>Via Zi-Message</Text>
               <Text style={styles.optionDescription}>
-                Ouvrir une conversation avec ce prestataire
+                Échanger via la messagerie ZIMA
               </Text>
             </View>
           </Pressable>
+        </View>
+
+        {/* Quick Messages */}
+        <View style={styles.quickMessagesContainer}>
+          <Text style={styles.quickMessagesTitle}>Messages rapides :</Text>
+          <View style={styles.quickMessagesGrid}>
+            {quickMessages.map((message, index) => (
+              <Pressable
+                key={index}
+                style={styles.quickMessage}
+                onPress={() => handleZiMessagePress(message)}
+              >
+                <Text style={styles.quickMessageText}>{message}</Text>
+              </Pressable>
+            ))}
+          </View>
         </View>
       </ScrollView>
     </BottomSheet>
@@ -112,11 +144,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.text.secondary,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 32,
   },
   optionsContainer: {
     gap: 16,
-    marginBottom: 32,
+    marginBottom: 24,
   },
   option: {
     flexDirection: 'row',
@@ -151,5 +183,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.text.secondary,
   },
-
+  quickMessagesContainer: {
+    marginTop: 8,
+  },
+  quickMessagesTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: Colors.text.primary,
+    marginBottom: 12,
+  },
+  quickMessagesGrid: {
+    gap: 8,
+  },
+  quickMessage: {
+    backgroundColor: Colors.background.secondary,
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
+  },
+  quickMessageText: {
+    fontSize: 14,
+    color: Colors.primary,
+    fontWeight: '600',
+  },
 });
