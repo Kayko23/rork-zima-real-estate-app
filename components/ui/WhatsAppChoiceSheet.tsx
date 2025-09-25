@@ -40,26 +40,24 @@ export default function WhatsAppChoiceSheet({
   };
 
   const handleZiMessagePress = (quickMessage?: string) => {
-    if (!quickMessage?.trim()) {
-      // Navigate to messages tab to start conversation
-      router.push('/(tabs)/messages');
-    } else {
-      // For now, navigate to messages with alert showing the quick message
-      Alert.alert(
-        'Message rapide',
-        `Démarrer une conversation avec ${providerName}: "${quickMessage.trim()}"`,
-        [
-          { text: 'Annuler', style: 'cancel' },
-          { 
-            text: 'Envoyer', 
-            onPress: () => {
-              router.push('/(tabs)/messages');
-            }
-          }
-        ]
-      );
-    }
     onClose();
+    
+    // Create a conversation ID based on provider
+    const conversationId = `conv-${providerId}`;
+    
+    if (!quickMessage?.trim()) {
+      // Navigate directly to chat with this provider
+      router.push(`/chat/${conversationId}` as any);
+    } else {
+      // Navigate to chat and the quick message will be handled there
+      router.push({
+        pathname: `/chat/${conversationId}` as any,
+        params: {
+          quickMessage: quickMessage.trim(),
+          providerName,
+        },
+      });
+    }
   };
 
   return (

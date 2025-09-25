@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -37,7 +37,11 @@ const quickMessages: QuickMessage[] = [
 ];
 
 export default function ChatScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, quickMessage, providerName } = useLocalSearchParams<{ 
+    id: string;
+    quickMessage?: string;
+    providerName?: string;
+  }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const scrollViewRef = useRef<ScrollView>(null);
@@ -46,39 +50,29 @@ export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [showQuickMessages, setShowQuickMessages] = useState<boolean>(true);
   
-  // Find the conversation
-  const conversation = mockConversations.find(conv => conv.id === id);
-  
-  useEffect(() => {
-    if (conversation) {
-      // Initialize with existing messages from conversation
-      const initialMessages: Message[] = [
-        {
-          id: '1',
-          content: conversation.lastMessage.content,
-          timestamp: conversation.lastMessage.timestamp,
-          senderId: conversation.lastMessage.senderId,
-          type: 'text',
-        },
-      ];
-      setMessages(initialMessages);
-    }
-  }, [conversation]);
-  
-  if (!conversation) {
-    return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Conversation non trouvée</Text>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>Retour</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  // Find the conversation or create a mock one for new chats
+  const conversation = useMemo(() => {
+    return mockConversations.find(conv => conv.id === id) || {
+      id: id || 'new-chat',
+      participants: [{
+        id: 'provider-1',
+        name: providerName || 'Prestataire',
+        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=400&auto=format&fit=crop',
+        isOnline: true,
+      }],
+      lastMessage: {
+        content: 'Bonjour ! Comment puis-je vous aider ?',
+        timestamp: new Date().toISOString(),
+        senderId: 'provider-1',
+      },
+      unreadCount: 0,
+      category: 'services' as const,
+    };
+  }, [id, providerName]);
   
   const participant = conversation.participants[0];
   
-  const sendMessage = (messageText: string) => {
+  const sendMessage = useCallback((messageText: string) => {
     if (!messageText.trim()) return;
     
     const newMessage: Message = {
@@ -113,7 +107,30 @@ export default function ChatScreen() {
         scrollViewRef.current?.scrollToEnd({ animated: true });
       }, 100);
     }, 1500);
-  };
+  }, [participant.id]);
+  
+  useEffect(() => {
+    // Initialize with existing messages from conversation or welcome message
+    const initialMessages: Message[] = [
+      {
+        id: '1',
+        content: conversation.lastMessage.content,
+        timestamp: conversation.lastMessage.timestamp,
+        senderId: conversation.lastMessage.senderId,
+        type: 'text',
+      },
+    ];
+    setMessages(initialMessages);
+    
+    // If there's a quick message from navigation, send it automatically
+    if (quickMessage && quickMessage.trim()) {
+      const timeoutId = setTimeout(() => {
+        sendMessage(quickMessage.trim());
+      }, 1000);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [conversation, quickMessage, sendMessage]);
   
   const handleQuickMessage = (quickMessage: QuickMessage) => {
     if (!quickMessage.text.trim()) return;

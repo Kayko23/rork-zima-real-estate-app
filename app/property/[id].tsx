@@ -320,9 +320,8 @@ function PropertyDetailScreen() {
             onAll={() => {
               console.log("Booking appointment with:", data.agent.name);
               router.push({
-                pathname: "/messages",
+                pathname: "/appointment/book",
                 params: {
-                  compose: "appointment",
                   agent: data.agent.name,
                   property: String(data.id ?? ""),
                 },
