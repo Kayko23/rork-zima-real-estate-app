@@ -63,7 +63,7 @@ export default function WhatsAppChoiceSheet({
   };
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} height={0.6}>
+    <BottomSheet visible={visible} onClose={onClose} height={0.75}>
       <View style={styles.container}>
         <Text style={styles.title}>Contacter {providerName}</Text>
         <Text style={styles.subtitle}>Choisissez votre méthode de contact</Text>
@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     flex: 1,
+    minHeight: 400,
   },
   title: {
     fontSize: 24,
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
   },
   optionsContainer: {
     gap: 16,
-    marginBottom: 32,
+    marginBottom: 24,
   },
   option: {
     flexDirection: 'row',
@@ -172,7 +173,7 @@ const styles = StyleSheet.create({
     color: Colors.text.secondary,
   },
   quickMessagesContainer: {
-    marginTop: 16,
+    flex: 1,
   },
   quickMessagesTitle: {
     fontSize: 16,
