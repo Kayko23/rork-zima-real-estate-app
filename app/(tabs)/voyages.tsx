@@ -1,8 +1,8 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, StatusBar } from 'react-native';
 import { Stack } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MapPin, Users, Calendar, Filter } from 'lucide-react-native';
+import { MapPin, Users, Calendar, Filter, Star } from 'lucide-react-native';
 import HomeHeader from '@/components/home/HomeHeader';
 import { useApp } from '@/hooks/useAppStore';
 import SearchSheet from '@/components/sheets/SearchSheet';
@@ -31,7 +31,7 @@ const demoPopular: CardItem[] = [
     rating: 4.8,
     reviews: 67,
     badge: 'Top',
-    image: { uri: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format' },
+    image: { uri: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1200&auto=format' },
   },
   {
     id: '2',
@@ -42,7 +42,29 @@ const demoPopular: CardItem[] = [
     rating: 4.6,
     reviews: 120,
     badge: 'Premium',
-    image: { uri: 'https://images.unsplash.com/photo-1505692794403-34d4982f88aa?q=80&w=1200&auto=format' },
+    image: { uri: 'https://images.unsplash.com/photo-1496412705862-e0088f16f791?q=80&w=1200&auto=format' },
+  },
+  {
+    id: '3',
+    title: 'Suite Executive - Resort',
+    city: 'Ouagadougou',
+    country: 'Burkina Faso',
+    price: 85000,
+    rating: 4.7,
+    reviews: 156,
+    badge: 'Premium',
+    image: { uri: 'https://images.unsplash.com/photo-1551776235-dde6d4829808?q=80&w=1200&auto=format' },
+  },
+  {
+    id: '4',
+    title: 'Bungalow jardin',
+    city: 'Lomé',
+    country: 'Togo',
+    price: 40000,
+    rating: 4.5,
+    reviews: 92,
+    badge: 'Top',
+    image: { uri: 'https://images.unsplash.com/photo-1505691723518-36a5ac3b2d95?q=80&w=1200&auto=format' },
   },
 ];
 
@@ -69,12 +91,12 @@ export default function VoyagesScreen() {
 
       <ScrollView
         contentContainerStyle={{ paddingBottom: 24 + insets.bottom }}
-        style={{ flex: 1, backgroundColor: '#F6F7F8' }}
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
           <Text style={styles.h1}>Voyages</Text>
-          <Text style={styles.subtitle}>Découvrez des hébergements exceptionnels à travers l'Afrique</Text>
+          <Text style={styles.subtitle}>Découvrez des hébergements exceptionnels à travers l&apos;Afrique</Text>
         </View>
 
         <TouchableOpacity activeOpacity={0.9} onPress={() => setIsSearchOpen(true)} style={styles.chipsRow} testID="voyages.searchChips">
@@ -94,6 +116,10 @@ export default function VoyagesScreen() {
 
         <Section title="Hôtels recommandés" onSeeAll={() => console.log('See all hotels')}>
           <HorizontalCards data={hotels} />
+        </Section>
+
+        <Section title="Résidences journalières" onSeeAll={() => console.log('See all residences')}>
+          <HorizontalCards data={popular.slice(0, 2)} />
         </Section>
       </ScrollView>
 
@@ -123,7 +149,9 @@ export default function VoyagesScreen() {
 function Chip({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
     <View style={styles.chip} testID="voyages.chip">
-      {icon}
+      <View style={styles.chipIcon}>
+        <Text>{icon}</Text>
+      </View>
       <Text numberOfLines={1} style={styles.chipTxt}>{label}</Text>
     </View>
   );
@@ -131,8 +159,8 @@ function Chip({ icon, label }: { icon: React.ReactNode; label: string }) {
 
 function Section({ title, children, onSeeAll }: { title: string; children: React.ReactNode; onSeeAll?: () => void }) {
   return (
-    <View style={{ paddingHorizontal: 16, marginTop: 18 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+    <View style={styles.sectionContainer}>
+      <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>{title}</Text>
         {!!onSeeAll && (
           <TouchableOpacity onPress={onSeeAll} testID="voyages.section.seeAll">
@@ -147,22 +175,29 @@ function Section({ title, children, onSeeAll }: { title: string; children: React
 
 function HorizontalCards({ data }: { data: CardItem[] }) {
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 14, paddingHorizontal: 16 }}>
-      {data.map((item) => (
-        <View key={item.id} style={styles.card} testID={`voyages.card.${item.id}`}>
+    <ScrollView 
+      horizontal 
+      showsHorizontalScrollIndicator={false} 
+      contentContainerStyle={{ paddingLeft: 16, paddingRight: 16 }}
+    >
+      {data.map((item, index) => (
+        <TouchableOpacity key={item.id} style={[styles.card, index < data.length - 1 && styles.cardMargin]} testID={`voyages.card.${item.id}`}>
           <Image source={item.image} style={styles.cardImg} />
           {!!item.badge && (
             <View style={styles.badge}>
               <Text style={styles.badgeTxt}>{item.badge}</Text>
             </View>
           )}
-          <View style={{ paddingHorizontal: 10, paddingTop: 10 }}>
+          <View style={styles.cardContent}>
             <Text numberOfLines={2} style={styles.cardTitle}>{item.title}</Text>
             <Text style={styles.cardPlace}>{item.city}, {item.country}</Text>
             <Text style={styles.cardPrice}>{item.price.toLocaleString()} FCFA <Text style={styles.cardUnit}>/ nuit</Text></Text>
-            <Text style={styles.cardRating}>★ {item.rating} · {item.reviews} avis</Text>
+            <View style={styles.ratingRow}>
+              <Star size={14} color="#F59E0B" fill="#F59E0B" />
+              <Text style={styles.cardRating}> {item.rating} · {item.reviews} avis</Text>
+            </View>
           </View>
-        </View>
+        </TouchableOpacity>
       ))}
     </ScrollView>
   );
@@ -171,6 +206,7 @@ function HorizontalCards({ data }: { data: CardItem[] }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F6F7F8' },
   headerContainer: { backgroundColor: '#F6F7F8', paddingHorizontal: 20, paddingBottom: 8 },
+  scrollView: { flex: 1, backgroundColor: '#F6F7F8' },
   header: { paddingHorizontal: 16, paddingTop: 6, paddingBottom: 8 },
   h1: { fontSize: 28, fontWeight: '800', color: '#0B1220', letterSpacing: 0.3 },
   subtitle: { marginTop: 8, color: '#475569', fontWeight: '600', lineHeight: 20 },
@@ -185,13 +221,40 @@ const styles = StyleSheet.create({
   filtersTxt: { color: '#0F5132', fontWeight: '800' },
   sectionTitle: { fontSize: 22, fontWeight: '800', color: '#0B1220' },
   seeAll: { fontWeight: '800', color: '#0F5132' },
-  card: { width: 300, backgroundColor: '#fff', borderRadius: 16, overflow: 'hidden' },
+  card: { 
+    width: 300, 
+    backgroundColor: '#fff', 
+    borderRadius: 16, 
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
   cardImg: { width: '100%', height: 180 },
-  badge: { position: 'absolute', top: 10, left: 10, backgroundColor: '#11A37F', paddingHorizontal: 10, height: 28, borderRadius: 999, alignItems: 'center', justifyContent: 'center' },
-  badgeTxt: { color: '#fff', fontWeight: '800' },
-  cardTitle: { fontSize: 16, fontWeight: '800', color: '#0B1220' },
-  cardPlace: { marginTop: 2, color: '#6B7280', fontWeight: '600' },
+  badge: { 
+    position: 'absolute', 
+    top: 10, 
+    left: 10, 
+    backgroundColor: '#11A37F', 
+    paddingHorizontal: 10, 
+    height: 28, 
+    borderRadius: 999, 
+    alignItems: 'center', 
+    justifyContent: 'center' 
+  },
+  badgeTxt: { color: '#fff', fontWeight: '800', fontSize: 12 },
+  cardContent: { paddingHorizontal: 12, paddingTop: 12, paddingBottom: 16 },
+  cardTitle: { fontSize: 16, fontWeight: '800', color: '#0B1220', lineHeight: 20 },
+  cardPlace: { marginTop: 4, color: '#6B7280', fontWeight: '600', fontSize: 14 },
   cardPrice: { marginTop: 8, fontSize: 16, fontWeight: '900', color: '#0B1220' },
-  cardUnit: { color: '#6B7280', fontWeight: '700' },
-  cardRating: { marginTop: 6, color: '#374151', fontWeight: '700', marginBottom: 12 },
+  cardUnit: { color: '#6B7280', fontWeight: '700', fontSize: 14 },
+  ratingRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6 },
+  cardRating: { color: '#374151', fontWeight: '700', fontSize: 14 },
+  sectionContainer: { paddingHorizontal: 16, marginTop: 18 },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  cardMargin: { marginRight: 14 },
+  chipIcon: { alignItems: 'center', justifyContent: 'center' },
+  hiddenText: { position: 'absolute', opacity: 0, fontSize: 0 },
 });
