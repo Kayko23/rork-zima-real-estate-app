@@ -1,9 +1,11 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Animated, PanResponder, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
-import { ArrowLeft, Bell, MessageCircle, Calendar, Heart, TrendingUp } from 'lucide-react-native';
+import { ArrowLeft, Bell, MessageCircle, Calendar, Heart, TrendingUp, Check, Trash2 } from 'lucide-react-native';
 import Colors from '@/constants/colors';
+
+const SWIPE_THRESHOLD = 80;
 
 interface Notification {
   id: string;
@@ -14,8 +16,144 @@ interface Notification {
   isRead: boolean;
 }
 
+interface SwipeableNotificationProps {
+  notification: Notification;
+  onMarkAsRead: (id: string) => void;
+  onDelete: (id: string) => void;
+  onPress: (notification: Notification) => void;
+  getIcon: (type: string) => any;
+  getColor: (type: string) => string;
+  formatTime: (timestamp: string) => string;
+}
+
+function SwipeableNotification({
+  notification,
+  onMarkAsRead,
+  onDelete,
+  onPress,
+  getIcon,
+  getColor,
+  formatTime,
+}: SwipeableNotificationProps) {
+  const { width: screenWidth } = useWindowDimensions();
+  const translateX = useRef(new Animated.Value(0)).current;
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const panResponder = PanResponder.create({
+    onMoveShouldSetPanResponder: (_, gestureState) => {
+      return !isAnimating && Math.abs(gestureState.dx) > 10 && Math.abs(gestureState.dy) < 50;
+    },
+    onPanResponderMove: (_, gestureState) => {
+      if (!isAnimating) {
+        translateX.setValue(gestureState.dx);
+      }
+    },
+    onPanResponderRelease: (_, gestureState) => {
+      if (gestureState.dx > SWIPE_THRESHOLD) {
+        // Swipe right - Mark as read
+        if (!notification.isRead && !isAnimating) {
+          setIsAnimating(true);
+          Animated.timing(translateX, {
+            toValue: screenWidth,
+            duration: 300,
+            useNativeDriver: true,
+          }).start(() => {
+            onMarkAsRead(notification.id);
+            translateX.setValue(0);
+            setIsAnimating(false);
+          });
+        } else {
+          // Already read, just bounce back
+          Animated.spring(translateX, {
+            toValue: 0,
+            useNativeDriver: true,
+          }).start();
+        }
+      } else if (gestureState.dx < -SWIPE_THRESHOLD) {
+        // Swipe left - Delete
+        if (!isAnimating) {
+          setIsDeleting(true);
+          setIsAnimating(true);
+          Animated.timing(translateX, {
+            toValue: -screenWidth,
+            duration: 300,
+            useNativeDriver: true,
+          }).start(() => {
+            onDelete(notification.id);
+          });
+        }
+      } else {
+        // Bounce back
+        Animated.spring(translateX, {
+          toValue: 0,
+          useNativeDriver: true,
+        }).start();
+      }
+    },
+  });
+
+  const IconComponent = getIcon(notification.type);
+  const iconColor = getColor(notification.type);
+
+  if (isDeleting) {
+    return null;
+  }
+
+  return (
+    <View style={styles.swipeContainer}>
+      {/* Background actions */}
+      <View style={styles.actionsContainer}>
+        {/* Mark as read action (right side) */}
+        <View style={[styles.actionLeft, { backgroundColor: Colors.success }]}>
+          <Check size={24} color="white" />
+          <Text style={styles.actionText}>Marquer comme lu</Text>
+        </View>
+        
+        {/* Delete action (left side) */}
+        <View style={[styles.actionRight, { backgroundColor: Colors.error }]}>
+          <Trash2 size={24} color="white" />
+          <Text style={styles.actionText}>Supprimer</Text>
+        </View>
+      </View>
+
+      {/* Main notification content */}
+      <Animated.View
+        style={[{ transform: [{ translateX }] }]}
+        {...panResponder.panHandlers}
+      >
+        <TouchableOpacity
+          style={[
+            styles.notificationItem,
+            !notification.isRead && styles.unreadNotification
+          ]}
+          onPress={() => onPress(notification)}
+          activeOpacity={0.7}
+        >
+          <View style={[styles.iconContainer, { backgroundColor: `${iconColor}20` }]}>
+            <IconComponent size={20} color={iconColor} />
+          </View>
+          
+          <View style={styles.notificationContent}>
+            <View style={styles.notificationHeader}>
+              <Text style={styles.notificationTitle}>{notification.title}</Text>
+              <Text style={styles.timestamp}>{formatTime(notification.timestamp)}</Text>
+            </View>
+            
+            <Text style={styles.notificationMessage} numberOfLines={2}>
+              {notification.message}
+            </Text>
+          </View>
+          
+          {!notification.isRead && <View style={styles.unreadDot} />}
+        </TouchableOpacity>
+      </Animated.View>
+    </View>
+  );
+}
+
 export default function NotificationsScreen() {
-  const notifications: Notification[] = [
+  const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: '1',
       type: 'message',
@@ -48,7 +186,19 @@ export default function NotificationsScreen() {
       timestamp: '2024-01-20T14:20:00Z',
       isRead: true,
     },
-  ];
+  ]);
+
+  const markAsRead = (id: string) => {
+    setNotifications(prev => 
+      prev.map(notif => 
+        notif.id === id ? { ...notif, isRead: true } : notif
+      )
+    );
+  };
+
+  const deleteNotification = (id: string) => {
+    setNotifications(prev => prev.filter(notif => notif.id !== id));
+  };
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -123,38 +273,18 @@ export default function NotificationsScreen() {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {notifications.length > 0 ? (
-          notifications.map((notification) => {
-            const IconComponent = getNotificationIcon(notification.type);
-            const iconColor = getNotificationColor(notification.type);
-            
-            return (
-              <TouchableOpacity
-                key={notification.id}
-                style={[
-                  styles.notificationItem,
-                  !notification.isRead && styles.unreadNotification
-                ]}
-                onPress={() => handleNotificationPress(notification)}
-              >
-                <View style={[styles.iconContainer, { backgroundColor: `${iconColor}20` }]}>
-                  <IconComponent size={20} color={iconColor} />
-                </View>
-                
-                <View style={styles.notificationContent}>
-                  <View style={styles.notificationHeader}>
-                    <Text style={styles.notificationTitle}>{notification.title}</Text>
-                    <Text style={styles.timestamp}>{formatTime(notification.timestamp)}</Text>
-                  </View>
-                  
-                  <Text style={styles.notificationMessage} numberOfLines={2}>
-                    {notification.message}
-                  </Text>
-                </View>
-                
-                {!notification.isRead && <View style={styles.unreadDot} />}
-              </TouchableOpacity>
-            );
-          })
+          notifications.map((notification) => (
+            <SwipeableNotification
+              key={notification.id}
+              notification={notification}
+              onMarkAsRead={markAsRead}
+              onDelete={deleteNotification}
+              onPress={handleNotificationPress}
+              getIcon={getNotificationIcon}
+              getColor={getNotificationColor}
+              formatTime={formatTime}
+            />
+          ))
         ) : (
           <View style={styles.emptyState}>
             <Bell size={48} color={Colors.text.secondary} />
@@ -187,8 +317,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     backgroundColor: Colors.background.primary,
-    marginHorizontal: 16,
-    marginBottom: 8,
     borderRadius: 12,
     padding: 16,
     shadowColor: '#000',
@@ -261,5 +389,38 @@ const styles = StyleSheet.create({
   },
   bottomSpacer: {
     height: 40,
+  },
+  swipeContainer: {
+    marginHorizontal: 16,
+    marginBottom: 8,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  actionsContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: 'row',
+  },
+  actionLeft: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionRight: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
