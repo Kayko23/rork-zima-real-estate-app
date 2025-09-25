@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Ionicons, Feather } from '@expo/vector-icons';
 import { providers } from '@/constants/professionals';
+import WhatsAppChoiceSheet from '@/components/ui/WhatsAppChoiceSheet';
 
 type Listing = {
   id: string;
@@ -87,6 +88,7 @@ export default function ProviderProfileScreen() {
   const router = useRouter();
   const [tab, setTab] = useState<'overview' | 'listings' | 'reviews'>('overview');
   const [faved, setFaved] = useState<boolean>(false);
+  const [showWhatsAppChoice, setShowWhatsAppChoice] = useState<boolean>(false);
 
   const pro: Pro = useMemo(() => {
     const providerData = providers.find(p => p.id === id);
@@ -218,10 +220,7 @@ export default function ProviderProfileScreen() {
 
   const openPhone = () => pro.phone && Linking.openURL(`tel:${pro.phone}`);
   const openMail = () => pro.email && Linking.openURL(`mailto:${pro.email}`);
-  const openWhatsApp = () =>
-    pro.whatsapp
-      ? Linking.openURL(`https://wa.me/${pro.whatsapp}`)
-      : Alert.alert('WhatsApp', 'Numéro indisponible');
+  const openWhatsApp = () => setShowWhatsAppChoice(true);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: palette.bg }} testID="provider-profile-screen">
@@ -427,6 +426,14 @@ export default function ProviderProfileScreen() {
       ) : (
         <BlurView intensity={40} tint="light" style={styles.bottomBlur} />
       )}
+      
+      <WhatsAppChoiceSheet
+        visible={showWhatsAppChoice}
+        onClose={() => setShowWhatsAppChoice(false)}
+        providerName={pro.name}
+        whatsappNumber={pro.whatsapp}
+        providerId={pro.id}
+      />
     </SafeAreaView>
   );
 }

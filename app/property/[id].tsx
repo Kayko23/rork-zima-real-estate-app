@@ -38,6 +38,7 @@ import {
 } from "lucide-react-native";
 import { Ionicons } from '@expo/vector-icons';
 import LiquidGlassView from "@/components/ui/LiquidGlassView";
+import WhatsAppChoiceSheet from "@/components/ui/WhatsAppChoiceSheet";
 
 const { width } = Dimensions.get("window");
 const CARD = 16;
@@ -152,6 +153,7 @@ function PropertyDetailScreen() {
 
   const [imgIndex, setImgIndex] = useState<number>(0);
   const [showAllAmenities, setShowAllAmenities] = useState<boolean>(false);
+  const [showWhatsAppChoice, setShowWhatsAppChoice] = useState<boolean>(false);
   const listRef = useRef<FlatList<string> | null>(null);
   const heroH = Math.min(420, Math.round(width * 0.72));
 
@@ -416,12 +418,20 @@ function PropertyDetailScreen() {
             <Pressable testID="call" onPress={() => Linking.openURL("tel:+221700000000").catch(err => console.log("call error", err))} style={styles.iconOnly}>
               <Phone size={18} color="#0b3b35" />
             </Pressable>
-            <Pressable testID="whatsapp" onPress={() => Linking.openURL("https://wa.me/221700000000?text=Bonjour%20ZIMA").catch(err => console.log("wa error", err))} style={styles.iconOnly}>
+            <Pressable testID="whatsapp" onPress={() => setShowWhatsAppChoice(true)} style={styles.iconOnly}>
               <Ionicons name="logo-whatsapp" size={20} color="#25D366" />
             </Pressable>
           </View>
         </View>
       </LiquidGlassView>
+      
+      <WhatsAppChoiceSheet
+        visible={showWhatsAppChoice}
+        onClose={() => setShowWhatsAppChoice(false)}
+        providerName={data.agent.name}
+        whatsappNumber="221700000000"
+        providerId={data.agent.name.toLowerCase().replace(/\s+/g, '-')}
+      />
     </View>
   );
 }
