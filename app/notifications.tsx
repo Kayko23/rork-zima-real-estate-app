@@ -252,6 +252,30 @@ export default function NotificationsScreen() {
       if (!notification.isRead) {
         markAsRead(notification.id);
       }
+      
+      // Navigate to appropriate section based on notification type
+      switch (notification.type) {
+        case 'message':
+          // Navigate to messages tab
+          router.push('/(tabs)/messages');
+          break;
+        case 'appointment':
+          // Navigate to agenda/calendar (if exists) or profile
+          router.push('/(tabs)/profile');
+          break;
+        case 'favorite':
+          // Navigate to favorites tab
+          router.push('/(tabs)/favorites');
+          break;
+        case 'listing':
+          // Navigate to home or browse properties
+          router.push('/(tabs)/home');
+          break;
+        default:
+          // Default to home
+          router.push('/(tabs)/home');
+          break;
+      }
     }
   };
 
