@@ -1,17 +1,18 @@
 import React, { useState } from "react";
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, StyleSheet, StatusBar } from "react-native";
 import { Stack } from "expo-router";
+import HomeHeader from "@/components/home/HomeHeader";
 import { VoyageSearchBar, VoyageQuery } from "@/components/voyages/VoyageSearchBar";
 import { VoyageSearchSheet } from "@/components/voyages/VoyageSearchSheet";
 import { VoyageCarousel } from "@/components/voyages/VoyageCarousel";
 import { mockVoyages } from "@/components/voyages/helpers";
 import { Filter, ArrowRight } from "lucide-react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useApp } from "@/hooks/useAppStore";
 
 export default function VoyagesScreen() {
   const [q, setQ] = useState<VoyageQuery>(() => ({ type: "all" }));
   const [openSearch, setOpenSearch] = useState(false);
-  const insets = useSafeAreaInsets();
+  const { setHomeTab } = useApp();
 
   const handleItemPress = (item: any) => {
     console.log("Opening voyage detail:", item.id);
@@ -25,20 +26,29 @@ export default function VoyagesScreen() {
   };
 
   return (
-    <>
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#F3F6F6" />
       <Stack.Screen
         options={{
           title: "Voyages",
           headerShown: false,
         }}
       />
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-          <Text style={styles.title}>Voyages</Text>
-          <Text style={styles.subtitle}>
-            Découvrez des hébergements exceptionnels à travers l&apos;Afrique
-          </Text>
-        </View>
+      <ScrollView 
+        style={styles.scrollView} 
+        contentContainerStyle={styles.content}
+        stickyHeaderIndices={[0]}
+        showsVerticalScrollIndicator={false}
+      >
+        <HomeHeader active="voyages" onChange={setHomeTab} />
+        
+        <View style={styles.pageContent}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Voyages</Text>
+            <Text style={styles.subtitle}>
+              Découvrez des hébergements exceptionnels à travers l&apos;Afrique
+            </Text>
+          </View>
 
         <View style={styles.searchSection}>
           <VoyageSearchBar query={q} onPress={() => setOpenSearch(true)} />
@@ -119,7 +129,8 @@ export default function VoyagesScreen() {
           />
         </View>
 
-        <View style={styles.bottomSpacer} />
+          <View style={styles.bottomSpacer} />
+        </View>
       </ScrollView>
 
       {/* Search Sheet */}
@@ -129,17 +140,24 @@ export default function VoyagesScreen() {
         onClose={() => setOpenSearch(false)}
         onSubmit={setQ}
       />
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#F3F6F6",
+  },
+  scrollView: {
+    flex: 1,
   },
   content: {
-    paddingBottom: 120,
+    paddingBottom: 96,
+    backgroundColor: "#F3F6F6",
+  },
+  pageContent: {
+    backgroundColor: "#F9FAFB",
   },
   header: {
     padding: 16,
