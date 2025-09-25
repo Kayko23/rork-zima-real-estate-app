@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Search, Filter } from 'lucide-react-native';
 import NotificationBell from '@/components/ui/NotificationBell';
 import { mockConversations } from '@/constants/data';
@@ -12,14 +13,24 @@ type MessageTab = 'all' | 'properties' | 'services' | 'support';
 export default function MessagesScreen() {
   const { hasUnreadNotifications, markNotificationsAsRead } = useApp();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [activeTab, setActiveTab] = React.useState<MessageTab>('all');
+  const [searchQuery, setSearchQuery] = React.useState<string>('');
+  const [isSearchFocused, setIsSearchFocused] = React.useState<boolean>(false);
 
-  const tabs = [
-    { id: 'all' as MessageTab, label: 'Tout', count: 3 },
-    { id: 'properties' as MessageTab, label: 'Logements', count: 2 },
-    { id: 'services' as MessageTab, label: 'Services', count: 1 },
-    { id: 'support' as MessageTab, label: 'Support ZIMA', count: 0 },
-  ];
+  const tabs = React.useMemo(() => {
+    const propertiesCount = mockConversations.filter(c => c.category === 'properties').length;
+    const servicesCount = mockConversations.filter(c => c.category === 'services').length;
+    const supportCount = mockConversations.filter(c => c.category === 'support').length;
+    const totalCount = mockConversations.length;
+    
+    return [
+      { id: 'all' as MessageTab, label: 'Tout', count: totalCount },
+      { id: 'properties' as MessageTab, label: 'Logements', count: propertiesCount },
+      { id: 'services' as MessageTab, label: 'Services', count: servicesCount },
+      { id: 'support' as MessageTab, label: 'Support ZIMA', count: supportCount },
+    ];
+  }, []);
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -33,15 +44,63 @@ export default function MessagesScreen() {
     }
   };
 
-  const handleConversationPress = (notification: { id: string }) => {
-    if (notification && notification.id && notification.id.trim()) {
-      console.log('Conversation pressed:', notification.id);
+  const handleConversationPress = (conversation: { id: string; participants: Array<{ name: string }> }) => {
+    if (conversation && conversation.id && conversation.id.trim()) {
+      console.log('Opening conversation:', conversation.id);
+      // Navigate to chat screen - you can create this route later
+      Alert.alert(
+        'Ouvrir la conversation',
+        `Conversation avec ${conversation.participants[0]?.name || 'Utilisateur'}`,
+        [
+          { text: 'Annuler', style: 'cancel' },
+          { 
+            text: 'Ouvrir', 
+            onPress: () => {
+              // router.push(`/chat/${conversation.id}`);
+              console.log('Chat opened for:', conversation.id);
+            }
+          }
+        ]
+      );
     }
   };
 
   const handleNotificationPress = () => {
     markNotificationsAsRead();
+    router.push('/notifications');
   };
+
+  const handleFilterPress = () => {
+    Alert.alert(
+      'Filtres',
+      'Choisissez vos filtres de conversation',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Non lus', onPress: () => console.log('Filter: Unread') },
+        { text: 'Récents', onPress: () => console.log('Filter: Recent') },
+        { text: 'Tous', onPress: () => console.log('Filter: All') }
+      ]
+    );
+  };
+
+  const filteredConversations = React.useMemo(() => {
+    let filtered = mockConversations;
+    
+    // Filter by active tab
+    if (activeTab !== 'all') {
+      filtered = filtered.filter(conv => conv.category === activeTab);
+    }
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(conv => 
+        conv.participants[0]?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        conv.lastMessage.content.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    return filtered;
+  }, [activeTab, searchQuery]);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -71,18 +130,26 @@ export default function MessagesScreen() {
       </View>
 
       <View style={styles.searchContainer}>
-        <View style={styles.searchBar}>
+        <View style={[styles.searchBar, isSearchFocused && styles.searchBarFocused]}>
           <Search size={20} color={Colors.text.secondary} />
-          <Text style={styles.searchPlaceholder}>Rechercher une conversation...</Text>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Rechercher une conversation..."
+            placeholderTextColor={Colors.text.secondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
+          />
         </View>
-        <TouchableOpacity style={styles.filterButton}>
+        <TouchableOpacity style={styles.filterButton} onPress={handleFilterPress}>
           <Filter size={20} color={Colors.text.secondary} />
         </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {mockConversations.length > 0 ? (
-          mockConversations.map((conversation) => (
+        {filteredConversations.length > 0 ? (
+          filteredConversations.map((conversation) => (
             <TouchableOpacity
               key={conversation.id}
               style={styles.conversationItem}
@@ -120,9 +187,14 @@ export default function MessagesScreen() {
           ))
         ) : (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>Aucune conversation</Text>
+            <Text style={styles.emptyTitle}>
+              {searchQuery.trim() ? 'Aucun résultat' : 'Aucune conversation'}
+            </Text>
             <Text style={styles.emptyText}>
-              Vos conversations apparaîtront ici
+              {searchQuery.trim() 
+                ? `Aucune conversation trouvée pour "${searchQuery}"`
+                : 'Vos conversations apparaîtront ici'
+              }
             </Text>
           </View>
         )}
@@ -188,10 +260,15 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: 12,
   },
-  searchPlaceholder: {
+  searchInput: {
     flex: 1,
     fontSize: 16,
-    color: Colors.text.secondary,
+    color: Colors.text.primary,
+    paddingVertical: 0,
+  },
+  searchBarFocused: {
+    borderWidth: 2,
+    borderColor: Colors.primary,
   },
   filterButton: {
     width: 48,
