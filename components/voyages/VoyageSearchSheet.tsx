@@ -14,7 +14,7 @@ export function VoyageSearchSheet({
   initial?: VoyageQuery;
   onSubmit: (q: VoyageQuery) => void;
 }) {
-  const [q, setQ] = useState<VoyageQuery>(initial || { type: "all" });
+  const [q, setQ] = useState<VoyageQuery>(() => initial || { type: "all" });
   
   if (!visible) return null;
 

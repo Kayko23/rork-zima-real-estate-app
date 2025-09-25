@@ -9,7 +9,7 @@ import { Filter, ArrowRight } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function VoyagesScreen() {
-  const [q, setQ] = useState<VoyageQuery>({ type: "all" });
+  const [q, setQ] = useState<VoyageQuery>(() => ({ type: "all" }));
   const [openSearch, setOpenSearch] = useState(false);
   const insets = useSafeAreaInsets();
 
