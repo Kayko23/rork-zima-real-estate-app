@@ -1,6 +1,40 @@
-// hooks/useHotels.ts
 import { useCallback, useEffect, useRef, useState } from "react";
 import { HotelsAPI, type Hotel, type HotelQuery } from "@/lib/hotels-api";
+
+const MOCKS: Hotel[] = [
+  {
+    id: "demo_1",
+    title: "Studio cosy proche plage",
+    city: "Dakar",
+    country: "Sénégal",
+    price_per_night: 45000,
+    rating: 4.8,
+    reviews: 67,
+    badge: "Top",
+    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format",
+  },
+  {
+    id: "demo_2",
+    title: "Chambre Deluxe – Plateau",
+    city: "Abidjan",
+    country: "Côte d'Ivoire",
+    price_per_night: 75000,
+    rating: 4.6,
+    reviews: 120,
+    badge: "Premium",
+    image: "https://images.unsplash.com/photo-1505692794403-34d4982f88aa?q=80&w=1200&auto=format",
+  },
+  {
+    id: "demo_3",
+    title: "Villa avec piscine privée",
+    city: "Dakar",
+    country: "Sénégal",
+    price_per_night: 120000,
+    rating: 4.9,
+    reviews: 34,
+    image: "https://images.unsplash.com/photo-1528909514045-2fa4ac7a08ba?q=80&w=1200&auto=format",
+  },
+];
 
 type Feed = {
   items: Hotel[];
@@ -36,7 +70,12 @@ export function usePopularHotels(seed: Partial<HotelQuery> = {}): Feed {
         setTotal(res.totalPages);
         setItems((prev) => (replace ? res.data : [...prev, ...res.data]));
       } catch (e: any) {
+        console.warn("Hotels popular failed, using MOCKS", e?.message);
+        if (!mounted.current) return;
         setErr(e?.message ?? "Erreur réseau");
+        setPage(1);
+        setTotal(1);
+        setItems((prev) => (replace ? MOCKS : [...prev, ...MOCKS]));
       } finally {
         setLoading(false);
       }
@@ -88,7 +127,11 @@ export function useRecommendedHotels(seed: Partial<HotelQuery> = {}): Feed {
         setTotal(res.totalPages);
         setItems((prev) => (replace ? res.data : [...prev, ...res.data]));
       } catch (e: any) {
+        console.warn("Hotels recommended failed, using MOCKS", e?.message);
         setErr(e?.message ?? "Erreur réseau");
+        setPage(1);
+        setTotal(1);
+        setItems((prev) => (replace ? MOCKS : [...prev, ...MOCKS]));
       } finally {
         setLoading(false);
       }
