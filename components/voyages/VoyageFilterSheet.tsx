@@ -1,90 +1,75 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { X } from 'lucide-react-native';
-import { colors as theme } from '@/theme/tokens';
+import React, { useState } from "react";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { BlurView } from "expo-blur";
+import { X, Star } from "lucide-react-native";
+import type { VoyageFilters } from "./helpers";
 
-export type VoyageFilters = {
-  priceMin?: number;
-  priceMax?: number;
-  types?: Array<'hotel' | 'residence' | 'daily'>;
-  amenities?: string[];
-};
+export default function VoyageFilterSheet({
+  visible, onClose, initial, onSubmit
+}:{ visible:boolean; onClose:()=>void; initial?:VoyageFilters; onSubmit:(f:VoyageFilters)=>void }) {
+  const [f, setF] = useState<VoyageFilters>(initial || { priceMin:0, priceMax:1000000, ratingMin:0, premiumOnly:false, amenities:[] });
 
-export function VoyageFilterSheet({
-  visible,
-  onClose,
-  initial,
-  onApply,
-}: {
-  visible: boolean;
-  onClose: () => void;
-  initial?: VoyageFilters;
-  onApply: (f: VoyageFilters) => void;
-}) {
-  const [f, setF] = useState<VoyageFilters>(initial || { priceMin: 10, priceMax: 500, types: [], amenities: [] });
   if (!visible) return null;
 
-  const toggle = (list: keyof VoyageFilters, value: string) => {
-    setF((prev) => {
-      const cur = new Set(((prev[list] as string[]) ?? []) as string[]);
-      if (cur.has(value)) cur.delete(value); else cur.add(value);
-      return { ...prev, [list]: Array.from(cur) };
-    });
-  };
-
   return (
-    <View style={fs.backdrop} testID="voyage-filter-sheet">
-      <View style={fs.sheet}>
-        <View style={fs.header}>
-          <Text style={fs.title}>Filtres</Text>
-          <Pressable onPress={onClose} accessibilityRole="button" testID="close-filter-sheet">
-            <X />
+    <View style={m.backdrop} testID="voyage-filter-sheet">
+      <Pressable style={m.flex1} onPress={onClose}/>
+      <BlurView intensity={40} tint="light" style={m.sheet}>
+        <View style={m.header}>
+          <Text style={m.title}>Filtres</Text>
+          <Pressable onPress={onClose}><X size={22} color="#0B3B36"/></Pressable>
+        </View>
+
+        <Text style={m.section}>Prix par nuit</Text>
+        <Text style={m.hint}>{f.priceMin} – {f.priceMax} FCFA</Text>
+
+        <View style={m.sliderRow}>
+          <Pressable style={[m.pill, m.pillInline]} onPress={()=>setF(prev=>({ ...prev, priceMax: Math.max(10000, (prev.priceMax - 5000)) }))}>
+            <Text style={m.pillTxt}>- 5k</Text>
+          </Pressable>
+          <Pressable style={[m.pill, m.pillInline]} onPress={()=>setF(prev=>({ ...prev, priceMax: Math.min(200000, (prev.priceMax + 5000)) }))}>
+            <Text style={m.pillTxt}>+ 5k</Text>
           </Pressable>
         </View>
 
-        <Text style={fs.h}>Prix / nuit ou jour</Text>
-        <Text style={fs.sub}>Min: ${f.priceMin} — Max: ${f.priceMax}</Text>
-
-        <Text style={fs.h}>Type d’hébergement</Text>
-        <View style={fs.chips}>
-          {(['hotel', 'residence', 'daily'] as const).map((t) => (
-            <Pressable key={t} onPress={() => toggle('types', t)} style={[fs.chip, (f.types || []).includes(t) && fs.chipActive]} testID={`chip-type-${t}`}>
-              <Text style={[fs.chipTxt, (f.types || []).includes(t) && fs.chipTxtActive]}>
-                {t === 'hotel' ? 'Hôtels' : t === 'residence' ? 'Résidences' : 'Journaliers'}
-              </Text>
+        <Text style={m.section}>Note minimale</Text>
+        <View style={m.row}>
+          {[0,3,4,4.5].map(n=> (
+            <Pressable key={n} style={[m.pill, f.ratingMin===n && m.pillOn]} onPress={()=>setF({...f, ratingMin:n})}>
+              <Star size={14} color={f.ratingMin===n?"#fff":"#0B3B36"}/>
+              <Text style={[m.pillTxt, f.ratingMin===n && m.pillOnTxt]}>{n}+</Text>
             </Pressable>
           ))}
         </View>
 
-        <Text style={fs.h}>Équipements</Text>
-        <View style={fs.chips}>
-          {['wifi', 'piscine', 'parking', 'petit-dej', 'clim'].map((a) => (
-            <Pressable key={a} onPress={() => toggle('amenities', a)} style={[fs.chip, (f.amenities || []).includes(a) && fs.chipActive]} testID={`chip-amenity-${a}`}>
-              <Text style={[fs.chipTxt, (f.amenities || []).includes(a) && fs.chipTxtActive]}>{a}</Text>
-            </Pressable>
-          ))}
-        </View>
-
-        <Pressable style={fs.cta} onPress={() => { onApply(f); onClose(); }} testID="btn-apply-filters">
-          <Text style={fs.ctaTxt}>Afficher les résultats</Text>
+        <Text style={m.section}>Label</Text>
+        <Pressable style={[m.pill, f.premiumOnly && m.pillOn]} onPress={()=>setF({...f, premiumOnly:!f.premiumOnly})}>
+          <Text style={[m.pillTxt, f.premiumOnly && m.pillOnTxt]}>Premium uniquement</Text>
         </Pressable>
-      </View>
+
+        <Pressable style={m.cta} onPress={()=>onSubmit(f)}>
+          <Text style={m.ctaTxt}>Voir les résultats</Text>
+        </Pressable>
+      </BlurView>
     </View>
   );
 }
 
-const fs = StyleSheet.create({
-  backdrop: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.25)', justifyContent: 'flex-end' },
-  sheet: { backgroundColor: '#fff', borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, gap: 8 },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title: { fontSize: 18, fontWeight: '800' },
-  h: { fontWeight: '800', marginTop: 6 },
-  sub: { color: '#475569' },
-  chips: { flexDirection: 'row', flexWrap: 'wrap' as const, gap: 8, marginTop: 6 },
-  chip: { height: 34, paddingHorizontal: 12, borderRadius: 999, backgroundColor: '#F3F4F6', alignItems: 'center', justifyContent: 'center' },
-  chipActive: { backgroundColor: '#E6F5F0', borderWidth: 1, borderColor: theme.primary },
-  chipTxt: { fontWeight: '700', color: '#334155' },
-  chipTxtActive: { color: theme.primary },
-  cta: { marginTop: 8, height: 48, borderRadius: 12, backgroundColor: theme.primary, alignItems: 'center', justifyContent: 'center' },
-  ctaTxt: { color: '#fff', fontWeight: '800' },
+const m = StyleSheet.create({
+  backdrop:{ position:"absolute", inset:0, backgroundColor:"rgba(0,0,0,.25)", justifyContent:"flex-end" },
+  flex1:{ flex:1 },
+  sheet:{ borderTopLeftRadius:22, borderTopRightRadius:22, overflow:"hidden", padding:16, backgroundColor:"rgba(255,255,255,.7)" },
+  header:{ flexDirection:"row", justifyContent:"space-between", alignItems:"center" },
+  title:{ fontSize:18, fontWeight:"800", color:"#0B3B36" },
+  section:{ marginTop:14, fontWeight:"800", color:"#0B3B36" },
+  hint:{ color:"#4B635F", marginBottom:6, marginTop:4 },
+  row:{ flexDirection:"row", gap:8, marginTop:6, flexWrap:"wrap" },
+  sliderRow:{ flexDirection:"row", gap:8, marginTop:6 },
+  pill:{ flexDirection:"row", alignItems:"center", gap:8, paddingVertical:8, paddingHorizontal:12, borderRadius:999, backgroundColor:"#fff", borderWidth:1, borderColor:"#E6EFEC"},
+  pillInline:{},
+  pillOn:{ backgroundColor:"#0B3B36", borderColor:"#0B3B36" },
+  pillOnTxt:{ color:"#fff" },
+  pillTxt:{ fontWeight:"700", color:"#0B3B36" },
+  cta:{ marginTop:18, backgroundColor:"#134E48", borderRadius:14, alignItems:"center", paddingVertical:12 },
+  ctaTxt:{ color:"#fff", fontWeight:"800" }
 });

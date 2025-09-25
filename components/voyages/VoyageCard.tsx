@@ -1,121 +1,41 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, Pressable } from "react-native";
-import { Heart, Star } from "lucide-react-native";
-import { formatPrice, VoyageItem } from "./helpers";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { Heart } from "lucide-react-native";
+import { TripItem } from "./helpers";
+import { router } from "expo-router";
 
-export function VoyageCard({
-  item,
-  onPress,
-}: {
-  item: VoyageItem;
-  onPress: () => void;
-}) {
+export default function VoyageCard({ item, onPress }:{ item:TripItem; onPress?:()=>void }) {
+  const handlePress = () => {
+    if (onPress) return onPress();
+    router.push(`/property/${item.id}`);
+  };
   return (
-    <Pressable onPress={onPress} style={c.wrap}>
-      <View style={c.photoWrap}>
-        <Image source={{ uri: item.photos[0] }} style={c.photo} />
-        <Pressable style={c.fav}>
-          <Heart size={18} color="#fff" />
-        </Pressable>
-        {item.badges?.[0] && (
-          <View style={c.badge}>
-            <Text style={c.badgeTxt}>{item.badges[0]}</Text>
-          </View>
-        )}
+    <TouchableOpacity style={c.card} activeOpacity={0.9} onPress={handlePress} testID={`voyage-card-${item.id}`}>
+      <Image source={item.image} style={c.img}/>
+      {!!item.badge && <View style={[c.badge, item.badge==="Top"?{backgroundColor:"#0EA5A3"}:{backgroundColor:"#0B3B36"}]}> 
+        <Text style={c.badgeTxt}>{item.badge}</Text>
+      </View>}
+      <View style={c.like}><Heart size={18} color="#fff"/></View>
+
+      <View style={c.body}>
+        <Text numberOfLines={1} style={c.title}>{item.title}</Text>
+        <Text style={c.place}>{item.city}, {item.country}</Text>
+        <Text style={c.price}>{item.price.toLocaleString()} FCFA <Text style={c.dim}>/ nuit</Text></Text>
+        <Text style={c.rating}>★ {item.rating} · {item.reviews} avis</Text>
       </View>
-      <Text numberOfLines={1} style={c.title}>
-        {item.title}
-      </Text>
-      <Text style={c.place}>
-        {item.city}, {item.country}
-      </Text>
-      <Text style={c.price}>
-        {formatPrice(item.price)}{" "}
-        <Text style={c.unit}>/ {item.unit === "night" ? "nuit" : "jour"}</Text>
-      </Text>
-      <View style={c.ratingRow}>
-        <Star size={12} color="#F59E0B" fill="#F59E0B" />
-        <Text style={c.rating}>
-          {item.rating} · {item.reviews} avis
-        </Text>
-      </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 }
-
 const c = StyleSheet.create({
-  wrap: {
-    width: 220,
-    marginRight: 12,
-  },
-  photoWrap: {
-    height: 150,
-    borderRadius: 16,
-    overflow: "hidden",
-    backgroundColor: "#eee",
-  },
-  photo: {
-    width: "100%",
-    height: "100%",
-  },
-  fav: {
-    position: "absolute",
-    right: 8,
-    top: 8,
-    height: 32,
-    width: 32,
-    borderRadius: 16,
-    backgroundColor: "rgba(0,0,0,0.35)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  badge: {
-    position: "absolute",
-    left: 8,
-    top: 8,
-    backgroundColor: "#059669",
-    paddingHorizontal: 8,
-    height: 26,
-    borderRadius: 13,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  badgeTxt: {
-    color: "#fff",
-    fontWeight: "800",
-    fontSize: 11,
-  },
-  title: {
-    fontWeight: "800",
-    fontSize: 15,
-    marginTop: 6,
-    color: "#1F2937",
-  },
-  place: {
-    color: "#6B7280",
-    marginTop: 2,
-    fontSize: 13,
-  },
-  price: {
-    fontWeight: "800",
-    marginTop: 2,
-    color: "#1F2937",
-    fontSize: 14,
-  },
-  unit: {
-    color: "#6B7280",
-    fontWeight: "700",
-    fontSize: 12,
-  },
-  ratingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    marginTop: 2,
-  },
-  rating: {
-    color: "#374151",
-    fontWeight: "700",
-    fontSize: 12,
-  },
+  card:{ width:300, marginRight:14, borderRadius:16, overflow:"hidden", backgroundColor:"#fff" },
+  img:{ width:"100%", height:180 },
+  like:{ position:"absolute", top:12, right:12, backgroundColor:"rgba(0,0,0,.35)", borderRadius:999, padding:6 },
+  badge:{ position:"absolute", left:12, top:12, borderRadius:999, paddingHorizontal:10, paddingVertical:6 },
+  badgeTxt:{ color:"#fff", fontWeight:"900", letterSpacing:0.3 },
+  body:{ padding:12, gap:4 },
+  title:{ fontSize:16, fontWeight:"900", color:"#0B3B36" },
+  place:{ color:"#4B635F" },
+  price:{ marginTop:2, fontWeight:"900", color:"#0B3B36" },
+  dim:{ color:"#4B635F", fontWeight:"600" },
+  rating:{ marginTop:2, color:"#0B3B36", fontWeight:"700" },
 });

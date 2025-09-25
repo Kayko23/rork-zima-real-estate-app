@@ -1,74 +1,26 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
-import { Search } from "lucide-react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { MapPin, Calendar, Users } from "lucide-react-native";
+import { VoyageQuery } from "./helpers";
 
-export type VoyageQuery = {
-  destination?: { label: string; lat?: number; lng?: number };
-  dateFrom?: string;
-  dateTo?: string; // ISO
-  guests?: number;
-  type?: "hotel" | "residence" | "daily" | "all";
-};
-
-export function VoyageSearchBar({
-  onPress,
-  query,
-}: {
-  onPress: () => void;
-  query?: VoyageQuery;
+export default function VoyageSearchBar({ value, onPress }:{
+  value: VoyageQuery; onPress: ()=>void;
 }) {
-  const pill = (label: string, value?: string) => (
-    <View style={s.pill}>
-      <Text style={s.pillTxt}>{value || label}</Text>
-    </View>
-  );
+  const destination = value.city?.label ?? value.country?.label ?? "Destination";
+  const dates = value.startDate && value.endDate ? `${value.startDate} – ${value.endDate}` : "Dates";
+  const pax = value.guests ? `${value.guests} voyageur${value.guests>1?"s":""}` : "1 voyageur";
 
   return (
-    <Pressable onPress={onPress} style={s.wrap}>
-      <Search size={18} color="#1F2937" />
-      <View style={s.pillsContainer}>
-        {pill("Destination", query?.destination?.label)}
-        {pill(
-          "Dates",
-          query?.dateFrom && query?.dateTo ? "Dates choisies" : undefined
-        )}
-        {pill("Voyageurs", query?.guests ? `${query.guests}` : undefined)}
-      </View>
-    </Pressable>
+    <TouchableOpacity style={s.wrap} onPress={onPress} activeOpacity={0.9} testID="voyage-searchbar">
+      <View style={s.pill}><MapPin size={16}/><Text style={s.txt}>{destination}</Text></View>
+      <View style={s.pill}><Calendar size={16}/><Text style={s.txt}>{dates}</Text></View>
+      <View style={s.pill}><Users size={16}/><Text style={s.txt}>{pax}</Text></View>
+    </TouchableOpacity>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    backgroundColor: "#fff",
-    height: 48,
-    borderRadius: 999,
-    paddingHorizontal: 14,
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 1,
-  },
-  pill: {
-    backgroundColor: "#F3F4F6",
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    height: 32,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  pillTxt: {
-    fontWeight: "700",
-    color: "#111827",
-    fontSize: 12,
-  },
-  pillsContainer: {
-    flexDirection: "row",
-    gap: 8,
-    flex: 1,
-    flexWrap: "wrap",
-  },
+  wrap:{ flexDirection:"row", gap:8, flexWrap:"wrap", alignItems:"center" },
+  pill:{ flexDirection:"row", alignItems:"center", gap:6, paddingVertical:8, paddingHorizontal:12, borderRadius:999, backgroundColor:"#fff", borderWidth:1, borderColor:"#E6EFEC"},
+  txt:{ fontWeight:"700", color:"#0B3B36" }
 });
