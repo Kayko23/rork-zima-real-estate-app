@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Pressable, Text, StyleSheet, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 type TabKey = "biens" | "services" | "voyages";
 
@@ -20,8 +21,26 @@ function Tab({
   k, label, icon, active, onChange,
 }: { k: TabKey; label: string; icon: any; active: TabKey; onChange: (k: TabKey) => void }) {
   const is = active === k;
+  
+  const handlePress = () => {
+    onChange(k);
+    
+    // Navigate to the appropriate route
+    switch (k) {
+      case 'biens':
+        router.push('/(tabs)/home');
+        break;
+      case 'services':
+        router.push('/(tabs)/professionnels');
+        break;
+      case 'voyages':
+        router.push('/(tabs)/voyages');
+        break;
+    }
+  };
+  
   return (
-    <Pressable onPress={() => onChange(k)} style={s.tab} accessibilityRole="button">
+    <Pressable onPress={handlePress} style={s.tab} accessibilityRole="button">
       <Ionicons name={icon} size={26} color={is ? "#111827" : "#6B7280"} />
       <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}
             style={[s.label, { color: is ? "#111827" : "#6B7280" }]}>{label}</Text>
