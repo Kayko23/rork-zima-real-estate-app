@@ -23,21 +23,23 @@ export function VoyageCard({
           </View>
         )}
       </View>
-      <Text numberOfLines={1} style={c.title}>
-        {item.title}
-      </Text>
-      <Text style={c.place}>
-        {item.city}, {item.country}
-      </Text>
-      <Text style={c.price}>
-        {formatPrice(item.price)}{" "}
-        <Text style={c.unit}>/ {item.unit === "night" ? "nuit" : "jour"}</Text>
-      </Text>
-      <View style={c.ratingRow}>
-        <Star size={12} color="#F59E0B" fill="#F59E0B" />
-        <Text style={c.rating}>
-          {item.rating} · {item.reviews} avis
+      <View style={c.content}>
+        <Text numberOfLines={1} style={c.title}>
+          {item.title}
         </Text>
+        <Text style={c.place}>
+          {item.city}, {item.country}
+        </Text>
+        <Text style={c.price}>
+          {formatPrice(item.price)}{" "}
+          <Text style={c.unit}>/ {item.unit === "night" ? "nuit" : "jour"}</Text>
+        </Text>
+        <View style={c.ratingRow}>
+          <Star size={12} color="#F59E0B" fill="#F59E0B" />
+          <Text style={c.rating}>
+            {item.rating} · {item.reviews} avis
+          </Text>
+        </View>
       </View>
     </Pressable>
   );
@@ -46,13 +48,23 @@ export function VoyageCard({
 const c = StyleSheet.create({
   wrap: {
     width: 220,
-    marginRight: 12,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   photoWrap: {
     height: 150,
-    borderRadius: 16,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
     overflow: "hidden",
     backgroundColor: "#eee",
+  },
+  content: {
+    padding: 12,
   },
   photo: {
     width: "100%",
@@ -88,7 +100,6 @@ const c = StyleSheet.create({
   title: {
     fontWeight: "800",
     fontSize: 15,
-    marginTop: 6,
     color: "#1F2937",
   },
   place: {

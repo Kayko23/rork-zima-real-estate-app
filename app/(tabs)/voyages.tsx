@@ -34,7 +34,7 @@ export default function VoyagesScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F3F6F6" />
+      <StatusBar barStyle="dark-content" backgroundColor="#F9FAFB" />
       <Stack.Screen
         options={{
           title: "Voyages",
@@ -169,10 +169,10 @@ export default function VoyagesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F3F6F6",
+    backgroundColor: "#F9FAFB",
   },
   headerContainer: {
-    backgroundColor: "#F3F6F6",
+    backgroundColor: "#F9FAFB",
     paddingHorizontal: 20,
     paddingBottom: 8,
     borderBottomWidth: 1,
@@ -183,10 +183,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    backgroundColor: "#F3F6F6",
+    backgroundColor: "#F9FAFB",
   },
   pageContent: {
-    backgroundColor: "#F3F6F6",
+    backgroundColor: "#F9FAFB",
   },
   header: {
     padding: 16,
