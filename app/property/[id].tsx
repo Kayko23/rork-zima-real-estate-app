@@ -11,6 +11,7 @@ import {
   Linking,
   Platform,
 } from "react-native";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   ChevronLeft,
@@ -108,6 +109,7 @@ export default function PropertyDetailRoute() {
 function PropertyDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
 
   const data: PropertyData = useMemo(
     () => ({
@@ -215,16 +217,46 @@ function PropertyDetailScreen() {
         />
 
         <View style={styles.heroOverlays} pointerEvents="box-none">
-          <View style={styles.topActions}>
+          <View style={[styles.topActions, { top: Math.max(insets.top + 8, 44) }]}>
             <LiquidGlassView style={styles.glassCircle} intensity={18} tint="light">
-              <Pressable testID="back" onPress={() => router.back()} style={styles.roundBtn}><ChevronLeft size={20} color="#0b3b35" /></Pressable>
+              <Pressable 
+                testID="back" 
+                onPress={() => {
+                  console.log("Back button pressed");
+                  router.back();
+                }} 
+                style={styles.roundBtn}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <ChevronLeft size={20} color="#0b3b35" />
+              </Pressable>
             </LiquidGlassView>
             <View style={{ flexDirection: "row", gap: 10 }}>
               <LiquidGlassView style={styles.glassCircle} intensity={18} tint="light">
-                <Pressable testID="share" onPress={() => console.log("share press")} style={styles.roundBtn}><Ionicons name="share-outline" size={20} color="#0E3B33" /></Pressable>
+                <Pressable 
+                  testID="share" 
+                  onPress={() => {
+                    console.log("Share button pressed");
+                    // TODO: Implement share functionality
+                  }} 
+                  style={styles.roundBtn}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Ionicons name="share-outline" size={20} color="#0E3B33" />
+                </Pressable>
               </LiquidGlassView>
               <LiquidGlassView style={styles.glassCircle} intensity={18} tint="light">
-                <Pressable testID="fav" onPress={() => console.log("favorite press")} style={styles.roundBtn}><Heart size={18} color="#0b3b35" /></Pressable>
+                <Pressable 
+                  testID="fav" 
+                  onPress={() => {
+                    console.log("Favorite button pressed");
+                    // TODO: Implement favorite functionality
+                  }} 
+                  style={styles.roundBtn}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Heart size={18} color="#0b3b35" />
+                </Pressable>
               </LiquidGlassView>
             </View>
           </View>
@@ -620,7 +652,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: brand.bg },
   heroWrap: { borderBottomLeftRadius: R, borderBottomRightRadius: R, overflow: "hidden", backgroundColor: "#e7efec" },
   heroOverlays: { position: "absolute", left: 0, right: 0, top: 0, bottom: 0 },
-  topActions: { position: "absolute", top: 14, left: 14, right: 14, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  topActions: { position: "absolute", left: 14, right: 14, flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
   glassCircle: { borderRadius: 999 },
   roundBtn: { height: 40, width: 40, alignItems: "center", justifyContent: "center" },
   pagerGlass: { position: "absolute", right: 14, bottom: 12, borderRadius: 999 },
