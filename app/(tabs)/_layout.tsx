@@ -93,6 +93,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="voyages"
+        options={{
+          title: 'Voyages',
+          tabBarIcon: ({ color, size }) => (
+            <Grid3X3 size={size} color={color} testID="tab-icon-voyages" />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="messages"
         options={{
           title: 'Messages',
@@ -121,6 +130,12 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="professionnels"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="voyages-search"
         options={{
           href: null,
         }}
