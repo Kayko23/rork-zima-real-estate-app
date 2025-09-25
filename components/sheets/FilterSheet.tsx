@@ -1,113 +1,67 @@
-import React, { useState } from 'react';
-import { View, Text, Switch, TouchableOpacity, StyleSheet } from 'react-native';
-import BottomSheet from '@/components/BottomSheet';
-import type { TripsFilters } from '@/lib/search-types';
+import React from "react";
+import { View, Text, Pressable, StyleSheet, Switch } from "react-native";
+import { X } from "lucide-react-native";
 
-type Props = {
-  initial?: Partial<TripsFilters>;
-  onApply: (values: Partial<TripsFilters>) => void;
-  visible: boolean;
-  onClose: () => void;
+export type TripsFilters = {
+  priceMin?: number; priceMax?: number;
+  morning?: boolean; afternoon?: boolean; evening?: boolean;
+  wifi?: boolean; pool?: boolean; breakfast?: boolean;
 };
 
-export default function FilterSheet({ initial, onApply, visible, onClose }: Props) {
-  const [priceMin, setPriceMin] = useState<number>(initial?.priceMin ?? 0);
-  const [priceMax, setPriceMax] = useState<number>(initial?.priceMax ?? 300000);
-  const [ratingMin, setRatingMin] = useState<number>(initial?.ratingMin ?? 0);
-  const [hasPool, setHasPool] = useState<boolean>(!!initial?.hasPool);
-  const [hasWifi, setHasWifi] = useState<boolean>(!!initial?.hasWifi);
-  const [breakfast, setBreakfast] = useState<boolean>(!!initial?.breakfast);
-
+export default function FilterSheet({
+  visible, onClose, value, onChange,
+}: {
+  visible: boolean; onClose: () => void;
+  value: TripsFilters; onChange: (v: TripsFilters) => void;
+}) {
+  if (!visible) return null;
   return (
-    <BottomSheet visible={visible} onClose={onClose}>
-      <View style={s.header} testID="filterSheet.header">
-        <Text style={s.title}>Filtres</Text>
-      </View>
-      <View style={s.group}>
-        <Text style={s.section}>Prix par nuit</Text>
-        <Text style={s.hint}>{priceMin.toLocaleString()} FCFA — {priceMax.toLocaleString()} FCFA</Text>
-        <Row label="Min" right={<Stepper value={priceMin} onChange={setPriceMin} step={5000} />} />
-        <Row label="Max" right={<Stepper value={priceMax} onChange={setPriceMax} step={5000} />} />
-      </View>
-      <View style={s.group}>
-        <Text style={s.section}>Note minimale</Text>
-        <Row label="≥" right={<Stepper value={ratingMin} onChange={setRatingMin} step={0.1} min={0} max={5} />} />
-      </View>
-      <View style={s.group}>
-        <Text style={s.section}>Équipements</Text>
-        <Row label="Piscine" right={<Switch value={hasPool} onValueChange={setHasPool} />} />
-        <Row label="Wi-Fi" right={<Switch value={hasWifi} onValueChange={setHasWifi} />} />
-        <Row label="Petit-déjeuner" right={<Switch value={breakfast} onValueChange={setBreakfast} />} />
-      </View>
-      <View style={s.footer} testID="filterSheet.footer">
-        <TouchableOpacity
-          style={[s.btn, s.btnGhost]}
-          onPress={() => {
-            setPriceMin(0);
-            setPriceMax(300000);
-            setRatingMin(0);
-            setHasPool(false);
-            setHasWifi(false);
-            setBreakfast(false);
-          }}
-          testID="filterSheet.reset"
-        >
-          <Text style={[s.btnTxt, { color: '#111827' }]}>Effacer tout</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[s.btn, s.btnPrimary]}
-          onPress={() => {
-            try {
-              onApply({ priceMin, priceMax, ratingMin, hasPool, hasWifi, breakfast });
-              onClose();
-            } catch (e) {
-              console.log('FilterSheet apply error', e);
-            }
-          }}
-          testID="filterSheet.apply"
-        >
-          <Text style={[s.btnTxt, { color: '#fff' }]}>Voir les résultats</Text>
-        </TouchableOpacity>
-      </View>
-    </BottomSheet>
-  );
-}
+    <View style={s.backdrop} testID="voyage.filterSheet">
+      <View style={s.sheet}>
+        <View style={s.header}>
+          <Text style={s.title}>Filtres</Text>
+          <Pressable onPress={onClose}><X size={22} color="#1F2937" /></Pressable>
+        </View>
 
-function Row({ label, right }: { label: string; right: React.ReactNode }) {
-  return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10 }}>
-      <Text style={{ fontWeight: '700', color: '#111827' }}>{label}</Text>
-      {right}
+        <Group title="Équipements">
+          <Toggle label="Wi-Fi"    val={!!value.wifi}      on={(v) => onChange({ ...value, wifi: v })} />
+          <Toggle label="Piscine"  val={!!value.pool}      on={(v) => onChange({ ...value, pool: v })} />
+          <Toggle label="Petit-déj" val={!!value.breakfast} on={(v) => onChange({ ...value, breakfast: v })} />
+        </Group>
+
+        <Group title="Moment de la journée">
+          <Toggle label="Matin"       val={!!value.morning}   on={(v) => onChange({ ...value, morning: v })} />
+          <Toggle label="Après-midi"  val={!!value.afternoon} on={(v) => onChange({ ...value, afternoon: v })} />
+          <Toggle label="Soir"        val={!!value.evening}   on={(v) => onChange({ ...value, evening: v })} />
+        </Group>
+
+        <Pressable style={s.cta} onPress={onClose}><Text style={s.ctaText}>Appliquer</Text></Pressable>
+      </View>
     </View>
   );
 }
 
-function Stepper({ value, onChange, step = 1, min = 0, max = Number.MAX_SAFE_INTEGER }:
-  { value: number; onChange: (v:number)=>void; step?: number; min?: number; max?: number }) {
+function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-      <TouchableOpacity onPress={() => onChange(Math.max(min, +(value - step).toFixed(2)))}
-        style={{ backgroundColor: '#E5E7EB', width: 36, height: 36, borderRadius: 10, alignItems:'center', justifyContent:'center' }}>
-        <Text style={{ fontSize: 18, fontWeight: '800' }}>–</Text>
-      </TouchableOpacity>
-      <Text style={{ width: 86, textAlign: 'center', fontWeight: '700' }}>{value}</Text>
-      <TouchableOpacity onPress={() => onChange(Math.min(max, +(value + step).toFixed(2)))}
-        style={{ backgroundColor: '#0F5132', width: 36, height: 36, borderRadius: 10, alignItems:'center', justifyContent:'center' }}>
-        <Text style={{ fontSize: 18, fontWeight: '800', color:'#fff' }}>+</Text>
-      </TouchableOpacity>
+    <View style={{ marginBottom: 12 }}>
+      <Text style={{ fontWeight: "800", marginBottom: 8, color: "#0F172A" }}>{title}</Text>
+      <View style={{ gap: 10 }}>{children}</View>
+    </View>
+  );
+}
+function Toggle({ label, val, on }: { label: string; val: boolean; on: (v: boolean) => void }) {
+  return (
+    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+      <Text style={{ fontSize: 16 }}>{label}</Text><Switch value={val} onValueChange={on} />
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  header: { paddingHorizontal: 16, paddingBottom: 8 },
-  title: { fontWeight: '800', fontSize: 18, color: '#0B1220' },
-  group: { paddingHorizontal: 16, paddingVertical: 8 },
-  section: { fontWeight: '800', marginBottom: 6, color: '#0B1220' },
-  hint: { color: '#6B7280', marginBottom: 6, fontWeight: '600' },
-  footer: { padding: 16, flexDirection: 'row', gap: 12 },
-  btn: { flex: 1, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  btnGhost: { backgroundColor: '#E5E7EB' },
-  btnPrimary: { backgroundColor: '#0F5132' },
-  btnTxt: { fontWeight: '800' },
+  backdrop: { position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.35)", justifyContent: "flex-end" },
+  sheet: { backgroundColor: "#fff", borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 16 },
+  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
+  title: { fontWeight: "900", fontSize: 18 },
+  cta: { marginTop: 12, backgroundColor: "#0B3B2E", padding: 14, borderRadius: 12, alignItems: "center" },
+  ctaText: { color: "#fff", fontWeight: "700" },
 });

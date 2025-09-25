@@ -1,74 +1,58 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { Search } from "lucide-react-native";
+import { Calendar, Users, MapPin } from "lucide-react-native";
 
 export type VoyageQuery = {
-  destination?: { label: string; lat?: number; lng?: number };
-  dateFrom?: string;
-  dateTo?: string; // ISO
+  destination?: string;
+  startDate?: string;
+  endDate?: string;
   guests?: number;
-  type?: "hotel" | "residence" | "daily" | "all";
 };
 
-export function VoyageSearchBar({
-  onPress,
-  query,
+export default function VoyageSearchBar({
+  value,
+  onOpen,
 }: {
-  onPress: () => void;
-  query?: VoyageQuery;
+  value: VoyageQuery;
+  onOpen: () => void;
 }) {
-  const pill = (label: string, value?: string) => (
-    <View style={s.pill}>
-      <Text style={s.pillTxt}>{value || label}</Text>
-    </View>
-  );
-
   return (
-    <Pressable onPress={onPress} style={s.wrap}>
-      <Search size={18} color="#1F2937" />
-      <View style={s.pillsContainer}>
-        {pill("Destination", query?.destination?.label)}
-        {pill(
-          "Dates",
-          query?.dateFrom && query?.dateTo ? "Dates choisies" : undefined
-        )}
-        {pill("Voyageurs", query?.guests ? `${query.guests}` : undefined)}
-      </View>
+    <Pressable onPress={onOpen} style={s.wrap} testID="voyage.searchBar">
+      <Chip icon={MapPin} label={value.destination || "Destination"} />
+      <Chip icon={Calendar} label={value.startDate && value.endDate ? "Dates" : "Dates"} />
+      <Chip icon={Users} label={`${value.guests ?? 1} voyageur${(value.guests ?? 1) > 1 ? "s" : ""}`} />
     </Pressable>
+  );
+}
+
+type IconProps = { size?: number; color?: string };
+function Chip({ icon: Icon, label }: { icon: React.ComponentType<IconProps>; label: string }) {
+  return (
+    <View style={s.chip}>
+      <View style={s.iconWrap}><Icon size={16} color="#0F172A" /></View>
+      <Text numberOfLines={1} style={s.chipText}>{label}</Text>
+    </View>
   );
 }
 
 const s = StyleSheet.create({
   wrap: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    backgroundColor: "#fff",
-    height: 48,
-    borderRadius: 999,
-    paddingHorizontal: 14,
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 1,
-  },
-  pill: {
-    backgroundColor: "#F3F4F6",
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    height: 32,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  pillTxt: {
-    fontWeight: "700",
-    color: "#111827",
-    fontSize: 12,
-  },
-  pillsContainer: {
-    flexDirection: "row",
     gap: 8,
-    flex: 1,
-    flexWrap: "wrap",
+    padding: 8,
+    borderRadius: 24,
+    backgroundColor: "#ffffff",
+    alignSelf: "stretch",
   },
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: "#F2F4F7",
+    borderRadius: 20,
+    gap: 6,
+  },
+  chipText: { fontSize: 14, fontWeight: "600", color: "#0F172A", maxWidth: 120 },
+  iconWrap: { alignItems: "center", justifyContent: "center" },
 });

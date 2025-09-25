@@ -1,132 +1,55 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, Pressable } from "react-native";
-import { Heart, Star } from "lucide-react-native";
-import { formatPrice, VoyageItem } from "./helpers";
+import { View, Text, Image, Pressable, StyleSheet } from "react-native";
+import { Heart } from "lucide-react-native";
+import type { Hotel } from "@/lib/hotels-api";
 
-export function VoyageCard({
-  item,
-  onPress,
-}: {
-  item: VoyageItem;
-  onPress: () => void;
-}) {
+export function VoyageCard({ item, onPress }: { item: Hotel; onPress?: () => void }) {
   return (
-    <Pressable onPress={onPress} style={c.wrap}>
-      <View style={c.photoWrap}>
-        <Image source={{ uri: item.photos[0] }} style={c.photo} />
-        <Pressable style={c.fav}>
-          <Heart size={18} color="#fff" />
-        </Pressable>
-        {item.badges?.[0] && (
-          <View style={c.badge}>
-            <Text style={c.badgeTxt}>{item.badges[0]}</Text>
-          </View>
-        )}
-      </View>
-      <View style={c.content}>
-        <Text numberOfLines={1} style={c.title}>
-          {item.title}
-        </Text>
-        <Text style={c.place}>
-          {item.city}, {item.country}
-        </Text>
-        <Text style={c.price}>
-          {formatPrice(item.price)}{" "}
-          <Text style={c.unit}>/ {item.unit === "night" ? "nuit" : "jour"}</Text>
-        </Text>
-        <View style={c.ratingRow}>
-          <Star size={12} color="#F59E0B" fill="#F59E0B" />
-          <Text style={c.rating}>
-            {item.rating} · {item.reviews} avis
-          </Text>
-        </View>
+    <Pressable onPress={onPress} style={c.card} testID={`voyage.card.${item.id}`}>
+      <Image source={{ uri: item.image }} style={c.img} />
+      {item.badge ? <View style={c.badge}><Text style={c.badgeTxt}>{item.badge}</Text></View> : null}
+      <Pressable style={c.like}><Heart size={18} color="#fff" /></Pressable>
+
+      <View style={c.body}>
+        <Text numberOfLines={2} style={c.title}>{item.title}</Text>
+        <Text style={c.sub}>{item.city}, {item.country}</Text>
+        <Text style={c.price}>{item.price_per_night.toLocaleString()} FCFA <Text style={c.night}>/ nuit</Text></Text>
+        <Text style={c.rating}>★ {item.rating.toFixed(1)} · {item.reviews} avis</Text>
       </View>
     </Pressable>
   );
 }
 
+export function VoyageCardSkeleton() {
+  return (
+    <View style={[c.card, c.skeletonCard]}>
+      <View style={[c.img, c.skelBlock]} />
+      <View style={c.skelBody}>
+        <View style={[c.skelLine, c.skelLineWide]} />
+        <View style={[c.skelLine, c.skelLineMid]} />
+        <View style={[c.skelLine, c.skelLineSmall]} />
+      </View>
+    </View>
+  );
+}
+
 const c = StyleSheet.create({
-  wrap: {
-    width: 220,
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
-  },
-  photoWrap: {
-    height: 150,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    overflow: "hidden",
-    backgroundColor: "#eee",
-  },
-  content: {
-    padding: 12,
-  },
-  photo: {
-    width: "100%",
-    height: "100%",
-  },
-  fav: {
-    position: "absolute",
-    right: 8,
-    top: 8,
-    height: 32,
-    width: 32,
-    borderRadius: 16,
-    backgroundColor: "rgba(0,0,0,0.35)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  badge: {
-    position: "absolute",
-    left: 8,
-    top: 8,
-    backgroundColor: "#059669",
-    paddingHorizontal: 8,
-    height: 26,
-    borderRadius: 13,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  badgeTxt: {
-    color: "#fff",
-    fontWeight: "800",
-    fontSize: 11,
-  },
-  title: {
-    fontWeight: "800",
-    fontSize: 15,
-    color: "#1F2937",
-  },
-  place: {
-    color: "#6B7280",
-    marginTop: 2,
-    fontSize: 13,
-  },
-  price: {
-    fontWeight: "800",
-    marginTop: 2,
-    color: "#1F2937",
-    fontSize: 14,
-  },
-  unit: {
-    color: "#6B7280",
-    fontWeight: "700",
-    fontSize: 12,
-  },
-  ratingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    marginTop: 2,
-  },
-  rating: {
-    color: "#374151",
-    fontWeight: "700",
-    fontSize: 12,
-  },
+  card: { width: 320, borderRadius: 18, overflow: "hidden", backgroundColor: "#fff", marginRight: 12 },
+  img: { width: "100%", height: 180 },
+  body: { padding: 10, gap: 2 },
+  title: { fontSize: 16, fontWeight: "800", color: "#0F172A" },
+  sub: { color: "#475569", marginBottom: 2 },
+  price: { fontWeight: "900", color: "#0F172A" },
+  night: { fontWeight: "500", color: "#334155" },
+  rating: { color: "#334155", marginTop: 6, fontWeight: "600" },
+  badge: { position: "absolute", top: 10, left: 10, backgroundColor: "#0EA5A7", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 16 },
+  badgeTxt: { color: "#fff", fontWeight: "800", fontSize: 12 },
+  like: { position: "absolute", top: 10, right: 10, backgroundColor: "rgba(0,0,0,0.35)", padding: 6, borderRadius: 999 },
+  skeletonCard: { backgroundColor: "#F3F4F6" },
+  skelBlock: { backgroundColor: "#E5E7EB" },
+  skelBody: { padding: 10, gap: 6 },
+  skelLine: { height: 14, backgroundColor: "#E5E7EB", borderRadius: 6 },
+  skelLineWide: { width: "80%" },
+  skelLineMid: { width: "60%" },
+  skelLineSmall: { width: "40%" },
 });
