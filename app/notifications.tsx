@@ -248,6 +248,10 @@ export default function NotificationsScreen() {
   const handleNotificationPress = (notification: Notification) => {
     if (notification && notification.id && notification.id.trim()) {
       console.log('Notification pressed:', notification.id);
+      // Mark as read when clicked
+      if (!notification.isRead) {
+        markAsRead(notification.id);
+      }
     }
   };
 
