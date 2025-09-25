@@ -45,7 +45,7 @@ export default function WhatsAppChoiceSheet({
   };
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} height={0.4}>
+    <BottomSheet visible={visible} onClose={onClose} height={0.5}>
       <View style={styles.header}>
         <Text style={styles.title}>Contacter {providerName}</Text>
         <Text style={styles.subtitle}>Choisissez votre méthode de contact</Text>
@@ -112,11 +112,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.text.secondary,
     textAlign: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   optionsContainer: {
     gap: 16,
-    marginBottom: 24,
+    marginBottom: 32,
   },
   option: {
     flexDirection: 'row',
