@@ -44,7 +44,6 @@ export default function VoyagesScreen() {
       
       {/* Header avec logo et navigation */}
       <View style={[styles.headerContainer, { paddingTop: insets.top + 8 }]}>
-        <Text style={styles.brand}>ZIMA</Text>
         <HomeHeader active="voyages" onChange={setHomeTab} />
       </View>
       
@@ -179,13 +178,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "rgba(0,0,0,0.05)",
   },
-  brand: {
-    fontSize: 28,
-    fontWeight: "800",
-    letterSpacing: 2,
-    color: "#123B2B",
-    marginBottom: 12,
-  },
+
   scrollView: {
     flex: 1,
   },
