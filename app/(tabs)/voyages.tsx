@@ -3,15 +3,20 @@ import { View, Text, ScrollView, Pressable, StyleSheet, StatusBar } from "react-
 import { Stack } from "expo-router";
 import HomeHeader from "@/components/home/HomeHeader";
 import { VoyageSearchBar, VoyageQuery } from "@/components/voyages/VoyageSearchBar";
-import { VoyageSearchSheet } from "@/components/voyages/VoyageSearchSheet";
 import { VoyageCarousel } from "@/components/voyages/VoyageCarousel";
 import { mockVoyages } from "@/components/voyages/helpers";
 import { Filter, ArrowRight } from "lucide-react-native";
 import { useApp } from "@/hooks/useAppStore";
+import SearchSheet from "@/components/sheets/SearchSheet";
+import FilterSheet from "@/components/sheets/FilterSheet";
+import type { TripsSearch, TripsFilters } from "@/lib/search-types";
 
 export default function VoyagesScreen() {
   const [q, setQ] = useState<VoyageQuery>(() => ({ type: "all" }));
-  const [openSearch, setOpenSearch] = useState(false);
+  const [search, setSearch] = useState<Partial<TripsSearch>>({});
+  const [filters, setFilters] = useState<Partial<TripsFilters>>({});
+  const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
+  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
   const { setHomeTab } = useApp();
 
   const handleItemPress = (item: any) => {
@@ -51,9 +56,9 @@ export default function VoyagesScreen() {
           </View>
 
         <View style={styles.searchSection}>
-          <VoyageSearchBar query={q} onPress={() => setOpenSearch(true)} />
+          <VoyageSearchBar query={q} onPress={() => setIsSearchOpen(true)} />
           <View style={styles.filterRow}>
-            <Pressable style={styles.filterButton}>
+            <Pressable style={styles.filterButton} onPress={() => setIsFilterOpen(true)} testID="voyages.filterButton">
               <Filter size={16} color="#374151" />
               <Text style={styles.filterText}>Filtres</Text>
             </Pressable>
@@ -133,12 +138,24 @@ export default function VoyagesScreen() {
         </View>
       </ScrollView>
 
-      {/* Search Sheet */}
-      <VoyageSearchSheet
-        visible={openSearch}
-        initial={q}
-        onClose={() => setOpenSearch(false)}
-        onSubmit={setQ}
+      <SearchSheet
+        visible={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        section="trips"
+        initial={search}
+        onApply={(v) => {
+          console.log('Search applied', v);
+          setSearch(v);
+        }}
+      />
+      <FilterSheet
+        visible={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        initial={filters}
+        onApply={(v) => {
+          console.log('Filters applied', v);
+          setFilters(v);
+        }}
       />
     </View>
   );
