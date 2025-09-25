@@ -6,7 +6,8 @@ import {
   Heart, 
   Grid3X3, 
   MessageCircle, 
-  User
+  User,
+  MapPin
 } from 'lucide-react-native';
 import { BlurView } from 'expo-blur';
 import Colors from '@/constants/colors';
@@ -80,6 +81,15 @@ export default function TabLayout() {
           title: 'Favoris',
           tabBarIcon: ({ color, size }) => (
             <Heart size={size} color={color} testID="tab-icon-favorites" />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="voyages"
+        options={{
+          title: 'Voyages',
+          tabBarIcon: ({ color, size }) => (
+            <MapPin size={size} color={color} testID="tab-icon-voyages" />
           ),
         }}
       />
