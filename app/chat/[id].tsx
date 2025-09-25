@@ -153,6 +153,7 @@ export default function ChatScreen() {
     >
       <Stack.Screen 
         options={{
+          headerShown: true,
           headerTitle: () => (
             <View style={styles.headerTitleContainer}>
               <Image 
