@@ -14,13 +14,6 @@ type Props = {
   providerId: string;
 };
 
-const quickMessages = [
-  "Puis-je voir la documentation ?",
-  "Puis-je avoir un rendez-vous ?",
-  "Quels sont vos tarifs ?",
-  "Êtes-vous disponible cette semaine ?"
-];
-
 export default function WhatsAppChoiceSheet({ 
   visible, 
   onClose, 
@@ -39,25 +32,10 @@ export default function WhatsAppChoiceSheet({
     }
   };
 
-  const handleZiMessagePress = (quickMessage?: string) => {
+  const handleZiMessagePress = () => {
     onClose();
-    
-    // Create a conversation ID based on provider
     const conversationId = `conv-${providerId}`;
-    
-    if (!quickMessage?.trim()) {
-      // Navigate directly to chat with this provider
-      router.push(`/chat/${conversationId}` as any);
-    } else {
-      // Navigate to chat and the quick message will be handled there
-      router.push({
-        pathname: `/chat/${conversationId}` as any,
-        params: {
-          quickMessage: quickMessage.trim(),
-          providerName,
-        },
-      });
-    }
+    router.push(`/chat/${conversationId}` as any);
   };
 
   return (
@@ -73,8 +51,7 @@ export default function WhatsAppChoiceSheet({
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.optionsContainer}>
-          {/* WhatsApp Option */}
-          <Pressable style={styles.option} onPress={handleWhatsAppPress}>
+          <Pressable style={styles.option} onPress={handleWhatsAppPress} testID="contact-option-whatsapp">
             <View style={[styles.iconContainer, { backgroundColor: '#25D366' }]}>
               <MessageCircle size={24} color="white" />
             </View>
@@ -86,8 +63,7 @@ export default function WhatsAppChoiceSheet({
             </View>
           </Pressable>
 
-          {/* Zi-Message Option */}
-          <Pressable style={styles.option} onPress={() => handleZiMessagePress()}>
+          <Pressable style={styles.option} onPress={handleZiMessagePress} testID="contact-option-zimessage">
             <View style={[styles.iconContainer, { backgroundColor: Colors.primary }]}>
               <Send size={24} color="white" />
             </View>
@@ -98,22 +74,6 @@ export default function WhatsAppChoiceSheet({
               </Text>
             </View>
           </Pressable>
-        </View>
-
-        {/* Quick Messages */}
-        <View style={styles.quickMessagesContainer}>
-          <Text style={styles.quickMessagesTitle}>Messages rapides :</Text>
-          <View style={styles.quickMessagesGrid}>
-            {quickMessages.map((message, index) => (
-              <Pressable
-                key={index}
-                style={styles.quickMessage}
-                onPress={() => handleZiMessagePress(message)}
-              >
-                <Text style={styles.quickMessageText}>{message}</Text>
-              </Pressable>
-            ))}
-          </View>
         </View>
       </ScrollView>
     </BottomSheet>
@@ -182,29 +142,5 @@ const styles = StyleSheet.create({
   optionDescription: {
     fontSize: 14,
     color: Colors.text.secondary,
-  },
-  quickMessagesContainer: {
-    marginTop: 8,
-  },
-  quickMessagesTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.text.primary,
-    marginBottom: 12,
-  },
-  quickMessagesGrid: {
-    gap: 8,
-  },
-  quickMessage: {
-    backgroundColor: Colors.background.secondary,
-    borderRadius: 12,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
-  },
-  quickMessageText: {
-    fontSize: 14,
-    color: Colors.primary,
-    fontWeight: '600',
   },
 });
