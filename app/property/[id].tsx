@@ -10,6 +10,8 @@ import {
   Dimensions,
   Linking,
   Platform,
+  Share,
+  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -156,6 +158,7 @@ function PropertyDetailScreen() {
   const [imgIndex, setImgIndex] = useState<number>(0);
   const [showAllAmenities, setShowAllAmenities] = useState<boolean>(false);
   const [showWhatsAppChoice, setShowWhatsAppChoice] = useState<boolean>(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const listRef = useRef<FlatList<string> | null>(null);
   const heroH = Math.min(420, Math.round(width * 0.72));
 
@@ -235,9 +238,34 @@ function PropertyDetailScreen() {
               <LiquidGlassView style={styles.glassCircle} intensity={18} tint="light">
                 <Pressable 
                   testID="share" 
-                  onPress={() => {
+                  onPress={async () => {
                     console.log("Share button pressed");
-                    // TODO: Implement share functionality
+                    try {
+                      const shareUrl = `https://zima.com/property/${data.id}`;
+                      const shareMessage = `Découvrez ce magnifique bien: ${data.title} à ${data.city}, ${data.country} - ${data.price.toLocaleString('en-US')} ${data.currency}`;
+                      
+                      if (Platform.OS === 'web') {
+                        if (navigator.share) {
+                          await navigator.share({
+                            title: data.title,
+                            text: shareMessage,
+                            url: shareUrl,
+                          });
+                        } else {
+                          await navigator.clipboard.writeText(`${shareMessage} - ${shareUrl}`);
+                          Alert.alert('Succès', 'Lien copié dans le presse-papiers!');
+                        }
+                      } else {
+                        await Share.share({
+                          message: `${shareMessage} - ${shareUrl}`,
+                          url: shareUrl,
+                          title: data.title,
+                        });
+                      }
+                    } catch (error) {
+                      console.log('Share error:', error);
+                      Alert.alert('Erreur', 'Impossible de partager ce bien.');
+                    }
                   }} 
                   style={styles.roundBtn}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -250,12 +278,18 @@ function PropertyDetailScreen() {
                   testID="fav" 
                   onPress={() => {
                     console.log("Favorite button pressed");
-                    // TODO: Implement favorite functionality
+                    setIsFavorite(!isFavorite);
+                    Alert.alert(
+                      isFavorite ? 'Retiré des favoris' : 'Ajouté aux favoris',
+                      isFavorite 
+                        ? 'Ce bien a été retiré de vos favoris' 
+                        : 'Ce bien a été ajouté à vos favoris'
+                    );
                   }} 
                   style={styles.roundBtn}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <Heart size={18} color="#0b3b35" />
+                  <Heart size={18} color="#0b3b35" fill={isFavorite ? "#0b3b35" : "transparent"} />
                 </Pressable>
               </LiquidGlassView>
             </View>
