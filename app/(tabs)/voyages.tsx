@@ -43,7 +43,7 @@ export default function VoyagesScreen() {
       />
       
       {/* Header avec logo et navigation */}
-      <View style={[styles.headerContainer, { paddingTop: insets.top + 8 }]}>
+      <View style={styles.headerContainer}>
         <HomeHeader active="voyages" onChange={setHomeTab} />
       </View>
       
@@ -175,8 +175,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F9FAFB",
     paddingHorizontal: 20,
     paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.05)",
   },
 
   scrollView: {

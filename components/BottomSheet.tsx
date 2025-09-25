@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Modal, Animated, Pressable, View, StyleSheet, useWindowDimensions } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { Modal, Animated, Pressable, View, StyleSheet, useWindowDimensions, Platform } from 'react-native';
 
 type Props = {
   visible: boolean;
@@ -24,9 +23,15 @@ export default function BottomSheet({ visible, onClose, children, height = 0.82 
     }).start();
   }, [visible, h, screenH, y]);
 
+  const Backdrop = Platform.OS === 'web' ? View : (require('expo-blur').BlurView);
+
   return (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
-      <BlurView tint="light" intensity={20} style={StyleSheet.absoluteFill} />
+      {Platform.OS === 'web' ? (
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(17,24,39,0.18)', backdropFilter: 'blur(6px)' as unknown as number }]} />
+      ) : (
+        <Backdrop tint="light" intensity={20} style={StyleSheet.absoluteFill} />
+      )}
       <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
 
       <Animated.View
