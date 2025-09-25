@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet, Alert } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
 import { MessageCircle, Send } from 'lucide-react-native';
@@ -61,11 +61,17 @@ export default function WhatsAppChoiceSheet({
   };
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} height={0.75}>
-      <View style={styles.container}>
+    <BottomSheet visible={visible} onClose={onClose} height={0.8}>
+      <View style={styles.header}>
         <Text style={styles.title}>Contacter {providerName}</Text>
         <Text style={styles.subtitle}>Choisissez votre méthode de contact</Text>
-
+      </View>
+      
+      <ScrollView 
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.optionsContainer}>
           {/* WhatsApp Option */}
           <Pressable style={styles.option} onPress={handleWhatsAppPress}>
@@ -109,16 +115,23 @@ export default function WhatsAppChoiceSheet({
             ))}
           </View>
         </View>
-      </View>
+      </ScrollView>
     </BottomSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+  },
+  scrollContainer: {
     flex: 1,
-    minHeight: 400,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   title: {
     fontSize: 24,
@@ -171,7 +184,7 @@ const styles = StyleSheet.create({
     color: Colors.text.secondary,
   },
   quickMessagesContainer: {
-    flex: 1,
+    marginTop: 8,
   },
   quickMessagesTitle: {
     fontSize: 16,
