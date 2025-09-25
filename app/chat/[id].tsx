@@ -8,6 +8,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams, Stack } from 'expo-router';
@@ -135,7 +136,20 @@ export default function ChatScreen() {
     >
       <Stack.Screen 
         options={{
-          title: participant.name,
+          headerTitle: () => (
+            <View style={styles.headerTitleContainer}>
+              <Image 
+                source={{ uri: participant.avatar }} 
+                style={styles.headerAvatar}
+              />
+              <View style={styles.headerTextContainer}>
+                <Text style={styles.headerName}>{participant.name}</Text>
+                <Text style={styles.headerStatus}>
+                  {participant.isOnline ? 'En ligne' : 'Hors ligne'}
+                </Text>
+              </View>
+            </View>
+          ),
           headerLeft: () => (
             <TouchableOpacity onPress={() => router.back()} style={styles.headerBackButton}>
               <ArrowLeft size={24} color={Colors.text.primary} />
@@ -143,11 +157,6 @@ export default function ChatScreen() {
           ),
           headerStyle: {
             backgroundColor: Colors.background.primary,
-          },
-          headerTitleStyle: {
-            color: Colors.text.primary,
-            fontSize: 18,
-            fontWeight: '600',
           },
         }} 
       />
@@ -383,5 +392,30 @@ const styles = StyleSheet.create({
   },
   sendButtonActive: {
     backgroundColor: Colors.primary,
+  },
+  headerTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  headerAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginRight: 12,
+  },
+  headerTextContainer: {
+    flex: 1,
+  },
+  headerName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text.primary,
+    lineHeight: 20,
+  },
+  headerStatus: {
+    fontSize: 12,
+    color: Colors.text.secondary,
+    lineHeight: 16,
   },
 });
