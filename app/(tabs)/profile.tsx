@@ -22,7 +22,7 @@ import { useApp } from '@/hooks/useAppStore';
 import Colors from '@/constants/colors';
 
 export default function ProfileScreen() {
-  const { user, userMode, hasUnreadNotifications, switchMode, markNotificationsAsRead } = useApp();
+  const { user, userMode, hasUnreadNotifications, switchMode } = useApp();
   const insets = useSafeAreaInsets();
 
 
@@ -32,7 +32,7 @@ export default function ProfileScreen() {
   };
 
   const handleNotificationPress = () => {
-    markNotificationsAsRead();
+    router.push('/notifications');
   };
 
   type SettingItem = {
