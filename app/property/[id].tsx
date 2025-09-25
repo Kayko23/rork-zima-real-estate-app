@@ -416,7 +416,7 @@ function PropertyDetailScreen() {
               <Phone size={18} color="#0b3b35" />
             </Pressable>
             <Pressable testID="whatsapp" onPress={() => Linking.openURL("https://wa.me/221700000000?text=Bonjour%20ZIMA").catch(err => console.log("wa error", err))} style={styles.iconOnly}>
-              <MessageCircle size={18} color="#25D366" />
+              <Ionicons name="logo-whatsapp" size={20} color="#25D366" />
             </Pressable>
           </View>
         </View>
