@@ -316,8 +316,9 @@ function PropertyDetailScreen() {
               router.push(`/provider/${data.agent.name.toLowerCase().replace(/\s+/g, '-')}`);
             }}
             onAll={() => {
-              console.log("Opening all listings for:", data.agent.name);
-              router.push(`/browse?agent=${encodeURIComponent(data.agent.name)}`);
+              console.log("Booking appointment with:", data.agent.name);
+              // Navigate to appointment booking or open booking modal
+              router.push(`/appointment/book?agent=${encodeURIComponent(data.agent.name)}&property=${data.id}`);
             }}
           />
         </View>
@@ -491,7 +492,7 @@ function AgentCard({ agent, onProfile, onAll }: { agent: Agent; onProfile: () =>
       </View>
       <View style={{ flexDirection: "row", gap: 10, marginTop: 8 }}>
         <ButtonOutline label="Voir le profil" onPress={onProfile} />
-        <Button label="Tous ses biens" onPress={onAll} />
+        <Button label="Rendez-vous" onPress={onAll} />
       </View>
     </View>
   );
