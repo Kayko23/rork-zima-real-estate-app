@@ -319,8 +319,14 @@ function PropertyDetailScreen() {
             }}
             onAll={() => {
               console.log("Booking appointment with:", data.agent.name);
-              // Navigate to appointment booking or open booking modal
-              router.push(`/appointment/book?agent=${encodeURIComponent(data.agent.name)}&property=${data.id}`);
+              router.push({
+                pathname: "/messages",
+                params: {
+                  compose: "appointment",
+                  agent: data.agent.name,
+                  property: String(data.id ?? ""),
+                },
+              });
             }}
           />
         </View>
