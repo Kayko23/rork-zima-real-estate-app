@@ -47,21 +47,7 @@ export default function MessagesScreen() {
   const handleConversationPress = (conversation: { id: string; participants: Array<{ name: string }> }) => {
     if (conversation && conversation.id && conversation.id.trim()) {
       console.log('Opening conversation:', conversation.id);
-      // Navigate to chat screen - you can create this route later
-      Alert.alert(
-        'Ouvrir la conversation',
-        `Conversation avec ${conversation.participants[0]?.name || 'Utilisateur'}`,
-        [
-          { text: 'Annuler', style: 'cancel' },
-          { 
-            text: 'Ouvrir', 
-            onPress: () => {
-              // router.push(`/chat/${conversation.id}`);
-              console.log('Chat opened for:', conversation.id);
-            }
-          }
-        ]
-      );
+      router.push(`/chat/${conversation.id}` as any);
     }
   };
 
