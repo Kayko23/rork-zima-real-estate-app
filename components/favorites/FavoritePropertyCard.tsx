@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, Image, Pressable, StyleSheet, Platform } from 'react-native';
-import { Heart, Star } from 'lucide-react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { Heart, Star, Bed, Bath, Square } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 import { Property } from '@/types';
 
@@ -17,47 +17,261 @@ const shadowSoft = Platform.select({
 });
 
 export function FavoritePropertyCard({ item, layout, onPress }: Props) {
+  const formatPrice = (price: number, currency: string) => {
+    if (!price || !currency || typeof price !== 'number' || typeof currency !== 'string') {
+      return '0';
+    }
+    if (typeof currency !== 'string' || currency.length > 10) {
+      return '0';
+    }
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
+
   return (
-    <Pressable style={[styles.card, layout === 'grid' && { flex: 1, maxWidth: '49%' }]} onPress={onPress} testID={`fav-prop-${item.id}`}>
-      <Image source={{ uri: item.images[0] }} style={styles.cover} />
-      <Pressable style={styles.like} accessibilityLabel={item.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}>
-        <Heart size={18} color={item.isFavorite ? Colors.primary : '#fff'} fill={item.isFavorite ? 'rgba(14,90,70,0.15)' : 'transparent'} />
-      </Pressable>
-
-      <View style={styles.info}>
-        <Text numberOfLines={1} style={styles.title}>{item.title}</Text>
-        <Text style={styles.sub}>{item.location.city} • {item.location.country}</Text>
-
-        <View style={styles.row}>
-          <View style={styles.chip}><Text style={styles.chipTxt}>{item.type === 'rent' ? 'À LOUER' : 'À VENDRE'}</Text></View>
-          <View style={styles.rate}>
-            <Star size={14} color={'#fbbf24'} />
-            <Text style={styles.rateTxt}>{(item.provider?.rating ?? 4.6).toFixed(1)}</Text>
+    <TouchableOpacity 
+      style={[styles.card(layout), layout === 'grid' && { flex: 1, maxWidth: '49%' }]} 
+      onPress={onPress} 
+      testID={`fav-prop-${item.id}`}
+      activeOpacity={0.95}
+    >
+      <View style={styles.imageContainer}>
+        <Image source={{ uri: item.images[0] }} style={styles.cover} />
+        
+        {/* Status Badge */}
+        <View style={styles.statusBadge}>
+          <Text style={styles.statusText}>
+            {item.type === 'sale' ? 'À VENDRE' : 'À LOUER'}
+          </Text>
+        </View>
+        
+        {/* Premium Badge */}
+        {item.isPremium && (
+          <View style={styles.premiumBadge}>
+            <Star size={12} color="white" fill="white" />
+            <Text style={styles.premiumText}>Premium</Text>
+          </View>
+        )}
+        
+        {/* Favorite Button */}
+        <TouchableOpacity 
+          style={styles.like} 
+          accessibilityLabel={item.isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+          activeOpacity={0.8}
+        >
+          <Heart 
+            size={18} 
+            color={item.isFavorite ? Colors.error : 'white'}
+            fill={item.isFavorite ? Colors.error : 'transparent'}
+          />
+        </TouchableOpacity>
+        
+        {/* Bottom Info Overlay */}
+        <View style={styles.bottomOverlay}>
+          <View style={styles.titleSection}>
+            <Text style={styles.title} numberOfLines={1}>
+              {`${item.category} • ${item.location.city}`}
+            </Text>
+            <View style={styles.priceChip}>
+              <Text style={styles.price}>
+                {`${formatPrice(item.price, item.currency)}${item.type === 'rent' ? '/mois' : ''}`}
+              </Text>
+            </View>
+          </View>
+          
+          <View style={styles.bottomRow}>
+            <View style={styles.features}>
+              {item.bedrooms && (
+                <View style={styles.feature}>
+                  <Bed size={12} color="white" />
+                  <Text style={styles.featureText}>{item.bedrooms}</Text>
+                </View>
+              )}
+              {item.bathrooms && (
+                <View style={styles.feature}>
+                  <Bath size={12} color="white" />
+                  <Text style={styles.featureText}>{item.bathrooms}</Text>
+                </View>
+              )}
+              {item.area && (
+                <View style={styles.feature}>
+                  <Square size={12} color="white" />
+                  <Text style={styles.featureText}>{item.area}m²</Text>
+                </View>
+              )}
+            </View>
+            
+            <View style={styles.badges}>
+              <View style={styles.ratingBadge}>
+                <Text style={styles.ratingText}>⭐ {(item.provider?.rating ?? 4.6).toFixed(1)}</Text>
+              </View>
+              <View style={styles.cameraBadge}>
+                <Text style={styles.cameraText}>{`📷 ${item.images.length}`}</Text>
+              </View>
+            </View>
           </View>
         </View>
-
-        <View style={styles.priceRow}>
-          <Text style={styles.price}>{Intl.NumberFormat('fr-FR', { style: 'currency', currency: item.currency }).format(item.price)}</Text>
-        </View>
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: '#fff', borderRadius: 24, overflow: 'hidden', ...(shadowSoft as object), marginBottom: 12 },
-  cover: { height: 160, width: '100%', backgroundColor: '#e5e7eb' },
-  like: { position: 'absolute', top: 10, right: 10, height: 34, width: 34, borderRadius: 17, backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center' },
-  info: { padding: 12, gap: 6 },
-  title: { fontSize: 16, fontWeight: '700', color: Colors.text.primary },
-  sub: { fontSize: 13, color: Colors.text.secondary },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 },
-  chip: { backgroundColor: '#F6F7F8', paddingHorizontal: 10, height: 24, borderRadius: 12, justifyContent: 'center' },
-  chipTxt: { fontSize: 12, fontWeight: '700', color: Colors.text.secondary },
-  rate: { flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: 'auto' },
-  rateTxt: { fontWeight: '700', color: Colors.text.primary },
-  priceRow: { marginTop: 4 },
-  price: { fontSize: 16, fontWeight: '800', color: Colors.primary },
+  card: (layout: 'grid' | 'list') => ({
+    height: layout === 'grid' ? 280 : 340,
+    borderRadius: 24,
+    overflow: 'hidden',
+    ...(shadowSoft as object),
+    marginBottom: 12,
+    ...(Platform.OS === 'web' && {
+      transition: 'all 0.2s ease',
+    }),
+  }),
+  imageContainer: {
+    flex: 1,
+    position: 'relative',
+  },
+  cover: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+    backgroundColor: '#e5e7eb',
+  },
+  statusBadge: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  statusText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+  },
+  premiumBadge: {
+    position: 'absolute',
+    top: 16,
+    right: 60,
+    backgroundColor: Colors.gold,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  premiumText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  like: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.35)',
+  },
+  bottomOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+  },
+  titleSection: {
+    marginBottom: 12,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: 'white',
+    marginBottom: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  priceChip: {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.35)',
+  },
+  price: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: 'white',
+  },
+  bottomRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  features: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  feature: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  featureText: {
+    fontSize: 12,
+    color: 'white',
+    fontWeight: '500',
+  },
+  badges: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  ratingBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.35)',
+  },
+  ratingText: {
+    fontSize: 11,
+    color: 'white',
+    fontWeight: '600',
+  },
+  cameraBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.35)',
+  },
+  cameraText: {
+    fontSize: 11,
+    color: 'white',
+    fontWeight: '600',
+  },
 });
 
 export default FavoritePropertyCard;
