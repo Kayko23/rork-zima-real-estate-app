@@ -1,4 +1,4 @@
-import create from "zustand";
+import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { AmenityKey } from "@/components/voyages/AmenitiesChips";
 import { currencyFromCountry, type Currency } from "@/components/voyages/currency";
@@ -36,14 +36,14 @@ const KEY = "voyage.filters.last";
 const PK = "voyage.filters.presets";
 const initial: VoyageFilters = { type: "all", guests: 1, amenities: [] };
 
-export const useVoyageFilters = create<State>((set, get) => ({
+export const useVoyageFilters = create<State>()((set, get) => ({
   q: initial,
   currency: currencyFromCountry(),
 
-  set: (partial) => set({ q: { ...get().q, ...partial } }),
+  set: (partial: Partial<VoyageFilters>) => set({ q: { ...get().q, ...partial } }),
 
-  setCountry: (country) => {
-    set((state) => {
+  setCountry: (country?: string) => {
+    set((state: State) => {
       const prev = state.q;
       const currency = currencyFromCountry(country);
       const range = defaultPriceRangeForCountry(country);
@@ -57,9 +57,9 @@ export const useVoyageFilters = create<State>((set, get) => ({
     });
   },
 
-  toggleAmenity: (k) => {
+  toggleAmenity: (k: AmenityKey) => {
     const cur = get().q.amenities;
-    const next = cur.includes(k) ? cur.filter((x) => x !== k) : [...cur, k];
+    const next = cur.includes(k) ? cur.filter((x: AmenityKey) => x !== k) : [...cur, k];
     set({ q: { ...get().q, amenities: next } });
   },
 
@@ -91,7 +91,7 @@ export const useVoyageFilters = create<State>((set, get) => ({
     } catch { return []; }
   },
 
-  saveNamedPreset: async (name) => {
+  saveNamedPreset: async (name: string) => {
     const cur = get().q;
     const p: Preset = { id: `${Date.now()}`, name, q: cur, createdAt: Date.now() };
     try {
@@ -107,14 +107,14 @@ export const useVoyageFilters = create<State>((set, get) => ({
     }
   },
 
-  applyPreset: (id) => {
+  applyPreset: (id: string) => {
     const p = get().presets.find((x) => x.id === id);
     if (!p) return;
     const currency = currencyFromCountry(p.q.destination?.country);
     set({ q: p.q, currency });
   },
 
-  deletePreset: async (id) => {
+  deletePreset: async (id: string) => {
     try {
       const raw = await AsyncStorage.getItem(PK);
       const list: Preset[] = raw ? JSON.parse(raw) : [];
