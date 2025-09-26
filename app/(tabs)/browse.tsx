@@ -26,7 +26,7 @@ const TRIPS_CATEGORIES: Category[] = [
   { key: 'daily-stays', title: 'Résidences journalières', subtitle: 'Studios & appartements', image: { uri: 'https://images.unsplash.com/photo-1505693330891-34c9c117f9d3?q=80&w=1200&auto=format&fit=crop' }, scope: 'trips' },
 ];
 
-export default function Browse() {
+export default function Browse(): React.ReactElement {
   const insets = useSafeAreaInsets();
   const [country, setCountry] = useState<string>('Afrique');
   const [city, setCity] = useState<string>('Toutes les villes');
@@ -94,7 +94,7 @@ export default function Browse() {
             count={counts[c.key] ?? 0}
             onPress={() => {
               console.log('[Browse] open property list', c.key, { country, city });
-              router.push({ pathname: '/browse', params: { category: c.key, scope: 'property', country, city } });
+              router.push({ pathname: '/property/list', params: { category: c.key, country, city } });
             }}
           />
         ))}
@@ -108,7 +108,7 @@ export default function Browse() {
             count={counts[c.key] ?? 0}
             onPress={() => {
               console.log('[Browse] open trips list', c.key, { country, city });
-              router.push({ pathname: '/voyages/all', params: { category: c.key, country, city } });
+              router.push({ pathname: '/voyages/list', params: { category: c.key, country, city } });
             }}
           />
         ))}
