@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Plus, Eye, Edit, Pause, TrendingUp, Trash2 } from 'lucide-react-native';
+import { router } from 'expo-router';
 import PropertyCard from '@/components/ui/PropertyCard';
 import NotificationBell from '@/components/ui/NotificationBell';
 import { mockProperties } from '@/constants/data';
@@ -23,14 +24,34 @@ export default function ListingsScreen() {
 
   const handleCreateListing = () => {
     console.log('Create new listing');
+    // Navigate to create listing form
+    router.push('/property/create');
   };
 
   const handleListingAction = (listingId: string, action: string) => {
     console.log(`Listing ${listingId} - ${action}`);
+    switch (action) {
+      case 'edit':
+        router.push(`/property/edit/${listingId}`);
+        break;
+      case 'adjust':
+        router.push(`/property/adjust/${listingId}`);
+        break;
+      case 'pause':
+        console.log('Pausing listing');
+        break;
+      case 'boost':
+        router.push(`/property/boost/${listingId}`);
+        break;
+      case 'delete':
+        console.log('Deleting listing');
+        break;
+    }
   };
 
   const handlePropertyPress = (propertyId: string) => {
     console.log('Property pressed:', propertyId);
+    router.push(`/property/${propertyId}`);
   };
 
   const handleToggleFavorite = (propertyId: string) => {
@@ -39,6 +60,7 @@ export default function ListingsScreen() {
 
   const handleNotificationPress = () => {
     markNotificationsAsRead();
+    router.push('/notifications');
   };
 
   const tabs = [

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Calendar, Clock, MapPin, Phone, CheckCircle, RotateCcw, Plus } from 'lucide-react-native';
+import { router } from 'expo-router';
 import NotificationBell from '@/components/ui/NotificationBell';
 import { useApp } from '@/hooks/useAppStore';
 import Colors from '@/constants/colors';
@@ -36,14 +37,22 @@ export default function AgendaScreen() {
 
   const handleAppointmentAction = (appointmentId: string, action: 'confirm' | 'reschedule') => {
     console.log(`Appointment ${appointmentId} - ${action}`);
+    if (action === 'confirm') {
+      console.log('Confirming appointment');
+      // Update appointment status to confirmed
+    } else if (action === 'reschedule') {
+      router.push(`/appointment/reschedule/${appointmentId}`);
+    }
   };
 
   const handleCreateAppointment = () => {
     console.log('Create new appointment');
+    router.push('/appointment/book');
   };
 
   const handleNotificationPress = () => {
     markNotificationsAsRead();
+    router.push('/notifications');
   };
 
   const formatDate = (date: Date) => {

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Clock, Eye, MessageCircle, CheckCircle, AlertCircle } from 'lucide-react-native';
+import { router } from 'expo-router';
 import NotificationBell from '@/components/ui/NotificationBell';
 import { useApp } from '@/hooks/useAppStore';
 import Colors from '@/constants/colors';
@@ -51,10 +52,23 @@ export default function DashboardScreen() {
 
   const handleTaskAction = (taskId: string, action: 'complete' | 'view') => {
     console.log(`Task ${taskId} - ${action}`);
+    if (action === 'complete') {
+      // Mark task as completed
+      console.log('Marking task as completed');
+    } else if (action === 'view') {
+      // Navigate to property or request details
+      const task = todayTasks.find(t => t.id === taskId);
+      if (task?.type === 'visit') {
+        router.push('/property/1'); // Navigate to property details
+      } else {
+        router.push('/notifications'); // Navigate to request details
+      }
+    }
   };
 
   const handleNotificationPress = () => {
     markNotificationsAsRead();
+    router.push('/notifications');
   };
 
   return (
