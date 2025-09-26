@@ -36,7 +36,7 @@ const KEY = "voyage.filters.last";
 const PK = "voyage.filters.presets";
 const initial: VoyageFilters = { type: "all", guests: 1, amenities: [] };
 
-export const useVoyageFilters = create<State>()((set, get) => ({
+export const useVoyageFilters = create<State>((set, get) => ({
   q: initial,
   currency: currencyFromCountry(),
 
