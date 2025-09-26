@@ -2,23 +2,22 @@ import React from "react";
 import { View, Image, FlatList, Text, StyleSheet, useWindowDimensions } from "react-native";
 
 export default function Gallery({ photos, countBadge }:{ photos:{uri:string}[]; countBadge?:boolean }) {
-  const [idx, setIdx] = React.useState<number>(0);
+  const [idx, setIdx] = React.useState(0);
   const { width } = useWindowDimensions();
   return (
-    <View testID="gallery-root">
+    <View style={s.wrap}>
       <FlatList
         data={photos}
-        keyExtractor={(item, i)=>String(i)}
+        keyExtractor={(_,i)=>String(i)}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={(e)=>{
-          const i = Math.round(e.nativeEvent.contentOffset.x / Math.max(1, width));
+          const i = Math.round(e.nativeEvent.contentOffset.x / width);
           setIdx(i);
-          console.log("Gallery scrolled to", i);
         }}
-        renderItem={({item})=> (
-          <Image source={item} style={styles.slide(width)} />
+        renderItem={({item})=>(
+          <Image source={item} style={[s.img, { width }]} />
         )}
       />
       {countBadge && (
@@ -28,7 +27,8 @@ export default function Gallery({ photos, countBadge }:{ photos:{uri:string}[]; 
   );
 }
 const s = StyleSheet.create({
+  wrap:{},
+  img:{ height: 260 },
   counter:{ position:"absolute", right:14, bottom:10, backgroundColor:"rgba(0,0,0,.45)", borderRadius:999, paddingHorizontal:10, paddingVertical:6 },
   counterTxt:{ color:"#fff", fontWeight:"900" }
 });
-const styles = { slide: (w:number) => ({ width: w, height: 260 }) };

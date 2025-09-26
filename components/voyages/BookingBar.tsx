@@ -10,9 +10,9 @@ export default function BookingBar({
     <BlurView intensity={26} tint="light" style={s.wrap}>
       <Text style={s.price}>{price.toLocaleString()} FCFA</Text>
       <View style={s.actions}>
-        <TouchableOpacity testID="call" style={s.ghost} onPress={onCall}><Phone size={18}/></TouchableOpacity>
-        <TouchableOpacity testID="whatsapp" style={s.ghost} onPress={onWhatsApp}><MessageCircle size={18}/></TouchableOpacity>
-        <TouchableOpacity testID="contact" style={s.cta} onPress={onContact}>
+        <TouchableOpacity style={s.ghost} onPress={onCall} testID="call-btn"><Phone size={18}/></TouchableOpacity>
+        <TouchableOpacity style={s.ghost} onPress={onWhatsApp} testID="wa-btn"><MessageCircle size={18}/></TouchableOpacity>
+        <TouchableOpacity style={s.cta} onPress={onContact} testID="contact-btn">
           <Wallet size={18} color="#fff"/><Text style={s.ctaTxt}>Contacter</Text>
         </TouchableOpacity>
       </View>
@@ -22,8 +22,8 @@ export default function BookingBar({
 const s = StyleSheet.create({
   wrap:{ position:"absolute", left:12, right:12, bottom:12, borderRadius:18, padding:12, backgroundColor:"rgba(255,255,255,.7)", flexDirection:"row", alignItems:"center", justifyContent:"space-between", gap:10 },
   price:{ fontWeight:"900", color:"#0B3B36", fontSize:16 },
-  actions:{ flexDirection:"row", alignItems:"center", gap:10 },
+  actions:{ flexDirection:"row", alignItems:"center", columnGap:10 },
   ghost:{ backgroundColor:"#fff", borderWidth:1, borderColor:"#DCEAE6", paddingVertical:10, paddingHorizontal:12, borderRadius:12 },
-  cta:{ backgroundColor:"#134E48", flexDirection:"row", alignItems:"center", gap:8, paddingVertical:10, paddingHorizontal:14, borderRadius:12 },
+  cta:{ backgroundColor:"#134E48", flexDirection:"row", alignItems:"center", columnGap:8, paddingVertical:10, paddingHorizontal:14, borderRadius:12 },
   ctaTxt:{ color:"#fff", fontWeight:"900" }
 });

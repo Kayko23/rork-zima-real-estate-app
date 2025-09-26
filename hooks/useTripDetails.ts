@@ -6,7 +6,7 @@ const API = process.env.EXPO_PUBLIC_TRIPS_API || "https://example.com/api";
 export function useTripDetails(id?:string) {
   const [data, setData] = useState<TripDetail | null>(null);
   const [similar, setSimilar] = useState<TripItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(()=>{
     let cancelled = false;
@@ -20,7 +20,7 @@ export function useTripDetails(id?:string) {
           setData(r as TripDetail);
           setSimilar((s.items || []) as TripItem[]);
         }
-      } catch (e) {
+      } catch {
         if (!cancelled) {
           const img = (n:number)=>({ uri:`https://picsum.photos/seed/trip${n}/800/600` });
           setData({

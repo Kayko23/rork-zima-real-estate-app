@@ -28,3 +28,29 @@ export type TripItem = {
   image: { uri: string };
   type: "hotel" | "daily";
 };
+
+export type Amenity = "wifi" | "piscine" | "parking" | "clim" | "cuisine" | "sécurité24h";
+
+export type Host = {
+  id: string;
+  name: string;
+  avatar: { uri: string };
+  verified: boolean;
+  reviews: number;
+  years: number;
+};
+
+export type TripDetail = TripItem & {
+  description: string;
+  photos: { uri: string }[];
+  address: string;
+  lat: number;
+  lng: number;
+  rooms: number;
+  baths: number;
+  area?: number; // m²
+  amenities: Amenity[];
+  host: Host;
+  // Avis condensés
+  ratingBreakdown?: { label: string; value: number }[];
+};

@@ -7,7 +7,7 @@ import { router } from "expo-router";
 export default function VoyageCard({ item, onPress }:{ item:TripItem; onPress?:()=>void }) {
   const handlePress = () => {
     if (onPress) return onPress();
-    router.push(`/property/${item.id}`);
+    router.push(`/trip/${item.id}`);
   };
   return (
     <TouchableOpacity style={c.card} activeOpacity={0.9} onPress={handlePress} testID={`voyage-card-${item.id}`}>
