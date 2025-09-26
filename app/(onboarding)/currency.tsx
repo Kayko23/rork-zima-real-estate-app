@@ -31,7 +31,7 @@ export default function CurrencyPickerScreen() {
   async function finish() {
     console.log('Completing onboarding with currency:', currency);
     await completeOnboarding();
-    router.replace("/"); // Home
+    router.replace("/(auth)/login"); // Go to login after onboarding
   }
 
   return (

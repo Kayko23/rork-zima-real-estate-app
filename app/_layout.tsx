@@ -7,6 +7,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AppProvider, useApp } from "@/hooks/useAppStore";
 import { VoyageFiltersProvider } from "@/components/voyages/filterContext";
 import { useBootstrapFx } from "@/lib/bootstrapFx";
+import { SessionProvider } from "@/hooks/useSession";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -23,6 +24,7 @@ function RootLayoutNav() {
   return (
     <Stack screenOptions={{ headerBackTitle: "Retour", headerShown: false }}>
       <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="(proTabs)" options={{ headerShown: false }} />
@@ -68,17 +70,19 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AppProvider>
-        <AppInitializer>
-          <VoyageFiltersProvider>
-            <GestureHandlerRootView style={styles.container}>
-              <View style={styles.container} onLayout={onLayoutRootView}>
-                <RootLayoutNav />
-              </View>
-            </GestureHandlerRootView>
-          </VoyageFiltersProvider>
-        </AppInitializer>
-      </AppProvider>
+      <SessionProvider>
+        <AppProvider>
+          <AppInitializer>
+            <VoyageFiltersProvider>
+              <GestureHandlerRootView style={styles.container}>
+                <View style={styles.container} onLayout={onLayoutRootView}>
+                  <RootLayoutNav />
+                </View>
+              </GestureHandlerRootView>
+            </VoyageFiltersProvider>
+          </AppInitializer>
+        </AppProvider>
+      </SessionProvider>
     </QueryClientProvider>
   );
 }

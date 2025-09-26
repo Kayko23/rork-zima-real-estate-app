@@ -19,10 +19,12 @@ import NotificationBell from '@/components/ui/NotificationBell';
 import LiquidGlassView from '@/components/ui/LiquidGlassView';
 import ModeSwitchPill from '@/components/ui/ModeSwitchPill';
 import { useApp } from '@/hooks/useAppStore';
+import { useSession } from '@/hooks/useSession';
 import Colors from '@/constants/colors';
 
 export default function ProfileScreen() {
   const { user, userMode, hasUnreadNotifications, switchMode } = useApp();
+  const { clearSession } = useSession();
   const insets = useSafeAreaInsets();
 
 
@@ -111,9 +113,10 @@ export default function ProfileScreen() {
       id: 'logout',
       title: 'Déconnexion',
       icon: LogOut,
-      onPress: () => {
+      onPress: async () => {
         console.log('Logout pressed');
-        router.replace('/(auth)/sign-in');
+        await clearSession();
+        router.replace('/(auth)/login');
       },
     },
   ];
