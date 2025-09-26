@@ -915,7 +915,6 @@ export const mockConversations: Conversation[] = [
 export const categories = [
   { id: 'residential', name: 'Résidentiel', icon: 'home', count: 1250 },
   { id: 'commercial-office', name: 'Commercial & Bureaux', icon: 'briefcase', count: 340 },
-  { id: 'investment', name: 'Investissement', icon: 'building-2', count: 95 },
   { id: 'land', name: 'Terrains', icon: 'map', count: 420 },
   { id: 'luxury', name: 'Luxe & Collection', icon: 'diamond', count: 78 },
   { id: 'hospitality', name: 'Vacances & Hôtellerie', icon: 'hotel', count: 210 }
@@ -952,15 +951,6 @@ export const propertyCategories: PropertyCategoryGroup[] = [
       { name: 'Entrepôt / Dépôt', slug: 'warehouse' },
       { name: 'Atelier / Petite industrie', slug: 'workshop' },
       { name: 'Espace évènementiel', slug: 'event-space' }
-    ]
-  },
-  {
-    group: 'Investissement',
-    items: [
-      { name: 'Immeuble de rapport', slug: 'income-building' },
-      { name: 'Résidence hôtelière / Apparthôtel', slug: 'aparthotel' },
-      { name: 'Fonds de commerce', slug: 'business-asset' },
-      { name: 'Terrain avec projet approuvé', slug: 'plot-with-approved-project' }
     ]
   },
   {
@@ -1015,8 +1005,7 @@ export const propertyAttributes = {
 export const categorySlugs = [
   'apartment','house','villa','duplex','penthouse','room','daily-residence','coliving','student-residence',
   'office','retail','showroom','warehouse','workshop','event-space',
-  'income-building','aparthotel','business-asset',
-  'plot-residential','plot-commercial','plot-agricultural','lot',
+    'plot-residential','plot-commercial','plot-agricultural','lot',
   'luxury','beachfront','lagoonfront','golf','mountain',
   'hotel','guesthouse','lodge','resort','bungalow','chalet'
 ] as const;
