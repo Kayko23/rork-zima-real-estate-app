@@ -49,6 +49,7 @@ const R = 20;
 
 type SafetyItem = { title: string; subtitle: string };
 type Agent = {
+  id: string;
   name: string;
   verified: boolean;
   stats: { reviews: number; rating: number; years: number };
@@ -136,6 +137,7 @@ function PropertyDetailScreen() {
       description:
         "Magnifique villa moderne avec vue imprenable sur la ville. Design contemporain, finitions de haute qualité, et excellent emplacement près du quartier des affaires.",
       agent: {
+        id: "p3",
         name: "Aminata Diallo",
         verified: true,
         stats: { reviews: 150, rating: 4.78, years: 5 },
@@ -380,8 +382,8 @@ function PropertyDetailScreen() {
           <AgentCard
             agent={data.agent}
             onProfile={() => {
-              console.log("Opening agent profile for:", data.agent.name);
-              router.push(`/provider/${data.agent.name.toLowerCase().replace(/\s+/g, '-')}`);
+              console.log("Opening agent profile for:", data.agent.name, "ID:", data.agent.id);
+              router.push(`/provider/${data.agent.id}`);
             }}
             onAll={() => {
               console.log("Booking appointment with:", data.agent.name);

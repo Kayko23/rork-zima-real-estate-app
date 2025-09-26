@@ -841,7 +841,10 @@ export const mockProviders: Provider[] = [
 // Fonction pour obtenir un prestataire par ID avec données enrichies
 export const getProviderById = (id: string) => {
   const provider = mockProviders.find(p => p.id === id);
-  if (!provider) return null;
+  
+  if (!provider) {
+    return null;
+  }
   
   return {
     ...provider,
