@@ -5,15 +5,15 @@ import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AppProvider } from "@/hooks/useAppStore";
+import { VoyageFiltersProvider } from "@/components/voyages/filterContext";
 
-// Prevent auto-hide of native splash
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
     },
   },
 });
@@ -31,13 +31,7 @@ function RootLayoutNav() {
       <Stack.Screen name="become-provider" options={{ headerShown: false }} />
       <Stack.Screen name="legal" options={{ headerShown: false }} />
       <Stack.Screen name="notifications" options={{ headerShown: false }} />
-      <Stack.Screen 
-        name="modal" 
-        options={{ 
-          presentation: "modal",
-          headerShown: false 
-        }} 
-      />
+      <Stack.Screen name="modal" options={{ presentation: "modal", headerShown: false }} />
     </Stack>
   );
 }
@@ -46,43 +40,35 @@ export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Simple initialization without complex async operations
     const timer = setTimeout(() => {
       setIsReady(true);
     }, 100);
-    
     return () => clearTimeout(timer);
   }, []);
 
   const onLayoutRootView = useCallback(async () => {
     if (isReady) {
-      try {
-        await SplashScreen.hideAsync();
-      } catch (e) {
-        // Ignore splash screen errors
-      }
+      try { await SplashScreen.hideAsync(); } catch {}
     }
   }, [isReady]);
 
-  if (!isReady) {
-    return null;
-  }
+  if (!isReady) return null;
 
   return (
     <QueryClientProvider client={queryClient}>
       <AppProvider>
-        <GestureHandlerRootView style={styles.container}>
-          <View style={styles.container} onLayout={onLayoutRootView}>
-            <RootLayoutNav />
-          </View>
-        </GestureHandlerRootView>
+        <VoyageFiltersProvider>
+          <GestureHandlerRootView style={styles.container}>
+            <View style={styles.container} onLayout={onLayoutRootView}>
+              <RootLayoutNav />
+            </View>
+          </GestureHandlerRootView>
+        </VoyageFiltersProvider>
       </AppProvider>
     </QueryClientProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
 });

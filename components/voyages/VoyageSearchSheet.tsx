@@ -4,12 +4,14 @@ import { X, Calendar, Users, MapPin } from "lucide-react-native";
 import { VoyageQuery, Option } from "./helpers";
 import { BlurView } from "expo-blur";
 import { getCities, getCountries } from "./worlddata"; // fourni ci-dessous
+import { useVoyageFilters } from "@/components/voyages/filterContext";
 
 export default function VoyageSearchSheet({
   visible, onClose, initial, onSubmit
 }:{ visible:boolean; onClose:()=>void; initial?:VoyageQuery; onSubmit:(q:VoyageQuery)=>void }) {
   const [q, setQ] = useState<VoyageQuery>(initial || { type:"all" });
   const [kw, setKw] = useState("");
+  const { setCountry, set } = useVoyageFilters();
 
   if (!visible) return null;
 
@@ -45,8 +47,13 @@ export default function VoyageSearchSheet({
             <TouchableOpacity
               style={m.item}
               onPress={()=> {
-                if (!q.country) setQ({...q, country:item as Option, city:null});
-                else setQ({...q, city:item as Option});
+                if (!q.country) {
+                  setQ({...q, country:item as Option, city:null});
+                  setCountry((item as Option).label);
+                } else {
+                  setQ({...q, city:item as Option});
+                  set({ destination: { country: q.country?.label, city: (item as Option).label } });
+                }
               }}>
               <Text style={m.itemTxt}>{item.label}</Text>
             </TouchableOpacity>
@@ -72,7 +79,7 @@ export default function VoyageSearchSheet({
             onPress={()=>setQ({...q, guests: Math.max(1,(q.guests??1)+1)})}>
             <Users size={16}/><Text style={m.pillTxt}>{q.guests ?? 1} voyageur(s)</Text>
           </Pressable>
-          <Pressable style={[m.pill,{backgroundColor:"#0B3B36"}]} onPress={()=>onSubmit(q)}>
+          <Pressable style={[m.pill,{backgroundColor:"#0B3B36"}]} onPress={()=>{ onSubmit(q); onClose(); }}>
             <Text style={[m.pillTxt,{color:"#fff", fontWeight:"800"}]}>Rechercher</Text>
           </Pressable>
         </View>
