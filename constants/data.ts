@@ -259,10 +259,7 @@ export const mockProviders: Provider[] = [
     email: 'adebayo@properties.ng',
     whatsapp: '+234801234567',
     listingCount: 28,
-    images: [
-      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=200',
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=200'
-    ]
+    images: []
   },
   {
     id: 'p3',
@@ -890,7 +887,6 @@ export const getProviderById = (id: string) => {
   };
 };
 
-
 export const mockConversations: Conversation[] = [
   {
     id: '1',
@@ -917,13 +913,113 @@ export const mockConversations: Conversation[] = [
 ];
 
 export const categories = [
-  { id: 'residences', name: 'Résidences', icon: 'home', count: 1250 },
-  { id: 'bureaux', name: 'Bureaux', icon: 'building', count: 340 },
-  { id: 'commerce', name: 'Commerce & Retail', icon: 'store', count: 180 },
-  { id: 'immeubles', name: 'Immeubles', icon: 'building-2', count: 95 },
-  { id: 'terrains', name: 'Terrains', icon: 'map-outline', count: 420 },
-  { id: 'industriel', name: 'Industriel', icon: 'factory', count: 65 }
+  { id: 'residential', name: 'Résidentiel', icon: 'home', count: 1250 },
+  { id: 'commercial-office', name: 'Commercial & Bureaux', icon: 'briefcase', count: 340 },
+  { id: 'investment', name: 'Investissement', icon: 'building-2', count: 95 },
+  { id: 'land', name: 'Terrains', icon: 'map', count: 420 },
+  { id: 'luxury', name: 'Luxe & Collection', icon: 'diamond', count: 78 },
+  { id: 'hospitality', name: 'Vacances & Hôtellerie', icon: 'hotel', count: 210 }
 ];
+
+export type PropertyCategoryGroup = {
+  group: string;
+  items: { name: string; slug: string }[];
+};
+
+export const propertyCategories: PropertyCategoryGroup[] = [
+  {
+    group: 'Résidentiel',
+    items: [
+      { name: 'Appartement', slug: 'apartment' },
+      { name: 'Maison individuelle / Villa', slug: 'villa' },
+      { name: 'Maison jumelée / Mitoyenne', slug: 'house' },
+      { name: 'Chambre meublée', slug: 'room' },
+      { name: 'Résidence journalière (type Airbnb)', slug: 'daily-residence' },
+      { name: 'Coliving', slug: 'coliving' },
+      { name: 'Résidence étudiante', slug: 'student-residence' },
+      { name: 'Résidence senior', slug: 'senior-residence' },
+      { name: 'Duplex', slug: 'duplex' },
+      { name: 'Penthouse', slug: 'penthouse' },
+      { name: 'Loft', slug: 'loft' }
+    ]
+  },
+  {
+    group: 'Commercial & Bureaux',
+    items: [
+      { name: 'Bureau / Plateau de bureaux', slug: 'office' },
+      { name: 'Local commercial / Boutique', slug: 'retail' },
+      { name: 'Showroom', slug: 'showroom' },
+      { name: 'Entrepôt / Dépôt', slug: 'warehouse' },
+      { name: 'Atelier / Petite industrie', slug: 'workshop' },
+      { name: 'Espace évènementiel', slug: 'event-space' }
+    ]
+  },
+  {
+    group: 'Investissement',
+    items: [
+      { name: 'Immeuble de rapport', slug: 'income-building' },
+      { name: 'Résidence hôtelière / Apparthôtel', slug: 'aparthotel' },
+      { name: 'Fonds de commerce', slug: 'business-asset' },
+      { name: 'Terrain avec projet approuvé', slug: 'plot-with-approved-project' }
+    ]
+  },
+  {
+    group: 'Terrains',
+    items: [
+      { name: 'Terrain résidentiel', slug: 'plot-residential' },
+      { name: 'Terrain commercial/industriel', slug: 'plot-commercial' },
+      { name: 'Lotissement (parcelles)', slug: 'lot' },
+      { name: 'Terrain agricole / Ferme / Plantation', slug: 'plot-agricultural' },
+      { name: 'Bail emphytéotique', slug: 'leasehold' }
+    ]
+  },
+  {
+    group: 'Luxe & Collection',
+    items: [
+      { name: 'Propriété de luxe / Prestige', slug: 'luxury' },
+      { name: 'Bord de mer / Lagune', slug: 'beachfront' },
+      { name: 'Golf / Vue panoramique / Montagne', slug: 'mountain' },
+      { name: 'Lagune', slug: 'lagoonfront' },
+      { name: 'Golf', slug: 'golf' }
+    ]
+  },
+  {
+    group: 'Vacances & Hôtellerie',
+    items: [
+      { name: 'Hôtel / Guest house', slug: 'hotel' },
+      { name: 'Lodge / Écolodge', slug: 'lodge' },
+      { name: 'Resort / Complexe touristique', slug: 'resort' },
+      { name: 'Bungalow / Chalet', slug: 'bungalow' },
+      { name: 'Chalet', slug: 'chalet' },
+      { name: 'Guest house', slug: 'guesthouse' }
+    ]
+  }
+];
+
+export const propertyStatuses = [
+  { name: 'À vendre', slug: 'for-sale' },
+  { name: 'À louer (longue durée)', slug: 'for-rent' },
+  { name: 'Location saisonnière / journalière', slug: 'short-stay' },
+  { name: 'Neuf / Sur plan (VEFA)', slug: 'new-offplan' },
+  { name: 'En construction / Livrable', slug: 'under-construction' }
+];
+
+export const propertyAttributes = {
+  metrics: ['chambres', 'sdb', 'surface_m2', 'terrain_m2', 'terrain_ha'] as const,
+  furnishing: ['meublé', 'non_meublé'] as const,
+  amenities: ['piscine','parking','sécurité24h','ascenseur','groupe_electrogène','climatisation'] as const,
+  views: ['mer','lagune','ville','montagne'] as const,
+  proximity: ['école','commerce','transport'] as const
+};
+
+export const categorySlugs = [
+  'apartment','house','villa','duplex','penthouse','room','daily-residence','coliving','student-residence',
+  'office','retail','showroom','warehouse','workshop','event-space',
+  'income-building','aparthotel','business-asset',
+  'plot-residential','plot-commercial','plot-agricultural','lot',
+  'luxury','beachfront','lagoonfront','golf','mountain',
+  'hotel','guesthouse','lodge','resort','bungalow','chalet'
+] as const;
 
 export const countries = [
   { code: 'GH', name: 'Ghana', cities: ['Accra', 'Kumasi', 'Tamale', 'Cape Coast'] },
