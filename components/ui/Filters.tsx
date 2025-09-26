@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { View, Text, StyleSheet, Pressable, Modal, FlatList } from "react-native";
 import { ChevronDown, MapPin, Globe, Filter } from "lucide-react-native";
 import { COUNTRIES, CITIES } from "@/constants/countries";
-import { GlassCard, GlassButton } from "./Glass";
+import { GlassButton } from "./Glass";
 
 export type FiltersState = {
   country: string | null;
@@ -14,7 +14,7 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
   const [f, setF] = useState<FiltersState>({ country: null, city: null, intent: "tous" });
   const [showCountryModal, setShowCountryModal] = useState(false);
   const [showCityModal, setShowCityModal] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const cities = useMemo(() => (f.country ? (CITIES[f.country] ?? []) : []), [f.country]);
 
@@ -34,76 +34,91 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
 
   const applyFilters = () => {
     onApply(f);
-    setIsExpanded(false);
   };
 
   return (
     <>
-      <GlassCard style={s.compactWrap}>
-        {/* Header avec bouton d'expansion */}
-        <Pressable style={s.header} onPress={() => setIsExpanded(!isExpanded)}>
-          <View style={s.headerLeft}>
-            <Filter size={18} color="#0F172A" />
-            <Text style={s.headerTitle}>Filtres</Text>
-            {(f.country || f.city || f.intent !== "tous") && (
-              <View style={s.badge}>
-                <Text style={s.badgeText}>•</Text>
-              </View>
-            )}
-          </View>
-          <ChevronDown 
-            size={20} 
-            color="#64748B" 
-            style={[s.chevron, isExpanded && s.chevronRotated]} 
-          />
-        </Pressable>
-
-        {/* Filtres rapides (toujours visibles) */}
-        <View style={s.quickFilters}>
-          <Pressable style={s.quickFilter} onPress={() => setShowCountryModal(true)}>
-            <Globe size={14} color="#64748B" />
-            <Text style={s.quickFilterText} numberOfLines={1}>
-              {f.country || "Pays"}
-            </Text>
-          </Pressable>
-          
-          <Pressable 
-            style={[s.quickFilter, !f.country && s.disabled]} 
-            disabled={!f.country}
-            onPress={() => setShowCityModal(true)}
-          >
-            <MapPin size={14} color={f.country ? "#64748B" : "#CBD5E1"} />
-            <Text style={[s.quickFilterText, !f.country && s.disabledText]} numberOfLines={1}>
-              {f.city || "Ville"}
-            </Text>
-          </Pressable>
-        </View>
-
-        {/* Filtres étendus */}
-        {isExpanded && (
-          <View style={s.expandedContent}>
-            <View style={s.row}>
-              {(["tous","à vendre","à louer"] as const).map(t => (
-                <Pressable 
-                  key={t} 
-                  onPress={() => handleIntentChange(t)}
-                  style={[s.pill, f.intent === t && s.pillActive]}
-                >
-                  <Text style={[s.pillText, f.intent === t && s.pillTextActive]}>
-                    {t}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-            
-            <GlassButton 
-              title="Appliquer" 
-              onPress={applyFilters} 
-              style={s.applyButton} 
-            />
+      {/* Bouton compact pour ouvrir les filtres */}
+      <Pressable style={s.filterButton} onPress={() => setShowFilters(true)}>
+        <Filter size={18} color="#0F172A" />
+        <Text style={s.filterButtonText}>Filtres</Text>
+        {(f.country || f.city || f.intent !== "tous") && (
+          <View style={s.filterBadge}>
+            <Text style={s.filterBadgeText}>•</Text>
           </View>
         )}
-      </GlassCard>
+        <ChevronDown size={16} color="#64748B" />
+      </Pressable>
+
+      {/* Modal des filtres */}
+      <Modal
+        visible={showFilters}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowFilters(false)}
+      >
+        <View style={s.modalBackdrop}>
+          <View style={s.filterModal}>
+            <View style={s.modalHeader}>
+              <Text style={s.modalTitle}>Filtres</Text>
+              <Pressable onPress={() => setShowFilters(false)}>
+                <Text style={s.closeButton}>✕</Text>
+              </Pressable>
+            </View>
+
+            <View style={s.modalContent}>
+              {/* Filtres de localisation */}
+              <View style={s.section}>
+                <Text style={s.sectionLabel}>Localisation</Text>
+                <View style={s.row}>
+                  <Pressable style={s.modalPill} onPress={() => setShowCountryModal(true)}>
+                    <Globe size={14} color="#64748B" />
+                    <Text style={s.modalPillText}>{f.country || "Pays"}</Text>
+                  </Pressable>
+                  
+                  <Pressable 
+                    style={[s.modalPill, !f.country && s.disabled]} 
+                    disabled={!f.country}
+                    onPress={() => setShowCityModal(true)}
+                  >
+                    <MapPin size={14} color={f.country ? "#64748B" : "#CBD5E1"} />
+                    <Text style={[s.modalPillText, !f.country && s.disabledText]}>
+                      {f.city || "Ville"}
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+
+              {/* Type de transaction */}
+              <View style={s.section}>
+                <Text style={s.sectionLabel}>Type de transaction</Text>
+                <View style={s.row}>
+                  {(["tous","à vendre","à louer"] as const).map(t => (
+                    <Pressable 
+                      key={t} 
+                      onPress={() => handleIntentChange(t)}
+                      style={[s.pill, f.intent === t && s.pillActive]}
+                    >
+                      <Text style={[s.pillText, f.intent === t && s.pillTextActive]}>
+                        {t}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
+              
+              <GlassButton 
+                title="Appliquer" 
+                onPress={() => {
+                  applyFilters();
+                  setShowFilters(false);
+                }} 
+                style={s.applyButton} 
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* Modal Pays */}
       <Modal
@@ -113,8 +128,8 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
         onRequestClose={() => setShowCountryModal(false)}
       >
         <View style={s.modalBackdrop}>
-          <View style={s.modalContent}>
-            <Text style={s.modalTitle}>Choisir un pays</Text>
+          <View style={s.pickerModal}>
+            <Text style={s.pickerTitle}>Choisir un pays</Text>
             <FlatList
               data={[{ label: "Tous les pays", value: null }, ...COUNTRIES.map(c => ({ label: c, value: c }))]}
               keyExtractor={(item) => item.value || "all"}
@@ -141,8 +156,8 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
         onRequestClose={() => setShowCityModal(false)}
       >
         <View style={s.modalBackdrop}>
-          <View style={s.modalContent}>
-            <Text style={s.modalTitle}>Choisir une ville</Text>
+          <View style={s.pickerModal}>
+            <Text style={s.pickerTitle}>Choisir une ville</Text>
             <FlatList
               data={[{ label: "Toutes les villes", value: null }, ...cities.map(c => ({ label: c, value: c }))]}
               keyExtractor={(item) => item.value || "all"}
@@ -165,64 +180,90 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
 }
 
 const s = StyleSheet.create({
-  compactWrap: { 
-    margin: 12, 
-    padding: 0,
-    overflow: "hidden"
-  },
-  header: {
+  filterButton: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(230,232,235,0.5)"
+    gap: 8,
+    backgroundColor: "rgba(255,255,255,0.9)",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    margin: 12,
+    borderWidth: 1,
+    borderColor: "rgba(230,232,235,0.8)",
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
   },
-  headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8
+  filterButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#0F172A",
+    flex: 1
   },
-  headerTitle: { 
-    fontWeight: "700", 
-    fontSize: 16, 
-    color: "#0F172A" 
-  },
-  badge: {
+  filterBadge: {
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: "#19715C"
   },
-  badgeText: {
+  filterBadgeText: {
     fontSize: 0
   },
-  chevron: {
-    transform: [{ rotate: "0deg" }]
+  filterModal: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: "80%",
+    paddingTop: 20
   },
-  chevronRotated: {
-    transform: [{ rotate: "180deg" }]
-  },
-  quickFilters: {
+  modalHeader: {
     flexDirection: "row",
-    gap: 8,
-    padding: 12,
-    paddingTop: 8
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9"
   },
-  quickFilter: {
-    flex: 1,
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#0F172A"
+  },
+  closeButton: {
+    fontSize: 18,
+    color: "#64748B",
+    padding: 4
+  },
+  modalContent: {
+    padding: 20
+  },
+  section: {
+    marginBottom: 24
+  },
+  sectionLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#0F172A",
+    marginBottom: 12
+  },
+  modalPill: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "rgba(255,255,255,0.7)",
+    backgroundColor: "#F8FAFC",
     borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderWidth: 1,
-    borderColor: "rgba(230,232,235,0.8)"
+    borderColor: "#E2E8F0",
+    flex: 1,
+    marginRight: 8
   },
-  quickFilterText: {
-    fontSize: 13,
+  modalPillText: {
+    fontSize: 14,
     fontWeight: "600",
     color: "#374151",
     flex: 1
@@ -232,12 +273,6 @@ const s = StyleSheet.create({
   },
   disabledText: {
     color: "#CBD5E1"
-  },
-  expandedContent: {
-    padding: 12,
-    paddingTop: 0,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(230,232,235,0.5)"
   },
   row: { 
     flexDirection: "row", 
@@ -274,14 +309,14 @@ const s = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "flex-end"
   },
-  modalContent: {
+  pickerModal: {
     backgroundColor: "#fff",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     maxHeight: "70%",
     paddingTop: 20
   },
-  modalTitle: {
+  pickerTitle: {
     fontSize: 18,
     fontWeight: "700",
     color: "#0F172A",

@@ -4,7 +4,7 @@ import * as SplashScreen from "expo-splash-screen";
 import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { AppProvider } from "@/hooks/useAppStore";
+import { AppProvider, useApp } from "@/hooks/useAppStore";
 import { VoyageFiltersProvider } from "@/components/voyages/filterContext";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -36,6 +36,16 @@ function RootLayoutNav() {
   );
 }
 
+function AppInitializer({ children }: { children: React.ReactNode }) {
+  const { hydrate } = useApp();
+  
+  useEffect(() => {
+    hydrate();
+  }, [hydrate]);
+  
+  return <>{children}</>;
+}
+
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
 
@@ -57,13 +67,15 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppProvider>
-        <VoyageFiltersProvider>
-          <GestureHandlerRootView style={styles.container}>
-            <View style={styles.container} onLayout={onLayoutRootView}>
-              <RootLayoutNav />
-            </View>
-          </GestureHandlerRootView>
-        </VoyageFiltersProvider>
+        <AppInitializer>
+          <VoyageFiltersProvider>
+            <GestureHandlerRootView style={styles.container}>
+              <View style={styles.container} onLayout={onLayoutRootView}>
+                <RootLayoutNav />
+              </View>
+            </GestureHandlerRootView>
+          </VoyageFiltersProvider>
+        </AppInitializer>
       </AppProvider>
     </QueryClientProvider>
   );

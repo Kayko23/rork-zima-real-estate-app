@@ -25,10 +25,9 @@ export default function LanguageScreen() {
     
     console.log('Setting language:', selected);
     await setLanguage(selected);
-    await completeOnboarding();
     
-    console.log('Navigating to tabs');
-    router.replace("/(tabs)/home");
+    console.log('Navigating to currency selection');
+    router.push("/(onboarding)/currency");
   }
 
   return (
@@ -36,7 +35,7 @@ export default function LanguageScreen() {
       {/* Progress indicator */}
       <View style={styles.progressWrap}>
         <Text style={styles.progressLabel}>Configuration</Text>
-        <Text style={styles.progressPct}>100%</Text>
+        <Text style={styles.progressPct}>50%</Text>
       </View>
       <View style={styles.progressBarBg}>
         <View style={styles.progressBarFg} />
@@ -78,7 +77,7 @@ export default function LanguageScreen() {
         testID="continue-button"
       >
         <Text style={[styles.ctaText, !canContinue && styles.ctaTextDisabled]}>
-          Start using ZIMA
+          Continue
         </Text>
       </Pressable>
 
@@ -117,7 +116,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#E6E8EB",
   },
   progressBarFg: {
-    width: "100%",
+    width: "50%",
     height: 4,
     borderRadius: 999,
     backgroundColor: Colors.primary,

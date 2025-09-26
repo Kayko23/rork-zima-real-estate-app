@@ -159,7 +159,7 @@ export default function SearchTab(): React.ReactElement {
                 accessibilityRole="button"
               >
                 <Image source={{ uri: c.image }} style={s.catImg} />
-                <View style={{ flex: 1 }}>
+                <View style={s.catContent}>
                   <Text style={s.catTitle}>{c.title}</Text>
                   <Text style={s.catSub} numberOfLines={1}>
                     {c.subtitle}
@@ -246,4 +246,5 @@ const s = StyleSheet.create({
   catTitle: { fontSize: 18, fontWeight: '700', color: '#0B1D17' },
   catSub: { color: '#6A7680', marginTop: 2 },
   catCount: { color: '#0F5C4D', marginTop: 6, fontWeight: '700' },
+  catContent: { flex: 1 },
 });

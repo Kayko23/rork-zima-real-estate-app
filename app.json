@@ -36,7 +36,8 @@
         {
           "origin": "https://rork.com/"
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true

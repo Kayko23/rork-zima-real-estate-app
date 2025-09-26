@@ -34,7 +34,9 @@ import {
 
 export default function ProviderProfile() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  console.log('[ProviderProfile] Received ID:', id, 'Type:', typeof id);
   const provider = getProviderById(id as string);
+  console.log('[ProviderProfile] Found provider:', provider ? provider.name : 'NOT FOUND');
 
   if (!provider) {
     return (

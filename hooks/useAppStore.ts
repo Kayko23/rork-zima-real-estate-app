@@ -4,6 +4,12 @@ import { UserMode, User, FilterState } from '@/types';
 
 type Language = 'fr' | 'en' | 'pt';
 
+type CurrencyState = {
+  currency: string;
+  fxBase: string | null;
+  fxRates: Record<string, number>;
+};
+
 // Simple storage that doesn't cause hydration issues
 const storage = {
   getItem: async (key: string): Promise<string | null> => {
@@ -66,6 +72,9 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [isInitialized, setIsInitialized] = useState(true);
   const [activeHomeTab, setActiveHomeTab] = useState<'biens' | 'services' | 'voyages'>('biens');
+  const [currency, setCurrencyState] = useState<string>('XOF');
+  const [fxBase, setFxBase] = useState<string | null>(null);
+  const [fxRates, setFxRates] = useState<Record<string, number>>({});
 
   useEffect(() => {
     // Load persisted data after component mounts
@@ -82,6 +91,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       const savedUser = await storage.getItem('user');
       const savedLanguage = await storage.getItem('language');
       const savedOnboarding = await storage.getItem('hasCompletedOnboarding');
+      const savedCurrency = await storage.getItem('currency');
       
       if (savedMode && savedMode.trim()) {
         setUserMode(savedMode as UserMode);
@@ -94,6 +104,9 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       }
       if (savedOnboarding === 'true') {
         setHasCompletedOnboarding(true);
+      }
+      if (savedCurrency && savedCurrency.trim()) {
+        setCurrencyState(savedCurrency);
       }
     } catch (error) {
       console.log('Error loading persisted data:', error);
@@ -162,6 +175,23 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     setActiveHomeTab(tab);
   }, []);
 
+  const setCurrency = useCallback(async (cur: string) => {
+    if (cur && cur.trim()) {
+      setCurrencyState(cur);
+      await storage.setItem('currency', cur);
+    }
+  }, []);
+
+  const setFx = useCallback((base: string, rates: Record<string, number>) => {
+    setFxBase(base);
+    setFxRates(rates);
+  }, []);
+
+  const hydrate = useCallback(async () => {
+    await loadPersistedData();
+    setIsHydrated(true);
+  }, []);
+
   return useMemo(() => ({
     userMode,
     user,
@@ -172,6 +202,9 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     hasCompletedOnboarding,
     isInitialized,
     activeHomeTab,
+    currency,
+    fxBase,
+    fxRates,
     switchMode,
     toggleAppMode,
     updateUser,
@@ -180,8 +213,11 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     markNotificationsAsRead,
     setLanguage,
     completeOnboarding,
-    setHomeTab
-  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, activeHomeTab, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding, setHomeTab]);
+    setHomeTab,
+    setCurrency,
+    setFx,
+    hydrate
+  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, activeHomeTab, currency, fxBase, fxRates, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding, setHomeTab, setCurrency, setFx, hydrate]);
 });
 
 // Export a safe version of the hook that always returns a valid object
@@ -200,6 +236,9 @@ export const useApp = () => {
       hasCompletedOnboarding: false,
       isInitialized: false,
       activeHomeTab: 'biens' as const,
+      currency: 'XOF',
+      fxBase: null,
+      fxRates: {},
       switchMode: async () => {},
       toggleAppMode: async () => {},
       updateUser: async () => {},
@@ -208,7 +247,10 @@ export const useApp = () => {
       markNotificationsAsRead: () => {},
       setLanguage: async () => {},
       completeOnboarding: async () => {},
-      setHomeTab: () => {}
+      setHomeTab: () => {},
+      setCurrency: async () => {},
+      setFx: () => {},
+      hydrate: async () => {}
     };
   }
   

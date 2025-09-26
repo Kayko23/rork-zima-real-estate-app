@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Platform } from 'react
 import { Heart, Star, Bed, Bath, Square } from 'lucide-react-native';
 import { Property } from '@/types';
 import Colors from '@/constants/colors';
+import { useMoney } from '@/lib/money';
 
 interface PropertyCardProps {
   property: Property;
@@ -12,16 +13,7 @@ interface PropertyCardProps {
 }
 
 export default function PropertyCard({ property, onPress, onToggleFavorite, width }: PropertyCardProps) {
-  const formatPrice = (price: number, currency: string) => {
-    if (!price || !currency || typeof price !== 'number' || typeof currency !== 'string') {
-      return '0';
-    }
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0,
-    }).format(price);
-  };
+  const { formatFrom } = useMoney();
 
   const cardWidth = width || '100%';
   
@@ -72,7 +64,7 @@ export default function PropertyCard({ property, onPress, onToggleFavorite, widt
             </Text>
             <View style={styles.priceChip}>
               <Text style={styles.price}>
-                {`${formatPrice(property.price, property.currency)}${property.type === 'rent' ? '/mois' : ''}`}
+                {`${formatFrom(property.price, property.currency)}${property.type === 'rent' ? '/mois' : ''}`}
               </Text>
             </View>
           </View>
