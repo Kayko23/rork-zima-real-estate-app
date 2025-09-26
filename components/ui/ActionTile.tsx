@@ -1,25 +1,39 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import Colors from '@/constants/colors';
+import AppButton from '@/components/ui/AppButton';
 
 interface ActionTileProps {
   title: string;
   icon: React.ReactNode;
-  onPress: () => void;
+  onPress?: () => void;
+  onPressUser?: () => void;
+  onPressProvider?: () => void;
+  href?: string;
+  userHref?: string;
+  providerHref?: string;
   variant?: 'primary' | 'secondary';
+  testID?: string;
 }
 
-export default function ActionTile({ title, icon, onPress, variant = 'primary' }: ActionTileProps) {
+export default function ActionTile({ title, icon, onPress, onPressUser, onPressProvider, href, userHref, providerHref, variant = 'primary', testID }: ActionTileProps) {
   const isPrimary = variant === 'primary';
   
   return (
-    <TouchableOpacity 
+    <AppButton
+      onPress={onPress}
+      onPressUser={onPressUser}
+      onPressProvider={onPressProvider}
+      href={href}
+      userHref={userHref}
+      providerHref={providerHref}
+      accessibilityLabel={title}
       style={[
         styles.container,
         isPrimary ? styles.primaryContainer : styles.secondaryContainer
-      ]} 
-      onPress={onPress}
-      activeOpacity={0.9}
+      ]}
+      testID={testID ?? 'action-tile'}
+      contentStyle={{ flexDirection: 'column', alignItems: 'center' }}
     >
       <View style={styles.iconContainer}>
         {React.isValidElement(icon) ? icon : null}
@@ -30,7 +44,7 @@ export default function ActionTile({ title, icon, onPress, variant = 'primary' }
       ]} numberOfLines={2}>
         {title}
       </Text>
-    </TouchableOpacity>
+    </AppButton>
   );
 }
 
@@ -43,7 +57,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    // Removed backdropFilter for web compatibility
   },
   primaryContainer: {
     backgroundColor: 'rgba(14, 90, 69, 0.1)',

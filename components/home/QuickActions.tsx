@@ -1,36 +1,46 @@
 import React from "react";
-import { View, Pressable, Text, StyleSheet, Platform } from "react-native";
-import { useRouter } from "expo-router";
+import { View, Text, StyleSheet, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Type from "@/constants/typography";
+import AppButton from "@/components/ui/AppButton";
 
 const GREEN = "#19715C";
 
 export default function QuickActions() {
-  const r = useRouter();
   return (
     <View style={s.row}>
-      {/* Biens immobiliers */}
-      <Pressable style={[s.card, s.outlined]} onPress={() => r.push("/(tabs)/categories")} accessibilityRole="button">
+      <AppButton
+        style={[s.card, s.outlined]}
+        userHref="/(tabs)/categories"
+        providerHref="/(proTabs)/listings"
+        accessibilityLabel="Accéder aux biens immobiliers"
+        testID="qa-properties"
+      >
         <Ionicons name="home-outline" size={22} color={GREEN} />
         <Text style={s.label} numberOfLines={1} adjustsFontSizeToFit>Biens immobiliers</Text>
-      </Pressable>
+      </AppButton>
 
-      {/* Services */}
-      <Pressable style={s.card} onPress={() => r.push("/(tabs)/services")} accessibilityRole="button">
+      <AppButton
+        style={s.card}
+        userHref="/(tabs)/services"
+        providerHref="/(proTabs)/dashboard"
+        accessibilityLabel="Accéder aux services et professionnels"
+        testID="qa-services"
+      >
         <Ionicons name="briefcase-outline" size={22} color="#0F172A" />
         <Text style={s.label} numberOfLines={1} adjustsFontSizeToFit>Services</Text>
-      </Pressable>
+      </AppButton>
 
-      {/* Voyages (nouvelle section) */}
-      <Pressable
+      <AppButton
         style={s.card}
-        onPress={() => r.push("/browse?title=Voyages&kind=voyages")}
-        accessibilityRole="button"
+        userHref="/browse?title=Voyages&kind=voyages"
+        providerHref="/(proTabs)/agenda"
+        accessibilityLabel="Accéder aux voyages"
+        testID="qa-voyages"
       >
         <Ionicons name="bed-outline" size={22} color="#0F172A" />
         <Text style={s.label} numberOfLines={1} adjustsFontSizeToFit>Voyages</Text>
-      </Pressable>
+      </AppButton>
     </View>
   );
 }
