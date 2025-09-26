@@ -36,14 +36,14 @@ const KEY = "voyage.filters.last";
 const PK = "voyage.filters.presets";
 const initial: VoyageFilters = { type: "all", guests: 1, amenities: [] };
 
-export const useVoyageFilters = create<State>((set, get) => ({
+export const useVoyageFilters = create<State>()((set, get) => ({
   q: initial,
   currency: currencyFromCountry(),
 
   set: (partial: Partial<VoyageFilters>) => set({ q: { ...get().q, ...partial } }),
 
   setCountry: (country?: string) => {
-    set((state: State) => {
+    set((state) => {
       const prev = state.q;
       const currency = currencyFromCountry(country);
       const range = defaultPriceRangeForCountry(country);
@@ -59,7 +59,7 @@ export const useVoyageFilters = create<State>((set, get) => ({
 
   toggleAmenity: (k: AmenityKey) => {
     const cur = get().q.amenities;
-    const next = cur.includes(k) ? cur.filter((x: AmenityKey) => x !== k) : [...cur, k];
+    const next = cur.includes(k) ? cur.filter((x) => x !== k) : [...cur, k];
     set({ q: { ...get().q, amenities: next } });
   },
 
