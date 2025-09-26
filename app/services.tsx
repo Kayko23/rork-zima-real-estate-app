@@ -37,6 +37,7 @@ export default function ServicesScreen() {
 
   const handleViewProfile = (providerId: string) => {
     console.log('View profile:', providerId);
+    router.push(`/provider/${providerId}`);
   };
 
   const handleCall = (phone: string) => {

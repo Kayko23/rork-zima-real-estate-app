@@ -32,7 +32,7 @@ export default function ServicesFeed() {
   const goProfile = (p: Provider) => {
     if (!p?.id || p.id.trim().length === 0) return;
     console.log('View profile:', p.id);
-    router.push(`/(tabs)/professionnels/profile/${p.id}`);
+    router.push(`/provider/${p.id}`);
   };
   
   const call = (p: Provider) => {

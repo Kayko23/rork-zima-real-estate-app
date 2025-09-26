@@ -187,7 +187,10 @@ export default function ProviderProfile() {
         </View>
 
         {/* Message Button */}
-        <TouchableOpacity style={styles.messageButton}>
+        <TouchableOpacity 
+          style={styles.messageButton}
+          onPress={() => router.push(`/chat/${provider.id}`)}
+        >
           <Ionicons name="chatbubble" size={20} color="#fff" />
           <Text style={styles.messageButtonText}>Envoyer un message</Text>
         </TouchableOpacity>
