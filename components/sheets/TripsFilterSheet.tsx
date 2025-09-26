@@ -124,7 +124,8 @@ export default function TripsFilterSheet({ visible, onClose }: Props) {
         />
       </ScrollView>
 
-      <View style={[m.footer, { marginBottom: insets.bottom + 8 }]}>        <Pressable onPress={()=>{ reset(); setLocal(q); setCount(undefined); }} style={m.reset} testID="filters-reset">
+      <View style={[m.footer, { marginBottom: insets.bottom + 8 }]}> 
+        <Pressable onPress={()=>{ reset(); setLocal(q); setCount(undefined); }} style={m.reset} testID="filters-reset">
           <Text style={m.resetTxt}>Réinitialiser</Text>
         </Pressable>
         <Pressable onPress={apply} style={[m.apply, (count===0) && {opacity:.5}]} testID="filters-apply" disabled={count===0 && !loadingCount}>
