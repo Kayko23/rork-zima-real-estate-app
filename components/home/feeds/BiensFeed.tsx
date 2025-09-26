@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import { router } from 'expo-router';
 import PropertyCard from '@/components/ui/PropertyCard';
 import SectionHeader from '@/components/ui/SectionHeader';
 import ActionDouble from '@/components/home/ActionDouble';
-import { mockProperties } from '@/constants/data';
+import { mockProperties, propertyCategories } from '@/constants/data';
 import Colors from '@/constants/colors';
 
 export default function BiensFeed() {
@@ -41,7 +41,7 @@ export default function BiensFeed() {
 
   const displayProperties = mockProperties;
 
-  const renderPropertyCard = ({ item, index }: { item: any; index: number }) => (
+  const renderPropertyCard = ({ item }: { item: any; index: number }) => (
     <PropertyCard
       key={item.id}
       property={item}
@@ -51,36 +51,46 @@ export default function BiensFeed() {
     />
   );
 
-  const categories = [
-    { 
-      id: 'residences', 
-      name: 'Résidences', 
-      emoji: '🏠',
-      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop',
-      properties: mockProperties.filter(p => p.category === 'Appartement' || p.category === 'Maison' || p.category === 'Villa').slice(0, 3)
-    },
-    { 
-      id: 'bureaux', 
-      name: 'Bureaux', 
-      emoji: '🏢',
-      image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=600&fit=crop',
-      properties: mockProperties.filter(p => p.category === 'Bureau').slice(0, 3)
-    },
-    { 
-      id: 'commerces', 
-      name: 'Commerces', 
-      emoji: '🏪',
-      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop',
-      properties: mockProperties.filter(p => p.category === 'Commerce').slice(0, 3)
-    },
-    { 
-      id: 'terrains', 
-      name: 'Terrains', 
-      emoji: '🗺️',
-      image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=600&fit=crop',
-      properties: mockProperties.filter(p => p.category === 'Terrain').slice(0, 3)
-    },
-  ];
+  const categoryGroups = useMemo(() => {
+    const images: Record<string, string> = {
+      residential: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80&auto=format&fit=crop',
+      'commercial-office': 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80&auto=format&fit=crop',
+      investment: 'https://images.unsplash.com/photo-1554224155-3a589877462f?w=1200&q=80&auto=format&fit=crop',
+      land: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&q=80&auto=format&fit=crop',
+      luxury: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=80&auto=format&fit=crop',
+      hospitality: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1200&q=80&auto=format&fit=crop',
+    };
+    const emojis: Record<string, string> = {
+      residential: '🏠',
+      'commercial-office': '🏢',
+      investment: '📈',
+      land: '🗺️',
+      luxury: '💎',
+      hospitality: '🏨',
+    };
+    const names: Record<string, string> = {
+      residential: 'Résidentiel',
+      'commercial-office': 'Commercial & Bureaux',
+      investment: 'Investissement',
+      land: 'Terrains',
+      luxury: 'Luxe & Collection',
+      hospitality: 'Vacances & Hôtellerie',
+    };
+
+    const out: { id: string; name: string; emoji: string; image: string; properties: typeof displayProperties }[] = [];
+    const order = ['Résidentiel','Commercial & Bureaux','Investissement','Terrains','Luxe & Collection','Vacances & Hôtellerie'];
+
+    order.forEach((grp) => {
+      const pc = propertyCategories.find((g) => g.group === grp);
+      if (!pc) return;
+      const key = Object.keys(names).find((k) => names[k] === grp) || 'residential';
+      const match = pc.items.map((it) => it.name);
+      const props = displayProperties.filter((p) => match.includes(p.category)).slice(0, 3);
+      out.push({ id: key, name: grp, emoji: emojis[key], image: images[key], properties: props });
+    });
+
+    return out;
+  }, [displayProperties]);
 
   return (
     <View style={styles.container}>
@@ -124,8 +134,8 @@ export default function BiensFeed() {
           subtitle="Explorez par type de bien"
           showSeeAll={false}
         />
-        {categories.map((category) => (
-          <View key={category.id} style={styles.categorySection}>
+        {categoryGroups.map((category) => (
+          <View key={category.id} style={styles.categorySection} testID={`home-category-${category.id}`}>
             <View style={styles.categoryHeader}>
               <View style={styles.categoryTitleRow}>
                 <Text style={styles.categoryEmoji}>{category.emoji}</Text>
@@ -144,6 +154,7 @@ export default function BiensFeed() {
                 source={{ uri: category.image }}
                 style={styles.categoryImage}
                 resizeMode="cover"
+                accessibilityLabel={category.name}
               />
               <View style={styles.categoryImageOverlay}>
                 <Text style={styles.categoryImageText}>

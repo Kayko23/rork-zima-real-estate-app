@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { ScrollView, StatusBar, StyleSheet, View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HomeHeader from '@/components/home/HomeHeader';
@@ -30,12 +30,13 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} testID="home-safe-area">
       <StatusBar barStyle="dark-content" backgroundColor="#F3F6F6" />
       <ScrollView
         contentContainerStyle={styles.contentContainer}
         stickyHeaderIndices={[0]}
         showsVerticalScrollIndicator={false}
+        testID="home-scroll"
       >
         <HomeHeader active={activeHomeTab} onChange={setHomeTab} />
         {renderContent()}
