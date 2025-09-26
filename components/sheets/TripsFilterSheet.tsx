@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { X, Filter, Star, Users, Calendar } from "lucide-react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BottomSheet from "@/components/ui/BottomSheet";
 import RangeSlider from "@/components/ui/RangeSlider";
 import AmenitiesChips, { AmenityKey } from "@/components/voyages/AmenitiesChips";
@@ -11,7 +12,11 @@ import { formatPrice } from "@/components/voyages/currency";
 
 type Props = { visible: boolean; onClose: () => void };
 
+const TABBAR_HEIGHT = 76;
+
 export default function TripsFilterSheet({ visible, onClose }: Props) {
+  const insets = useSafeAreaInsets();
+  const bottomGap = insets.bottom + TABBAR_HEIGHT + 12;
   const { q, set, reset, currency, listPresets, presets, saveNamedPreset, applyPreset, deletePreset, savePreset, hydrate } = useVoyageFilters();
   const [local, setLocal] = useState<VoyageFilters>(q);
   const [count, setCount] = useState<number | undefined>(undefined);
@@ -69,7 +74,7 @@ export default function TripsFilterSheet({ visible, onClose }: Props) {
         </ScrollView>
       )}
 
-      <ScrollView contentContainerStyle={m.scrollPad} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[m.scrollPad, { paddingBottom: bottomGap }]} showsVerticalScrollIndicator={false}>
         <Text style={m.label}>Voyageurs</Text>
         <View style={m.row}>
           <Pressable style={m.pill} onPress={()=>setLocal((p: VoyageFilters)=>({ ...p, guests: Math.max(1, (p.guests ?? 1) - 1) }))}><Text style={m.pillTxt}>−</Text></Pressable>
@@ -119,8 +124,7 @@ export default function TripsFilterSheet({ visible, onClose }: Props) {
         />
       </ScrollView>
 
-      <View style={m.footer}>
-        <Pressable onPress={()=>{ reset(); setLocal(q); setCount(undefined); }} style={m.reset} testID="filters-reset">
+      <View style={[m.footer, { marginBottom: insets.bottom + 8 }]}>        <Pressable onPress={()=>{ reset(); setLocal(q); setCount(undefined); }} style={m.reset} testID="filters-reset">
           <Text style={m.resetTxt}>Réinitialiser</Text>
         </Pressable>
         <Pressable onPress={apply} style={[m.apply, (count===0) && {opacity:.5}]} testID="filters-apply" disabled={count===0 && !loadingCount}>
