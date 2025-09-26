@@ -12,7 +12,6 @@ export const CURRENCIES: CurrencyItem[] = [
     code: "XOF", 
     name: "Franc CFA (UEMOA)", 
     symbol: "CFA", 
-    flag: "🇸🇳",
     locales: ["fr-SN","fr-CI","fr-BF","fr-ML","fr-BJ","fr-TG","fr-NE","fr-GW"] 
   },
   // Devises CFA (Afrique Centrale)
@@ -20,7 +19,6 @@ export const CURRENCIES: CurrencyItem[] = [
     code: "XAF", 
     name: "Franc CFA (CEMAC)", 
     symbol: "FCFA", 
-    flag: "🇨🇲",
     locales: ["fr-CM","fr-GA","fr-CF","fr-CG","fr-GQ","fr-TD"] 
   },
   // Autres devises africaines
