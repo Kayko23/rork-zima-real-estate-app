@@ -4,7 +4,7 @@ import { Filter } from 'lucide-react-native';
 import LiquidGlassView from '@/components/ui/LiquidGlassView';
 import VoyageSearchBar from '@/components/voyages/VoyageSearchBar';
 import VoyageSearchSheet from '@/components/voyages/VoyageSearchSheet';
-import VoyageFilterSheet from '@/components/voyages/VoyageFilterSheet';
+import TripsFilterSheet from '@/components/sheets/TripsFilterSheet';
 import VoyageCarousel from '@/components/voyages/VoyageCarousel';
 import { VoyageQuery, VoyageFilters } from '@/components/voyages/helpers';
 import { useVoyageApi } from '@/hooks/useVoyageApi';
@@ -79,7 +79,7 @@ export default function VoyagesFeed() {
       </ScrollView>
 
       <VoyageSearchSheet visible={openSearch} initial={query} onClose={() => setOpenSearch(false)} onSubmit={onApplySearch} />
-      <VoyageFilterSheet visible={openFilters} initial={filters} onClose={() => setOpenFilters(false)} onSubmit={onApplyFilters} />
+      <TripsFilterSheet visible={openFilters} initial={filters} onClose={() => setOpenFilters(false)} onSubmit={onApplyFilters} />
     </View>
   );
 }
