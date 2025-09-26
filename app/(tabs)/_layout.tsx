@@ -4,7 +4,7 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { 
   Home, 
   Heart, 
-  Grid3X3, 
+  Search, 
   MessageCircle, 
   User
 } from 'lucide-react-native';
@@ -84,11 +84,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="categories"
+        name="browse"
         options={{
-          title: 'Tout',
+          title: 'Recherche',
           tabBarIcon: ({ color, size }) => (
-            <Grid3X3 size={size} color={color} testID="tab-icon-categories" />
+            <Search size={size} color={color} testID="tab-icon-browse" />
           ),
         }}
       />
