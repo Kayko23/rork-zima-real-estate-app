@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import PropertyCard from '@/components/ui/PropertyCard';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -24,6 +24,9 @@ export default function BiensFeed() {
     if (!section?.trim()) return;
     if (section.length > 100) return;
     console.log('See all pressed:', section);
+
+    const normalized = section.toLowerCase();
+
     const sectionMap: Record<string, { title: string; kind: string }> = {
       premium: { title: "Biens premium", kind: "premium" },
       new: { title: "Nouveautés", kind: "nouveautes" },
@@ -31,12 +34,22 @@ export default function BiensFeed() {
       bureaux: { title: "Bureaux", kind: "bureaux" },
       commerces: { title: "Commerces", kind: "commerces" },
       terrains: { title: "Terrains", kind: "terrain" },
+
+      residential: { title: "Résidentiel", kind: "residence" },
+      'commercial-office': { title: "Commercial & Bureaux", kind: "bureaux" },
+      investment: { title: "Investissement", kind: "premium" },
+      land: { title: "Terrains", kind: "terrain" },
+      luxury: { title: "Luxe & Collection", kind: "premium" },
+      hospitality: { title: "Vacances & Hôtellerie", kind: "voyages" },
     };
-    
-    const sectionData = sectionMap[section];
+
+    const sectionData = sectionMap[normalized];
     if (sectionData) {
       router.push(`/browse?title=${encodeURIComponent(sectionData.title)}&kind=${sectionData.kind}`);
+      return;
     }
+
+    router.push(`/browse?title=${encodeURIComponent(section)}&kind=${encodeURIComponent(normalized)}`);
   };
 
   const displayProperties = mockProperties;
@@ -137,19 +150,32 @@ export default function BiensFeed() {
         {categoryGroups.map((category) => (
           <View key={category.id} style={styles.categorySection} testID={`home-category-${category.id}`}>
             <View style={styles.categoryHeader}>
-              <View style={styles.categoryTitleRow}>
+              <Pressable
+                style={styles.categoryTitleRow}
+                onPress={() => handleSeeAllPress(category.id)}
+                accessibilityRole="button"
+                testID={`home-category-title-${category.id}`}
+              >
                 <Text style={styles.categoryEmoji}>{category.emoji}</Text>
                 <Text style={styles.categoryTitle}>{category.name}</Text>
-              </View>
+              </Pressable>
               <TouchableOpacity 
                 style={styles.seeAllButton}
                 onPress={() => handleSeeAllPress(category.id)}
+                accessibilityRole="button"
+                testID={`home-category-seeall-${category.id}`}
+                activeOpacity={0.7}
               >
                 <Text style={styles.seeAllText}>Voir tout ›</Text>
               </TouchableOpacity>
             </View>
 
-            <View style={styles.categoryImageContainer}>
+            <Pressable
+              style={styles.categoryImageContainer}
+              onPress={() => handleSeeAllPress(category.id)}
+              accessibilityRole="button"
+              testID={`home-category-image-${category.id}`}
+            >
               <Image 
                 source={{ uri: category.image }}
                 style={styles.categoryImage}
@@ -161,7 +187,7 @@ export default function BiensFeed() {
                   {`${category.properties.length} biens disponibles`}
                 </Text>
               </View>
-            </View>
+            </Pressable>
 
             {category.properties.length > 0 && (
               <FlatList

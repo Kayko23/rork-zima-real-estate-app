@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
 import { Filter } from 'lucide-react-native';
+import { router } from 'expo-router';
 import LiquidGlassView from '@/components/ui/LiquidGlassView';
 import VoyageSearchBar from '@/components/voyages/VoyageSearchBar';
 import VoyageSearchSheet from '@/components/voyages/VoyageSearchSheet';
@@ -56,7 +57,7 @@ export default function VoyagesFeed() {
 
         <VoyageCarousel
           title="Populaires près de vous"
-          onSeeAll={undefined}
+          onSeeAll={() => router.push('/browse?title='+encodeURIComponent('Voyages populaires')+'&kind=voyages')}
           data={popular.items}
           loading={isLoading && popular.items.length === 0}
           onEndReached={fetchNextPopular}
@@ -64,7 +65,7 @@ export default function VoyagesFeed() {
 
         <VoyageCarousel
           title="Hôtels recommandés"
-          onSeeAll={undefined}
+          onSeeAll={() => router.push('/browse?title='+encodeURIComponent("Hôtels recommandés")+'&kind=voyages')}
           data={recommended.items}
           loading={isLoading && recommended.items.length === 0}
           onEndReached={fetchNextRecommended}
@@ -72,14 +73,14 @@ export default function VoyagesFeed() {
 
         <VoyageCarousel
           title="Résidences à la journée"
-          onSeeAll={undefined}
+          onSeeAll={() => router.push('/browse?title='+encodeURIComponent('Résidences à la journée')+'&kind=voyages')}
           data={daily.items}
           loading={isLoading && daily.items.length === 0}
         />
       </ScrollView>
 
       <VoyageSearchSheet visible={openSearch} initial={query} onClose={() => setOpenSearch(false)} onSubmit={onApplySearch} />
-      <TripsFilterSheet visible={openFilters} initial={filters} onClose={() => setOpenFilters(false)} onSubmit={onApplyFilters} />
+      <TripsFilterSheet visible={openFilters} onClose={() => setOpenFilters(false)} />
     </View>
   );
 }

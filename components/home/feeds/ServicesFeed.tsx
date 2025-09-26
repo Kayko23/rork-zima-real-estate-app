@@ -83,7 +83,7 @@ export default function ServicesFeed() {
                 <Text style={styles.sectionTitle}>{title}</Text>
 
                 <TouchableOpacity
-                  onPress={() => console.log('View all:', key)}
+                  onPress={() => router.push('/(tabs)/professionnels')}
                   style={styles.more}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
@@ -118,7 +118,7 @@ export default function ServicesFeed() {
           <Text style={styles.joinSubtitle}>
             Rejoignez notre réseau de professionnels vérifiés et développez votre activité.
           </Text>
-          <TouchableOpacity style={styles.joinButton}>
+          <TouchableOpacity style={styles.joinButton} onPress={() => router.push('/(auth)/sign-up')}>
             <Text style={styles.joinButtonText}>Rejoindre ZIMA</Text>
           </TouchableOpacity>
         </View>
