@@ -115,6 +115,7 @@ export default function SearchTab(): React.ReactElement {
               },
             ]}
             leftIcon={<SearchIcon size={18} color="#111" />}
+            onSubmit={(q) => router.push({ pathname: '/browse', params: { q, domain: activeDomain, country: country?.code ?? '', city: city?.name ?? '' } })}
           />
 
           <View style={s.segment}>

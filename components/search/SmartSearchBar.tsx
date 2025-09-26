@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TextInput, StyleSheet, Text, Pressable, ViewStyle } from 'react-native';
+import { View, TextInput, StyleSheet, Text, Pressable, ViewStyle, NativeSyntheticEvent, TextInputSubmitEditingEventData } from 'react-native';
 
 export interface Chip {
   key: string;
@@ -13,21 +13,31 @@ export default function SmartSearchBar({
   leftIcon,
   chips,
   style,
+  onSubmit,
 }: {
   placeholder?: string;
-  leftIcon?: React.ReactNode;
+  leftIcon?: React.ReactElement | null;
   chips: Chip[];
   style?: ViewStyle;
+  onSubmit?: (q: string) => void;
 }): React.ReactElement {
+  const handleSubmit = (e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => {
+    const q = e?.nativeEvent?.text ?? '';
+    console.log('[SmartSearchBar] submit', q);
+    onSubmit?.(q);
+  };
+
   return (
     <View style={[st.wrap, style]} testID="smart-search-bar">
       <View style={st.inputRow}>
-        <View>{leftIcon}</View>
+        {!!leftIcon && <View style={st.iconWrap}>{leftIcon}</View>}
         <TextInput
           style={st.input}
           placeholder={placeholder}
           placeholderTextColor="#8C989F"
           testID="smart-search-input"
+          returnKeyType="search"
+          onSubmitEditing={handleSubmit}
         />
       </View>
       <View style={st.chips}>
@@ -64,6 +74,7 @@ const st = StyleSheet.create({
     elevation: 1,
   },
   input: { flex: 1, paddingVertical: 8, color: '#0B1D17' },
+  iconWrap: { justifyContent: 'center', alignItems: 'center' },
   chips: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' as const },
   chip: {
     backgroundColor: '#E8EFF1',
