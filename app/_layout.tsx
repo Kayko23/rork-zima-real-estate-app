@@ -6,6 +6,7 @@ import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AppProvider, useApp } from "@/hooks/useAppStore";
 import { VoyageFiltersProvider } from "@/components/voyages/filterContext";
+import { useBootstrapFx } from "@/lib/bootstrapFx";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -38,6 +39,7 @@ function RootLayoutNav() {
 
 function AppInitializer({ children }: { children: React.ReactNode }) {
   const { hydrate } = useApp();
+  useBootstrapFx();
   
   useEffect(() => {
     hydrate();

@@ -1,6 +1,8 @@
 import createContextHook from '@nkzw/create-context-hook';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { UserMode, User, FilterState } from '@/types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
 type Language = 'fr' | 'en' | 'pt';
 
@@ -10,12 +12,16 @@ type CurrencyState = {
   fxRates: Record<string, number>;
 };
 
-// Simple storage that doesn't cause hydration issues
+// Cross-platform storage
 const storage = {
   getItem: async (key: string): Promise<string | null> => {
     try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        return window.localStorage.getItem(key);
+      if (Platform.OS === 'web') {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          return window.localStorage.getItem(key);
+        }
+      } else {
+        return await AsyncStorage.getItem(key);
       }
     } catch {
       // Ignore errors
@@ -24,8 +30,12 @@ const storage = {
   },
   setItem: async (key: string, value: string): Promise<void> => {
     try {
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.setItem(key, value);
+      if (Platform.OS === 'web') {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem(key, value);
+        }
+      } else {
+        await AsyncStorage.setItem(key, value);
       }
     } catch {
       // Ignore errors

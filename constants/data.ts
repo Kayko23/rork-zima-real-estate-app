@@ -48,8 +48,8 @@ export const mockProperties: Property[] = [
   {
     id: '2',
     title: 'Appartement 2 pièces centre-ville',
-    price: 1200,
-    currency: 'USD',
+    price: 1850000,
+    currency: 'NGN',
     location: {
       city: 'Lagos',
       country: 'Nigeria',
@@ -91,8 +91,8 @@ export const mockProperties: Property[] = [
   {
     id: '3',
     title: 'Penthouse de luxe avec vue mer',
-    price: 850000,
-    currency: 'USD',
+    price: 520000000,
+    currency: 'XOF',
     location: {
       city: 'Dakar',
       country: 'Sénégal',
@@ -136,8 +136,8 @@ export const mockProperties: Property[] = [
   {
     id: '4',
     title: 'Studio moderne centre Abidjan',
-    price: 800,
-    currency: 'USD',
+    price: 488000,
+    currency: 'XOF',
     location: {
       city: 'Abidjan',
       country: 'Côte d\'Ivoire',

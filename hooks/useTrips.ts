@@ -23,7 +23,7 @@ export function useTrips(kind: "popular" | "recommended" | "all") {
       const img = (n:number)=>({ uri:`https://picsum.photos/seed/v${kind}${page}${n}/800/600` });
       const seed: TripItem[] = Array.from({length:6}).map((_,i)=>({
         id:`${kind}-${page}-${i}`, title:`Suite ${i+1}`, city:"Abidjan", country:"Côte d'Ivoire",
-        price:75000 + i*5000, rating:4.6, reviews:120+i, image:img(i), type: i%2? "hotel":"daily"
+        price:75000 + i*5000, currency: "XOF", rating:4.6, reviews:120+i, image:img(i), type: i%2? "hotel":"daily"
       }));
       setItems(prev => [...prev, ...seed]);
       setHasMore(page < 4);

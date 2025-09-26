@@ -22,6 +22,7 @@ export type TripItem = {
   city: string;
   country: string;
   price: number; // par nuit
+  currency?: string; // devise du prix
   rating: number;
   reviews: number;
   badge?: "Top" | "Premium";
