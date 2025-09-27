@@ -41,11 +41,46 @@ function RootLayoutNav() {
 
 function AppInitializer({ children }: { children: React.ReactNode }) {
   const { hydrate } = useApp();
+  const [isReady, setIsReady] = useState(false);
+  
   useBootstrapFx();
   
   useEffect(() => {
-    hydrate();
-  }, [hydrate]);
+    let mounted = true;
+    
+    const initializeApp = async () => {
+      try {
+        await hydrate();
+        if (mounted) {
+          setIsReady(true);
+        }
+      } catch (error) {
+        console.error('App initialization error:', error);
+        if (mounted) {
+          setIsReady(true); // Continue anyway
+        }
+      }
+    };
+    
+    // Add a timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (mounted && !isReady) {
+        console.warn('App initialization timeout, continuing anyway');
+        setIsReady(true);
+      }
+    }, 3000);
+    
+    initializeApp();
+    
+    return () => {
+      mounted = false;
+      clearTimeout(timeout);
+    };
+  }, [hydrate, isReady]);
+  
+  if (!isReady) {
+    return null; // Or a loading spinner
+  }
   
   return <>{children}</>;
 }

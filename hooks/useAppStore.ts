@@ -77,10 +77,10 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const [user, setUser] = useState<User>(defaultUser);
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(true);
-  const [isHydrated, setIsHydrated] = useState(true);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [language, setLanguageState] = useState<Language | null>('fr');
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [activeHomeTab, setActiveHomeTab] = useState<'biens' | 'services' | 'voyages'>('biens');
   const [currency, setCurrencyState] = useState<string>('XOF');
   const [fxBase, setFxBase] = useState<string | null>(null);
@@ -93,10 +93,6 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
 
   const loadPersistedData = async () => {
     try {
-      if (typeof window === 'undefined') {
-        return;
-      }
-      
       const savedMode = await storage.getItem('userMode');
       const savedUser = await storage.getItem('user');
       const savedLanguage = await storage.getItem('language');
@@ -107,7 +103,11 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
         setUserMode(savedMode as UserMode);
       }
       if (savedUser && savedUser.trim()) {
-        setUser(JSON.parse(savedUser));
+        try {
+          setUser(JSON.parse(savedUser));
+        } catch {
+          // Invalid JSON, ignore
+        }
       }
       if (savedLanguage && savedLanguage.trim()) {
         setLanguageState(savedLanguage as Language);
@@ -118,8 +118,11 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       if (savedCurrency && savedCurrency.trim()) {
         setCurrencyState(savedCurrency);
       }
+      
+      setIsInitialized(true);
     } catch (error) {
       console.log('Error loading persisted data:', error);
+      setIsInitialized(true); // Continue anyway
     }
   };
 
@@ -198,8 +201,13 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   }, []);
 
   const hydrate = useCallback(async () => {
-    await loadPersistedData();
-    setIsHydrated(true);
+    try {
+      await loadPersistedData();
+    } catch (error) {
+      console.error('Hydration error:', error);
+    } finally {
+      setIsHydrated(true);
+    }
   }, []);
 
   return useMemo(() => ({

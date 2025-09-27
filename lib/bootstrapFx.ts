@@ -2,14 +2,16 @@ import { useEffect } from "react";
 import { useApp } from "@/hooks/useAppStore";
 
 export function useBootstrapFx() {
-  const { setFx } = useApp();
+  const { setFx, isHydrated } = useApp();
 
   useEffect(() => {
-    (async () => {
+    if (!isHydrated) return;
+    
+    let mounted = true;
+    
+    const loadRates = async () => {
       try {
-        // Fallback avec taux de change approximatifs pour les devises africaines
-        // En production, remplacez par votre API de taux de change
-        setFx("USD", { 
+        const rates = { 
           USD: 1, 
           XOF: 610, // Franc CFA UEMOA
           XAF: 610, // Franc CFA CEMAC
@@ -28,31 +30,22 @@ export function useBootstrapFx() {
           MUR: 46, // Roupie mauricienne
           BWP: 13.5, // Pula botswanais
           EUR: 0.92 // Euro
-        });
+        };
+        
+        if (mounted) {
+          setFx("USD", rates);
+        }
       } catch (error) {
         console.log('Error loading exchange rates:', error);
-        // Même fallback en cas d'erreur
-        setFx("USD", { 
-          USD: 1, 
-          XOF: 610, 
-          XAF: 610, 
-          NGN: 1540, 
-          GHS: 15.5, 
-          ZAR: 18.5,
-          KES: 155,
-          UGX: 3700,
-          TZS: 2500,
-          ETB: 120,
-          EGP: 49,
-          MAD: 10.2,
-          TND: 3.1,
-          DZD: 135,
-          RWF: 1300,
-          MUR: 46,
-          BWP: 13.5,
-          EUR: 0.92
-        });
       }
-    })();
-  }, [setFx]);
+    };
+    
+    // Small delay to ensure everything is ready
+    const timer = setTimeout(loadRates, 100);
+    
+    return () => {
+      mounted = false;
+      clearTimeout(timer);
+    };
+  }, [setFx, isHydrated]);
 }

@@ -80,10 +80,18 @@ export const [SessionProvider, useSession] = createContextHook(() => {
   const hydrate = useCallback(async () => {
     try {
       const [[, u], [, t]] = await storage.multiGet(["@zima.user", "@zima.token"]);
-      if (u && t) {
-        const userData = JSON.parse(u);
-        setUser(userData);
-        setAccessToken(t);
+      if (u && t && u.trim() && t.trim()) {
+        try {
+          const userData = JSON.parse(u);
+          if (userData && userData.id) {
+            setUser(userData);
+            setAccessToken(t);
+          }
+        } catch (parseError) {
+          console.error("Error parsing user data:", parseError);
+          // Clear invalid data
+          await storage.multiRemove(["@zima.user", "@zima.token"]);
+        }
       }
     } catch (error) {
       console.error("Error hydrating session:", error);
@@ -93,8 +101,34 @@ export const [SessionProvider, useSession] = createContextHook(() => {
   }, []);
 
   useEffect(() => {
-    hydrate();
-  }, [hydrate]);
+    let mounted = true;
+    
+    const initSession = async () => {
+      try {
+        await hydrate();
+      } catch (error) {
+        console.error('Session initialization error:', error);
+        if (mounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+    
+    // Add timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (mounted && isLoading) {
+        console.warn('Session hydration timeout');
+        setIsLoading(false);
+      }
+    }, 2000);
+    
+    initSession();
+    
+    return () => {
+      mounted = false;
+      clearTimeout(timeout);
+    };
+  }, [hydrate, isLoading]);
 
   return useMemo(() => ({
     user,
