@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet, ScrollView } from "react-native";
+import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { AccountForm, ProfileForm, DocsForm, accountSchema, profileSchema, docsSchema } from "@/lib/signupSchema";
 import DocItem from "@/components/upload/DocItem";
@@ -18,7 +18,16 @@ export default function SignupWizard() {
   });
   
   // Étape 2 — Profil
-  const f2 = useForm<ProfileForm>();
+  const f2 = useForm<ProfileForm>({
+    defaultValues: {
+      country: "",
+      city: "",
+      birthdate: "",
+      companyName: "",
+      category: "",
+      languages: [],
+    } as any,
+  });
   
   // Étape 3 — Docs
   const f3 = useForm<DocsForm>({ 
@@ -40,7 +49,7 @@ export default function SignupWizard() {
         if (!isValid) return;
       }
       if (step === 2) {
-        const isValid = await f2.trigger();
+        const isValid = await f2.trigger(["country", "city"]);
         if (!isValid) return;
       }
       if (step === 3) {
@@ -58,17 +67,24 @@ export default function SignupWizard() {
   const submit = async () => {
     try {
       setIsSubmitting(true);
-      
+
+      const okAccount = await f1.trigger();
+      const okProfile = await f2.trigger(["country", "city"]);
+      const okDocs = await f3.trigger();
+      if (!okAccount || !okProfile || !okDocs) {
+        if (!okProfile) setStep(2);
+        if (!okAccount) setStep(1);
+        return;
+      }
+
       const acc = f1.getValues();
       const pro = f2.getValues();
       const docs = f3.getValues();
 
-      // Validation des schémas
       const validatedAccount = accountSchema.parse(acc);
       const validatedProfile = profileSchema.parse(pro);
       const validatedDocs = docsSchema.parse(docs);
 
-      // Uploads si présents
       const uploads: Record<string, any> = {};
       for (const k of Object.keys(validatedDocs) as (keyof DocsForm)[]) {
         const file = validatedDocs[k];
@@ -87,7 +103,11 @@ export default function SignupWizard() {
       await setSession(user, token);
       router.replace("/");
     } catch (e: any) {
-      console.error("Registration error:", e?.message ?? "Réessayez");
+      const issues: string[] = Array.isArray(e?.issues)
+        ? e.issues.map((i: any) => `${i.path?.join('.') ?? ''}: ${i.message}`)
+        : [e?.message ?? 'Réessayez'];
+      Alert.alert('Inscription', issues.join('\n'));
+      console.error("Registration error:", e);
     } finally {
       setIsSubmitting(false);
     }
@@ -212,7 +232,8 @@ export default function SignupWizard() {
               <Text style={styles.label}>Pays</Text>
               <Controller 
                 control={f2.control} 
-                name="country" 
+                name="country"
+                rules={{ required: true, minLength: 2 }} 
                 render={({ field: { onChange, value } }) => (
                   <TextInput 
                     style={styles.input} 
@@ -227,7 +248,8 @@ export default function SignupWizard() {
               <Text style={styles.label}>Ville</Text>
               <Controller 
                 control={f2.control} 
-                name="city" 
+                name="city"
+                rules={{ required: true, minLength: 1 }} 
                 render={({ field: { onChange, value } }) => (
                   <TextInput 
                     style={styles.input} 
