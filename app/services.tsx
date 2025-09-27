@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Platform, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, router } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
@@ -13,69 +13,116 @@ import Colors from '@/constants/colors';
 import { FilterState } from '@/types';
 
 export default function ServicesScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [filters, setFilters] = useState<FilterState>({
-    sortBy: 'recent'
+    sortBy: 'recent',
   });
 
-  const filterChips = [
+  const filterChips = useMemo(() => [
     { id: 'type', label: 'Type de pro', value: 'Tous' },
     { id: 'city', label: 'Ville', value: 'Accra' },
-  ];
+  ], []);
 
-  const handleFilterChipPress = (chipId: string) => {
-    console.log('Filter chip pressed:', chipId);
-  };
+  const handleFilterChipPress = useCallback((chipId: string) => {
+    console.log('[Services] Filter chip pressed:', chipId);
+  }, []);
 
-  const handleFilterChange = (newFilters: Partial<FilterState>) => {
+  const handleFilterChange = useCallback((newFilters: Partial<FilterState>) => {
+    console.log('[Services] Filters change:', newFilters);
     setFilters(prev => ({ ...prev, ...newFilters }));
-  };
+  }, []);
 
-  const handleFilterPress = () => {
-    console.log('Filter button pressed');
-  };
+  const handleFilterPress = useCallback(() => {
+    console.log('[Services] Filter button pressed');
+  }, []);
 
-  const handleViewProfile = (providerId: string) => {
-    console.log('View profile:', providerId);
-    router.push(`/provider/${providerId}`);
-  };
-
-  const handleCall = (phone: string) => {
-    if (phone && phone.trim()) {
-      Linking.openURL(`tel:${phone}`);
+  const handleViewProfile = useCallback((providerId: string) => {
+    console.log('[Services] View profile tapped', providerId);
+    try {
+      if (!providerId) throw new Error('ID invalide');
+      router.push(`/provider/${providerId}`);
+    } catch (e) {
+      console.log('[Services] View profile error', e);
+      Alert.alert('Navigation', "Impossible d'ouvrir le profil.");
     }
-  };
+  }, []);
 
-  const handleWhatsApp = (phone: string) => {
-    if (phone && phone.trim()) {
-      Linking.openURL(`https://wa.me/${phone.replace('+', '')}`);
+  const handleCall = useCallback(async (phone: string) => {
+    console.log('[Services] Call tapped', phone);
+    try {
+      const num = phone?.replace(/\s+/g, '');
+      if (!num) throw new Error('Numéro manquant');
+      const url = `tel:${num}`;
+      const supported = await Linking.canOpenURL(url);
+      if (!supported && Platform.OS === 'web') {
+        // @ts-ignore window exists on web
+        window.location.href = url as unknown as string;
+        return;
+      }
+      await Linking.openURL(url);
+    } catch (e) {
+      console.log('[Services] Call error', e);
+      Alert.alert('Appel', "Impossible de démarrer l’appel.");
     }
-  };
+  }, []);
 
-  const handleEmail = (email: string) => {
-    if (email && email.trim()) {
-      Linking.openURL(`mailto:${email}`);
+  const handleWhatsApp = useCallback(async (phone: string) => {
+    console.log('[Services] WhatsApp tapped', phone);
+    try {
+      const num = phone?.replace(/\D/g, '');
+      if (!num) throw new Error('Numéro WhatsApp manquant');
+      const appUrl = `whatsapp://send?phone=${num}`;
+      const webUrl = `https://wa.me/${num}`;
+      const canApp = await Linking.canOpenURL(appUrl);
+      if (canApp && Platform.OS !== 'web') {
+        await Linking.openURL(appUrl);
+        return;
+      }
+      await Linking.openURL(webUrl);
+    } catch (e) {
+      console.log('[Services] WhatsApp error', e);
+      Alert.alert('WhatsApp', 'Impossible d’ouvrir WhatsApp.');
     }
-  };
+  }, []);
+
+  const handleEmail = useCallback(async (email: string) => {
+    console.log('[Services] Email tapped', email);
+    try {
+      const addr = email?.trim();
+      if (!addr) throw new Error('Email manquant');
+      const url = `mailto:${addr}`;
+      const supported = await Linking.canOpenURL(url);
+      if (!supported && Platform.OS === 'web') {
+        // @ts-ignore window exists on web
+        window.location.href = url as unknown as string;
+        return;
+      }
+      await Linking.openURL(url);
+    } catch (e) {
+      console.log('[Services] Email error', e);
+      Alert.alert('Email', "Impossible d’ouvrir l’email.");
+    }
+  }, []);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <Stack.Screen 
+      <Stack.Screen
         options={{
           headerShown: true,
           headerTitle: '',
           headerTransparent: true,
           headerLeft: () => (
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => router.back()}
               style={styles.backButton}
+              testID="back-btn"
             >
               <ArrowLeft size={24} color={Colors.background.primary} />
             </TouchableOpacity>
           ),
         }}
       />
-      
+
       <ScrollView showsVerticalScrollIndicator={false}>
         <HeroSection
           title="Services immobiliers"
@@ -89,9 +136,9 @@ export default function ServicesScreen() {
                 onFilterPress={handleFilterPress}
                 placeholder="Rechercher un professionnel..."
               />
-              
-              <FilterChips 
-                chips={filterChips} 
+
+              <FilterChips
+                chips={filterChips}
                 onChipPress={handleFilterChipPress}
                 filters={filters}
                 onFilterChange={handleFilterChange}
