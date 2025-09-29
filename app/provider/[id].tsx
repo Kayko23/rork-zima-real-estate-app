@@ -40,15 +40,16 @@ export default function ProviderProfile() {
 
   if (!provider) {
     return (
-      <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
         <Stack.Screen options={{ title: 'Professionnel introuvable', headerShown: false }} />
-        <View style={styles.errorContainer}>
+        <SafeAreaView style={styles.errorContainer}>
           <Text style={styles.errorText}>Professionnel introuvable</Text>
+          <Text style={styles.errorSubtext}>Le professionnel que vous recherchez n&apos;existe pas ou a été supprimé.</Text>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Text style={styles.backButtonText}>Retour</Text>
           </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+        </SafeAreaView>
+      </View>
     );
   }
 
@@ -336,21 +337,31 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     flex: 1,
-    paddingTop: 100,
+    justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
     backgroundColor: '#f8f9fa',
   },
   errorText: {
     ...Type.h2,
+    color: Colors.text.primary,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  errorSubtext: {
+    fontSize: 16,
     color: Colors.text.secondary,
-    marginBottom: 16,
+    marginBottom: 24,
+    textAlign: 'center',
+    lineHeight: 22,
   },
   backButton: {
     paddingHorizontal: 24,
     paddingVertical: 12,
     backgroundColor: Colors.primary,
-    borderRadius: 8,
+    borderRadius: 12,
+    minWidth: 120,
+    alignItems: 'center',
   },
   backButtonText: {
     color: '#fff',
