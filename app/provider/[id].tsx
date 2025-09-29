@@ -12,6 +12,7 @@ import {
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getProviderById } from '@/constants/data';
+import { providers } from '@/constants/professionals';
 import Colors from '@/constants/colors';
 import Type from '@/constants/typography';
 import {
@@ -35,7 +36,8 @@ export default function ProviderProfile() {
   const params = useLocalSearchParams();
   console.log('[ProviderProfile] Raw params:', params);
   
-  let provider;
+  let provider: any = null;
+  
   try {
     // Extract ID from params safely
     let providerId: string | undefined;
@@ -59,13 +61,84 @@ export default function ProviderProfile() {
       const cleanId = providerId.trim();
       console.log('[ProviderProfile] Looking for provider with clean ID:', cleanId);
       
-      // Safely get provider without JSON parsing issues
-      try {
-        provider = getProviderById(cleanId);
-        console.log('[ProviderProfile] Found provider:', provider ? provider.name : 'NOT FOUND');
-      } catch (providerError) {
-        console.error('[ProviderProfile] Error in getProviderById:', providerError);
-        provider = null;
+      // First try to find in professionals providers
+      const professionalProvider = providers.find(p => String(p.id) === cleanId);
+      
+      if (professionalProvider) {
+        // Map the professional provider to the expected format
+        provider = {
+          id: professionalProvider.id,
+          name: professionalProvider.name,
+          type: professionalProvider.category === 'agency' ? 'agency' : 'agent',
+          avatar: professionalProvider.avatar || 'https://i.pravatar.cc/150',
+          cover: professionalProvider.cover || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1200&auto=format&fit=crop',
+          rating: professionalProvider.rating || 4.0,
+          reviewCount: professionalProvider.reviews || 0,
+          location: {
+            city: professionalProvider.city || 'Ville',
+            country: professionalProvider.country || 'Pays'
+          },
+          specialties: professionalProvider.tags || ['Résidentiel'],
+          isVerified: professionalProvider.badges?.includes('verified') || false,
+          isPremium: professionalProvider.badges?.includes('premium') || false,
+          phone: '+233244123456',
+          email: `contact@${professionalProvider.name.toLowerCase().replace(/\s+/g, '')}.com`,
+          whatsapp: '+233244123456',
+          listingCount: professionalProvider.listings || 0,
+          images: [
+            'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200',
+            'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200',
+            'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=200'
+          ],
+          languages: ['Français', 'English'],
+          zones: ['Centre-ville', 'Résidentiel', 'Commercial'],
+          listings: [
+            {
+              id: 'l1',
+              title: 'Villa moderne avec piscine',
+              city: professionalProvider.city,
+              country: professionalProvider.country,
+              price: '$2,500/mois',
+              status: 'À louer' as const,
+              thumbnail: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
+            },
+            {
+              id: 'l2',
+              title: 'Penthouse centre-ville',
+              city: professionalProvider.city,
+              country: professionalProvider.country,
+              price: '$450,000',
+              status: 'À vendre' as const,
+              thumbnail: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
+            },
+          ],
+          reviews: [
+            {
+              id: 'r1',
+              author: 'Emeka Nwankwo',
+              rating: 5,
+              text: 'Excellent service ! Très professionnel et à l\'écoute.',
+              date: '30/10/2024',
+            },
+            {
+              id: 'r2',
+              author: 'Fatou Sall',
+              rating: 5,
+              text: 'Service impeccable. Connaît très bien le marché local.',
+              date: '15/10/2024',
+            },
+          ],
+        };
+        console.log('[ProviderProfile] Mapped professional provider:', provider.name);
+      } else {
+        // Fallback to getProviderById
+        try {
+          provider = getProviderById(cleanId);
+          console.log('[ProviderProfile] Found provider via getProviderById:', provider ? provider.name : 'NOT FOUND');
+        } catch (providerError) {
+          console.error('[ProviderProfile] Error in getProviderById:', providerError);
+          provider = null;
+        }
       }
     }
   } catch (error) {
@@ -205,12 +278,12 @@ export default function ProviderProfile() {
             <View style={styles.statsRow}>
               <View style={styles.stat}>
                 <Star size={16} color="#f59e0b" fill="#f59e0b" />
-                <Text style={styles.statValue}>{(provider.rating || 0).toFixed(1)}</Text>
-                <Text style={styles.statLabel}>({provider.reviewCount || 0} avis)</Text>
+                <Text style={styles.statValue}>{Number(provider.rating || 0).toFixed(1)}</Text>
+                <Text style={styles.statLabel}>({provider.reviewCount || provider.reviews || 0} avis)</Text>
               </View>
               <Text style={styles.dot}> • </Text>
               <View style={styles.stat}>
-                <Text style={styles.statValue}>{provider.listingCount || 0}</Text>
+                <Text style={styles.statValue}>{provider.listingCount || provider.listings || 0}</Text>
                 <Text style={styles.statLabel}>annonces</Text>
               </View>
             </View>
@@ -273,7 +346,7 @@ export default function ProviderProfile() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Spécialités</Text>
           <View style={styles.specialtiesRow}>
-            {(provider.specialties || []).map((specialty) => (
+            {(provider.specialties || []).map((specialty: string) => (
               <View key={specialty} style={styles.specialtyChip}>
                 <Text style={styles.specialtyText}>{specialty}</Text>
               </View>
@@ -290,7 +363,7 @@ export default function ProviderProfile() {
             </TouchableOpacity>
           </View>
           
-          {provider.listings?.map((listing) => (
+          {provider.listings?.map((listing: any) => (
             <TouchableOpacity key={listing.id} style={styles.listingCard}>
               <Image source={{ uri: listing.thumbnail }} style={styles.listingImage} />
               <View style={styles.listingInfo}>
@@ -321,7 +394,7 @@ export default function ProviderProfile() {
             </TouchableOpacity>
           </View>
           
-          {provider.reviews?.map((review) => (
+          {provider.reviews?.map((review: any) => (
             <View key={review.id} style={styles.reviewCard}>
               <View style={styles.reviewHeader}>
                 <Text style={styles.reviewAuthor}>{review.author}</Text>

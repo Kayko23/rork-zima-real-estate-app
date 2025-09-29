@@ -30,20 +30,29 @@ export default function ServicesFeed() {
   }, []);
 
   const goProfile = (p: Provider) => {
+    console.log('[ServicesFeed] goProfile called with:', p);
+    
     if (!p?.id || String(p.id).trim().length === 0) {
-      console.log('Invalid provider ID:', p?.id);
+      console.log('[ServicesFeed] Invalid provider ID:', p?.id);
       return;
     }
-    console.log('View profile:', p.id, 'Type:', typeof p.id, 'Provider:', p.name);
+    
+    console.log('[ServicesFeed] View profile:', p.id, 'Type:', typeof p.id, 'Provider:', p.name);
+    
     try {
       const cleanId = String(p.id).trim();
-      console.log('Navigating to provider profile with ID:', cleanId);
-      router.push({
-        pathname: '/provider/[id]',
-        params: { id: cleanId }
-      });
+      console.log('[ServicesFeed] Navigating to provider profile with ID:', cleanId);
+      
+      // Add a small delay to ensure any animations complete
+      setTimeout(() => {
+        router.push({
+          pathname: '/provider/[id]',
+          params: { id: cleanId }
+        });
+      }, 100);
+      
     } catch (error) {
-      console.error('Navigation error:', error);
+      console.error('[ServicesFeed] Navigation error:', error);
     }
   };
   
