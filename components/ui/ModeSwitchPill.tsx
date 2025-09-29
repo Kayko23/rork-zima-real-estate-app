@@ -128,7 +128,7 @@ export default function ModeSwitchPill() {
     <TouchableOpacity
       style={[
         styles.container,
-        { bottom: Math.max(insets.bottom, 12) + 64 + 80 }
+        { bottom: Math.max(insets.bottom, 12) + 64 + 120 }
       ]}
       onPress={handlePress}
       activeOpacity={0.8}

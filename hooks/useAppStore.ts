@@ -104,9 +104,14 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       }
       if (savedUser && savedUser.trim()) {
         try {
-          setUser(JSON.parse(savedUser));
-        } catch {
-          // Invalid JSON, ignore
+          const parsedUser = JSON.parse(savedUser);
+          if (parsedUser && typeof parsedUser === 'object') {
+            setUser({ ...defaultUser, ...parsedUser });
+          }
+        } catch (error) {
+          console.log('Invalid user JSON, using default:', error);
+          // Clear corrupted data
+          await storage.setItem('user', JSON.stringify(defaultUser));
         }
       }
       if (savedLanguage && savedLanguage.trim()) {

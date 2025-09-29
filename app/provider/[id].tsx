@@ -39,11 +39,15 @@ export default function ProviderProfile() {
   try {
     // Ensure id is a string and not undefined
     const providerId = Array.isArray(id) ? id[0] : id;
-    if (!providerId || typeof providerId !== 'string') {
+    console.log('[ProviderProfile] Processing ID:', providerId, 'Type:', typeof providerId);
+    
+    if (!providerId || typeof providerId !== 'string' || providerId.trim() === '') {
       console.log('[ProviderProfile] Invalid ID provided:', providerId);
       provider = null;
     } else {
-      provider = getProviderById(String(providerId).trim());
+      const cleanId = String(providerId).trim();
+      console.log('[ProviderProfile] Looking for provider with clean ID:', cleanId);
+      provider = getProviderById(cleanId);
       console.log('[ProviderProfile] Found provider:', provider ? provider.name : 'NOT FOUND');
     }
   } catch (error) {
