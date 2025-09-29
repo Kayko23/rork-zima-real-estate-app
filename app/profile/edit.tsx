@@ -6,7 +6,7 @@ export default function EditProfileScreen() {
     <EmptyScreen
       title="Éditer le profil"
       subtitle="Mettez à jour votre nom, photo, téléphone, langue et devise."
-      primaryCta={{ label: "Ouvrir le formulaire", onPress: () => console.log("Profile form not implemented yet") }}
+      primaryCta={{ label: "Ouvrir le formulaire", onPress: () => console.log("Formulaire à implémenter") }}
       secondaryCta={{ label: "Retour", onPress: () => router.back() }}
     />
   );
