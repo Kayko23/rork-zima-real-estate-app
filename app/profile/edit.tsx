@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Image, Pressable, StyleSheet, ScrollView } from "react-native";
+import React, { useRef, useState } from "react";
+import { View, Text, TextInput, Image, Pressable, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Save, Camera, UserRound, Mail, Phone, MapPin, Globe2, Lock, Eye, EyeOff } from "lucide-react-native";
 import { useApp } from "@/hooks/useAppStore";
@@ -76,59 +76,72 @@ export default function EditProfileScreen() {
     }
   }
 
+  const scrollRef = useRef<ScrollView | null>(null);
+
   return (
-    <ScrollView contentContainerStyle={s.container}>
-      <Pressable onPress={() => pick("cover")} style={s.cover}>
-        {cover ? <Image source={{uri: cover}} style={s.coverImg}/> : <Camera />}
-      </Pressable>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.select({ ios: "padding", android: "height", default: undefined })}
+      keyboardVerticalOffset={Platform.select({ ios: 88, android: 0, default: 0 }) ?? 0}
+    >
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={s.container}
+        keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets
+      >
+        <Pressable onPress={() => pick("cover")} style={s.cover}>
+          {cover ? <Image source={{uri: cover}} style={s.coverImg}/> : <Camera />}
+        </Pressable>
 
-      <Pressable onPress={() => pick("avatar")} style={s.avatarWrap}>
-        {avatar ? <Image source={{uri: avatar}} style={s.avatar}/> : <UserRound size={28} />}
-      </Pressable>
+        <Pressable onPress={() => pick("avatar")} style={s.avatarWrap}>
+          {avatar ? <Image source={{uri: avatar}} style={s.avatar}/> : <UserRound size={28} />}
+        </Pressable>
 
-      <View style={s.form}>
-        <Field icon={<UserRound size={18}/>} value={fullName} onChangeText={setFullName} placeholder="Nom complet" />
-        <Field icon={<Mail size={18}/>} value={email} onChangeText={setEmail} placeholder="Email" keyboardType="email-address" />
-        <Field icon={<Phone size={18}/>} value={phone} onChangeText={setPhone} placeholder="Téléphone" keyboardType="phone-pad" />
-        <Field icon={<MapPin size={18}/>} value={city} onChangeText={setCity} placeholder="Ville" />
-        <Field icon={<Globe2 size={18}/>} value={country} onChangeText={setCountry} placeholder="Pays" />
-        <Text style={s.label}>Bio</Text>
-        <View style={s.bioContainer}>
-          <TextInput style={[s.input, s.multiline]} multiline numberOfLines={5} value={bio} onChangeText={setBio} placeholder="Présentez-vous…" />
+        <View style={s.form}>
+          <Field icon={<UserRound size={18}/>} value={fullName} onChangeText={setFullName} placeholder="Nom complet" returnKeyType="next" />
+          <Field icon={<Mail size={18}/>} value={email} onChangeText={setEmail} placeholder="Email" keyboardType="email-address" autoCapitalize="none" returnKeyType="next" />
+          <Field icon={<Phone size={18}/>} value={phone} onChangeText={setPhone} placeholder="Téléphone" keyboardType="phone-pad" returnKeyType="next" />
+          <Field icon={<MapPin size={18}/>} value={city} onChangeText={setCity} placeholder="Ville" returnKeyType="next" />
+          <Field icon={<Globe2 size={18}/>} value={country} onChangeText={setCountry} placeholder="Pays" returnKeyType="next" />
+          <Text style={s.label}>Bio</Text>
+          <View style={s.bioContainer}>
+            <TextInput style={[s.input, s.multiline]} multiline numberOfLines={5} value={bio} onChangeText={setBio} placeholder="Présentez-vous…" textAlignVertical="top" returnKeyType="done" />
+          </View>
+          
+          <Text style={[s.label, {marginTop: 24}]}>Changer le mot de passe</Text>
+          <PasswordField 
+            icon={<Lock size={18}/>} 
+            value={currentPassword} 
+            onChangeText={setCurrentPassword} 
+            placeholder="Mot de passe actuel" 
+            showPassword={showCurrentPassword}
+            onToggleShow={() => setShowCurrentPassword(!showCurrentPassword)}
+          />
+          <PasswordField 
+            icon={<Lock size={18}/>} 
+            value={newPassword} 
+            onChangeText={setNewPassword} 
+            placeholder="Nouveau mot de passe" 
+            showPassword={showNewPassword}
+            onToggleShow={() => setShowNewPassword(!showNewPassword)}
+          />
+          <PasswordField 
+            icon={<Lock size={18}/>} 
+            value={confirmPassword} 
+            onChangeText={setConfirmPassword} 
+            placeholder="Confirmer le nouveau mot de passe" 
+            showPassword={showConfirmPassword}
+            onToggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
+          />
         </View>
-        
-        <Text style={[s.label, {marginTop: 24}]}>Changer le mot de passe</Text>
-        <PasswordField 
-          icon={<Lock size={18}/>} 
-          value={currentPassword} 
-          onChangeText={setCurrentPassword} 
-          placeholder="Mot de passe actuel" 
-          showPassword={showCurrentPassword}
-          onToggleShow={() => setShowCurrentPassword(!showCurrentPassword)}
-        />
-        <PasswordField 
-          icon={<Lock size={18}/>} 
-          value={newPassword} 
-          onChangeText={setNewPassword} 
-          placeholder="Nouveau mot de passe" 
-          showPassword={showNewPassword}
-          onToggleShow={() => setShowNewPassword(!showNewPassword)}
-        />
-        <PasswordField 
-          icon={<Lock size={18}/>} 
-          value={confirmPassword} 
-          onChangeText={setConfirmPassword} 
-          placeholder="Confirmer le nouveau mot de passe" 
-          showPassword={showConfirmPassword}
-          onToggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
-        />
-      </View>
 
-      <Pressable onPress={onSave} style={s.cta}>
-        <Save color="#fff" />
-        <Text style={s.ctaTxt}>Enregistrer</Text>
-      </Pressable>
-    </ScrollView>
+        <Pressable onPress={onSave} style={s.cta}>
+          <Save color="#fff" />
+          <Text style={s.ctaTxt}>Enregistrer</Text>
+        </Pressable>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -137,7 +150,7 @@ function Field(props: any) {
   return (
     <View style={s.row}>
       <View style={s.icon}>
-        <Text>{icon}</Text>
+        {icon}
       </View>
       <TextInput style={s.input} {...ti} />
     </View>
@@ -156,11 +169,13 @@ function PasswordField(props: {
   return (
     <View style={s.row}>
       <View style={s.icon}>
-        <Text>{icon}</Text>
+        {icon}
       </View>
       <TextInput 
         style={s.input} 
         secureTextEntry={!showPassword}
+        autoCapitalize="none"
+        returnKeyType="done"
         {...ti} 
       />
       <Pressable onPress={onToggleShow} style={s.eyeIcon}>
@@ -185,5 +200,5 @@ const s = StyleSheet.create({
   multiline:{ height:120, paddingTop:12, textAlignVertical:"top" },
   cta:{ margin:16, height:52, backgroundColor:"#1F2937", borderRadius:14, alignItems:"center", justifyContent:"center", flexDirection:"row", gap:8 },
   ctaTxt:{ color:"#fff", fontWeight:"700" },
-  eyeIcon: { padding: 4 },
+  eyeIcon: { padding: 4, marginLeft: 8 },
 });
