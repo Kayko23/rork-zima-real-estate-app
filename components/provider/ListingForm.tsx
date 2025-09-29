@@ -76,6 +76,29 @@ type DocType =
   | "certificat_cession"
   | "autre";
 
+const baseDocOptions: { key: DocType; label: string }[] = [
+  { key: "titre_foncier", label: "Titre foncier" },
+  { key: "certificat_foncier", label: "Certificat foncier" },
+  { key: "permis_construire", label: "Permis de construire" },
+  { key: "attestation_villageoise", label: "Attestation villageoise" },
+  { key: "certificat_cession", label: "Certificat de cession" },
+  { key: "autre", label: "Autre" },
+];
+
+const docOptionsByCountry: Record<string, { key: DocType; label: string }[]> = {
+  CI: [
+    { key: "attestation_villageoise", label: "Attestation villageoise" },
+  ],
+  SN: [],
+  BJ: [],
+  TG: [],
+  CM: [],
+  NG: [],
+  GH: [],
+  FR: [],
+  US: [],
+};
+
 export default function ListingForm({
   initial,
   onSubmit,
@@ -134,6 +157,13 @@ export default function ListingForm({
   }, [price, currency]);
 
   const availableAmenities = amenitiesByCategory[category] ?? [];
+
+  const docOptions = useMemo(() => {
+    const extras = docOptionsByCountry[countryCode] ?? [];
+    const merged = [...baseDocOptions, ...extras];
+    const seen = new Set<string>();
+    return merged.filter(d => (seen.has(d.key) ? false : (seen.add(d.key), true)));
+  }, [countryCode]);
 
   const addPhoto = useCallback(async () => {
     try {
@@ -261,7 +291,7 @@ export default function ListingForm({
           </ScrollView>
         )}
         {attachments.length > 0 && (
-          <Text style={s.hint}>{attachments.length} pi E8ce(s) jointe(s)</Text>
+          <Text style={s.hint}>{attachments.length} pièce(s) jointe(s)</Text>
         )}
 
         <Text style={s.section}>Informations</Text>
@@ -328,14 +358,7 @@ export default function ListingForm({
 
         <Text style={s.label}>Type de document</Text>
         <View style={s.rowWrap}>
-          {([
-            { key: "titre_foncier", label: "Titre foncier" },
-            { key: "certificat_foncier", label: "Certificat foncier" },
-            { key: "permis_construire", label: "Permis de construire" },
-            { key: "attestation_villageoise", label: "Attestation villageoise" },
-            { key: "certificat_cession", label: "Certificat de cession" },
-            { key: "autre", label: "Autre" },
-          ] as { key: DocType; label: string }[]).map(d => (
+          {docOptions.map(d => (
             <Pressable key={d.key} onPress={() => setDocType(d.key)} style={[s.chip, docType === d.key && s.chipActive]} testID={`doc-${d.key}`}>
               <Text style={[s.chipTxt, docType === d.key && s.chipTxtActive]}>{d.label}</Text>
             </Pressable>
@@ -377,7 +400,7 @@ export default function ListingForm({
             {consent && <Check color="#fff" size={16} />}
           </View>
           <Text style={s.consentText}>
-            Lu et approuvé la confidentialité. Jassure que les informations sont correctes et jassume toute responsabilité en cas de fraude.
+            Lu et approuvé les conditions de confidentialité et j’assure que toutes les informations renseignées sont correctes. En cas de fraude, j’assumerai l’entière responsabilité.
           </Text>
         </Pressable>
 
