@@ -132,7 +132,7 @@ export default function ChatThread() {
         ctx={ctx as any}
         hasDocs={true}
         onSelect={(text, id) => {
-          if (id === "shareDocs") return pickAndSendDocs();
+          if (id === "shareDocs" || id === "docs") return pickAndSendDocs();
           sendText(text);
         }}
       />

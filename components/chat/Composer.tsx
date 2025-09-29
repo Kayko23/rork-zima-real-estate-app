@@ -1,13 +1,7 @@
 import React, { useState } from "react";
 import { View, TextInput, Pressable, StyleSheet, KeyboardAvoidingView, Platform, Text } from "react-native";
 
-export default function ChatComposer({ 
-  onSend, 
-  onPickDocs 
-}: { 
-  onSend: (t: string) => void; 
-  onPickDocs: () => void; 
-}) {
+export default function ChatComposer({ onSend, onPickDocs }:{ onSend:(t:string)=>void; onPickDocs:()=>void; }) {
   const [v, setV] = useState("");
   
   function submit() { 
@@ -19,26 +13,26 @@ export default function ChatComposer({
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <View style={styles.wrap}>
-        <Pressable onPress={onPickDocs} style={styles.icon}>
-          <Text style={styles.iconText}>📎</Text>
+      <View style={s.wrap}>
+        <Pressable onPress={onPickDocs} style={s.icon}>
+          <Text style={s.iconText}>📎</Text>
         </Pressable>
         <TextInput
-          style={styles.input}
+          style={s.input}
           placeholder="Tapez votre message…"
           value={v}
           onChangeText={setV}
           multiline
         />
-        <Pressable onPress={submit} style={styles.send}>
-          <Text style={styles.sendText}>Envoyer</Text>
+        <Pressable onPress={submit} style={s.send}>
+          <Text style={s.sendText}>Envoyer</Text>
         </Pressable>
       </View>
     </KeyboardAvoidingView>
   );
 }
 
-const styles = StyleSheet.create({
+const s = StyleSheet.create({
   wrap: { 
     flexDirection: "row", 
     alignItems: "flex-end", 
@@ -56,8 +50,8 @@ const styles = StyleSheet.create({
     justifyContent: "center", 
     backgroundColor: "#F1F6F4" 
   },
-  iconText: {
-    fontSize: 18
+  iconText: { 
+    fontSize: 18 
   },
   input: { 
     flex: 1, 
@@ -74,8 +68,8 @@ const styles = StyleSheet.create({
     borderRadius: 12, 
     backgroundColor: "#1F2937" 
   },
-  sendText: {
+  sendText: { 
     color: "#fff", 
-    fontWeight: "700"
+    fontWeight: "700" 
   },
 });
