@@ -93,7 +93,9 @@ export default function EditProfileScreen() {
         <Field icon={<MapPin size={18}/>} value={city} onChangeText={setCity} placeholder="Ville" />
         <Field icon={<Globe2 size={18}/>} value={country} onChangeText={setCountry} placeholder="Pays" />
         <Text style={s.label}>Bio</Text>
-        <TextInput style={[s.input, s.multiline]} multiline numberOfLines={5} value={bio} onChangeText={setBio} placeholder="Présentez-vous…" />
+        <View style={s.bioContainer}>
+          <TextInput style={[s.input, s.multiline]} multiline numberOfLines={5} value={bio} onChangeText={setBio} placeholder="Présentez-vous…" />
+        </View>
         
         <Text style={[s.label, {marginTop: 24}]}>Changer le mot de passe</Text>
         <PasswordField 
@@ -179,6 +181,7 @@ const s = StyleSheet.create({
   icon:{ marginRight:8 },
   input:{ flex:1, height:48 },
   label:{ marginTop:8, marginBottom:4, fontWeight:"600" },
+  bioContainer: { borderWidth:1, borderColor:"#e5e7eb", borderRadius:12, paddingHorizontal:12, backgroundColor:"#fff" },
   multiline:{ height:120, paddingTop:12, textAlignVertical:"top" },
   cta:{ margin:16, height:52, backgroundColor:"#1F2937", borderRadius:14, alignItems:"center", justifyContent:"center", flexDirection:"row", gap:8 },
   ctaTxt:{ color:"#fff", fontWeight:"700" },
