@@ -74,6 +74,10 @@ export interface User {
   email: string;
   avatar: string;
   phone?: string;
+  city?: string;
+  country?: string;
+  bio?: string;
+  cover?: string;
   isProvider: boolean;
   preferences: {
     language: 'fr' | 'en' | 'pt';

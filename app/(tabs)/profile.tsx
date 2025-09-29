@@ -56,13 +56,13 @@ export default function ProfileScreen() {
       id: 'favorites',
       title: 'Mes favoris',
       icon: Heart,
-      onPress: () => router.push('/(tabs)/favorites'),
+      onPress: () => router.push('/profile/favorites-bridge'),
     },
     {
       id: 'messages',
       title: 'Messages',
       icon: MessageCircle,
-      onPress: () => router.push('/(tabs)/messages'),
+      onPress: () => router.push('/profile/messages-bridge'),
     },
     {
       id: 'payments',
@@ -81,7 +81,7 @@ export default function ProfileScreen() {
       title: 'Langue',
       subtitle: user.preferences.language === 'fr' ? 'Français' : 'English',
       icon: Globe,
-      onPress: () => router.push('/(onboarding)/language'),
+      onPress: () => router.push('/profile/language-currency'),
     },
     {
       id: 'mode',
@@ -89,8 +89,7 @@ export default function ProfileScreen() {
       icon: UserPlus,
       onPress: () => {
         if (userMode === 'user') {
-          switchMode('provider');
-          router.replace('/(proTabs)/dashboard');
+          router.push('/profile/switch-mode');
         } else {
           switchMode('user');
           router.replace('/(tabs)/home');
@@ -101,7 +100,7 @@ export default function ProfileScreen() {
       id: 'support',
       title: 'Aide & support',
       icon: HelpCircle,
-      onPress: () => router.push('/support'),
+      onPress: () => router.push('/profile/help'),
     },
     {
       id: 'legal',
