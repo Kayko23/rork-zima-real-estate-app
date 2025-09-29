@@ -58,8 +58,15 @@ export default function ProviderProfile() {
     } else {
       const cleanId = providerId.trim();
       console.log('[ProviderProfile] Looking for provider with clean ID:', cleanId);
-      provider = getProviderById(cleanId);
-      console.log('[ProviderProfile] Found provider:', provider ? provider.name : 'NOT FOUND');
+      
+      // Safely get provider without JSON parsing issues
+      try {
+        provider = getProviderById(cleanId);
+        console.log('[ProviderProfile] Found provider:', provider ? provider.name : 'NOT FOUND');
+      } catch (providerError) {
+        console.error('[ProviderProfile] Error in getProviderById:', providerError);
+        provider = null;
+      }
     }
   } catch (error) {
     console.error('[ProviderProfile] Error getting provider:', error);

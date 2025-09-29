@@ -850,7 +850,12 @@ export const getProviderById = (id: string) => {
   
   try {
     // Chercher d'abord dans les providers de professionals.ts
-    const professionalProvider = providers.find(p => String(p.id).trim() === String(id).trim());
+    const professionalProvider = providers.find(p => {
+      const providerId = String(p.id).trim();
+      const searchId = String(id).trim();
+      return providerId === searchId;
+    });
+    
     console.log('[getProviderById] Found in professionals:', !!professionalProvider);
     
     if (professionalProvider) {
@@ -860,15 +865,21 @@ export const getProviderById = (id: string) => {
       const safeCountry = String(professionalProvider.country || 'Pays non spécifié');
       
       // Créer un nom d'email sécurisé
-      const emailName = safeName.toLowerCase()
-        .replace(/[àáâãäå]/g, 'a')
-        .replace(/[èéêë]/g, 'e')
-        .replace(/[ìíîï]/g, 'i')
-        .replace(/[òóôõö]/g, 'o')
-        .replace(/[ùúûü]/g, 'u')
-        .replace(/[ç]/g, 'c')
-        .replace(/[^a-z0-9]/g, '')
-        .substring(0, 20) || 'contact';
+      let emailName = 'contact';
+      try {
+        emailName = safeName.toLowerCase()
+          .replace(/[àáâãäå]/g, 'a')
+          .replace(/[èéêë]/g, 'e')
+          .replace(/[ìíîï]/g, 'i')
+          .replace(/[òóôõö]/g, 'o')
+          .replace(/[ùúûü]/g, 'u')
+          .replace(/[ç]/g, 'c')
+          .replace(/[^a-z0-9]/g, '')
+          .substring(0, 20) || 'contact';
+      } catch (emailError) {
+        console.warn('[getProviderById] Error creating email name:', emailError);
+        emailName = 'contact';
+      }
       
       const mappedProvider = {
         id: String(professionalProvider.id),
