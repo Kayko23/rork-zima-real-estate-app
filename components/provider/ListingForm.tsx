@@ -21,50 +21,72 @@ const currencyMap: Record<string, { code: string }> = {
 };
 
 const categories = [
-  { key: "residential", label: "Résidentiel", types: ["appartement", "studio", "villa", "maison", "penthouse"] },
-  { key: "offices", label: "Bureaux", types: ["bureau", "plateau", "coworking"] },
-  { key: "retail", label: "Commerces", types: ["boutique", "magasin", "showroom"] },
-  { key: "land", label: "Terrain", types: ["terrain urbain", "terrain agricole", "lotissement"] },
-  { key: "industrial", label: "Industriel", types: ["entrepôt", "usine", "atelier"] },
-  { key: "hotel", label: "Hôtellerie", types: ["hôtel", "auberge", "maison d'hôte"] },
+  { key: "residential", label: "Résidentiel", types: ["appartement", "studio", "villa", "maison", "penthouse", "duplex", "triplex"] },
+  { key: "offices", label: "Bureaux", types: ["bureau", "plateau", "coworking", "espace de travail", "salle de réunion"] },
+  { key: "retail", label: "Commerces & Retail", types: ["boutique", "magasin", "showroom", "centre commercial", "local commercial"] },
+  { key: "land", label: "Terrains", types: ["terrain urbain", "terrain agricole", "lotissement", "terrain constructible", "terrain industriel"] },
+  { key: "industrial", label: "Industriel & Logistique", types: ["entrepôt", "usine", "atelier", "hangar", "zone industrielle"] },
+  { key: "hotel", label: "Hôtellerie & Événementiel", types: ["hôtel", "auberge", "maison d'hôte", "salle événementielle", "espace événementiel"] },
 ] as const;
 
 const amenitiesByCategory: Record<string, { key: string; label: string }[]> = {
   residential: [
-    { key: "wifi", label: "Wifi" },
-    { key: "parking", label: "Parking" },
+    { key: "wifi", label: "Wifi gratuit" },
+    { key: "parking", label: "Parking gratuit" },
     { key: "ac", label: "Climatisation" },
-    { key: "balcony", label: "Balcon" },
+    { key: "balcony", label: "Balcon/Terrasse" },
     { key: "pool", label: "Piscine" },
     { key: "security24", label: "Sécurité 24h" },
+    { key: "garden", label: "Jardin privé" },
+    { key: "elevator", label: "Ascenseur" },
+    { key: "kitchen", label: "Cuisine équipée" },
+    { key: "furnished", label: "Meublé" },
   ],
   offices: [
     { key: "parking", label: "Parking" },
     { key: "elevator", label: "Ascenseur" },
     { key: "security24", label: "Sécurité 24h" },
     { key: "kitchen", label: "Kitchenette" },
+    { key: "wifi", label: "Wifi haut débit" },
+    { key: "ac", label: "Climatisation" },
+    { key: "meeting_room", label: "Salle de réunion" },
+    { key: "reception", label: "Réception" },
   ],
   retail: [
-    { key: "corner", label: "Angle" },
+    { key: "corner", label: "Emplacement d'angle" },
     { key: "frontage", label: "Belle vitrine" },
-    { key: "parking", label: "Parking" },
+    { key: "parking", label: "Parking clientèle" },
+    { key: "storage", label: "Espace stockage" },
+    { key: "ac", label: "Climatisation" },
+    { key: "security", label: "Système sécurité" },
+    { key: "high_traffic", label: "Zone de passage" },
   ],
   land: [
-    { key: "titled", label: "Borné" },
-    { key: "electricity", label: "Électricité" },
-    { key: "water", label: "Eau" },
+    { key: "titled", label: "Terrain borné" },
+    { key: "electricity", label: "Électricité disponible" },
+    { key: "water", label: "Eau disponible" },
+    { key: "road_access", label: "Accès routier" },
+    { key: "flat", label: "Terrain plat" },
+    { key: "corner_lot", label: "Terrain d'angle" },
   ],
   industrial: [
-    { key: "height", label: "Grande hauteur" },
+    { key: "height", label: "Grande hauteur sous plafond" },
     { key: "dock", label: "Quai de déchargement" },
     { key: "security24", label: "Sécurité 24h" },
+    { key: "crane", label: "Pont roulant" },
+    { key: "truck_access", label: "Accès poids lourds" },
+    { key: "power", label: "Alimentation électrique industrielle" },
   ],
   hotel: [
-    { key: "wifi", label: "Wifi" },
-    { key: "breakfast", label: "Petit-déjeuner" },
-    { key: "parking", label: "Parking" },
+    { key: "wifi", label: "Wifi gratuit" },
+    { key: "breakfast", label: "Petit-déjeuner inclus" },
+    { key: "parking", label: "Parking gratuit" },
     { key: "pool", label: "Piscine" },
     { key: "ac", label: "Climatisation" },
+    { key: "restaurant", label: "Restaurant" },
+    { key: "spa", label: "Spa/Wellness" },
+    { key: "conference", label: "Salle de conférence" },
+    { key: "room_service", label: "Service en chambre" },
   ],
 };
 
@@ -88,15 +110,41 @@ const baseDocOptions: { key: DocType; label: string }[] = [
 const docOptionsByCountry: Record<string, { key: DocType; label: string }[]> = {
   CI: [
     { key: "attestation_villageoise", label: "Attestation villageoise" },
+    { key: "certificat_foncier", label: "Certificat foncier rural" },
   ],
-  SN: [],
-  BJ: [],
-  TG: [],
-  CM: [],
-  NG: [],
-  GH: [],
-  FR: [],
-  US: [],
+  SN: [
+    { key: "titre_foncier", label: "Titre foncier" },
+    { key: "certificat_foncier", label: "Certificat d'occupation" },
+  ],
+  BJ: [
+    { key: "certificat_foncier", label: "Certificat foncier" },
+    { key: "permis_construire", label: "Permis de construire" },
+  ],
+  TG: [
+    { key: "titre_foncier", label: "Titre foncier" },
+    { key: "certificat_cession", label: "Acte de cession" },
+  ],
+  CM: [
+    { key: "titre_foncier", label: "Titre foncier" },
+    { key: "certificat_foncier", label: "Certificat d'occupation" },
+    { key: "permis_construire", label: "Permis de construire" },
+  ],
+  NG: [
+    { key: "certificat_foncier", label: "Certificate of Occupancy" },
+    { key: "titre_foncier", label: "Deed of Assignment" },
+  ],
+  GH: [
+    { key: "titre_foncier", label: "Land Title Certificate" },
+    { key: "certificat_foncier", label: "Lease Agreement" },
+  ],
+  FR: [
+    { key: "titre_foncier", label: "Acte de propriété" },
+    { key: "permis_construire", label: "Permis de construire" },
+  ],
+  US: [
+    { key: "titre_foncier", label: "Property Deed" },
+    { key: "permis_construire", label: "Building Permit" },
+  ],
 };
 
 export default function ListingForm({
@@ -202,7 +250,13 @@ export default function ListingForm({
   }, []);
 
   const validatePhone = (val: string) => /^\+?[0-9 ()-]{7,}$/.test(val.trim());
-  const validateDate = (val: string) => /^\d{2}-\d{2}-\d{4}$/.test(val.trim());
+  const validateDate = (val: string) => {
+    const regex = /^(\d{2})-(\d{2})-(\d{4})$/.test(val.trim());
+    if (!regex) return false;
+    const [, day, month, year] = val.match(/^(\d{2})-(\d{2})-(\d{4})$/) || [];
+    const d = parseInt(day), m = parseInt(month), y = parseInt(year);
+    return d >= 1 && d <= 31 && m >= 1 && m <= 12 && y >= 1900 && y <= new Date().getFullYear() + 10;
+  };
   const limitLandmarkWords = (val: string) => val.trim().split(/[\s]+/).slice(0, 5).join(" ");
 
   const handleSubmit = useCallback(() => {
@@ -353,8 +407,9 @@ export default function ListingForm({
           })}
         </View>
 
-        <Text style={s.label}>Année / Date (JJ-MM-AAAA)</Text>
-        <Input value={yearDate} onChangeText={setYearDate} placeholder="ex: 12-08-2021" keyboardType="numbers-and-punctuation" testID="input-yeardate" />
+        <Text style={s.label}>Année de construction/certification (JJ-MM-AAAA)</Text>
+        <Input value={yearDate} onChangeText={setYearDate} placeholder="ex: 15-03-2020" keyboardType="numbers-and-punctuation" testID="input-yeardate" />
+        {yearDate && !validateDate(yearDate) && <Text style={s.error}>Format requis: JJ-MM-AAAA (ex: 15-03-2020)</Text>}
 
         <Text style={s.label}>Type de document</Text>
         <View style={s.rowWrap}>
@@ -386,8 +441,9 @@ export default function ListingForm({
         <Text style={s.label}>Orientation</Text>
         <Input value={orientation} onChangeText={setOrientation} placeholder="Ex: Sud-Est" testID="input-orientation" />
 
-        <Text style={s.label}>Repère (5 mots max)</Text>
-        <Input value={landmark} onChangeText={(t: string) => setLandmark(limitLandmarkWords(t))} placeholder="Ex: près grand rond-point" testID="input-landmark" />
+        <Text style={s.label}>Repère pour localiser facilement (5 mots max)</Text>
+        <Input value={landmark} onChangeText={(t: string) => setLandmark(limitLandmarkWords(t))} placeholder="Ex: près mosquée centrale" testID="input-landmark" />
+        <Text style={s.hint}>Décrivez un point de repère connu pour faciliter la localisation</Text>
 
         <Text style={s.label}>Description</Text>
         <Input multiline style={s.textarea} value={desc} onChangeText={setDesc} placeholder="Décrivez le bien…" testID="input-desc" />
