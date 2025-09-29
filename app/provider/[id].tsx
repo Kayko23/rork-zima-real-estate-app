@@ -336,9 +336,10 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     flex: 1,
-    justifyContent: 'center',
+    paddingTop: 100,
     alignItems: 'center',
     padding: 24,
+    backgroundColor: '#f8f9fa',
   },
   errorText: {
     ...Type.h2,
