@@ -115,18 +115,20 @@ export const [SessionProvider, useSession] = createContextHook(() => {
         await hydrate();
       } catch (error) {
         console.error('Session initialization error:', error);
+      } finally {
         if (mounted) {
           setIsLoading(false);
         }
       }
     };
     
+    // Shorter timeout to prevent hydration issues
     const timeout = setTimeout(() => {
       if (mounted) {
         console.warn('Session hydration timeout');
         setIsLoading(false);
       }
-    }, 2000);
+    }, 1000);
     
     initSession();
     

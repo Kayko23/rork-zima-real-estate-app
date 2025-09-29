@@ -40,7 +40,7 @@ function RootLayoutNav() {
 }
 
 function AppInitializer({ children }: { children: React.ReactNode }) {
-  const { hydrate } = useApp();
+  const { isInitialized } = useApp();
   const [isReady, setIsReady] = useState(false);
   
   useBootstrapFx();
@@ -48,38 +48,27 @@ function AppInitializer({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let mounted = true;
     
-    const initializeApp = async () => {
-      try {
-        await hydrate();
-        if (mounted) {
-          setIsReady(true);
-        }
-      } catch (error) {
-        console.error('App initialization error:', error);
-        if (mounted) {
-          setIsReady(true); // Continue anyway
-        }
-      }
-    };
-    
-    // Add a timeout to prevent infinite loading
+    // Simple timeout to ensure app starts even if initialization is slow
     const timeout = setTimeout(() => {
-      if (mounted && !isReady) {
-        console.warn('App initialization timeout, continuing anyway');
+      if (mounted) {
         setIsReady(true);
       }
-    }, 3000);
+    }, 500); // Reduced timeout
     
-    initializeApp();
+    // Also set ready when initialized
+    if (isInitialized && mounted) {
+      setIsReady(true);
+      clearTimeout(timeout);
+    }
     
     return () => {
       mounted = false;
       clearTimeout(timeout);
     };
-  }, [hydrate, isReady]);
+  }, [isInitialized]);
   
   if (!isReady) {
-    return null; // Or a loading spinner
+    return null;
   }
   
   return <>{children}</>;
@@ -89,15 +78,17 @@ export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsReady(true);
-    }, 100);
-    return () => clearTimeout(timer);
+    // Immediate initialization to prevent hydration timeout
+    setIsReady(true);
   }, []);
 
   const onLayoutRootView = useCallback(async () => {
     if (isReady) {
-      try { await SplashScreen.hideAsync(); } catch {}
+      try { 
+        await SplashScreen.hideAsync(); 
+      } catch (error) {
+        console.log('SplashScreen hide error:', error);
+      }
     }
   }, [isReady]);
 

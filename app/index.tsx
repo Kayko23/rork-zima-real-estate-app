@@ -9,19 +9,39 @@ export default function Index() {
   const { isAuthenticated, isLoading } = useSession();
 
   useEffect(() => {
-    if (isLoading) return;
-
-    const timer = setTimeout(() => {
+    let mounted = true;
+    
+    const navigate = () => {
+      if (!mounted) return;
+      
       if (isAuthenticated) {
-        // User is logged in, go to main app
         router.replace("/(tabs)/home");
       } else {
-        // User is not logged in, go to onboarding/auth
         router.replace("/(onboarding)/splash");
       }
-    }, 100);
+    };
 
-    return () => clearTimeout(timer);
+    if (!isLoading) {
+      // Navigate immediately if not loading
+      navigate();
+    } else {
+      // Set a timeout to prevent infinite loading
+      const timer = setTimeout(() => {
+        if (mounted) {
+          console.warn('Navigation timeout, proceeding with default route');
+          navigate();
+        }
+      }, 2000);
+      
+      return () => {
+        mounted = false;
+        clearTimeout(timer);
+      };
+    }
+    
+    return () => {
+      mounted = false;
+    };
   }, [router, isAuthenticated, isLoading]);
 
   return (

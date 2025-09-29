@@ -2,11 +2,9 @@ import { useEffect } from "react";
 import { useApp } from "@/hooks/useAppStore";
 
 export function useBootstrapFx() {
-  const { setFx, isHydrated } = useApp();
+  const { setFx } = useApp();
 
   useEffect(() => {
-    if (!isHydrated) return;
-    
     let mounted = true;
     
     const loadRates = async () => {
@@ -40,12 +38,12 @@ export function useBootstrapFx() {
       }
     };
     
-    // Small delay to ensure everything is ready
-    const timer = setTimeout(loadRates, 100);
+    // Load rates immediately without waiting for hydration
+    const timer = setTimeout(loadRates, 50);
     
     return () => {
       mounted = false;
       clearTimeout(timer);
     };
-  }, [setFx, isHydrated]);
+  }, [setFx]);
 }

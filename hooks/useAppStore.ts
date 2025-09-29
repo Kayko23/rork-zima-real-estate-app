@@ -88,7 +88,16 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
 
   useEffect(() => {
     // Load persisted data after component mounts
-    loadPersistedData();
+    const initializeStore = async () => {
+      try {
+        await loadPersistedData();
+      } catch (error) {
+        console.error('Store initialization error:', error);
+        setIsInitialized(true); // Continue anyway
+      }
+    };
+    
+    initializeStore();
   }, []);
 
   const loadPersistedData = async () => {
