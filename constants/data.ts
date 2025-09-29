@@ -843,14 +843,14 @@ export const mockProviders: Provider[] = [
 export const getProviderById = (id: string) => {
   console.log('[getProviderById] Looking for provider with ID:', id);
   
-  if (!id || typeof id !== 'string') {
+  if (!id || typeof id !== 'string' || id.trim() === '') {
     console.log('[getProviderById] Invalid ID provided:', id);
     return null;
   }
   
   try {
     // Chercher d'abord dans les providers de professionals.ts
-    const professionalProvider = providers.find(p => String(p.id) === String(id));
+    const professionalProvider = providers.find(p => String(p.id).trim() === String(id).trim());
     console.log('[getProviderById] Found in professionals:', !!professionalProvider);
     
     if (professionalProvider) {

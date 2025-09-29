@@ -30,9 +30,16 @@ export default function ServicesFeed() {
   }, []);
 
   const goProfile = (p: Provider) => {
-    if (!p?.id || p.id.trim().length === 0) return;
-    console.log('View profile:', p.id);
-    router.push(`/provider/${p.id}`);
+    if (!p?.id || String(p.id).trim().length === 0) {
+      console.log('Invalid provider ID:', p?.id);
+      return;
+    }
+    console.log('View profile:', p.id, 'Type:', typeof p.id);
+    try {
+      router.push(`/provider/${encodeURIComponent(String(p.id))}`);
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
   };
   
   const call = (p: Provider) => {

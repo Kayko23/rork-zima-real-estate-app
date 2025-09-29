@@ -37,8 +37,15 @@ export default function ProviderProfile() {
   
   let provider;
   try {
-    provider = getProviderById(id as string);
-    console.log('[ProviderProfile] Found provider:', provider ? provider.name : 'NOT FOUND');
+    // Ensure id is a string and not undefined
+    const providerId = Array.isArray(id) ? id[0] : id;
+    if (!providerId || typeof providerId !== 'string') {
+      console.log('[ProviderProfile] Invalid ID provided:', providerId);
+      provider = null;
+    } else {
+      provider = getProviderById(providerId);
+      console.log('[ProviderProfile] Found provider:', provider ? provider.name : 'NOT FOUND');
+    }
   } catch (error) {
     console.error('[ProviderProfile] Error getting provider:', error);
     provider = null;
