@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Image, KeyboardAvoidingView, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Save, Camera, MapPin } from "lucide-react-native";
-import { Listing, ListingType } from "@/services/annonces.api";
+import { Listing, ListingType, RentPeriod } from "@/services/annonces.api";
 
 export default function ListingForm({
   initial,
@@ -13,6 +13,7 @@ export default function ListingForm({
 }) {
   const [title, setTitle] = useState(initial?.title ?? "");
   const [type, setType] = useState<ListingType>(initial?.type ?? "sale");
+  const [rentPeriod, setRentPeriod] = useState<RentPeriod>(initial?.rentPeriod ?? "monthly");
   const [price, setPrice] = useState(String(initial?.price ?? ""));
   const [currency, setCurrency] = useState(initial?.currency ?? "XOF");
   const [city, setCity] = useState(initial?.city ?? "");
@@ -32,7 +33,7 @@ export default function ListingForm({
   }
 
   const handleSubmit = () => {
-    onSubmit({
+    const payload: Partial<Listing> = {
       title, 
       type, 
       price: Number(price || 0), 
@@ -43,7 +44,13 @@ export default function ListingForm({
       beds: Number(beds || 0), 
       baths: Number(baths || 0),
       photos
-    });
+    };
+    
+    if (type === "rent") {
+      payload.rentPeriod = rentPeriod;
+    }
+    
+    onSubmit(payload);
   };
 
   return (
@@ -70,6 +77,16 @@ export default function ListingForm({
           <Seg active={type==="sale"} onPress={() => setType("sale")} label="Vente" />
           <Seg active={type==="rent"} onPress={() => setType("rent")} label="Location" />
         </View>
+
+        {type === "rent" && (
+          <>
+            <Label>Période de location</Label>
+            <View style={s.segment}>
+              <Seg active={rentPeriod==="monthly"} onPress={() => setRentPeriod("monthly")} label="Mensuel" />
+              <Seg active={rentPeriod==="daily"} onPress={() => setRentPeriod("daily")} label="Journalier" />
+            </View>
+          </>
+        )}
 
         <Label>Prix & devise</Label>
         <View style={s.priceRow}>

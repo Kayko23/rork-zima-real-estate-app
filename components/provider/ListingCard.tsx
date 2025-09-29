@@ -13,7 +13,10 @@ export default function ListingCard({ item }: { item: Listing }) {
         <Image source={{ uri: photo }} style={s.image} />
         {item.premium && <View style={s.premium}><Text style={s.premiumTxt}>Premium</Text></View>}
         <View style={s.badges}>
-          <Text style={s.tag}>{item.type === "sale" ? "À VENDRE" : "À LOUER"}</Text>
+          <Text style={s.tag}>
+            {item.type === "sale" ? "À VENDRE" : 
+             item.rentPeriod === "daily" ? "LOCATION JOUR" : "LOCATION MOIS"}
+          </Text>
         </View>
         <Pressable style={s.fav}><Heart color="#fff" /></Pressable>
       </View>
@@ -22,6 +25,9 @@ export default function ListingCard({ item }: { item: Listing }) {
         <Text style={s.title} numberOfLines={1}>{item.title}</Text>
         <Text style={s.price}>
           {Intl.NumberFormat("fr-FR").format(item.price)} {item.currency}
+          {item.type === "rent" && item.rentPeriod && (
+            <Text style={s.period}> / {item.rentPeriod === "monthly" ? "mois" : "jour"}</Text>
+          )}
         </Text>
         <View style={s.meta}>
           <Text>🛏 {item.beds ?? 0}</Text>
@@ -77,6 +83,7 @@ const s = StyleSheet.create({
   info:{ padding:14, gap:6 },
   title:{ fontSize:18, fontWeight:"800" },
   price:{ fontWeight:"800" },
+  period:{ fontWeight:"600", color:"#6b7280" },
   meta:{ flexDirection:"row", gap:14, color:"#6b7280" },
   stats:{ flexDirection:"row", flexWrap:"wrap", gap:10, paddingHorizontal:14, paddingBottom:6, alignItems:"center" },
   stat:{ flexDirection:"row", alignItems:"center", gap:4 },
