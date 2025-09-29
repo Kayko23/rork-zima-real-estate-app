@@ -75,21 +75,61 @@ export default function TripsFilterSheet({ visible, onClose }: Props) {
       )}
 
       <ScrollView 
-        contentContainerStyle={[m.scrollPad, { paddingBottom: bottomGap }]} 
-        showsVerticalScrollIndicator={false}
-
+        contentContainerStyle={[m.scrollPad, { paddingBottom: bottomGap + 80 }]} 
+        showsVerticalScrollIndicator={true}
+        bounces={true}
+        nestedScrollEnabled={true}
       >
         <Text style={m.label}>Voyageurs</Text>
         <View style={m.row}>
-          <Pressable style={m.pill} onPress={()=>setLocal((p: VoyageFilters)=>({ ...p, guests: Math.max(1, (p.guests ?? 1) - 1) }))}><Text style={m.pillTxt}>−</Text></Pressable>
-          <Pressable style={m.pill}><Users size={16}/><Text style={m.pillTxt}>{local.guests ?? 1}</Text></Pressable>
-          <Pressable style={m.pill} onPress={()=>setLocal((p: VoyageFilters)=>({ ...p, guests: (p.guests ?? 1) + 1 }))}><Text style={m.pillTxt}>+</Text></Pressable>
+          <Pressable 
+            style={m.pill} 
+            onPress={()=>{
+              setLocal((p: VoyageFilters)=>({ ...p, guests: Math.max(1, (p.guests ?? 1) - 1) }));
+            }} 
+            testID="guests-minus"
+          >
+            <Text style={m.pillTxt}>−</Text>
+          </Pressable>
+          <View style={[m.pill, m.pillDisplay]}>
+            <Users size={16} color="#134E48"/>
+            <Text style={m.pillTxt}>{local.guests ?? 1} voyageur{(local.guests ?? 1) > 1 ? "s" : ""}</Text>
+          </View>
+          <Pressable 
+            style={m.pill} 
+            onPress={()=>{
+              setLocal((p: VoyageFilters)=>({ ...p, guests: (p.guests ?? 1) + 1 }));
+            }} 
+            testID="guests-plus"
+          >
+            <Text style={m.pillTxt}>+</Text>
+          </Pressable>
         </View>
 
         <Text style={m.label}>Dates</Text>
-        <View style={m.row}>
-          <Pressable style={m.block}><Calendar size={16} color="#134E48" /><Text style={m.blockTxt}>{(local as any).start || "Arrivée"}</Text></Pressable>
-          <Pressable style={m.block}><Calendar size={16} color="#134E48" /><Text style={m.blockTxt}>{(local as any).end || "Départ"}</Text></Pressable>
+        <View style={m.dateRow}>
+          <Pressable 
+            style={m.block} 
+            onPress={()=>{
+              const today = new Date().toISOString().slice(0,10);
+              setLocal({ ...local, start: today } as any);
+            }}
+            testID="date-start"
+          >
+            <Calendar size={16} color="#134E48" />
+            <Text style={m.blockTxt}>{(local as any).start || "Arrivée"}</Text>
+          </Pressable>
+          <Pressable 
+            style={m.block} 
+            onPress={()=>{
+              const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0,10);
+              setLocal({ ...local, end: tomorrow } as any);
+            }}
+            testID="date-end"
+          >
+            <Calendar size={16} color="#134E48" />
+            <Text style={m.blockTxt}>{(local as any).end || "Départ"}</Text>
+          </Pressable>
         </View>
 
         <Text style={m.label}>Prix par nuit</Text>
@@ -107,12 +147,16 @@ export default function TripsFilterSheet({ visible, onClose }: Props) {
         </View>
 
         <Text style={m.label}>Note minimale</Text>
-        <View style={m.row}>
-          {[3,3.5,4,4.5,5].map((r)=> (
-            <Pressable key={String(r)} onPress={()=>setLocal({ ...local, ratingMin: r as any })}
-              style={[m.chip, (local as any).ratingMin===r && m.chipActive]}>
-              <Star size={14} color={(local as any).ratingMin===r ? "#fff" : "#374151"} />
-              <Text style={[m.chipTxt, (local as any).ratingMin===r && m.chipTxtActive]}> {r}+</Text>
+        <View style={m.ratingRow}>
+          {[0, 3, 3.5, 4, 4.5, 5].map((r)=> (
+            <Pressable 
+              key={String(r)} 
+              onPress={()=>setLocal({ ...local, ratingMin: r as any })}
+              style={[m.chip, (local as any).ratingMin===r && m.chipActive]}
+              testID={`rating-${r}`}
+            >
+              <Star size={14} color={(local as any).ratingMin===r ? "#fff" : "#374151"} fill={(local as any).ratingMin===r ? "#fff" : "none"} />
+              <Text style={[m.chipTxt, (local as any).ratingMin===r && m.chipTxtActive]}>{r === 0 ? 'Tous' : `${r}+`}</Text>
             </Pressable>
           ))}
         </View>
@@ -154,17 +198,20 @@ const m = StyleSheet.create({
   presetsRow:{ paddingHorizontal:16, paddingBottom:6, gap:8 },
   presetChip:{ backgroundColor:"#F1F5F9", paddingHorizontal:12, paddingVertical:8, borderRadius:999, marginRight:8 },
   presetTxt:{ fontWeight:"700", color:"#0F172A", maxWidth:160 },
-  scrollPad:{ paddingBottom:8, paddingHorizontal:16 },
+  scrollPad:{ paddingTop: 8, paddingHorizontal:16 },
   gap8:{ gap:8 },
   rowSpread:{ flexDirection:"row", alignItems:"center", justifyContent:"space-between" },
   title:{ fontWeight:"900", fontSize:18, color:"#134E48" },
   label:{ marginTop:10, marginBottom:6, fontWeight:"800", color:"#0B3B36" },
-  row:{ flexDirection:"row", alignItems:"center", gap:10 },
-  chip:{ borderWidth:1, borderColor:"#E6EFEC", borderRadius:999, paddingHorizontal:14, paddingVertical:9, flexDirection:"row", alignItems:"center", gap:6, backgroundColor:"#fff" },
+  row:{ flexDirection:"row", alignItems:"center", gap:10, flexWrap: "wrap" },
+  dateRow:{ flexDirection:"row", alignItems:"center", gap:10 },
+  ratingRow:{ flexDirection:"row", alignItems:"center", gap:8, flexWrap: "wrap" },
+  chip:{ borderWidth:1, borderColor:"#E6EFEC", borderRadius:999, paddingHorizontal:12, paddingVertical:8, flexDirection:"row", alignItems:"center", gap:4, backgroundColor:"#fff" },
   chipActive:{ backgroundColor:"#134E48", borderColor:"#134E48" },
   chipTxt:{ fontWeight:"800", color:"#374151" },
   chipTxtActive:{ color:"#fff" },
-  pill:{ backgroundColor:"#fff", borderWidth:1, borderColor:"#E6EFEC", borderRadius:999, paddingVertical:9, paddingHorizontal:14, flexDirection:"row", alignItems:"center", gap:8 },
+  pill:{ backgroundColor:"#fff", borderWidth:1, borderColor:"#E6EFEC", borderRadius:999, paddingVertical:9, paddingHorizontal:14, flexDirection:"row", alignItems:"center", gap:8, minWidth: 44 },
+  pillDisplay:{ flex: 1, justifyContent: "center" },
   pillTxt:{ fontWeight:"800", color:"#0B3B36" },
   block:{ flex:1, backgroundColor:"#fff", borderRadius:14, padding:12, borderWidth:1, borderColor:"#E6EFEC", flexDirection:"row", gap:8, alignItems:"center" },
   blockTxt:{ fontWeight:"700", color:"#0B3B36" },

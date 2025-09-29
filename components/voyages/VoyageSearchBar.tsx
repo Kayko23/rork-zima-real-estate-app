@@ -13,17 +13,17 @@ export default function VoyageSearchBar({ value, onPress }:{
   return (
     <TouchableOpacity style={s.wrap} onPress={onPress} activeOpacity={0.9} testID="voyage-searchbar">
       <View style={s.row}>
-        <View style={s.pill}>
+        <View style={[s.pill, { flex: 1, minWidth: "100%" }]}>
           <MapPin size={16} color="#0B3B36" />
           <Text style={s.txt} numberOfLines={1}>{destination}</Text>
         </View>
       </View>
       <View style={s.row}>
-        <View style={s.pill}>
+        <View style={[s.pill, { flex: 1 }]}>
           <Calendar size={16} color="#0B3B36" />
           <Text style={s.txt} numberOfLines={1}>{dates}</Text>
         </View>
-        <View style={s.pill}>
+        <View style={[s.pill, { flex: 0, minWidth: 110 }]}>
           <Users size={16} color="#0B3B36" />
           <Text style={s.txt} numberOfLines={1}>{pax}</Text>
         </View>
@@ -37,7 +37,7 @@ const s = StyleSheet.create({
     backgroundColor: "#F8FFFE",
     borderRadius: 16,
     padding: 12,
-    gap: 8,
+    gap: 10,
     borderWidth: 1,
     borderColor: "#E6EFEC",
   },
@@ -45,9 +45,9 @@ const s = StyleSheet.create({
     flexDirection: "row",
     gap: 8,
     alignItems: "center",
+    flexWrap: "wrap",
   },
   pill: {
-    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
@@ -57,10 +57,10 @@ const s = StyleSheet.create({
     backgroundColor: "#fff",
     borderWidth: 1,
     borderColor: "#E6EFEC",
-    minHeight: 40,
+    minHeight: 42,
+    minWidth: 120,
   },
   txt: {
-    flex: 1,
     fontWeight: "600",
     color: "#0B3B36",
     fontSize: 14,
