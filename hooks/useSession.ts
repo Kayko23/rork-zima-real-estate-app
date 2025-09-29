@@ -116,9 +116,8 @@ export const [SessionProvider, useSession] = createContextHook(() => {
       }
     };
     
-    // Add timeout to prevent infinite loading
     const timeout = setTimeout(() => {
-      if (mounted && isLoading) {
+      if (mounted) {
         console.warn('Session hydration timeout');
         setIsLoading(false);
       }
@@ -130,7 +129,7 @@ export const [SessionProvider, useSession] = createContextHook(() => {
       mounted = false;
       clearTimeout(timeout);
     };
-  }, [hydrate, isLoading]);
+  }, [hydrate]);
 
   return useMemo(() => ({
     user,
