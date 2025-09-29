@@ -43,16 +43,33 @@ export const [VoyageFiltersProvider, useVoyageFilters] = createContextHook(() =>
   useEffect(() => {
     (async () => {
       const raw = await storage.getItem(KEY);
-      if (raw) {
+      if (raw && raw.trim()) {
         try {
-          const saved = JSON.parse(raw) as VoyageFilters;
-          setQ(saved);
-          setCurrency(currencyFromCountry(saved.destination?.country));
-        } catch {}
+          // Validate JSON string before parsing
+          if (raw.startsWith('{') && raw.endsWith('}')) {
+            const saved = JSON.parse(raw) as VoyageFilters;
+            if (saved && typeof saved === 'object') {
+              setQ(saved);
+              setCurrency(currencyFromCountry(saved.destination?.country));
+            }
+          }
+        } catch (error) {
+          console.log('Error parsing voyage filters:', error);
+        }
       }
       const pr = await storage.getItem(PK);
-      if (pr) {
-        try { setPresets(JSON.parse(pr) as Preset[]); } catch {}
+      if (pr && pr.trim()) {
+        try {
+          // Validate JSON string before parsing
+          if (pr.startsWith('[') && pr.endsWith(']')) {
+            const parsed = JSON.parse(pr) as Preset[];
+            if (Array.isArray(parsed)) {
+              setPresets(parsed);
+            }
+          }
+        } catch (error) {
+          console.log('Error parsing voyage presets:', error);
+        }
       }
     })();
   }, []);
@@ -90,16 +107,33 @@ export const [VoyageFiltersProvider, useVoyageFilters] = createContextHook(() =>
 
   const hydrate = useCallback(async () => {
     const raw = await storage.getItem(KEY);
-    if (raw) {
+    if (raw && raw.trim()) {
       try {
-        const saved = JSON.parse(raw) as VoyageFilters;
-        setQ(saved);
-        setCurrency(currencyFromCountry(saved.destination?.country));
-      } catch {}
+        // Validate JSON string before parsing
+        if (raw.startsWith('{') && raw.endsWith('}')) {
+          const saved = JSON.parse(raw) as VoyageFilters;
+          if (saved && typeof saved === 'object') {
+            setQ(saved);
+            setCurrency(currencyFromCountry(saved.destination?.country));
+          }
+        }
+      } catch (error) {
+        console.log('Error hydrating voyage filters:', error);
+      }
     }
     const pr = await storage.getItem(PK);
-    if (pr) {
-      try { setPresets(JSON.parse(pr) as Preset[]); } catch {}
+    if (pr && pr.trim()) {
+      try {
+        // Validate JSON string before parsing
+        if (pr.startsWith('[') && pr.endsWith(']')) {
+          const parsed = JSON.parse(pr) as Preset[];
+          if (Array.isArray(parsed)) {
+            setPresets(parsed);
+          }
+        }
+      } catch (error) {
+        console.log('Error hydrating voyage presets:', error);
+      }
     }
   }, []);
 
@@ -109,9 +143,26 @@ export const [VoyageFiltersProvider, useVoyageFilters] = createContextHook(() =>
 
   const listPresets = useCallback(async () => {
     const raw = await storage.getItem(PK);
-    const list: Preset[] = raw ? JSON.parse(raw) : [];
-    setPresets(list);
-    return list;
+    if (!raw || !raw.trim()) {
+      setPresets([]);
+      return [];
+    }
+    try {
+      // Validate JSON string before parsing
+      if (raw.startsWith('[') && raw.endsWith(']')) {
+        const list: Preset[] = JSON.parse(raw);
+        if (Array.isArray(list)) {
+          setPresets(list);
+          return list;
+        }
+      }
+      setPresets([]);
+      return [];
+    } catch (error) {
+      console.log('Error listing voyage presets:', error);
+      setPresets([]);
+      return [];
+    }
   }, []);
 
   const saveNamedPreset = useCallback(async (name: string) => {

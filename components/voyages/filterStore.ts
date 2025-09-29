@@ -68,10 +68,21 @@ export const useVoyageFilters = create<State>()((set, get) => ({
   hydrate: async () => {
     try {
       const raw = await AsyncStorage.getItem(KEY);
-      if (!raw) return;
-      const q: VoyageFilters = JSON.parse(raw);
-      set({ q, currency: currencyFromCountry(q.destination?.country) });
-    } catch {}
+      if (!raw || !raw.trim()) return;
+      // Validate JSON string before parsing
+      if (raw.startsWith('{') && raw.endsWith('}')) {
+        const q: VoyageFilters = JSON.parse(raw);
+        if (q && typeof q === 'object') {
+          set({ q, currency: currencyFromCountry(q.destination?.country) });
+        }
+      }
+    } catch (error) {
+      console.log('Error hydrating voyage filters:', error);
+      // Clear corrupted data
+      try {
+        await AsyncStorage.removeItem(KEY);
+      } catch {}
+    }
   },
 
   savePreset: async () => {
@@ -85,10 +96,25 @@ export const useVoyageFilters = create<State>()((set, get) => ({
   listPresets: async () => {
     try {
       const raw = await AsyncStorage.getItem(PK);
-      const list: Preset[] = raw ? JSON.parse(raw) : [];
-      set({ presets: list });
-      return list;
-    } catch { return []; }
+      if (!raw || !raw.trim()) {
+        set({ presets: [] });
+        return [];
+      }
+      // Validate JSON string before parsing
+      if (raw.startsWith('[') && raw.endsWith(']')) {
+        const list: Preset[] = JSON.parse(raw);
+        if (Array.isArray(list)) {
+          set({ presets: list });
+          return list;
+        }
+      }
+      set({ presets: [] });
+      return [];
+    } catch (error) {
+      console.log('Error listing presets:', error);
+      set({ presets: [] });
+      return [];
+    }
   },
 
   saveNamedPreset: async (name: string) => {
@@ -96,12 +122,19 @@ export const useVoyageFilters = create<State>()((set, get) => ({
     const p: Preset = { id: `${Date.now()}`, name, q: cur, createdAt: Date.now() };
     try {
       const raw = await AsyncStorage.getItem(PK);
-      const list: Preset[] = raw ? JSON.parse(raw) : [];
+      let list: Preset[] = [];
+      if (raw && raw.trim() && raw.startsWith('[') && raw.endsWith(']')) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          list = parsed;
+        }
+      }
       const updated = [p, ...list].slice(0, 20);
       await AsyncStorage.setItem(PK, JSON.stringify(updated));
       set({ presets: updated });
       return p;
-    } catch {
+    } catch (error) {
+      console.log('Error saving preset:', error);
       set({ presets: [p, ...get().presets] });
       return p;
     }
@@ -117,10 +150,18 @@ export const useVoyageFilters = create<State>()((set, get) => ({
   deletePreset: async (id: string) => {
     try {
       const raw = await AsyncStorage.getItem(PK);
-      const list: Preset[] = raw ? JSON.parse(raw) : [];
+      let list: Preset[] = [];
+      if (raw && raw.trim() && raw.startsWith('[') && raw.endsWith(']')) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          list = parsed;
+        }
+      }
       const updated = list.filter((x) => x.id !== id);
       await AsyncStorage.setItem(PK, JSON.stringify(updated));
       set({ presets: updated });
-    } catch {}
+    } catch (error) {
+      console.log('Error deleting preset:', error);
+    }
   },
 }));

@@ -28,10 +28,19 @@ export function updateRates(next: Rates){ RATES = { ...RATES, ...next }; }
 export async function loadRatesFromCache(){
   try {
     const raw = await AsyncStorage.getItem(FX_KEY);
-    if (!raw) return;
-    const parsed = JSON.parse(raw) as Rates;
-    if (parsed && typeof parsed === "object") updateRates(parsed);
-  } catch {/* ignore */}
+    if (!raw || !raw.trim()) return;
+    // Validate JSON string before parsing
+    if (raw.startsWith('{') && raw.endsWith('}')) {
+      const parsed = JSON.parse(raw) as Rates;
+      if (parsed && typeof parsed === "object") updateRates(parsed);
+    }
+  } catch (error) {
+    console.log('Error loading FX rates from cache:', error);
+    // Clear corrupted data
+    try {
+      await AsyncStorage.removeItem(FX_KEY);
+    } catch {}
+  }
 }
 
 /** Sauve les taux + horodatage */

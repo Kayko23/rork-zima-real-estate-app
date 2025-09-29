@@ -84,10 +84,15 @@ export const [SessionProvider, useSession] = createContextHook(() => {
       const [[, u], [, t]] = await storage.multiGet(["@zima.user", "@zima.token"]);
       if (u && t && u.trim() && t.trim()) {
         try {
-          const userData = JSON.parse(u);
-          if (userData && userData.id) {
-            setUser(userData);
-            setAccessToken(t);
+          // Validate JSON string before parsing
+          if (u.startsWith('{') && u.endsWith('}')) {
+            const userData = JSON.parse(u);
+            if (userData && userData.id) {
+              setUser(userData);
+              setAccessToken(t);
+            }
+          } else {
+            throw new Error('Invalid JSON format');
           }
         } catch (parseError) {
           console.error("Error parsing user data:", parseError);
