@@ -850,30 +850,34 @@ export const getProviderById = (id: string) => {
   
   try {
     // Chercher d'abord dans les providers de professionals.ts
-    const professionalProvider = providers.find(p => p.id === id);
+    const professionalProvider = providers.find(p => String(p.id) === String(id));
     console.log('[getProviderById] Found in professionals:', !!professionalProvider);
     
     if (professionalProvider) {
       // Mapper les données du provider professionnel vers le format attendu
+      const safeName = professionalProvider.name || 'Nom non disponible';
+      const safeCity = professionalProvider.city || 'Ville non spécifiée';
+      const safeCountry = professionalProvider.country || 'Pays non spécifié';
+      
       const mappedProvider = {
-        id: professionalProvider.id,
-        name: professionalProvider.name || 'Nom non disponible',
+        id: String(professionalProvider.id),
+        name: safeName,
         type: professionalProvider.category === 'agency' ? 'agency' as const : 'agent' as const,
         avatar: professionalProvider.avatar || 'https://i.pravatar.cc/150',
         cover: professionalProvider.cover || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1200&auto=format&fit=crop',
-        rating: professionalProvider.rating || 4.0,
-        reviewCount: professionalProvider.reviews || 0,
+        rating: Number(professionalProvider.rating) || 4.0,
+        reviewCount: Number(professionalProvider.reviews) || 0,
         location: {
-          city: professionalProvider.city || 'Ville non spécifiée',
-          country: professionalProvider.country || 'Pays non spécifié'
+          city: safeCity,
+          country: safeCountry
         },
-        specialties: professionalProvider.tags || ['Résidentiel'],
-        isVerified: (professionalProvider.badges && professionalProvider.badges.includes('verified')) || false,
-        isPremium: (professionalProvider.badges && professionalProvider.badges.includes('premium')) || false,
+        specialties: Array.isArray(professionalProvider.tags) ? professionalProvider.tags : ['Résidentiel'],
+        isVerified: Array.isArray(professionalProvider.badges) && professionalProvider.badges.includes('verified'),
+        isPremium: Array.isArray(professionalProvider.badges) && professionalProvider.badges.includes('premium'),
         phone: '+233244123456',
-        email: `contact@${(professionalProvider.name || 'provider').toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '')}.com`,
+        email: `contact@${safeName.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '')}.com`,
         whatsapp: '+233244123456',
-        listingCount: professionalProvider.listings || 0,
+        listingCount: Number(professionalProvider.listings) || 0,
         images: [
           'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200',
           'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200',
@@ -885,8 +889,8 @@ export const getProviderById = (id: string) => {
           {
             id: 'l1',
             title: 'Villa moderne avec piscine',
-            city: professionalProvider.city || 'Ville',
-            country: professionalProvider.country || 'Pays',
+            city: safeCity,
+            country: safeCountry,
             price: '$2,500/mois',
             status: 'À louer' as const,
             thumbnail: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
@@ -894,8 +898,8 @@ export const getProviderById = (id: string) => {
           {
             id: 'l2',
             title: 'Penthouse centre-ville',
-            city: professionalProvider.city || 'Ville',
-            country: professionalProvider.country || 'Pays',
+            city: safeCity,
+            country: safeCountry,
             price: '$450,000',
             status: 'À vendre' as const,
             thumbnail: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
@@ -924,7 +928,7 @@ export const getProviderById = (id: string) => {
     }
     
     // Fallback vers mockProviders si pas trouvé
-    const provider = mockProviders.find(p => p.id === id);
+    const provider = mockProviders.find(p => String(p.id) === String(id));
     console.log('[getProviderById] Found in mockProviders:', !!provider);
     
     if (!provider) {

@@ -1,146 +1,132 @@
-import React, { useState } from "react";
-import { View, FlatList, StyleSheet, TouchableOpacity, Image, Text } from "react-native";
-import { useLocalSearchParams, Stack, useRouter } from "expo-router";
-import { ArrowLeft } from "lucide-react-native";
-import * as DocumentPicker from "expo-document-picker";
-import { uploadToBackendAsync, isImageMime } from "@/lib/upload";
-import type { ChatMessage } from "@/lib/chat/types";
-import QuickReplies from "@/components/chat/QuickReplies";
-import MessageBubble from "@/components/chat/MessageBubble";
-import ChatComposer from "@/components/chat/Composer";
-import Colors from "@/constants/colors";
-import { mockConversations } from "@/constants/data";
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import { useLocalSearchParams, Stack, router } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { ArrowLeft, Send, Paperclip } from 'lucide-react-native';
+import Colors from '@/constants/colors';
 
-export default function ChatThread() {
-  const { id, ctx = "property", providerName } = useLocalSearchParams<{ 
-    id: string; 
-    ctx?: "property" | "service" | "trip";
-    providerName?: string;
-  }>();
-  const router = useRouter();
-  const me = { id: "current-user" };
-  const [items, setItems] = useState<ChatMessage[]>([]);
+type Message = {
+  id: string;
+  text: string;
+  isMe: boolean;
+  timestamp: string;
+};
 
-  // Find the conversation or create a mock one for new chats
-  const conversation = mockConversations.find(conv => conv.id === id) || {
-    id: id || 'new-chat',
-    participants: [{
-      id: 'provider-1',
-      name: providerName || 'Prestataire',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=400&auto=format&fit=crop',
-      isOnline: true,
-    }],
-    lastMessage: {
-      content: 'Bonjour ! Comment puis-je vous aider ?',
-      timestamp: new Date().toISOString(),
-      senderId: 'provider-1',
+export default function ChatScreen() {
+  const { id, ctx } = useLocalSearchParams<{ id: string; ctx?: string }>();
+  const [message, setMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: '1',
+      text: 'Bonjour ! Je suis intéressé par vos services.',
+      isMe: true,
+      timestamp: '14:30',
     },
-    unreadCount: 0,
-    category: 'services' as const,
+    {
+      id: '2',
+      text: 'Bonjour ! Merci pour votre intérêt. Comment puis-je vous aider ?',
+      isMe: false,
+      timestamp: '14:32',
+    },
+  ]);
+
+  const sendMessage = () => {
+    if (!message.trim()) return;
+    
+    const newMessage: Message = {
+      id: Date.now().toString(),
+      text: message.trim(),
+      isMe: true,
+      timestamp: new Date().toLocaleTimeString('fr-FR', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      }),
+    };
+    
+    setMessages(prev => [...prev, newMessage]);
+    setMessage('');
   };
 
-  const participant = conversation.participants[0];
-
-  function add(m: ChatMessage) { 
-    setItems(prev => [m, ...prev]); 
-  }
-
-  function sendText(text: string) {
-    if (!text.trim()) return;
-    add({ 
-      id: Date.now().toString(), 
-      type: "text", 
-      text: text.trim(), 
-      createdAt: Date.now(), 
-      senderId: me.id 
-    });
-  }
-
-  async function pickAndSendDocs() {
-    try {
-      const res = await DocumentPicker.getDocumentAsync({ 
-        multiple: true, 
-        copyToCacheDirectory: true 
-      });
-      
-      if (res.canceled) return;
-      
-      for (const asset of res.assets) {
-        const uploaded = await uploadToBackendAsync({ 
-          uri: asset.uri, 
-          name: asset.name ?? "document", 
-          mimeType: asset.mimeType ?? undefined, 
-          size: asset.size 
-        });
-        
-        const type = isImageMime(uploaded.mime) ? "image" : "file";
-        add({ 
-          id: Date.now().toString() + Math.random(), 
-          type, 
-          file: { ...uploaded }, 
-          createdAt: Date.now(), 
-          senderId: me.id 
-        } as ChatMessage);
-      }
-    } catch (error) {
-      console.error("Error picking documents:", error);
-    }
-  }
+  const renderMessage = ({ item }: { item: Message }) => (
+    <View style={[
+      styles.messageContainer,
+      item.isMe ? styles.myMessage : styles.theirMessage
+    ]}>
+      <Text style={[
+        styles.messageText,
+        item.isMe ? styles.myMessageText : styles.theirMessageText
+      ]}>
+        {item.text}
+      </Text>
+      <Text style={[
+        styles.timestamp,
+        item.isMe ? styles.myTimestamp : styles.theirTimestamp
+      ]}>
+        {item.timestamp}
+      </Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
       <Stack.Screen 
         options={{
-          headerShown: true,
-          headerTitle: () => (
-            <View style={styles.headerTitleContainer}>
-              <Image 
-                source={{ uri: participant.avatar }} 
-                style={styles.headerAvatar}
-              />
-              <View style={styles.headerTextContainer}>
-                <Text style={styles.headerName}>{participant.name}</Text>
-                <Text style={styles.headerStatus}>
-                  {participant.isOnline ? 'En ligne' : 'Hors ligne'}
-                </Text>
-              </View>
-            </View>
-          ),
+          title: `Chat avec ${id}`,
           headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()} style={styles.headerBackButton}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
               <ArrowLeft size={24} color={Colors.text.primary} />
             </TouchableOpacity>
           ),
-          headerStyle: {
-            backgroundColor: Colors.background.primary,
-          },
         }} 
       />
-
+      
       <FlatList
-        inverted
-        data={items}
-        keyExtractor={(m) => m.id}
+        data={messages}
+        keyExtractor={(item) => item.id}
+        renderItem={renderMessage}
+        style={styles.messagesList}
         contentContainerStyle={styles.messagesContent}
-        renderItem={({ item }) => (
-          <MessageBubble msg={item} isMine={item.senderId === me.id} />
-        )}
+        inverted={false}
       />
-
-      <QuickReplies
-        role={"provider"}
-        ctx={ctx as any}
-        hasDocs={true}
-        onSelect={(text, id) => {
-          if (id === "shareDocs" || id === "docs") return pickAndSendDocs();
-          sendText(text);
-        }}
-      />
-
-      <ChatComposer
-        onSend={sendText}
-        onPickDocs={pickAndSendDocs}
-      />
+      
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.inputContainer}
+      >
+        <SafeAreaView edges={['bottom']} style={styles.inputSafeArea}>
+          <View style={styles.inputRow}>
+            <TouchableOpacity style={styles.attachButton}>
+              <Paperclip size={20} color={Colors.text.secondary} />
+            </TouchableOpacity>
+            
+            <TextInput
+              style={styles.textInput}
+              value={message}
+              onChangeText={setMessage}
+              placeholder="Tapez votre message..."
+              multiline
+              maxLength={500}
+            />
+            
+            <TouchableOpacity 
+              style={[styles.sendButton, !message.trim() && styles.sendButtonDisabled]}
+              onPress={sendMessage}
+              disabled={!message.trim()}
+            >
+              <Send size={20} color={message.trim() ? '#fff' : Colors.text.secondary} />
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -148,38 +134,100 @@ export default function ChatThread() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background.secondary,
+    backgroundColor: '#f8f9fa',
   },
-  messagesContent: {
-    padding: 12,
-  },
-  headerTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  headerAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    marginRight: 12,
-  },
-  headerTextContainer: {
-    flex: 1,
-  },
-  headerName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text.primary,
-    lineHeight: 20,
-  },
-  headerStatus: {
-    fontSize: 12,
-    color: Colors.text.secondary,
-    lineHeight: 16,
-  },
-  headerBackButton: {
+  backButton: {
     padding: 8,
     marginLeft: -8,
+  },
+  messagesList: {
+    flex: 1,
+  },
+  messagesContent: {
+    padding: 16,
+    paddingBottom: 8,
+  },
+  messageContainer: {
+    maxWidth: '80%',
+    marginVertical: 4,
+    padding: 12,
+    borderRadius: 16,
+  },
+  myMessage: {
+    alignSelf: 'flex-end',
+    backgroundColor: Colors.primary,
+    borderBottomRightRadius: 4,
+  },
+  theirMessage: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#fff',
+    borderBottomLeftRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
+  },
+  messageText: {
+    fontSize: 16,
+    lineHeight: 20,
+  },
+  myMessageText: {
+    color: '#fff',
+  },
+  theirMessageText: {
+    color: Colors.text.primary,
+  },
+  timestamp: {
+    fontSize: 12,
+    marginTop: 4,
+  },
+  myTimestamp: {
+    color: 'rgba(255,255,255,0.7)',
+    textAlign: 'right',
+  },
+  theirTimestamp: {
+    color: Colors.text.secondary,
+  },
+  inputContainer: {
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: Colors.border.light,
+  },
+  inputSafeArea: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 12,
+  },
+  attachButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.background.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  textInput: {
+    flex: 1,
+    minHeight: 40,
+    maxHeight: 100,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: Colors.background.secondary,
+    borderRadius: 20,
+    fontSize: 16,
+    textAlignVertical: 'center',
+  },
+  sendButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendButtonDisabled: {
+    backgroundColor: Colors.background.secondary,
   },
 });

@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   FlatList,
   Linking,
-
 } from 'react-native';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -35,8 +34,15 @@ import {
 export default function ProviderProfile() {
   const { id } = useLocalSearchParams<{ id: string }>();
   console.log('[ProviderProfile] Received ID:', id, 'Type:', typeof id);
-  const provider = getProviderById(id as string);
-  console.log('[ProviderProfile] Found provider:', provider ? provider.name : 'NOT FOUND');
+  
+  let provider;
+  try {
+    provider = getProviderById(id as string);
+    console.log('[ProviderProfile] Found provider:', provider ? provider.name : 'NOT FOUND');
+  } catch (error) {
+    console.error('[ProviderProfile] Error getting provider:', error);
+    provider = null;
+  }
 
   if (!provider) {
     return (
@@ -202,12 +208,12 @@ export default function ProviderProfile() {
             <View style={styles.aboutItem}>
               <Globe size={16} color={Colors.text.secondary} />
               <Text style={styles.aboutLabel}>Langues</Text>
-              <Text style={styles.aboutValue}>{provider.languages?.join(', ')}</Text>
+              <Text style={styles.aboutValue}>{provider.languages?.join(', ') || 'Français, English'}</Text>
             </View>
             <View style={styles.aboutItem}>
               <MapPin size={16} color={Colors.text.secondary} />
               <Text style={styles.aboutLabel}>Zones d&apos;activité</Text>
-              <Text style={styles.aboutValue}>{provider.zones?.join(', ')}</Text>
+              <Text style={styles.aboutValue}>{provider.zones?.join(', ') || 'Centre-ville, Résidentiel'}</Text>
             </View>
             <View style={styles.aboutItem}>
               <Calendar size={16} color={Colors.text.secondary} />
@@ -221,7 +227,7 @@ export default function ProviderProfile() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Spécialités</Text>
           <View style={styles.specialtiesRow}>
-            {provider.specialties.map((specialty) => (
+            {(provider.specialties || []).map((specialty) => (
               <View key={specialty} style={styles.specialtyChip}>
                 <Text style={styles.specialtyText}>{specialty}</Text>
               </View>
@@ -313,7 +319,7 @@ export default function ProviderProfile() {
         <View style={styles.bottomActions}>
           <TouchableOpacity 
             style={styles.messageButton}
-            onPress={() => router.push(`/chat/${provider.id}`)}
+            onPress={() => router.push({ pathname: '/chat/[id]', params: { id: provider.id, ctx: 'service' } })}
           >
             <MessageCircle size={20} color="#fff" />
             <Text style={styles.messageButtonText}>Envoyer un message</Text>
