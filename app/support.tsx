@@ -1,56 +1,13 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import BackButton from "@/components/ui/BackButton";
-import Colors from "@/constants/colors";
+
+import EmptyScreen from "@/components/ui/EmptyScreen";
 
 export default function SupportScreen() {
-  const insets = useSafeAreaInsets();
-
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <BackButton />
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.title}>Aide & Support</Text>
-        <Text style={styles.subtitle}>Trouvez de l&apos;aide, contactez le support ou consultez la FAQ.</Text>
-      </ScrollView>
-    </View>
+    <EmptyScreen
+      title="Aide & Support"
+      subtitle="Trouvez des réponses, contactez-nous ou ouvrez un ticket."
+      primaryCta={{ label: "Centre d'aide", onPress: () => console.log("FAQ not implemented yet") }}
+      secondaryCta={{ label: "Contacter", onPress: () => console.log("Contact support not implemented yet") }}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background.secondary,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#E6E8EB",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "800",
-    color: "#0F172A",
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#0F172A",
-    marginBottom: 12,
-  },
-  description: {
-    fontSize: 16,
-    color: "#64748B",
-    textAlign: "center",
-    lineHeight: 24,
-  },
-});
