@@ -1,4 +1,5 @@
 import { Property, Provider, Conversation } from '@/types';
+import { providers } from './professionals';
 
 export const mockProperties: Property[] = [
   {
@@ -840,6 +841,77 @@ export const mockProviders: Provider[] = [
 
 // Fonction pour obtenir un prestataire par ID avec données enrichies
 export const getProviderById = (id: string) => {
+  // Chercher d'abord dans les providers de professionals.ts
+  const professionalProvider = providers.find(p => p.id === id);
+  
+  if (professionalProvider) {
+    // Mapper les données du provider professionnel vers le format attendu
+    return {
+      id: professionalProvider.id,
+      name: professionalProvider.name,
+      type: professionalProvider.category === 'agency' ? 'agency' as const : 'agent' as const,
+      avatar: professionalProvider.avatar || 'https://i.pravatar.cc/150',
+      cover: professionalProvider.cover || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1200&auto=format&fit=crop',
+      rating: professionalProvider.rating,
+      reviewCount: professionalProvider.reviews,
+      location: {
+        city: professionalProvider.city,
+        country: professionalProvider.country
+      },
+      specialties: professionalProvider.tags || ['Résidentiel'],
+      isVerified: professionalProvider.badges?.includes('verified') || false,
+      isPremium: professionalProvider.badges?.includes('premium') || false,
+      phone: '+233244123456', // Données par défaut
+      email: `contact@${professionalProvider.name.toLowerCase().replace(/\s+/g, '')}.com`,
+      whatsapp: '+233244123456',
+      listingCount: professionalProvider.listings,
+      images: [
+        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200',
+        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200',
+        'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=200'
+      ],
+      languages: ['Français', 'English'],
+      zones: ['Centre-ville', 'Résidentiel', 'Commercial'],
+      listings: [
+        {
+          id: 'l1',
+          title: 'Villa moderne avec piscine',
+          city: professionalProvider.city,
+          country: professionalProvider.country,
+          price: '$2,500/mois',
+          status: 'À louer' as const,
+          thumbnail: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
+        },
+        {
+          id: 'l2',
+          title: 'Penthouse centre-ville',
+          city: professionalProvider.city,
+          country: professionalProvider.country,
+          price: '$450,000',
+          status: 'À vendre' as const,
+          thumbnail: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
+        },
+      ],
+      reviews: [
+        {
+          id: 'r1',
+          author: 'Emeka Nwankwo',
+          rating: 5,
+          text: 'Excellent service ! Très professionnel et à l\'écoute.',
+          date: '30/10/2024',
+        },
+        {
+          id: 'r2',
+          author: 'Fatou Sall',
+          rating: 5,
+          text: 'Service impeccable. Connaît très bien le marché local.',
+          date: '15/10/2024',
+        },
+      ],
+    };
+  }
+  
+  // Fallback vers mockProviders si pas trouvé
   const provider = mockProviders.find(p => p.id === id);
   
   if (!provider) {
