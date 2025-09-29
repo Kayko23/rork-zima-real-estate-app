@@ -43,7 +43,7 @@ export default function ProviderProfile() {
       console.log('[ProviderProfile] Invalid ID provided:', providerId);
       provider = null;
     } else {
-      provider = getProviderById(providerId);
+      provider = getProviderById(String(providerId).trim());
       console.log('[ProviderProfile] Found provider:', provider ? provider.name : 'NOT FOUND');
     }
   } catch (error) {
@@ -67,19 +67,35 @@ export default function ProviderProfile() {
   }
 
   const openPhone = () => {
-    if (provider.phone) Linking.openURL(`tel:${provider.phone}`);
+    if (provider?.phone) {
+      try {
+        Linking.openURL(`tel:${provider.phone}`);
+      } catch (error) {
+        console.error('Error opening phone:', error);
+      }
+    }
   };
 
   const openEmail = () => {
-    if (provider.email) Linking.openURL(`mailto:${provider.email}`);
+    if (provider?.email) {
+      try {
+        Linking.openURL(`mailto:${provider.email}`);
+      } catch (error) {
+        console.error('Error opening email:', error);
+      }
+    }
   };
 
   const openWhatsApp = () => {
-    if (provider.whatsapp) {
-      const url = `whatsapp://send?phone=${provider.whatsapp}`;
-      Linking.openURL(url).catch(() =>
-        Linking.openURL(`https://wa.me/${provider.whatsapp}`)
-      );
+    if (provider?.whatsapp) {
+      try {
+        const url = `whatsapp://send?phone=${provider.whatsapp}`;
+        Linking.openURL(url).catch(() =>
+          Linking.openURL(`https://wa.me/${provider.whatsapp}`)
+        );
+      } catch (error) {
+        console.error('Error opening WhatsApp:', error);
+      }
     }
   };
 
@@ -95,7 +111,7 @@ export default function ProviderProfile() {
         {/* Cover Image */}
         <View style={styles.coverContainer}>
           <Image
-            source={{ uri: provider.cover }}
+            source={{ uri: provider.cover || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1200&auto=format&fit=crop' }}
             style={styles.coverImage}
           />
           <View style={styles.coverOverlay} />
@@ -123,7 +139,7 @@ export default function ProviderProfile() {
         <View style={styles.profileHeader}>
           <View style={styles.avatarContainer}>
             <Image
-              source={{ uri: provider.avatar }}
+              source={{ uri: provider.avatar || 'https://i.pravatar.cc/150' }}
               style={styles.avatar}
             />
             <View style={styles.onlineDot} />
@@ -159,19 +175,19 @@ export default function ProviderProfile() {
               <Text style={styles.dot}> • </Text>
               <MapPin size={14} color={Colors.text.secondary} />
               <Text style={styles.metaText}>
-                {provider.location.city}, {provider.location.country}
+                {provider.location?.city || 'Ville'}, {provider.location?.country || 'Pays'}
               </Text>
             </View>
             
             <View style={styles.statsRow}>
               <View style={styles.stat}>
                 <Star size={16} color="#f59e0b" fill="#f59e0b" />
-                <Text style={styles.statValue}>{provider.rating.toFixed(1)}</Text>
-                <Text style={styles.statLabel}>({provider.reviewCount} avis)</Text>
+                <Text style={styles.statValue}>{(provider.rating || 0).toFixed(1)}</Text>
+                <Text style={styles.statLabel}>({provider.reviewCount || 0} avis)</Text>
               </View>
               <Text style={styles.dot}> • </Text>
               <View style={styles.stat}>
-                <Text style={styles.statValue}>{provider.listingCount}</Text>
+                <Text style={styles.statValue}>{provider.listingCount || 0}</Text>
                 <Text style={styles.statLabel}>annonces</Text>
               </View>
             </View>
@@ -326,7 +342,13 @@ export default function ProviderProfile() {
         <View style={styles.bottomActions}>
           <TouchableOpacity 
             style={styles.messageButton}
-            onPress={() => router.push({ pathname: '/chat/[id]', params: { id: provider.id, ctx: 'service' } })}
+            onPress={() => {
+              try {
+                router.push({ pathname: '/chat/[id]', params: { id: provider.id, ctx: 'service' } });
+              } catch (error) {
+                console.error('Error navigating to chat:', error);
+              }
+            }}
           >
             <MessageCircle size={20} color="#fff" />
             <Text style={styles.messageButtonText}>Envoyer un message</Text>

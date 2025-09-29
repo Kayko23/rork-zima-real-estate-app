@@ -855,29 +855,40 @@ export const getProviderById = (id: string) => {
     
     if (professionalProvider) {
       // Mapper les données du provider professionnel vers le format attendu
-      const safeName = professionalProvider.name || 'Nom non disponible';
-      const safeCity = professionalProvider.city || 'Ville non spécifiée';
-      const safeCountry = professionalProvider.country || 'Pays non spécifié';
+      const safeName = String(professionalProvider.name || 'Nom non disponible');
+      const safeCity = String(professionalProvider.city || 'Ville non spécifiée');
+      const safeCountry = String(professionalProvider.country || 'Pays non spécifié');
+      
+      // Créer un nom d'email sécurisé
+      const emailName = safeName.toLowerCase()
+        .replace(/[àáâãäå]/g, 'a')
+        .replace(/[èéêë]/g, 'e')
+        .replace(/[ìíîï]/g, 'i')
+        .replace(/[òóôõö]/g, 'o')
+        .replace(/[ùúûü]/g, 'u')
+        .replace(/[ç]/g, 'c')
+        .replace(/[^a-z0-9]/g, '')
+        .substring(0, 20) || 'contact';
       
       const mappedProvider = {
         id: String(professionalProvider.id),
         name: safeName,
-        type: professionalProvider.category === 'agency' ? 'agency' as const : 'agent' as const,
-        avatar: professionalProvider.avatar || 'https://i.pravatar.cc/150',
-        cover: professionalProvider.cover || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1200&auto=format&fit=crop',
-        rating: Number(professionalProvider.rating) || 4.0,
-        reviewCount: Number(professionalProvider.reviews) || 0,
+        type: (professionalProvider.category === 'agency' ? 'agency' : 'agent') as 'agency' | 'agent',
+        avatar: String(professionalProvider.avatar || 'https://i.pravatar.cc/150'),
+        cover: String(professionalProvider.cover || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1200&auto=format&fit=crop'),
+        rating: Math.max(0, Math.min(5, Number(professionalProvider.rating) || 4.0)),
+        reviewCount: Math.max(0, Number(professionalProvider.reviews) || 0),
         location: {
           city: safeCity,
           country: safeCountry
         },
-        specialties: Array.isArray(professionalProvider.tags) ? professionalProvider.tags : ['Résidentiel'],
-        isVerified: Array.isArray(professionalProvider.badges) && professionalProvider.badges.includes('verified'),
-        isPremium: Array.isArray(professionalProvider.badges) && professionalProvider.badges.includes('premium'),
+        specialties: Array.isArray(professionalProvider.tags) ? professionalProvider.tags.slice(0, 5) : ['Résidentiel'],
+        isVerified: Array.isArray(professionalProvider.badges) ? professionalProvider.badges.includes('verified') : false,
+        isPremium: Array.isArray(professionalProvider.badges) ? professionalProvider.badges.includes('premium') : false,
         phone: '+233244123456',
-        email: `contact@${safeName.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '')}.com`,
+        email: `${emailName}@zimarealty.com`,
         whatsapp: '+233244123456',
-        listingCount: Number(professionalProvider.listings) || 0,
+        listingCount: Math.max(0, Number(professionalProvider.listings) || 0),
         images: [
           'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=200',
           'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=200',
