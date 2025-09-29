@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Image, Pressable, StyleSheet, ScrollView } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { Save, Camera, UserRound, Mail, Phone, MapPin, Globe2 } from "lucide-react-native";
+import { Save, Camera, UserRound, Mail, Phone, MapPin, Globe2, Lock, Eye, EyeOff } from "lucide-react-native";
 import { useApp } from "@/hooks/useAppStore";
 
 export default function EditProfileScreen() {
@@ -14,6 +14,12 @@ export default function EditProfileScreen() {
   const [city, setCity] = useState(user?.city ?? "");
   const [country, setCountry] = useState(user?.country ?? "");
   const [bio, setBio] = useState(user?.bio ?? "");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   async function pick(kind: "avatar" | "cover") {
     const res = await ImagePicker.launchImageLibraryAsync({ 
@@ -27,7 +33,23 @@ export default function EditProfileScreen() {
   }
 
   function onSave() {
-    updateUser({ 
+    // Validate password change if provided
+    if (newPassword || confirmPassword || currentPassword) {
+      if (!currentPassword) {
+        alert("Veuillez saisir votre mot de passe actuel");
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        alert("Les nouveaux mots de passe ne correspondent pas");
+        return;
+      }
+      if (newPassword.length < 6) {
+        alert("Le nouveau mot de passe doit contenir au moins 6 caractères");
+        return;
+      }
+    }
+
+    const updateData: any = { 
       name: fullName, 
       email, 
       phone, 
@@ -36,7 +58,22 @@ export default function EditProfileScreen() {
       bio, 
       avatar, 
       cover 
-    });
+    };
+
+    // Add password change if provided
+    if (newPassword && currentPassword) {
+      updateData.currentPassword = currentPassword;
+      updateData.newPassword = newPassword;
+    }
+
+    updateUser(updateData);
+    
+    // Clear password fields after save
+    if (newPassword) {
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    }
   }
 
   return (
@@ -57,6 +94,32 @@ export default function EditProfileScreen() {
         <Field icon={<Globe2 size={18}/>} value={country} onChangeText={setCountry} placeholder="Pays" />
         <Text style={s.label}>Bio</Text>
         <TextInput style={[s.input, s.multiline]} multiline numberOfLines={5} value={bio} onChangeText={setBio} placeholder="Présentez-vous…" />
+        
+        <Text style={[s.label, {marginTop: 24}]}>Changer le mot de passe</Text>
+        <PasswordField 
+          icon={<Lock size={18}/>} 
+          value={currentPassword} 
+          onChangeText={setCurrentPassword} 
+          placeholder="Mot de passe actuel" 
+          showPassword={showCurrentPassword}
+          onToggleShow={() => setShowCurrentPassword(!showCurrentPassword)}
+        />
+        <PasswordField 
+          icon={<Lock size={18}/>} 
+          value={newPassword} 
+          onChangeText={setNewPassword} 
+          placeholder="Nouveau mot de passe" 
+          showPassword={showNewPassword}
+          onToggleShow={() => setShowNewPassword(!showNewPassword)}
+        />
+        <PasswordField 
+          icon={<Lock size={18}/>} 
+          value={confirmPassword} 
+          onChangeText={setConfirmPassword} 
+          placeholder="Confirmer le nouveau mot de passe" 
+          showPassword={showConfirmPassword}
+          onToggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
+        />
       </View>
 
       <Pressable onPress={onSave} style={s.cta}>
@@ -79,6 +142,32 @@ function Field(props: any) {
   );
 }
 
+function PasswordField(props: {
+  icon: React.ReactNode;
+  value: string;
+  onChangeText: (text: string) => void;
+  placeholder: string;
+  showPassword: boolean;
+  onToggleShow: () => void;
+}) {
+  const { icon, showPassword, onToggleShow, ...ti } = props;
+  return (
+    <View style={s.row}>
+      <View style={s.icon}>
+        <Text>{icon}</Text>
+      </View>
+      <TextInput 
+        style={s.input} 
+        secureTextEntry={!showPassword}
+        {...ti} 
+      />
+      <Pressable onPress={onToggleShow} style={s.eyeIcon}>
+        {showPassword ? <EyeOff size={18} color="#6b7280" /> : <Eye size={18} color="#6b7280" />}
+      </Pressable>
+    </View>
+  );
+}
+
 const s = StyleSheet.create({
   container: { paddingBottom: 32 },
   cover: { height: 160, backgroundColor: "#eef2ef", justifyContent: "center", alignItems: "center" },
@@ -93,4 +182,5 @@ const s = StyleSheet.create({
   multiline:{ height:120, paddingTop:12, textAlignVertical:"top" },
   cta:{ margin:16, height:52, backgroundColor:"#1F2937", borderRadius:14, alignItems:"center", justifyContent:"center", flexDirection:"row", gap:8 },
   ctaTxt:{ color:"#fff", fontWeight:"700" },
+  eyeIcon: { padding: 4 },
 });
