@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { View, Text, StyleSheet, Pressable, Modal, FlatList } from "react-native";
+import { View, Text, StyleSheet, Pressable, Modal, FlatList, ScrollView } from "react-native";
 import { ChevronDown, MapPin, Globe, Filter } from "lucide-react-native";
 import { COUNTRIES, CITIES } from "@/constants/countries";
 import { GlassButton } from "./Glass";
@@ -66,7 +66,7 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
               </Pressable>
             </View>
 
-            <View style={s.modalContent}>
+            <ScrollView style={s.modalContent} showsVerticalScrollIndicator={false}>
               {/* Filtres de localisation */}
               <View style={s.section}>
                 <Text style={s.sectionLabel}>Localisation</Text>
@@ -107,15 +107,17 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
                 </View>
               </View>
               
-              <GlassButton 
-                title="Appliquer" 
-                onPress={() => {
-                  applyFilters();
-                  setShowFilters(false);
-                }} 
-                style={s.applyButton} 
-              />
-            </View>
+              <View style={s.buttonContainer}>
+                <GlassButton 
+                  title="Appliquer" 
+                  onPress={() => {
+                    applyFilters();
+                    setShowFilters(false);
+                  }} 
+                  style={s.applyButton} 
+                />
+              </View>
+            </ScrollView>
           </View>
         </View>
       </Modal>
@@ -238,7 +240,11 @@ const s = StyleSheet.create({
     padding: 4
   },
   modalContent: {
+    flex: 1,
     padding: 20
+  },
+  buttonContainer: {
+    paddingVertical: 20
   },
   section: {
     marginBottom: 24

@@ -89,13 +89,17 @@ export default function SearchSheet({ open, mode, initial, onClose, onApply }: P
 
           {/* Suggestions rapides pays régionaux */}
           <Text style={styles.section}>Pays UEMOA / CEDEAO / CEMAC</Text>
-          <View style={styles.chips}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalChips}
+          >
             {allCountries.map((c) => (
               <Pressable key={c} onPress={() => setWhere(c)} style={[styles.chip, where === c && styles.chipActive]}>
                 <Text style={[styles.chipTxt, where === c && styles.chipTxtActive]}>{c}</Text>
               </Pressable>
             ))}
-          </View>
+          </ScrollView>
 
           {/* Lignes spécifiques par mode */}
           {mode !== 'services' && (
@@ -107,10 +111,25 @@ export default function SearchSheet({ open, mode, initial, onClose, onApply }: P
               </Pressable>
 
               <Text style={styles.section}>Voyageurs</Text>
-              <Pressable onPress={() => setGuests(Math.max(1, (guests ?? 1) + 1))} style={styles.rowBtn}>
-                <Users size={18} color="#475569" />
-                <Text style={styles.rowBtnTxt}>{guests} voyageur(s)</Text>
-              </Pressable>
+              <View style={styles.guestControls}>
+                <Pressable 
+                  onPress={() => setGuests(Math.max(1, (guests ?? 1) - 1))} 
+                  style={[styles.guestBtn, (guests ?? 1) <= 1 && styles.guestBtnDisabled]}
+                  disabled={(guests ?? 1) <= 1}
+                >
+                  <Text style={[styles.guestBtnText, (guests ?? 1) <= 1 && styles.guestBtnTextDisabled]}>−</Text>
+                </Pressable>
+                <View style={styles.guestDisplay}>
+                  <Users size={18} color="#475569" />
+                  <Text style={styles.guestText}>{guests} voyageur{(guests ?? 1) > 1 ? 's' : ''}</Text>
+                </View>
+                <Pressable 
+                  onPress={() => setGuests((guests ?? 1) + 1)} 
+                  style={styles.guestBtn}
+                >
+                  <Text style={styles.guestBtnText}>+</Text>
+                </Pressable>
+              </View>
             </>
           )}
 
@@ -162,6 +181,7 @@ const styles = StyleSheet.create({
   input: { flex: 1, fontWeight: '700', color: '#0F172A' },
   cityPickerContainer: { marginHorizontal: 20, marginTop: 12 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginHorizontal: 20, marginTop: 10 },
+  horizontalChips: { paddingHorizontal: 20, paddingVertical: 10, gap: 8 },
   chip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999, backgroundColor: '#F4F6F8', borderWidth: 1, borderColor: '#E6E8EC' },
   chipActive: { backgroundColor: '#E9F4F1', borderColor: '#0E5A46' },
   chipTxt: { color: '#475569', fontWeight: '700' },
@@ -172,4 +192,11 @@ const styles = StyleSheet.create({
   clear: { textDecorationLine: 'underline', fontWeight: '800', color: '#0F172A' },
   searchBtn: { backgroundColor: '#FF2D55', paddingHorizontal: 18, paddingVertical: 12, borderRadius: 999 },
   searchTxt: { color: '#fff', fontWeight: '900' },
+  guestControls: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 20, marginTop: 10, gap: 12 },
+  guestBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#F4F6F8', borderWidth: 1, borderColor: '#E6E8EC', alignItems: 'center', justifyContent: 'center' },
+  guestBtnDisabled: { opacity: 0.5 },
+  guestBtnText: { fontSize: 18, fontWeight: '700', color: '#475569' },
+  guestBtnTextDisabled: { color: '#CBD5E1' },
+  guestDisplay: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#F4F6F8', borderRadius: 12, borderWidth: 1, borderColor: '#E6E8EC' },
+  guestText: { fontWeight: '700', color: '#475569' },
 });

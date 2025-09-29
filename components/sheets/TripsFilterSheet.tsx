@@ -74,7 +74,11 @@ export default function TripsFilterSheet({ visible, onClose }: Props) {
         </ScrollView>
       )}
 
-      <ScrollView contentContainerStyle={[m.scrollPad, { paddingBottom: bottomGap }]} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        contentContainerStyle={[m.scrollPad, { paddingBottom: bottomGap }]} 
+        showsVerticalScrollIndicator={false}
+
+      >
         <Text style={m.label}>Voyageurs</Text>
         <View style={m.row}>
           <Pressable style={m.pill} onPress={()=>setLocal((p: VoyageFilters)=>({ ...p, guests: Math.max(1, (p.guests ?? 1) - 1) }))}><Text style={m.pillTxt}>−</Text></Pressable>

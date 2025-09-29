@@ -8,6 +8,7 @@ import HeroSection from '@/components/ui/HeroSection';
 import SearchBar from '@/components/ui/SearchBar';
 import FilterChips from '@/components/ui/FilterChips';
 import ProviderCard from '@/components/ui/ProviderCard';
+import ProfessionalFilters, { ProfessionalFiltersState } from '@/components/search/ProfessionalFilters';
 import { mockProviders } from '@/constants/data';
 import Colors from '@/constants/colors';
 import { FilterState } from '@/types';
@@ -16,6 +17,10 @@ export default function ServicesScreen() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filters, setFilters] = useState<FilterState>({
     sortBy: 'recent',
+  });
+  const [professionalFilters, setProfessionalFilters] = useState<ProfessionalFiltersState>({
+    country: null,
+    category: null,
   });
 
   const filterChips = useMemo(() => [
@@ -34,6 +39,11 @@ export default function ServicesScreen() {
 
   const handleFilterPress = useCallback(() => {
     console.log('[Services] Filter button pressed');
+  }, []);
+
+  const handleProfessionalFiltersApply = useCallback((newFilters: ProfessionalFiltersState) => {
+    console.log('[Services] Professional filters applied:', newFilters);
+    setProfessionalFilters(newFilters);
   }, []);
 
   const handleViewProfile = useCallback((providerId: string) => {
@@ -143,6 +153,8 @@ export default function ServicesScreen() {
                 filters={filters}
                 onFilterChange={handleFilterChange}
               />
+              
+              <ProfessionalFilters onApply={handleProfessionalFiltersApply} />
             </View>
           </View>
         </HeroSection>
