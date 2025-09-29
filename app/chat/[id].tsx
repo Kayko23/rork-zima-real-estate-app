@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,9 +8,10 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from 'react-native';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft, Send, Paperclip } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 
@@ -22,8 +23,12 @@ type Message = {
 };
 
 export default function ChatScreen() {
-  const { id, ctx } = useLocalSearchParams<{ id: string; ctx?: string }>();
+  const { id } = useLocalSearchParams<{ id: string; ctx?: string }>();
+  const insets = useSafeAreaInsets();
+  const flatListRef = useRef<FlatList>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [message, setMessage] = useState('');
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -37,7 +42,53 @@ export default function ChatScreen() {
       isMe: false,
       timestamp: '14:32',
     },
+    {
+      id: '3',
+      text: 'Je cherche des informations sur vos tarifs et disponibilités.',
+      isMe: true,
+      timestamp: '14:35',
+    },
+    {
+      id: '4',
+      text: 'Bien sûr ! Nos tarifs varient selon le type de service. Pouvez-vous me dire quel service vous intéresse exactement ?',
+      isMe: false,
+      timestamp: '14:37',
+    },
   ]);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
+    });
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      keyboardDidShowListener?.remove();
+      keyboardDidHideListener?.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    // Scroll to bottom when new message is added
+    if (messages.length > 0) {
+      const scrollTimeout = setTimeout(() => {
+        flatListRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+      
+      return () => clearTimeout(scrollTimeout);
+    }
+  }, [messages]);
+
+  useEffect(() => {
+    // Cleanup timeout on unmount
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const sendMessage = () => {
     if (!message.trim()) return;
@@ -54,6 +105,30 @@ export default function ChatScreen() {
     
     setMessages(prev => [...prev, newMessage]);
     setMessage('');
+    
+    // Simulate response after a delay
+    timeoutRef.current = setTimeout(() => {
+      const responses = [
+        'Merci pour votre message !',
+        'Je vais vérifier cela pour vous.',
+        'Pouvez-vous me donner plus de détails ?',
+        'C\'est noté, je reviens vers vous rapidement.',
+      ];
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      
+      const responseMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: randomResponse,
+        isMe: false,
+        timestamp: new Date().toLocaleTimeString('fr-FR', { 
+          hour: '2-digit', 
+          minute: '2-digit' 
+        }),
+      };
+      
+      setMessages(prev => [...prev, responseMessage]);
+      timeoutRef.current = null;
+    }, 1000 + Math.random() * 2000);
   };
 
   const renderMessage = ({ item }: { item: Message }) => (
@@ -90,42 +165,62 @@ export default function ChatScreen() {
       />
       
       <FlatList
+        ref={flatListRef}
         data={messages}
         keyExtractor={(item) => item.id}
         renderItem={renderMessage}
         style={styles.messagesList}
-        contentContainerStyle={styles.messagesContent}
-        inverted={false}
+        contentContainerStyle={[
+          styles.messagesContent,
+          { paddingBottom: Math.max(insets.bottom, 16) }
+        ]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        maintainVisibleContentPosition={{
+          minIndexForVisible: 0,
+          autoscrollToTopThreshold: 10,
+        }}
       />
       
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.inputContainer}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
-        <SafeAreaView edges={['bottom']} style={styles.inputSafeArea}>
-          <View style={styles.inputRow}>
-            <TouchableOpacity style={styles.attachButton}>
-              <Paperclip size={20} color={Colors.text.secondary} />
-            </TouchableOpacity>
-            
-            <TextInput
-              style={styles.textInput}
-              value={message}
-              onChangeText={setMessage}
-              placeholder="Tapez votre message..."
-              multiline
-              maxLength={500}
-            />
-            
-            <TouchableOpacity 
-              style={[styles.sendButton, !message.trim() && styles.sendButtonDisabled]}
-              onPress={sendMessage}
-              disabled={!message.trim()}
-            >
-              <Send size={20} color={message.trim() ? '#fff' : Colors.text.secondary} />
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
+        <View style={[
+          styles.inputContainer,
+          Platform.OS === 'android' && keyboardHeight > 0 && {
+            marginBottom: keyboardHeight - insets.bottom
+          }
+        ]}>
+          <SafeAreaView edges={['bottom']} style={styles.inputSafeArea}>
+            <View style={styles.inputRow}>
+              <TouchableOpacity style={styles.attachButton}>
+                <Paperclip size={20} color={Colors.text.secondary} />
+              </TouchableOpacity>
+              
+              <TextInput
+                style={styles.textInput}
+                value={message}
+                onChangeText={setMessage}
+                placeholder="Tapez votre message..."
+                placeholderTextColor={Colors.text.secondary}
+                multiline
+                maxLength={500}
+                returnKeyType="send"
+                onSubmitEditing={sendMessage}
+                blurOnSubmit={false}
+              />
+              
+              <TouchableOpacity 
+                style={[styles.sendButton, !message.trim() && styles.sendButtonDisabled]}
+                onPress={sendMessage}
+                disabled={!message.trim()}
+              >
+                <Send size={20} color={message.trim() ? '#fff' : Colors.text.secondary} />
+              </TouchableOpacity>
+            </View>
+          </SafeAreaView>
+        </View>
       </KeyboardAvoidingView>
     </View>
   );
@@ -145,29 +240,39 @@ const styles = StyleSheet.create({
   },
   messagesContent: {
     padding: 16,
-    paddingBottom: 8,
+    paddingTop: 8,
+    flexGrow: 1,
+    justifyContent: 'flex-end',
   },
   messageContainer: {
-    maxWidth: '80%',
-    marginVertical: 4,
-    padding: 12,
-    borderRadius: 16,
+    maxWidth: '85%',
+    marginVertical: 3,
+    padding: 14,
+    borderRadius: 18,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   myMessage: {
     alignSelf: 'flex-end',
     backgroundColor: Colors.primary,
-    borderBottomRightRadius: 4,
+    borderBottomRightRadius: 6,
+    marginLeft: '15%',
   },
   theirMessage: {
     alignSelf: 'flex-start',
     backgroundColor: '#fff',
-    borderBottomLeftRadius: 4,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    borderBottomLeftRadius: 6,
+    marginRight: '15%',
   },
   messageText: {
     fontSize: 16,
-    lineHeight: 20,
+    lineHeight: 22,
   },
   myMessageText: {
     color: '#fff',
@@ -176,11 +281,12 @@ const styles = StyleSheet.create({
     color: Colors.text.primary,
   },
   timestamp: {
-    fontSize: 12,
-    marginTop: 4,
+    fontSize: 11,
+    marginTop: 6,
+    fontWeight: '500',
   },
   myTimestamp: {
-    color: 'rgba(255,255,255,0.7)',
+    color: 'rgba(255,255,255,0.8)',
     textAlign: 'right',
   },
   theirTimestamp: {
@@ -190,44 +296,64 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: Colors.border.light,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 8,
   },
   inputSafeArea: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: 12,
+    paddingBottom: 8,
   },
   inputRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    gap: 12,
+    gap: 10,
   },
   attachButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: Colors.background.secondary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   textInput: {
     flex: 1,
-    minHeight: 40,
-    maxHeight: 100,
+    minHeight: 42,
+    maxHeight: 120,
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingVertical: 12,
     backgroundColor: Colors.background.secondary,
-    borderRadius: 20,
+    borderRadius: 21,
     fontSize: 16,
-    textAlignVertical: 'center',
+    textAlignVertical: 'top',
+    color: Colors.text.primary,
   },
   sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: Colors.primary,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   sendButtonDisabled: {
     backgroundColor: Colors.background.secondary,
+    shadowOpacity: 0,
+    elevation: 0,
   },
 });
