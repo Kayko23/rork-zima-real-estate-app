@@ -34,9 +34,14 @@ export default function ServicesFeed() {
       console.log('Invalid provider ID:', p?.id);
       return;
     }
-    console.log('View profile:', p.id, 'Type:', typeof p.id);
+    console.log('View profile:', p.id, 'Type:', typeof p.id, 'Provider:', p.name);
     try {
-      router.push(`/provider/${encodeURIComponent(String(p.id))}`);
+      const cleanId = String(p.id).trim();
+      console.log('Navigating to provider profile with ID:', cleanId);
+      router.push({
+        pathname: '/provider/[id]',
+        params: { id: cleanId }
+      });
     } catch (error) {
       console.error('Navigation error:', error);
     }

@@ -32,20 +32,31 @@ import {
 } from 'lucide-react-native';
 
 export default function ProviderProfile() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  console.log('[ProviderProfile] Received ID:', id, 'Type:', typeof id);
+  const params = useLocalSearchParams();
+  console.log('[ProviderProfile] Raw params:', params);
   
   let provider;
   try {
-    // Ensure id is a string and not undefined
-    const providerId = Array.isArray(id) ? id[0] : id;
-    console.log('[ProviderProfile] Processing ID:', providerId, 'Type:', typeof providerId);
+    // Extract ID from params safely
+    let providerId: string | undefined;
+    
+    if (params && typeof params === 'object') {
+      if (Array.isArray(params.id)) {
+        providerId = params.id[0];
+      } else if (typeof params.id === 'string') {
+        providerId = params.id;
+      } else if (params.id) {
+        providerId = String(params.id);
+      }
+    }
+    
+    console.log('[ProviderProfile] Extracted ID:', providerId, 'Type:', typeof providerId);
     
     if (!providerId || typeof providerId !== 'string' || providerId.trim() === '') {
       console.log('[ProviderProfile] Invalid ID provided:', providerId);
       provider = null;
     } else {
-      const cleanId = String(providerId).trim();
+      const cleanId = providerId.trim();
       console.log('[ProviderProfile] Looking for provider with clean ID:', cleanId);
       provider = getProviderById(cleanId);
       console.log('[ProviderProfile] Found provider:', provider ? provider.name : 'NOT FOUND');
@@ -93,9 +104,10 @@ export default function ProviderProfile() {
   const openWhatsApp = () => {
     if (provider?.whatsapp) {
       try {
-        const url = `whatsapp://send?phone=${provider.whatsapp}`;
+        const cleanPhone = provider.whatsapp.replace(/[^0-9+]/g, '');
+        const url = `whatsapp://send?phone=${cleanPhone}`;
         Linking.openURL(url).catch(() =>
-          Linking.openURL(`https://wa.me/${provider.whatsapp}`)
+          Linking.openURL(`https://wa.me/${cleanPhone}`)
         );
       } catch (error) {
         console.error('Error opening WhatsApp:', error);
@@ -348,7 +360,14 @@ export default function ProviderProfile() {
             style={styles.messageButton}
             onPress={() => {
               try {
-                router.push({ pathname: '/chat/[id]', params: { id: provider.id, ctx: 'service' } });
+                router.push({ 
+                  pathname: '/chat/[id]', 
+                  params: { 
+                    id: String(provider.id), 
+                    ctx: 'service',
+                    name: provider.name 
+                  } 
+                });
               } catch (error) {
                 console.error('Error navigating to chat:', error);
               }
