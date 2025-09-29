@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, Pressable, StyleSheet, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Plus } from "lucide-react-native";
@@ -11,19 +11,23 @@ export default function MyListingsScreen() {
   const [tab, setTab] = useState<ListingStatus>("active");
   const [data, setData] = useState<Listing[]|null>(null);
 
-  const load = useCallback(async () => {
+  async function load() {
     setData(null);
     const rows = await fetchListings(tab);
     setData(rows);
-  }, [tab]);
+  }
   
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { 
+    load(); 
+  }, [tab]);
 
   return (
     <View style={s.container}>
       <View style={[s.tabs, { paddingTop: ins.top + 8 }]}>
         <Text style={s.h1}>Mes annonces</Text>
-        <Pressable onPress={() => router.push("/provider/annonces/new")} style={s.fabSmall}><Plus color="#fff"/></Pressable>
+        <Pressable onPress={() => router.push("/provider/annonces/new")} style={s.fabSmall}>
+          <Plus color="#fff"/>
+        </Pressable>
 
         <View style={s.segment}>
           {(["active","pending","expired"] as ListingStatus[]).map(t => (
@@ -37,7 +41,9 @@ export default function MyListingsScreen() {
       </View>
 
       {!data ? (
-        <View style={s.loading}><ActivityIndicator/></View>
+        <View style={s.loading}>
+          <ActivityIndicator/>
+        </View>
       ) : (
         <FlatList
           data={data}
@@ -55,15 +61,15 @@ export default function MyListingsScreen() {
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1 },
-  tabs:{ backgroundColor:"#fff" },
-  h1:{ fontSize:26, fontWeight:"900", paddingHorizontal:16, marginBottom:6 },
-  segment:{ flexDirection:"row", gap:8, paddingHorizontal:16, paddingBottom:10 },
-  segBtn:{ paddingHorizontal:14, height:36, borderRadius:999, backgroundColor:"#F3F4F6", justifyContent:"center" },
-  segBtnActive:{ backgroundColor:"#064e3b" },
-  segTxt:{ fontWeight:"700" },
-  segTxtActive:{ color:"#fff", fontWeight:"800" },
+  container: { flex:1 },
+  tabs: { backgroundColor:"#fff" },
+  h1: { fontSize:26, fontWeight:"900", paddingHorizontal:16, marginBottom:6 },
+  segment: { flexDirection:"row", gap:8, paddingHorizontal:16, paddingBottom:10 },
+  segBtn: { paddingHorizontal:14, height:36, borderRadius:999, backgroundColor:"#F3F4F6", justifyContent:"center" },
+  segBtnActive: { backgroundColor:"#064e3b" },
+  segTxt: { fontWeight:"700" },
+  segTxtActive: { color:"#fff", fontWeight:"800" },
   loading: { flex:1, alignItems:"center", justifyContent:"center" },
-  fab:{ position:"absolute", right:20, width:56, height:56, borderRadius:28, backgroundColor:"#065f46", alignItems:"center", justifyContent:"center", elevation:6 },
-  fabSmall:{ position:"absolute", top:10, right:16, width:44, height:44, borderRadius:22, backgroundColor:"#065f46", alignItems:"center", justifyContent:"center" },
+  fab: { position:"absolute", right:20, width:56, height:56, borderRadius:28, backgroundColor:"#065f46", alignItems:"center", justifyContent:"center", elevation:6 },
+  fabSmall: { position:"absolute", top:10, right:16, width:44, height:44, borderRadius:22, backgroundColor:"#065f46", alignItems:"center", justifyContent:"center" },
 });

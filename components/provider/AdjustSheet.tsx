@@ -10,19 +10,49 @@ export default function AdjustSheet({ initial, onConfirm }:{
   const [from, setFrom] = useState(initial.from ?? "");
   const [to, setTo] = useState(initial.to ?? "");
   
+  const handleConfirm = () => {
+    onConfirm({ 
+      price: Number(price||0), 
+      currency, 
+      from: from || undefined, 
+      to: to || undefined 
+    });
+  };
+
   return (
     <View style={s.wrap}>
-      <Text style={s.title}>Ajuster l&apos;annonce</Text>
-      <View style={s.row}>
-        <TextInput style={[s.input,s.flex]} keyboardType="numeric" value={price} onChangeText={setPrice} placeholder="Prix" />
-        <TextInput style={[s.input,s.currency]} value={currency} onChangeText={setCurrency} placeholder="Devise" />
+      <Text style={s.title}>Ajuster l'annonce</Text>
+      <View style={s.priceRow}>
+        <TextInput 
+          style={[s.input, s.priceInput]} 
+          keyboardType="numeric" 
+          value={price} 
+          onChangeText={setPrice} 
+          placeholder="Prix" 
+        />
+        <TextInput 
+          style={[s.input, s.currencyInput]} 
+          value={currency} 
+          onChangeText={setCurrency} 
+          placeholder="Devise" 
+        />
       </View>
       <Text style={s.label}>Disponibilité (optionnel)</Text>
-      <View style={s.row}>
-        <TextInput style={[s.input,s.flex]} value={from} onChangeText={setFrom} placeholder="Du (YYYY-MM-DD)" />
-        <TextInput style={[s.input,s.flex]} value={to} onChangeText={setTo} placeholder="Au (YYYY-MM-DD)" />
+      <View style={s.dateRow}>
+        <TextInput 
+          style={[s.input, s.dateInput]} 
+          value={from} 
+          onChangeText={setFrom} 
+          placeholder="Du (YYYY-MM-DD)" 
+        />
+        <TextInput 
+          style={[s.input, s.dateInput]} 
+          value={to} 
+          onChangeText={setTo} 
+          placeholder="Au (YYYY-MM-DD)" 
+        />
       </View>
-      <Pressable style={s.cta} onPress={()=> onConfirm({ price: Number(price||0), currency, from, to })}>
+      <Pressable style={s.cta} onPress={handleConfirm}>
         <Text style={s.ctaTxt}>Enregistrer</Text>
       </Pressable>
     </View>
@@ -30,13 +60,15 @@ export default function AdjustSheet({ initial, onConfirm }:{
 }
 
 const s = StyleSheet.create({
-  wrap:{ padding:16, gap:10 }, 
-  title:{ fontSize:18, fontWeight:"800" }, 
-  row: { flexDirection:"row", gap:10 },
-  flex: { flex:1 },
-  currency: { width:110 },
-  input:{ height:48, borderRadius:12, borderWidth:1, borderColor:"#e5e7eb", paddingHorizontal:12, backgroundColor:"#fff" }, 
-  label:{ fontWeight:"700", marginTop:6 },
-  cta:{ height:48, backgroundColor:"#064e3b", borderRadius:12, alignItems:"center", justifyContent:"center" }, 
-  ctaTxt:{ color:"#fff", fontWeight:"800" }
+  wrap: { padding:16, gap:10 }, 
+  title: { fontSize:18, fontWeight:"800" }, 
+  priceRow: { flexDirection:"row", gap:10 },
+  dateRow: { flexDirection:"row", gap:10 },
+  input: { height:48, borderRadius:12, borderWidth:1, borderColor:"#e5e7eb", paddingHorizontal:12, backgroundColor:"#fff" }, 
+  priceInput: { flex:1 },
+  currencyInput: { width:110 },
+  dateInput: { flex:1 },
+  label: { fontWeight:"700", marginTop:6 },
+  cta: { height:48, backgroundColor:"#064e3b", borderRadius:12, alignItems:"center", justifyContent:"center" }, 
+  ctaTxt: { color:"#fff", fontWeight:"800" }
 });

@@ -31,58 +31,78 @@ export default function ListingForm({
     if (!res.canceled) setPhotos(p => [...p, res.assets[0].uri]);
   }
 
+  const handleSubmit = () => {
+    onSubmit({
+      title, 
+      type, 
+      price: Number(price || 0), 
+      currency, 
+      city, 
+      country,
+      surface: Number(surface || 0), 
+      beds: Number(beds || 0), 
+      baths: Number(baths || 0),
+      photos
+    });
+  };
+
   return (
     <KeyboardAvoidingView 
       style={s.container} 
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={s.scrollContent}>
-        <Label><Text>Photos</Text></Label>
+      <ScrollView 
+        contentContainerStyle={s.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Label>Photos</Label>
         <View style={s.gallery}>
-          {photos.map((u, i) => <Image key={`photo-${i}-${u.slice(-10)}`} source={{uri:u}} style={s.photo}/>)}
+          {photos.map((u, i) => <Image key={`photo-${i}`} source={{uri:u}} style={s.photo}/>)}
           <Pressable onPress={addPhoto} style={s.addPhoto}><Camera /></Pressable>
         </View>
 
-        <Label><Text>Titre</Text></Label>
+        <Label>Titre</Label>
         <Input value={title} onChangeText={setTitle} placeholder="Ex: Villa · Accra" />
 
-        <Label><Text>Type</Text></Label>
+        <Label>Type</Label>
         <View style={s.segment}>
           <Seg active={type==="sale"} onPress={() => setType("sale")} label="Vente" />
           <Seg active={type==="rent"} onPress={() => setType("rent")} label="Location" />
         </View>
 
-        <Label><Text>Prix & devise</Text></Label>
-        <View style={s.row}>
-          <Input style={s.flex1} value={price} onChangeText={setPrice} placeholder="Montant" keyboardType="numeric" />
-          <Input style={s.currency} value={currency} onChangeText={setCurrency} placeholder="Devise" />
+        <Label>Prix & devise</Label>
+        <View style={s.priceRow}>
+          <Input style={s.priceInput} value={price} onChangeText={setPrice} placeholder="Montant" keyboardType="numeric" />
+          <Input style={s.currencyInput} value={currency} onChangeText={setCurrency} placeholder="Devise" />
         </View>
 
-        <Label><Text>Surface / Chambres / SDB</Text></Label>
-        <View style={s.row}>
-          <Input style={s.flex1} value={surface} onChangeText={setSurface} placeholder="m²" keyboardType="numeric" />
-          <Input style={s.flex1} value={beds} onChangeText={setBeds} placeholder="chambres" keyboardType="numeric" />
-          <Input style={s.flex1} value={baths} onChangeText={setBaths} placeholder="SDB" keyboardType="numeric" />
+        <Label>Surface / Chambres / SDB</Label>
+        <View style={s.detailsRow}>
+          <Input style={s.detailInput} value={surface} onChangeText={setSurface} placeholder="m²" keyboardType="numeric" />
+          <Input style={s.detailInput} value={beds} onChangeText={setBeds} placeholder="chambres" keyboardType="numeric" />
+          <Input style={s.detailInput} value={baths} onChangeText={setBaths} placeholder="SDB" keyboardType="numeric" />
         </View>
 
-        <Label><MapPin size={16}/><Text> Localisation</Text></Label>
-        <View style={s.row}>
-          <Input style={s.flex1} value={country} onChangeText={setCountry} placeholder="Pays" />
-          <Input style={s.flex1} value={city} onChangeText={setCity} placeholder="Ville" />
+        <View style={s.locationHeader}>
+          <MapPin size={16}/>
+          <Label>Localisation</Label>
+        </View>
+        <View style={s.locationRow}>
+          <Input style={s.locationInput} value={country} onChangeText={setCountry} placeholder="Pays" />
+          <Input style={s.locationInput} value={city} onChangeText={setCity} placeholder="Ville" />
         </View>
 
-        <Label><Text>Description</Text></Label>
-        <Input multiline style={s.textarea} value={desc} onChangeText={setDesc} placeholder="Décrivez le bien…" />
+        <Label>Description</Label>
+        <Input 
+          multiline 
+          style={[s.textarea]} 
+          value={desc} 
+          onChangeText={setDesc} 
+          placeholder="Décrivez le bien…" 
+        />
 
-        <Pressable
-          onPress={() => onSubmit({
-            title, type, price: Number(price || 0), currency, city, country,
-            surface: Number(surface || 0), beds: Number(beds || 0), baths: Number(baths || 0),
-            photos
-          })}
-          style={s.cta}
-        >
+        <Pressable onPress={handleSubmit} style={s.cta}>
           <Save color="#fff" />
           <Text style={s.ctaTxt}>Enregistrer</Text>
         </Pressable>
@@ -109,21 +129,26 @@ function Seg({label, active, onPress}:{label:string; active:boolean; onPress:()=
 
 const s = StyleSheet.create({
   container: { flex: 1 },
+  label: { fontWeight:"800", marginTop:4 },
   scrollContent: { padding:16, gap:12, paddingBottom:120 },
   gallery:{ flexDirection:"row", flexWrap:"wrap", gap:10 },
   photo:{ width:90, height:90, borderRadius:12 },
   addPhoto:{ width:90, height:90, borderRadius:12, borderWidth:1, borderColor:"#e5e7eb", alignItems:"center", justifyContent:"center", backgroundColor:"#F9FAFB" },
   input:{ height:48, borderRadius:12, borderWidth:1, borderColor:"#e5e7eb", paddingHorizontal:12, backgroundColor:"#fff" },
-  textarea:{ height:120, textAlignVertical:"top", paddingTop:12 },
-  row: { flexDirection:"row", gap:10 },
-  flex1: { flex:1 },
-  currency: { width:110 },
+  textarea:{ height:120, textAlignVertical:"top", paddingTop: 12 },
   segment:{ flexDirection:"row", gap:10 },
   segBtn:{ paddingHorizontal:14, height:36, borderRadius:999, backgroundColor:"#F3F4F6", justifyContent:"center" },
   segBtnActive:{ backgroundColor:"#064e3b" }, 
   segTxt:{ fontWeight:"700" }, 
   segTxtActive:{ color:"#fff", fontWeight:"800" },
-  label: { fontWeight:"800", marginTop:4 },
+  priceRow: { flexDirection:"row", gap:10 },
+  priceInput: { flex:1 },
+  currencyInput: { width:110 },
+  detailsRow: { flexDirection:"row", gap:10 },
+  detailInput: { flex:1 },
+  locationHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
+  locationRow: { flexDirection:"row", gap:10 },
+  locationInput: { flex:1 },
   cta:{ marginTop:12, height:52, backgroundColor:"#1F2937", borderRadius:14, alignItems:"center", justifyContent:"center", flexDirection:"row", gap:8 },
   ctaTxt:{ color:"#fff", fontWeight:"800" },
 });

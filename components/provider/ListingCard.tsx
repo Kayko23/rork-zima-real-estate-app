@@ -31,12 +31,13 @@ export default function ListingCard({ item }: { item: Listing }) {
       </View>
 
       <View style={s.stats}>
-        <View style={s.stat}><Eye size={16} /><Text> {item.contacts ? item.contacts*400 : 1250} vues</Text></View>
+        <View style={s.stat}><Eye size={16} /><Text> {item.views ?? 1250} vues</Text></View>
         <View style={s.stat}><Users size={16} /><Text> {item.contacts ?? 0} contacts</Text></View>
         {item.rating && <View style={s.stat}><Star size={16} color="#f59e0b"/><Text> {item.rating}</Text></View>}
         <View style={[s.status, statusStyle[item.status]]}><Text style={s.statusTxt}>{labelStatus[item.status]}</Text></View>
       </View>
 
+      {/* barre d'actions */}
       <View style={s.actions}>
         <Pill icon={<Pencil size={16}/>} label="Modifier" onPress={() => router.push(`/provider/annonces/${item.id}/edit`)} />
         <Pill icon={<TrendingUp size={16} color="#b45309"/>} label="Ajuster" onPress={() => router.push(`/provider/annonces/${item.id}/adjust`)} />
