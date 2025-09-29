@@ -39,7 +39,7 @@ export const [SessionProvider, useSession] = createContextHook(() => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const setSession = useCallback(async (newUser: User, token: string) => {
+  const setSession = useCallback(async (newUser: User, token: string, rememberMe: boolean = true) => {
     try {
       if (!newUser?.id?.trim() || !token?.trim()) {
         console.error('Invalid user or token provided');
@@ -56,10 +56,12 @@ export const [SessionProvider, useSession] = createContextHook(() => {
         lastName: newUser.lastName?.trim(),
       };
       
-      await storage.multiSet([
-        ["@zima.user", JSON.stringify(sanitizedUser)], 
-        ["@zima.token", token.trim()]
-      ]);
+      if (rememberMe) {
+        await storage.multiSet([
+          ["@zima.user", JSON.stringify(sanitizedUser)], 
+          ["@zima.token", token.trim()]
+        ]);
+      }
       setUser(sanitizedUser);
       setAccessToken(token.trim());
     } catch (error) {

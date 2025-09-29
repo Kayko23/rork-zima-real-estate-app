@@ -1,19 +1,21 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet, Alert, ScrollView } from "react-native";
+import { View, Text, TextInput, Pressable, StyleSheet, Alert, ScrollView, Switch } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { authApi } from "@/lib/authApi";
 import { useSession } from "@/hooks/useSession";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { User } from "lucide-react-native";
 
 type LoginForm = { 
   emailOrPhone: string; 
   password: string; 
+  rememberMe: boolean;
 };
 
 export default function LoginScreen() {
   const { control, handleSubmit, formState: { errors } } = useForm<LoginForm>({ 
-    defaultValues: { emailOrPhone: "", password: "" } 
+    defaultValues: { emailOrPhone: "", password: "", rememberMe: true } 
   });
   const { setSession } = useSession();
   const [busy, setBusy] = useState(false);
@@ -32,12 +34,31 @@ export default function LoginScreen() {
         : { phone: data.emailOrPhone.trim(), password: data.password.trim() };
         
       const { token, user } = await authApi.login(payload);
-      await setSession(user, token);
+      await setSession(user, token, data.rememberMe);
       router.replace("/");
     } catch (e: any) {
       Alert.alert("Connexion échouée", e?.message ?? "Vérifiez vos identifiants");
     } finally { 
       setBusy(false); 
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    try {
+      setBusy(true);
+      const guestUser = {
+        id: `guest_${Date.now()}`,
+        role: "user" as const,
+        name: "Invité",
+        firstName: "Invité",
+        lastName: "ZIMA"
+      };
+      await setSession(guestUser, "guest_token", false);
+      router.replace("/");
+    } catch {
+      Alert.alert("Erreur", "Impossible de se connecter en tant qu'invité");
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -56,7 +77,7 @@ export default function LoginScreen() {
             render={({ field: { onChange, value } }) => (
               <TextInput 
                 autoCapitalize="none" 
-                keyboardType="email-address"
+                keyboardType="default"
                 style={[styles.input, errors.emailOrPhone && styles.inputError]} 
                 value={value} 
                 onChangeText={onChange} 
@@ -92,6 +113,25 @@ export default function LoginScreen() {
             <Text style={styles.errorText}>{errors.password.message}</Text>
           )}
 
+          <View style={styles.rememberContainer}>
+            <Controller
+              control={control}
+              name="rememberMe"
+              render={({ field: { onChange, value } }) => (
+                <View style={styles.switchContainer}>
+                  <Switch
+                    value={value}
+                    onValueChange={onChange}
+                    trackColor={{ false: "#E7EDF3", true: "#0B3C2F" }}
+                    thumbColor={value ? "#fff" : "#f4f3f4"}
+                    testID="remember-me-switch"
+                  />
+                  <Text style={styles.rememberText}>Se souvenir de moi</Text>
+                </View>
+              )}
+            />
+          </View>
+
           <Pressable 
             style={[styles.btn, busy && styles.btnDisabled]} 
             disabled={busy} 
@@ -109,6 +149,22 @@ export default function LoginScreen() {
             <Text style={styles.link}>Créer un compte</Text>
           </Pressable>
           
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>ou</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <Pressable 
+            style={[styles.guestBtn, busy && styles.btnDisabled]} 
+            disabled={busy} 
+            onPress={handleGuestLogin}
+            testID="guest-login-button"
+          >
+            <User size={20} color="#0B3C2F" style={styles.guestIcon} />
+            <Text style={styles.guestBtnTxt}>Continuer en tant qu&apos;invité</Text>
+          </Pressable>
+
           <Pressable 
             onPress={() => {
               Alert.alert("Mot de passe oublié", "Cette fonctionnalité sera bientôt disponible");
@@ -194,5 +250,51 @@ const styles = StyleSheet.create({
     color: "#6B7280", 
     fontWeight: "700",
     textAlign: "center",
+  },
+  rememberContainer: {
+    marginTop: 16,
+  },
+  switchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  rememberText: {
+    color: "#51626F",
+    fontWeight: "600",
+  },
+  divider: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#E7EDF3",
+  },
+  dividerText: {
+    marginHorizontal: 16,
+    color: "#6B7280",
+    fontWeight: "600",
+  },
+  guestBtn: {
+    height: 52,
+    borderRadius: 14,
+    backgroundColor: "#F0F9FF",
+    borderWidth: 2,
+    borderColor: "#0B3C2F",
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 16,
+  },
+  guestIcon: {
+    marginRight: 4,
+  },
+  guestBtnTxt: {
+    color: "#0B3C2F",
+    fontWeight: "800",
   },
 });

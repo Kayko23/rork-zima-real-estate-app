@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert } from "react-native";
 import { useForm, Controller } from "react-hook-form";
-import { AccountForm, ProfileForm, DocsForm, accountSchema, profileSchema, docsSchema } from "@/lib/signupSchema";
+import { AccountForm, ProfileForm, DocsForm, accountSchema, createProfileSchemaForRole, createDocsSchemaForRole } from "@/lib/signupSchema";
 import DocItem from "@/components/upload/DocItem";
 import { authApi } from "@/lib/authApi";
 import { useSession } from "@/hooks/useSession";
@@ -26,7 +26,7 @@ export default function SignupWizard() {
       companyName: "",
       category: "",
       languages: [],
-    } as any,
+    },
   });
   
   // Étape 3 — Docs
@@ -46,15 +46,37 @@ export default function SignupWizard() {
     try {
       if (step === 1) {
         const isValid = await f1.trigger();
-        if (!isValid) return;
+        if (!isValid) {
+          console.log("Step 1 validation failed:", f1.formState.errors);
+          return;
+        }
       }
       if (step === 2) {
-        const isValid = await f2.trigger(["country", "city"]);
-        if (!isValid) return;
+        // Valider selon le rôle sélectionné
+        const role = f1.getValues("role");
+        const requiredFields = ["country", "city"];
+        if (role === "provider") {
+          requiredFields.push("companyName", "category");
+        }
+        const isValid = await f2.trigger(requiredFields as any);
+        if (!isValid) {
+          console.log("Step 2 validation failed:", f2.formState.errors);
+          return;
+        }
       }
       if (step === 3) {
-        const isValid = await f3.trigger();
-        if (!isValid) return;
+        // Pour les particuliers, on peut passer cette étape même sans documents
+        const role = f1.getValues("role");
+        if (role === "user") {
+          // Pas de validation stricte pour les particuliers
+        } else {
+          // Validation pour les prestataires
+          const isValid = await f3.trigger();
+          if (!isValid) {
+            console.log("Step 3 validation failed:", f3.formState.errors);
+            return;
+          }
+        }
       }
       setStep((s) => (s < 4 ? ((s + 1) as any) : s));
     } catch (error) {
@@ -68,28 +90,30 @@ export default function SignupWizard() {
     try {
       setIsSubmitting(true);
 
-      const okAccount = await f1.trigger();
-      const okProfile = await f2.trigger(["country", "city"]);
-      const okDocs = await f3.trigger();
-      if (!okAccount || !okProfile || !okDocs) {
-        if (!okProfile) setStep(2);
-        if (!okAccount) setStep(1);
-        return;
-      }
-
       const acc = f1.getValues();
       const pro = f2.getValues();
       const docs = f3.getValues();
+      const role = acc.role;
 
+      // Validation avec schémas conditionnels
       const validatedAccount = accountSchema.parse(acc);
+      const profileSchema = createProfileSchemaForRole(role);
+      const docsSchema = createDocsSchemaForRole(role);
+      
       const validatedProfile = profileSchema.parse(pro);
       const validatedDocs = docsSchema.parse(docs);
 
+      // Upload des documents s'ils existent
       const uploads: Record<string, any> = {};
-      for (const k of Object.keys(validatedDocs) as (keyof DocsForm)[]) {
-        const file = validatedDocs[k];
-        if (file) {
-          uploads[k] = await authApi.upload(file);
+      if (validatedDocs) {
+        for (const [key, file] of Object.entries(validatedDocs)) {
+          if (file && typeof file === 'object' && 'uri' in file) {
+            try {
+              uploads[key] = await authApi.upload(file as any);
+            } catch (uploadError) {
+              console.warn(`Failed to upload ${key}:`, uploadError);
+            }
+          }
         }
       }
 
@@ -99,14 +123,24 @@ export default function SignupWizard() {
         documents: uploads 
       };
 
+      console.log("Submitting registration:", payload);
       const { token, user } = await authApi.register(payload);
       await setSession(user, token);
       router.replace("/");
     } catch (e: any) {
-      const issues: string[] = Array.isArray(e?.issues)
-        ? e.issues.map((i: any) => `${i.path?.join('.') ?? ''}: ${i.message}`)
-        : [e?.message ?? 'Réessayez'];
-      Alert.alert('Inscription', issues.join('\n'));
+      let errorMessage = "Une erreur s'est produite lors de l'inscription";
+      
+      if (e?.issues && Array.isArray(e.issues)) {
+        const issues = e.issues.map((i: any) => {
+          const field = i.path?.join('.') || 'Champ';
+          return `${field}: ${i.message}`;
+        });
+        errorMessage = issues.join('\n');
+      } else if (e?.message) {
+        errorMessage = e.message;
+      }
+      
+      Alert.alert('Erreur d\'inscription', errorMessage);
       console.error("Registration error:", e);
     } finally {
       setIsSubmitting(false);
@@ -315,20 +349,36 @@ export default function SignupWizard() {
             <View>
               <Text style={styles.h2}>Documents & pièces</Text>
               
+              {f1.watch("role") === "user" ? (
+                <View style={styles.optionalSection}>
+                  <Text style={styles.optionalTitle}>Documents optionnels</Text>
+                  <Text style={styles.optionalSubtitle}>
+                    En tant que particulier, vous pouvez ajouter ces documents maintenant ou plus tard dans votre profil.
+                  </Text>
+                </View>
+              ) : (
+                <View style={styles.requiredSection}>
+                  <Text style={styles.requiredTitle}>Documents requis</Text>
+                  <Text style={styles.requiredSubtitle}>
+                    En tant que prestataire, ces documents sont nécessaires pour valider votre profil.
+                  </Text>
+                </View>
+              )}
+              
               <DocItem 
-                label="Pièce d'identité (recto)" 
+                label={`Pièce d'identité (recto)${f1.watch("role") === "user" ? " - Optionnel" : ""}`}
                 value={f3.watch("idFront")} 
                 onChange={(f) => f3.setValue("idFront", f)} 
               />
               
               <DocItem 
-                label="Pièce d'identité (verso)" 
+                label={`Pièce d'identité (verso)${f1.watch("role") === "user" ? " - Optionnel" : ""}`}
                 value={f3.watch("idBack")} 
                 onChange={(f) => f3.setValue("idBack", f)} 
               />
               
               <DocItem 
-                label="Justificatif de domicile (< 3 mois)" 
+                label={`Justificatif de domicile (< 3 mois)${f1.watch("role") === "user" ? " - Optionnel" : ""}`}
                 value={f3.watch("proofAddress")} 
                 onChange={(f) => f3.setValue("proofAddress", f)} 
               />
@@ -336,13 +386,13 @@ export default function SignupWizard() {
               {f1.watch("role") === "provider" && (
                 <>
                   <DocItem 
-                    label="Registre Commerce / RCCM (PDF ou image)" 
+                    label="Registre Commerce / RCCM (PDF ou image) - Optionnel" 
                     value={f3.watch("proRegistration")} 
                     onChange={(f) => f3.setValue("proRegistration", f)} 
                   />
                   
                   <DocItem 
-                    label="Licence / Agrément pro" 
+                    label="Licence / Agrément pro - Optionnel" 
                     value={f3.watch("proLicense")} 
                     onChange={(f) => f3.setValue("proLicense", f)} 
                   />
@@ -510,5 +560,43 @@ const styles = StyleSheet.create({
   },
   spacer: {
     width: 100,
+  },
+  optionalSection: {
+    backgroundColor: "#F0F9FF",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: "#0EA5E9",
+  },
+  optionalTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#0369A1",
+    marginBottom: 4,
+  },
+  optionalSubtitle: {
+    fontSize: 14,
+    color: "#0369A1",
+    lineHeight: 20,
+  },
+  requiredSection: {
+    backgroundColor: "#FEF3C7",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: "#F59E0B",
+  },
+  requiredTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#92400E",
+    marginBottom: 4,
+  },
+  requiredSubtitle: {
+    fontSize: 14,
+    color: "#92400E",
+    lineHeight: 20,
   },
 });
