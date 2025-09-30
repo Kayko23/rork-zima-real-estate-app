@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
+import { View, Text, TextInput, Pressable, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function AdjustSheet({ initial, onConfirm }:{
   initial:{ price:number; currency:string; from?:string; to?:string };
@@ -20,8 +21,18 @@ export default function AdjustSheet({ initial, onConfirm }:{
   };
 
   return (
-    <View style={s.wrap}>
-      <Text style={s.title}>Ajuster l'annonce</Text>
+    <SafeAreaView style={s.safeArea} edges={['top']}>
+      <KeyboardAvoidingView 
+        style={s.container} 
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+      >
+        <ScrollView 
+          contentContainerStyle={s.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={s.title}>Ajuster l'annonce</Text>
       <View style={s.priceRow}>
         <TextInput 
           style={[s.input, s.priceInput]} 
@@ -52,15 +63,19 @@ export default function AdjustSheet({ initial, onConfirm }:{
           placeholder="Au (YYYY-MM-DD)" 
         />
       </View>
-      <Pressable style={s.cta} onPress={handleConfirm}>
-        <Text style={s.ctaTxt}>Enregistrer</Text>
-      </Pressable>
-    </View>
+          <Pressable style={s.cta} onPress={handleConfirm}>
+            <Text style={s.ctaTxt}>Enregistrer</Text>
+          </Pressable>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { padding:16, gap:10 }, 
+  safeArea: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1 },
+  scrollContent: { padding: 16, gap: 10, paddingBottom: 40 }, 
   title: { fontSize:18, fontWeight:"800" }, 
   priceRow: { flexDirection:"row", gap:10 },
   dateRow: { flexDirection:"row", gap:10 },

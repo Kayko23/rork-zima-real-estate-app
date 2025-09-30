@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Image, KeyboardAvoidingView, Platform, Modal, TouchableOpacity, Keyboard } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { Save, MapPin, Check, FilePlus, ChevronDown, ChevronDown as KeyboardHide, Calendar } from "lucide-react-native";
 import { Listing, ListingType, RentPeriod } from "@/services/annonces.api";
@@ -330,12 +331,13 @@ export default function ListingForm({
   }, [category]);
 
   return (
-    <KeyboardAvoidingView 
-      style={s.container} 
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
-      testID="listingForm-root"
-    >
+    <SafeAreaView style={s.safeArea} edges={['top']}>
+      <KeyboardAvoidingView 
+        style={s.container} 
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+        testID="listingForm-root"
+      >
       <Pressable
         style={s.keyboardDismiss}
         onPress={() => Keyboard.dismiss()}
@@ -868,7 +870,8 @@ export default function ListingForm({
           </View>
         </View>
       </Modal>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -877,7 +880,8 @@ function Input(props: any) {
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  safeArea: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1 },
   scrollContent: { padding: 16, gap: 12, paddingBottom: Platform.OS === "ios" ? 40 : 120 },
   section: { fontSize: 16, fontWeight: "800", marginTop: 4, marginBottom: 6 },
   hint: { color: "#6b7280", marginTop: 4 },

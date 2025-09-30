@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 
 export default function ConfirmSheet({ title, description, confirmLabel, onConfirm, danger }:{
@@ -10,8 +11,12 @@ export default function ConfirmSheet({ title, description, confirmLabel, onConfi
   danger?: boolean;
 }) {
   return (
-    <View style={s.container}>
-      <Text style={s.title}>{title}</Text>
+    <SafeAreaView style={s.safeArea} edges={['top']}>
+      <ScrollView 
+        contentContainerStyle={s.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={s.title}>{title}</Text>
       {!!description && <Text style={s.description}>{description}</Text>}
       <View style={s.buttonRow}>
         <Pressable style={[s.btn, s.cancelBtn]} onPress={() => router.back()}>
@@ -21,12 +26,14 @@ export default function ConfirmSheet({ title, description, confirmLabel, onConfi
           <Text style={[s.confirmBtnTxt, danger && s.dangerBtnTxt]}>{confirmLabel}</Text>
         </Pressable>
       </View>
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({ 
-  container: { padding:16, gap:10 },
+  safeArea: { flex: 1, backgroundColor: "#fff" },
+  scrollContent: { padding: 16, gap: 10, paddingBottom: 40 },
   title: { fontSize:18, fontWeight:"800" },
   description: { color:"#6b7280" },
   buttonRow: { flexDirection:"row", gap:10 },
