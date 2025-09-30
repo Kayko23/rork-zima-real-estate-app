@@ -83,7 +83,7 @@ export default function TripDetailScreen() {
                     <Text style={s.btnGhostTxt}>Voir le profil</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={s.btn} onPress={()=>router.push(`/provider/${data.host.id}` as const)}>
-                    <Text style={s.btnTxt}>Tous ses biens</Text>
+                    <Text style={s.btnTxt}>Réserver</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -208,7 +208,7 @@ const s = StyleSheet.create({
   reviewName:{ fontWeight:"900", color:"#0B3B36", marginBottom:4 },
 
   btn:{ backgroundColor:"#134E48", paddingVertical:10, paddingHorizontal:14, borderRadius:12 },
-  btnTxt:{ color:"#fff", fontWeight:"800" },
+  btnTxt:{ color:"#fff", fontWeight:"800", fontSize: 14 },
   btnGhost:{ backgroundColor:"#fff", paddingVertical:10, paddingHorizontal:14, borderRadius:12, borderWidth:1, borderColor:"#DCEAE6" },
   btnGhostTxt:{ color:"#134E48", fontWeight:"800" },
   moreSection:{ marginTop:12 },
