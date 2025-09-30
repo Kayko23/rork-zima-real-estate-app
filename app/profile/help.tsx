@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet, Linking, ScrollView } from "react-native";
-import { Mail, Phone, HelpCircle, AlertCircle, MessageCircle, FileText } from "lucide-react-native";
+import { Mail, Phone, MessageCircle } from "lucide-react-native";
 import Colors from "@/constants/colors";
 
 export default function HelpScreen() {
@@ -28,30 +28,6 @@ export default function HelpScreen() {
       icon: Phone,
       color: Colors.primary,
       action: () => Linking.openURL("tel:+2250709090909"),
-    },
-    {
-      id: "faq",
-      title: "FAQ",
-      description: "Questions fréquemment posées",
-      icon: HelpCircle,
-      color: Colors.text.secondary,
-      action: () => console.log("FAQ - Coming soon"),
-    },
-    {
-      id: "documentation",
-      title: "Documentation",
-      description: "Guides et tutoriels",
-      icon: FileText,
-      color: Colors.text.secondary,
-      action: () => console.log("Documentation - Coming soon"),
-    },
-    {
-      id: "report",
-      title: "Signaler un problème",
-      description: "Rapportez un bug ou une erreur",
-      icon: AlertCircle,
-      color: "#E53E3E",
-      action: () => Linking.openURL("mailto:support@zima.app?subject=Signalement de problème"),
     },
   ];
 
