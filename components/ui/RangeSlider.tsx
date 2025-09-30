@@ -14,7 +14,10 @@ export default function RangeSlider({ min, max, value, onChange }: Props) {
   const left = useSharedValue<number>(0);
   const right = useSharedValue<number>(0);
 
-  const clamp = (n: number, a: number, b: number) => Math.min(Math.max(n, a), b);
+  const clamp = (n: number, a: number, b: number) => {
+    'worklet';
+    return Math.min(Math.max(n, a), b);
+  };
 
   const onLayout = (e: LayoutChangeEvent) => {
     width.value = e.nativeEvent.layout.width;
@@ -25,7 +28,8 @@ export default function RangeSlider({ min, max, value, onChange }: Props) {
 
   const toVal = (x: number) => {
     'worklet';
-    const ratio = clamp(x, 0, width.value) / (width.value || 1);
+    if (!width.value || width.value === 0) return min;
+    const ratio = clamp(x, 0, width.value) / width.value;
     const v = min + ratio * (max - min);
     const step = 1000;
     return Math.round(v / step) * step;
@@ -33,12 +37,14 @@ export default function RangeSlider({ min, max, value, onChange }: Props) {
 
   const panLeft = Gesture.Pan()
     .onChange((e) => {
+      if (!width.value || width.value === 0) return;
       left.value = clamp(left.value + e.changeX, 0, right.value - 8);
       runOnJS(onChange)([toVal(left.value), toVal(right.value)]);
     });
 
   const panRight = Gesture.Pan()
     .onChange((e) => {
+      if (!width.value || width.value === 0) return;
       right.value = clamp(right.value + e.changeX, left.value + 8, width.value);
       runOnJS(onChange)([toVal(left.value), toVal(right.value)]);
     });

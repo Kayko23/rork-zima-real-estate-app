@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { View, StyleSheet, LayoutChangeEvent, Text } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -14,7 +14,10 @@ type Props = {
   renderLabel?: (val: number) => string;
 };
 
-function clamp(n:number, a:number, b:number){ return Math.min(Math.max(n,a), b); }
+function clamp(n:number, a:number, b:number){ 
+  'worklet';
+  return Math.min(Math.max(n,a), b); 
+}
 
 export default function RangeSliderAdvanced({
   min, max, value, onChange, step = 1000, minGap = 0, renderLabel,
@@ -23,17 +26,21 @@ export default function RangeSliderAdvanced({
   const leftX = useSharedValue(0);
   const rightX = useSharedValue(0);
 
-  const pxToVal = useCallback((x:number)=>{
-    const ratio = width.value ? x / width.value : 0;
+  const pxToVal = (x:number)=>{
+    'worklet';
+    if (!width.value || width.value === 0) return min;
+    const ratio = x / width.value;
     const raw = min + ratio * (max - min);
     const stepped = Math.round(raw / step) * step;
     return clamp(stepped, min, max);
-  }, [min,max,step]);
+  };
 
-  const valToPx = useCallback((v:number)=>{
+  const valToPx = (v:number)=>{
+    'worklet';
+    if (!width.value || width.value === 0) return 0;
     const ratio = (v - min) / (max - min);
-    return ratio * (width.value || 0);
-  }, [min,max]);
+    return ratio * width.value;
+  };
 
   const onLayout = (e: LayoutChangeEvent) => {
     width.value = e.nativeEvent.layout.width;
@@ -57,6 +64,7 @@ export default function RangeSliderAdvanced({
 
   const panLeft = Gesture.Pan()
     .onChange((e)=> {
+      if (!width.value || width.value === 0) return;
       const next = clamp(leftX.value + e.changeX, 0, rightX.value - minPixelGap);
       leftX.value = next;
       runOnJS(fireChange)(leftX.value, rightX.value);
@@ -65,6 +73,7 @@ export default function RangeSliderAdvanced({
 
   const panRight = Gesture.Pan()
     .onChange((e)=> {
+      if (!width.value || width.value === 0) return;
       const next = clamp(rightX.value + e.changeX, leftX.value + minPixelGap, width.value);
       rightX.value = next;
       runOnJS(fireChange)(leftX.value, rightX.value);
