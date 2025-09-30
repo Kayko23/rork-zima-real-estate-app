@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -114,48 +114,124 @@ function PropertyDetailScreen() {
   const { id } = useLocalSearchParams();
   const insets = useSafeAreaInsets();
 
-  const data: PropertyData = useMemo(
-    () => ({
-      id,
-      title: "Appartement Moderne au Centre-ville de Dakar",
-      city: "Dakar",
-      country: "Senegal",
-      type: "villa",
-      chips: ["villa", "3 pièces", "2 SDB", "85 m²"],
-      price: 125000,
-      currency: "$US",
-      premium: true,
-      rating: 4.8,
-      reviewsCount: 23,
-      images: [
-        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1600&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1600&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1600&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=1600&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1600&auto=format&fit=crop",
-      ],
-      description:
-        "Magnifique villa moderne avec vue imprenable sur la ville. Design contemporain, finitions de haute qualité, et excellent emplacement près du quartier des affaires.",
-      agent: {
-        id: "p3",
-        name: "Aminata Diallo",
-        verified: true,
-        stats: { reviews: 150, rating: 4.78, years: 5 },
-        role: "Agent immobilier",
-        avatar:
-          "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
-      },
-      safety: [
-        { title: "Politique de vérification", subtitle: "Tous nos agents sont vérifiés et certifiés" },
-        { title: "Sécurité des visites", subtitle: "Visites accompagnées et sécurisées" },
-      ],
-      popularInCity: [
-        { id: "p1", title: "appartement · Lagos", info1: "85 $ pour 2 nuits", info2: "4.6" },
-        { id: "p2", title: "boutique · Cotonou", info1: "400 $/mois", info2: "4.3" },
-      ],
-    }),
-    [id]
-  );
+  const [data, setData] = useState<PropertyData | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    async function loadProperty() {
+      try {
+        setLoading(true);
+        console.log("Loading property with ID:", id);
+        
+        const { fetchListings } = await import("@/services/annonces.api");
+        const { mockProperties } = await import("@/constants/data");
+        
+        const allListings = await fetchListings("active");
+        const pendingListings = await fetchListings("pending");
+        const all = [...allListings, ...pendingListings];
+        
+        let foundListing = all.find(l => l.id === id);
+        
+        if (!foundListing) {
+          const mockProp = mockProperties.find(p => p.id === id);
+          if (mockProp) {
+            foundListing = {
+              id: mockProp.id,
+              title: mockProp.title,
+              city: mockProp.location.city,
+              country: mockProp.location.country,
+              price: mockProp.price,
+              currency: mockProp.currency,
+              type: mockProp.type === 'sale' ? 'sale' : 'rent',
+              surface: mockProp.area,
+              beds: mockProp.bedrooms,
+              baths: mockProp.bathrooms,
+              photos: mockProp.images,
+              status: 'active',
+            } as any;
+          }
+        }
+        
+        if (foundListing) {
+          const chips: string[] = [];
+          if ((foundListing as any).subtype) chips.push((foundListing as any).subtype);
+          if (foundListing.beds) chips.push(`${foundListing.beds} pièces`);
+          if (foundListing.baths) chips.push(`${foundListing.baths} SDB`);
+          if (foundListing.surface) chips.push(`${foundListing.surface} m²`);
+          
+          const propertyData: PropertyData = {
+            id: foundListing.id,
+            title: foundListing.title || "Bien immobilier",
+            city: foundListing.city || "Ville",
+            country: foundListing.country || "Pays",
+            type: (foundListing as any).subtype || foundListing.type || "bien",
+            chips,
+            price: foundListing.price || 0,
+            currency: foundListing.currency || "XOF",
+            premium: foundListing.premium || false,
+            rating: foundListing.rating || 4.5,
+            reviewsCount: foundListing.reviews || 0,
+            images: foundListing.photos && foundListing.photos.length > 0 ? foundListing.photos : [
+              "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1600&auto=format&fit=crop",
+              "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1600&auto=format&fit=crop",
+            ],
+            description: (foundListing as any).description || "Magnifique bien immobilier.",
+            agent: {
+              id: "p1",
+              name: "Agent Zima",
+              verified: true,
+              stats: { reviews: 100, rating: 4.7, years: 3 },
+              role: "Agent immobilier",
+              avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
+            },
+            safety: [
+              { title: "Politique de vérification", subtitle: "Tous nos agents sont vérifiés et certifiés" },
+              { title: "Sécurité des visites", subtitle: "Visites accompagnées et sécurisées" },
+            ],
+            popularInCity: [],
+          };
+          
+          setData(propertyData);
+        } else {
+          console.log("Property not found, using fallback");
+          setData({
+            id,
+            title: "Bien immobilier",
+            city: "Ville",
+            country: "Pays",
+            type: "bien",
+            chips: [],
+            price: 0,
+            currency: "XOF",
+            premium: false,
+            rating: 4.5,
+            reviewsCount: 0,
+            images: ["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1600&auto=format&fit=crop"],
+            description: "Bien immobilier",
+            agent: {
+              id: "p1",
+              name: "Agent Zima",
+              verified: true,
+              stats: { reviews: 0, rating: 4.5, years: 1 },
+              role: "Agent immobilier",
+              avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
+            },
+            safety: [],
+            popularInCity: [],
+          });
+        }
+      } catch (error) {
+        console.error("Error loading property:", error);
+        setData(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    if (id) {
+      loadProperty();
+    }
+  }, [id]);
 
   const [imgIndex, setImgIndex] = useState<number>(0);
   const [showAllAmenities, setShowAllAmenities] = useState<boolean>(false);
@@ -180,6 +256,7 @@ function PropertyDetailScreen() {
   const remainingCount = allAmenities.length - 4;
 
   const openMaps = () => {
+    if (!data) return;
     try {
       const q = encodeURIComponent(`${data.city}, ${data.country}`);
       const url = Platform.OS === "ios" ? `http://maps.apple.com/?q=${q}` : `https://www.google.com/maps/search/?api=1&query=${q}`;
@@ -191,6 +268,7 @@ function PropertyDetailScreen() {
   };
 
   const openItinerary = () => {
+    if (!data) return;
     try {
       const q = encodeURIComponent(`${data.city}, ${data.country}`);
       const url = Platform.OS === "ios" ? `http://maps.apple.com/?daddr=${q}` : `https://www.google.com/maps/dir/?api=1&destination=${q}`;
@@ -200,6 +278,22 @@ function PropertyDetailScreen() {
       console.log("openItinerary error", e);
     }
   };
+
+  if (loading) {
+    return (
+      <View style={[styles.screen, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={{ fontSize: 16, color: '#6b7280' }}>Chargement...</Text>
+      </View>
+    );
+  }
+
+  if (!data) {
+    return (
+      <View style={[styles.screen, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+        <Text style={{ fontSize: 16, color: '#b91c1c', fontWeight: '600', textAlign: 'center' }}>Bien introuvable</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.screen} testID="property-detail-screen">
@@ -531,7 +625,7 @@ function Chip({ label }: { label: string }) {
   
   return (
     <View style={styles.chip}>
-      {icon && <View style={{ marginRight: 6 }}>{icon}</View>}
+      {icon && <View style={{ marginRight: 6 }}><Text>{icon}</Text></View>}
       <Text style={styles.chipText}>{label}</Text>
     </View>
   );

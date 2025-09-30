@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import PropertyCard from '@/components/ui/PropertyCard';
@@ -8,6 +8,70 @@ import { mockProperties, propertyCategories } from '@/constants/data';
 import Colors from '@/constants/colors';
 
 export default function BiensFeed() {
+  const [allProperties, setAllProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    async function loadProperties() {
+      try {
+        setLoading(true);
+        const { fetchListings } = await import('@/services/annonces.api');
+        const activeListings = await fetchListings('active');
+        const pendingListings = await fetchListings('pending');
+        
+        const mappedListings = [...activeListings, ...pendingListings].map(listing => ({
+          id: listing.id,
+          title: listing.title,
+          price: listing.price,
+          currency: listing.currency,
+          location: {
+            city: listing.city,
+            country: listing.country,
+          },
+          type: listing.type,
+          category: (listing as any).subtype || listing.type || 'Bien',
+          bedrooms: listing.beds,
+          bathrooms: listing.baths,
+          area: listing.surface,
+          images: listing.photos && listing.photos.length > 0 ? listing.photos : [
+            'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800',
+          ],
+          description: (listing as any).description || '',
+          features: (listing as any).amenities || [],
+          isPremium: listing.premium || false,
+          isFavorite: false,
+          views: listing.views || 0,
+          createdAt: new Date().toISOString(),
+          provider: {
+            id: 'p1',
+            name: 'Agent Zima',
+            type: 'agent' as const,
+            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+            rating: 4.7,
+            reviewCount: 50,
+            location: { city: listing.city, country: listing.country },
+            specialties: ['Résidentiel'],
+            isVerified: true,
+            isPremium: false,
+            phone: '+233244123456',
+            email: 'contact@zima.com',
+            listingCount: 10,
+            images: [],
+          },
+        }));
+        
+        setAllProperties([...mockProperties, ...mappedListings]);
+      } catch (error) {
+        console.error('[BiensFeed] Error loading properties:', error);
+        setAllProperties(mockProperties);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    loadProperties();
+  }, []);
+
   const handlePropertyPress = (propertyId: string) => {
     console.log('Property pressed:', propertyId);
     router.push({
@@ -52,7 +116,7 @@ export default function BiensFeed() {
     router.push(`/browse?title=${encodeURIComponent(section)}&kind=${encodeURIComponent(normalized)}`);
   };
 
-  const displayProperties = mockProperties;
+  const displayProperties = allProperties;
 
   const renderPropertyCard = ({ item }: { item: any; index: number }) => (
     <PropertyCard
@@ -104,6 +168,14 @@ export default function BiensFeed() {
 
     return out;
   }, [displayProperties]);
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', minHeight: 200 }]}>
+        <Text style={{ color: Colors.text.secondary }}>Chargement des biens...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>

@@ -64,7 +64,10 @@ export default function PropertyCard({ property, onPress, onToggleFavorite, widt
             </Text>
             <View style={styles.priceChip}>
               <Text style={styles.price}>
-                {`${formatFrom(property.price, property.currency)}${property.type === 'rent' ? '/mois' : ''}`}
+                {property.currency && property.price ? 
+                  `${formatFrom(property.price, property.currency)}${property.type === 'rent' ? '/mois' : ''}` 
+                  : 'Prix non disponible'
+                }
               </Text>
             </View>
           </View>
