@@ -204,7 +204,12 @@ export default function EditProfileScreen() {
             autoFocus
           />
         </View>
-        <ScrollView style={s.pickerList}>
+        <ScrollView 
+          style={s.pickerList}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
           {filteredCountries.map((c) => (
             <Pressable
               key={c.code}
@@ -235,7 +240,12 @@ export default function EditProfileScreen() {
             autoFocus
           />
         </View>
-        <ScrollView style={s.pickerList}>
+        <ScrollView 
+          style={s.pickerList}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
           {filteredCities.map((cityName) => (
             <Pressable
               key={cityName}
@@ -320,7 +330,7 @@ const s = StyleSheet.create({
   sheetTitle: { fontSize: 18, fontWeight: "700", marginBottom: 12, textAlign: "center" },
   searchBox: { flexDirection: "row", alignItems: "center", backgroundColor: "#f3f4f6", borderRadius: 12, paddingHorizontal: 12, marginBottom: 12, gap: 8 },
   searchInput: { flex: 1, height: 44, fontSize: 16 },
-  pickerList: { maxHeight: 500 },
+  pickerList: { flex: 1 },
   pickerItem: { paddingVertical: 14, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: "#f3f4f6" },
   pickerItemText: { fontSize: 16 },
   pickerItemSelected: { fontWeight: "700", color: "#0C5A45" },

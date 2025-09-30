@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Modal, Animated, Pressable, View, StyleSheet, useWindowDimensions } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Modal, Animated, Pressable, View, StyleSheet, useWindowDimensions, Keyboard, Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
 
 type Props = {
@@ -11,18 +11,35 @@ type Props = {
 
 export default function BottomSheet({ visible, onClose, children, height = 0.82 }: Props) {
   const { height: screenH } = useWindowDimensions();
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const h = height <= 1 ? screenH * height : height;
   const y = useRef(new Animated.Value(screenH)).current;
 
   useEffect(() => {
+    const showListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => setKeyboardHeight(e.endCoordinates.height)
+    );
+    const hideListener = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => setKeyboardHeight(0)
+    );
+    return () => {
+      showListener.remove();
+      hideListener.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    const targetY = visible ? screenH - h - keyboardHeight : screenH;
     Animated.spring(y, {
-      toValue: visible ? screenH - h : screenH,
+      toValue: targetY,
       useNativeDriver: true,
       damping: 18,
       stiffness: 200,
       mass: 0.8,
     }).start();
-  }, [visible, h, screenH, y]);
+  }, [visible, h, screenH, y, keyboardHeight]);
 
   return (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
@@ -49,6 +66,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
+    paddingHorizontal: 16,
+    paddingTop: 8,
     paddingBottom: 24,
     overflow: 'hidden',
   },
