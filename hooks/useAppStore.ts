@@ -85,6 +85,9 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const [currency, setCurrencyState] = useState<string>('XOF');
   const [fxBase, setFxBase] = useState<string | null>(null);
   const [fxRates, setFxRates] = useState<Record<string, number>>({});
+  const [favoritePropertyIds, setFavoritePropertyIds] = useState<Set<string>>(new Set());
+  const [favoriteProviderIds, setFavoriteProviderIds] = useState<Set<string>>(new Set());
+  const [favoriteVoyageIds, setFavoriteVoyageIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Load persisted data after component mounts
@@ -107,6 +110,9 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       const savedLanguage = await storage.getItem('language');
       const savedOnboarding = await storage.getItem('hasCompletedOnboarding');
       const savedCurrency = await storage.getItem('currency');
+      const savedFavProperties = await storage.getItem('favoriteProperties');
+      const savedFavProviders = await storage.getItem('favoriteProviders');
+      const savedFavVoyages = await storage.getItem('favoriteVoyages');
       
       if (savedMode && savedMode.trim()) {
         setUserMode(savedMode as UserMode);
@@ -136,6 +142,30 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       }
       if (savedCurrency && savedCurrency.trim()) {
         setCurrencyState(savedCurrency);
+      }
+      if (savedFavProperties) {
+        try {
+          const parsed = JSON.parse(savedFavProperties);
+          setFavoritePropertyIds(new Set(parsed));
+        } catch (e) {
+          console.log('Error parsing favorite properties', e);
+        }
+      }
+      if (savedFavProviders) {
+        try {
+          const parsed = JSON.parse(savedFavProviders);
+          setFavoriteProviderIds(new Set(parsed));
+        } catch (e) {
+          console.log('Error parsing favorite providers', e);
+        }
+      }
+      if (savedFavVoyages) {
+        try {
+          const parsed = JSON.parse(savedFavVoyages);
+          setFavoriteVoyageIds(new Set(parsed));
+        } catch (e) {
+          console.log('Error parsing favorite voyages', e);
+        }
       }
       
       setIsInitialized(true);
@@ -229,6 +259,55 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     }
   }, []);
 
+  const toggleFavoriteProperty = useCallback(async (id: string) => {
+    setFavoritePropertyIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+        console.log('[Favorites] Removed property', id);
+      } else {
+        next.add(id);
+        console.log('[Favorites] Added property', id);
+      }
+      storage.setItem('favoriteProperties', JSON.stringify(Array.from(next)));
+      return next;
+    });
+  }, []);
+
+  const toggleFavoriteProvider = useCallback(async (id: string) => {
+    setFavoriteProviderIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+        console.log('[Favorites] Removed provider', id);
+      } else {
+        next.add(id);
+        console.log('[Favorites] Added provider', id);
+      }
+      storage.setItem('favoriteProviders', JSON.stringify(Array.from(next)));
+      return next;
+    });
+  }, []);
+
+  const toggleFavoriteVoyage = useCallback(async (id: string) => {
+    setFavoriteVoyageIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+        console.log('[Favorites] Removed voyage', id);
+      } else {
+        next.add(id);
+        console.log('[Favorites] Added voyage', id);
+      }
+      storage.setItem('favoriteVoyages', JSON.stringify(Array.from(next)));
+      return next;
+    });
+  }, []);
+
+  const isFavoriteProperty = useCallback((id: string) => favoritePropertyIds.has(id), [favoritePropertyIds]);
+  const isFavoriteProvider = useCallback((id: string) => favoriteProviderIds.has(id), [favoriteProviderIds]);
+  const isFavoriteVoyage = useCallback((id: string) => favoriteVoyageIds.has(id), [favoriteVoyageIds]);
+
   return useMemo(() => ({
     userMode,
     user,
@@ -242,6 +321,9 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     currency,
     fxBase,
     fxRates,
+    favoritePropertyIds,
+    favoriteProviderIds,
+    favoriteVoyageIds,
     switchMode,
     toggleAppMode,
     updateUser,
@@ -253,8 +335,14 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     setHomeTab,
     setCurrency,
     setFx,
-    hydrate
-  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, activeHomeTab, currency, fxBase, fxRates, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding, setHomeTab, setCurrency, setFx, hydrate]);
+    hydrate,
+    toggleFavoriteProperty,
+    toggleFavoriteProvider,
+    toggleFavoriteVoyage,
+    isFavoriteProperty,
+    isFavoriteProvider,
+    isFavoriteVoyage
+  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, activeHomeTab, currency, fxBase, fxRates, favoritePropertyIds, favoriteProviderIds, favoriteVoyageIds, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding, setHomeTab, setCurrency, setFx, hydrate, toggleFavoriteProperty, toggleFavoriteProvider, toggleFavoriteVoyage, isFavoriteProperty, isFavoriteProvider, isFavoriteVoyage]);
 });
 
 // Export a safe version of the hook that always returns a valid object
@@ -276,6 +364,9 @@ export const useApp = () => {
       currency: 'XOF',
       fxBase: null,
       fxRates: {},
+      favoritePropertyIds: new Set<string>(),
+      favoriteProviderIds: new Set<string>(),
+      favoriteVoyageIds: new Set<string>(),
       switchMode: async () => {},
       toggleAppMode: async () => {},
       updateUser: async () => {},
@@ -287,7 +378,13 @@ export const useApp = () => {
       setHomeTab: () => {},
       setCurrency: async () => {},
       setFx: () => {},
-      hydrate: async () => {}
+      hydrate: async () => {},
+      toggleFavoriteProperty: async () => {},
+      toggleFavoriteProvider: async () => {},
+      toggleFavoriteVoyage: async () => {},
+      isFavoriteProperty: () => false,
+      isFavoriteProvider: () => false,
+      isFavoriteVoyage: () => false
     };
   }
   

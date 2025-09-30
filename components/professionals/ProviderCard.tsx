@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
-import { MapPin, Phone, MessageCircle, Mail, Star } from "lucide-react-native";
+import { MapPin, Phone, MessageCircle, Mail, Star, Heart } from "lucide-react-native";
+import { useApp } from "@/hooks/useAppStore";
 
 export type Provider = {
   id: string;
@@ -26,6 +27,9 @@ type Props = {
 };
 
 export default function ProviderCard({ item, onPressProfile, onPressCall, onPressWhatsApp, onPressMail }: Props) {
+  const { isFavoriteProvider, toggleFavoriteProvider } = useApp();
+  const isFav = isFavoriteProvider(item.id);
+  
   return (
     <View style={s.card}>
       <View style={s.coverWrap}>
@@ -47,6 +51,18 @@ export default function ProviderCard({ item, onPressProfile, onPressCall, onPres
             )}
           </View>
         )}
+        
+        <TouchableOpacity 
+          style={s.favoriteButton} 
+          onPress={() => toggleFavoriteProvider(item.id)}
+          activeOpacity={0.8}
+        >
+          <Heart 
+            size={18} 
+            color={isFav ? '#EF4444' : '#fff'}
+            fill={isFav ? '#EF4444' : 'transparent'}
+          />
+        </TouchableOpacity>
       </View>
 
       <View style={s.content}>
@@ -133,6 +149,17 @@ const s = StyleSheet.create({
     color: "#fff",
     fontSize: 11,
     fontWeight: "700",
+  },
+  favoriteButton: {
+    position: "absolute",
+    bottom: 12,
+    right: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   name: { fontSize: 18, fontWeight: "700", color: "#0F172A", paddingLeft: 64, marginTop: 8 },
   row: { flexDirection: "row", alignItems: "center" },

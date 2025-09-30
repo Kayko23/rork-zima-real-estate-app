@@ -4,12 +4,22 @@ import { Heart } from "lucide-react-native";
 import { TripItem } from "./helpers";
 import { router } from "expo-router";
 import { useMoney } from "@/lib/money";
+import { useApp } from "@/hooks/useAppStore";
 
 export default function VoyageCard({ item, onPress }:{ item:TripItem; onPress?:()=>void }) {
+  const { isFavoriteVoyage, toggleFavoriteVoyage } = useApp();
+  const isFav = isFavoriteVoyage(item.id);
+  
   const handlePress = () => {
     if (onPress) return onPress();
     router.push(`/trip/${item.id}`);
   };
+  
+  const handleToggleFavorite = (e: any) => {
+    e.stopPropagation();
+    toggleFavoriteVoyage(item.id);
+  };
+  
   const { formatFrom } = useMoney();
   return (
     <TouchableOpacity style={c.card} activeOpacity={0.9} onPress={handlePress} testID={`voyage-card-${item.id}`}>
@@ -17,7 +27,9 @@ export default function VoyageCard({ item, onPress }:{ item:TripItem; onPress?:(
       {!!item.badge && <View style={[c.badge, item.badge==="Top"?{backgroundColor:"#0EA5A3"}:{backgroundColor:"#0B3B36"}]}> 
         <Text style={c.badgeTxt}>{item.badge}</Text>
       </View>}
-      <View style={c.like}><Heart size={18} color="#fff"/></View>
+      <TouchableOpacity style={c.like} onPress={handleToggleFavorite} activeOpacity={0.8}>
+        <Heart size={18} color={isFav ? '#EF4444' : '#fff'} fill={isFav ? '#EF4444' : 'transparent'}/>
+      </TouchableOpacity>
 
       <View style={c.body}>
         <Text numberOfLines={1} style={c.title}>{item.title}</Text>

@@ -4,16 +4,29 @@ import { Heart, Star, Bed, Bath, Square } from 'lucide-react-native';
 import { Property } from '@/types';
 import Colors from '@/constants/colors';
 import { useMoney } from '@/lib/money';
+import { useApp } from '@/hooks/useAppStore';
 
 interface PropertyCardProps {
   property: Property;
   onPress: () => void;
-  onToggleFavorite: () => void;
+  onToggleFavorite?: () => void;
   width?: number;
 }
 
 export default function PropertyCard({ property, onPress, onToggleFavorite, width }: PropertyCardProps) {
   const { formatFrom } = useMoney();
+  const { isFavoriteProperty, toggleFavoriteProperty } = useApp();
+  
+  const isFav = isFavoriteProperty(property.id);
+  
+  const handleToggleFavorite = (e: any) => {
+    e.stopPropagation();
+    if (onToggleFavorite) {
+      onToggleFavorite();
+    } else {
+      toggleFavoriteProperty(property.id);
+    }
+  };
 
   const cardWidth = width || '100%';
   
@@ -45,14 +58,14 @@ export default function PropertyCard({ property, onPress, onToggleFavorite, widt
         {/* Favorite Button */}
         <TouchableOpacity 
           style={styles.favoriteButton} 
-          onPress={onToggleFavorite}
+          onPress={handleToggleFavorite}
           testID="favorite-button"
           activeOpacity={0.8}
         >
           <Heart 
             size={18} 
-            color={property.isFavorite ? Colors.error : 'white'}
-            fill={property.isFavorite ? Colors.error : 'transparent'}
+            color={isFav ? Colors.error : 'white'}
+            fill={isFav ? Colors.error : 'transparent'}
           />
         </TouchableOpacity>
         

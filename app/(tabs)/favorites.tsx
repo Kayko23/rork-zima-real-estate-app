@@ -37,19 +37,21 @@ export default function FavoritesScreen() {
   const [viewType, setViewType] = useState<ViewType>('list');
   const [sort, setSort] = useState<SortType>('recent');
 
+  const { favoritePropertyIds, favoriteProviderIds } = useApp();
+  
   const favoriteProperties = useMemo(() => {
-    const arr = mockProperties.filter((p) => p.isFavorite);
+    const arr = mockProperties.filter((p) => favoritePropertyIds.has(p.id));
     if (sort === 'priceAsc') return [...arr].sort((a, b) => a.price - b.price);
     if (sort === 'priceDesc') return [...arr].sort((a, b) => b.price - a.price);
     if (sort === 'rating') return [...arr].sort((a, b) => (b.provider?.rating ?? 0) - (a.provider?.rating ?? 0));
     return arr;
-  }, [sort]);
+  }, [sort, favoritePropertyIds]);
 
   const favoriteProviders = useMemo(() => {
-    const arr = mockProviders.slice(0, 8);
+    const arr = mockProviders.filter((p) => favoriteProviderIds.has(p.id));
     if (sort === 'rating') return [...arr].sort((a, b) => b.rating - a.rating);
     return arr;
-  }, [sort]);
+  }, [sort, favoriteProviderIds]);
 
   const onCycleSort = useCallback(() => {
     const order: SortType[] = ['recent', 'rating', 'priceAsc', 'priceDesc'];

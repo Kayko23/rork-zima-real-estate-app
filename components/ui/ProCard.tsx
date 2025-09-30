@@ -8,8 +8,11 @@ import {
   Pressable,
   StyleSheet,
   GestureResponderEvent,
+  TouchableOpacity,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Heart } from 'lucide-react-native';
+import { useApp } from '@/hooks/useAppStore';
 
 export type ProItem = {
   id: string;
@@ -53,6 +56,9 @@ const COLORS = {
 };
 
 const ProCard = memo<Props>(function ProCard({ item, onPressProfile, onPressCard }) {
+  const { isFavoriteProvider, toggleFavoriteProvider } = useApp();
+  const isFav = isFavoriteProvider(item.id);
+  
   const openTel = () => {
     if (item.phone) Linking.openURL(`tel:${item.phone}`);
   };
@@ -81,6 +87,18 @@ const ProCard = memo<Props>(function ProCard({ item, onPressProfile, onPressCard
           />
           {item.online && <View style={styles.onlineDot} />}
         </View>
+        
+        <TouchableOpacity 
+          style={styles.favoriteButton} 
+          onPress={() => toggleFavoriteProvider(item.id)}
+          activeOpacity={0.8}
+        >
+          <Heart 
+            size={18} 
+            color={isFav ? '#EF4444' : COLORS.sub}
+            fill={isFav ? '#EF4444' : 'transparent'}
+          />
+        </TouchableOpacity>
 
         <View style={styles.infoContainer}>
           <View style={styles.nameAndBadges}>
@@ -235,6 +253,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#10B981',
     borderWidth: 2,
     borderColor: COLORS.bg,
+  },
+  favoriteButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
   infoContainer: {
     flex: 1,
