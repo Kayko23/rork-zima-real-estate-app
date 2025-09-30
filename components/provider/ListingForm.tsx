@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Image, KeyboardAvoidingView, Platform, Modal, TouchableOpacity, Keyboard } from "react-native";
+import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Image, KeyboardAvoidingView, Platform, Modal, TouchableOpacity, Keyboard, TextInputProps } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
 import { Save, MapPin, Check, FilePlus, ChevronDown, ChevronDown as KeyboardHide, Calendar } from "lucide-react-native";
@@ -875,8 +875,9 @@ export default function ListingForm({
   );
 }
 
-function Input(props: any) {
-  return <TextInput {...props} style={[s.input, props.style]} />;
+function Input(props: Omit<TextInputProps, 'value'> & { value?: string }) {
+  const normalizedValue = props.value ?? "";
+  return <TextInput {...props} value={normalizedValue} style={[s.input, props.style]} />;
 }
 
 const s = StyleSheet.create({
