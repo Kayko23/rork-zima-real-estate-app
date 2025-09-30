@@ -6,6 +6,7 @@ import SectionHeader from '@/components/ui/SectionHeader';
 import ActionDouble from '@/components/home/ActionDouble';
 import { mockProperties, propertyCategories } from '@/constants/data';
 import Colors from '@/constants/colors';
+import { fetchListings } from '@/services/annonces.api';
 
 export default function BiensFeed() {
   const [allProperties, setAllProperties] = useState<any[]>([]);
@@ -15,54 +16,63 @@ export default function BiensFeed() {
     async function loadProperties() {
       try {
         setLoading(true);
-        const { fetchListings } = await import('@/services/annonces.api');
         const activeListings = await fetchListings('active');
         const pendingListings = await fetchListings('pending');
         
-        const mappedListings = [...activeListings, ...pendingListings].map(listing => ({
-          id: listing.id,
-          title: listing.title,
-          price: listing.price,
-          currency: listing.currency,
-          location: {
-            city: listing.city,
-            country: listing.country,
-          },
-          type: listing.type,
-          category: (listing as any).subtype || listing.type || 'Bien',
-          bedrooms: listing.beds,
-          bathrooms: listing.baths,
-          area: listing.surface,
-          images: listing.photos && listing.photos.length > 0 ? listing.photos : [
-            'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800',
-          ],
-          description: (listing as any).description || '',
-          features: (listing as any).amenities || [],
-          isPremium: listing.premium || false,
-          isFavorite: false,
-          views: listing.views || 0,
-          createdAt: new Date().toISOString(),
-          provider: {
-            id: 'p1',
-            name: 'Agent Zima',
-            type: 'agent' as const,
-            avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-            rating: 4.7,
-            reviewCount: 50,
-            location: { city: listing.city, country: listing.country },
-            specialties: ['Résidentiel'],
-            isVerified: true,
-            isPremium: false,
-            phone: '+233244123456',
-            email: 'contact@zima.com',
-            listingCount: 10,
-            images: [],
-          },
-        }));
+        const mappedListings = [...activeListings, ...pendingListings].map(listing => {
+          try {
+            return {
+              id: listing.id,
+              title: listing.title,
+              price: listing.price,
+              currency: listing.currency,
+              location: {
+                city: listing.city,
+                country: listing.country,
+              },
+              type: listing.type,
+              category: (listing as any).subtype || listing.type || 'Bien',
+              bedrooms: listing.beds,
+              bathrooms: listing.baths,
+              area: listing.surface,
+              images: listing.photos && listing.photos.length > 0 ? listing.photos : [
+                'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800',
+              ],
+              description: (listing as any).description || '',
+              features: (listing as any).amenities || [],
+              isPremium: listing.premium || false,
+              isFavorite: false,
+              views: listing.views || 0,
+              createdAt: new Date().toISOString(),
+              provider: {
+                id: 'p1',
+                name: 'Agent Zima',
+                type: 'agent' as const,
+                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+                rating: 4.7,
+                reviewCount: 50,
+                location: { city: listing.city, country: listing.country },
+                specialties: ['Résidentiel'],
+                isVerified: true,
+                isPremium: false,
+                phone: '+233244123456',
+                email: 'contact@zima.com',
+                listingCount: 10,
+                images: [],
+              },
+            };
+          } catch (err) {
+            console.error('[BiensFeed] Error mapping listing:', listing.id, err);
+            return null;
+          }
+        }).filter(Boolean);
         
         setAllProperties([...mockProperties, ...mappedListings]);
       } catch (error) {
         console.error('[BiensFeed] Error loading properties:', error);
+        if (error instanceof Error) {
+          console.error('[BiensFeed] Error details:', error.message, error.stack);
+        }
         setAllProperties(mockProperties);
       } finally {
         setLoading(false);

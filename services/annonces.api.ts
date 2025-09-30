@@ -27,10 +27,15 @@ const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
 
 // === STUBS. Remplace baseURL + fetch réels plus tard ===
 export async function fetchListings(status: ListingStatus): Promise<Listing[]> {
-  await delay(300);
-  const filtered = DEMO.filter(l => l.status === status);
-  console.log(`[fetchListings] Fetched ${filtered.length} listings with status: ${status}`);
-  return filtered;
+  try {
+    await delay(300);
+    const filtered = DEMO.filter(l => l.status === status);
+    console.log(`[fetchListings] Fetched ${filtered.length} listings with status: ${status}`);
+    return filtered;
+  } catch (error) {
+    console.error('[fetchListings] Error:', error);
+    return [];
+  }
 }
 
 export async function getListingById(id: string): Promise<Listing | null> {
