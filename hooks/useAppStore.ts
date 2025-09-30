@@ -90,111 +90,88 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const [favoriteVoyageIds, setFavoriteVoyageIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    let mounted = true;
-    
     // Load persisted data after component mounts
     const initializeStore = async () => {
       try {
         await loadPersistedData();
       } catch (error) {
         console.error('Store initialization error:', error);
-        if (mounted) {
-          setIsInitialized(true); // Continue anyway
-        }
+        setIsInitialized(true); // Continue anyway
       }
     };
-    
-    // Set a timeout to ensure initialization completes
-    const timeout = setTimeout(() => {
-      if (mounted && !isInitialized) {
-        console.warn('Store initialization timeout, proceeding anyway');
-        setIsInitialized(true);
-      }
-    }, 1000);
     
     initializeStore();
-    
-    return () => {
-      mounted = false;
-      clearTimeout(timeout);
-    };
   }, []);
 
   const loadPersistedData = async () => {
     try {
-      // Use Promise.allSettled to prevent one failure from blocking others
-      const results = await Promise.allSettled([
-        storage.getItem('userMode'),
-        storage.getItem('user'),
-        storage.getItem('language'),
-        storage.getItem('hasCompletedOnboarding'),
-        storage.getItem('currency'),
-        storage.getItem('favoriteProperties'),
-        storage.getItem('favoriteProviders'),
-        storage.getItem('favoriteVoyages')
-      ]);
+      const savedMode = await storage.getItem('userMode');
+      const savedUser = await storage.getItem('user');
+      const savedLanguage = await storage.getItem('language');
+      const savedOnboarding = await storage.getItem('hasCompletedOnboarding');
+      const savedCurrency = await storage.getItem('currency');
+      const savedFavProperties = await storage.getItem('favoriteProperties');
+      const savedFavProviders = await storage.getItem('favoriteProviders');
+      const savedFavVoyages = await storage.getItem('favoriteVoyages');
       
-      const [savedMode, savedUser, savedLanguage, savedOnboarding, savedCurrency, savedFavProperties, savedFavProviders, savedFavVoyages] = results.map(r => r.status === 'fulfilled' ? r.value : null);
-      
-      if (savedMode && typeof savedMode === 'string' && savedMode.trim()) {
+      if (savedMode && savedMode.trim()) {
         setUserMode(savedMode as UserMode);
       }
-      if (savedUser && typeof savedUser === 'string' && savedUser.trim()) {
+      if (savedUser && savedUser.trim()) {
         try {
+          // Validate JSON string before parsing
           if (savedUser.startsWith('{') && savedUser.endsWith('}')) {
             const parsedUser = JSON.parse(savedUser);
             if (parsedUser && typeof parsedUser === 'object') {
               setUser({ ...defaultUser, ...parsedUser });
             }
+          } else {
+            throw new Error('Invalid JSON format');
           }
         } catch (error) {
-          console.log('Invalid user JSON, using default');
+          console.log('Invalid user JSON, using default:', error);
+          // Clear corrupted data
+          await storage.setItem('user', JSON.stringify(defaultUser));
         }
       }
-      if (savedLanguage && typeof savedLanguage === 'string' && savedLanguage.trim()) {
+      if (savedLanguage && savedLanguage.trim()) {
         setLanguageState(savedLanguage as Language);
       }
       if (savedOnboarding === 'true') {
         setHasCompletedOnboarding(true);
       }
-      if (savedCurrency && typeof savedCurrency === 'string' && savedCurrency.trim()) {
+      if (savedCurrency && savedCurrency.trim()) {
         setCurrencyState(savedCurrency);
       }
-      if (savedFavProperties && typeof savedFavProperties === 'string') {
+      if (savedFavProperties) {
         try {
           const parsed = JSON.parse(savedFavProperties);
-          if (Array.isArray(parsed)) {
-            setFavoritePropertyIds(new Set(parsed));
-          }
+          setFavoritePropertyIds(new Set(parsed));
         } catch (e) {
-          console.log('Error parsing favorite properties');
+          console.log('Error parsing favorite properties', e);
         }
       }
-      if (savedFavProviders && typeof savedFavProviders === 'string') {
+      if (savedFavProviders) {
         try {
           const parsed = JSON.parse(savedFavProviders);
-          if (Array.isArray(parsed)) {
-            setFavoriteProviderIds(new Set(parsed));
-          }
+          setFavoriteProviderIds(new Set(parsed));
         } catch (e) {
-          console.log('Error parsing favorite providers');
+          console.log('Error parsing favorite providers', e);
         }
       }
-      if (savedFavVoyages && typeof savedFavVoyages === 'string') {
+      if (savedFavVoyages) {
         try {
           const parsed = JSON.parse(savedFavVoyages);
-          if (Array.isArray(parsed)) {
-            setFavoriteVoyageIds(new Set(parsed));
-          }
+          setFavoriteVoyageIds(new Set(parsed));
         } catch (e) {
-          console.log('Error parsing favorite voyages');
+          console.log('Error parsing favorite voyages', e);
         }
       }
       
       setIsInitialized(true);
     } catch (error) {
       console.log('Error loading persisted data:', error);
-      setIsInitialized(true);
+      setIsInitialized(true); // Continue anyway
     }
   };
 

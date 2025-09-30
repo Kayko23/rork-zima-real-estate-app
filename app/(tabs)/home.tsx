@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { StatusBar, StyleSheet, View, Text } from 'react-native';
-import Screen from '@/components/layout/Screen';
+import React, { useState, useEffect, useMemo } from 'react';
+import { ScrollView, StatusBar, StyleSheet, View, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import HomeHeader from '@/components/home/HomeHeader';
 import BiensFeed from '@/components/home/feeds/BiensFeed';
 import ServicesFeed from '@/components/home/feeds/ServicesFeed';
@@ -30,21 +30,28 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} testID="home-safe-area">
       <StatusBar barStyle="dark-content" backgroundColor="#F3F6F6" />
-      <Screen scroll stickyHeaderIndices={[0]}>
-        <View>
-          <HomeHeader active={activeHomeTab} onChange={setHomeTab} />
-        </View>
+      <ScrollView
+        contentContainerStyle={styles.contentContainer}
+        stickyHeaderIndices={[0]}
+        showsVerticalScrollIndicator={false}
+        testID="home-scroll"
+      >
+        <HomeHeader active={activeHomeTab} onChange={setHomeTab} />
         {renderContent()}
-      </Screen>
-    </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#F3F6F6',
+  },
+  contentContainer: {
+    paddingBottom: 96,
     backgroundColor: '#F3F6F6',
   },
   loadingContainer: {

@@ -10,38 +10,37 @@ export default function Index() {
 
   useEffect(() => {
     let mounted = true;
-    let timer: NodeJS.Timeout;
     
     const navigate = () => {
       if (!mounted) return;
       
-      try {
-        if (isAuthenticated) {
-          router.replace("/(tabs)/home");
-        } else {
-          router.replace("/(onboarding)/splash");
-        }
-      } catch (error) {
-        console.error('Navigation error:', error);
+      if (isAuthenticated) {
+        router.replace("/(tabs)/home");
+      } else {
+        router.replace("/(onboarding)/splash");
       }
     };
 
     if (!isLoading) {
-      // Small delay to ensure everything is ready
-      timer = setTimeout(navigate, 100);
+      // Navigate immediately if not loading
+      navigate();
     } else {
       // Set a timeout to prevent infinite loading
-      timer = setTimeout(() => {
+      const timer = setTimeout(() => {
         if (mounted) {
           console.warn('Navigation timeout, proceeding with default route');
           navigate();
         }
-      }, 1500);
+      }, 2000);
+      
+      return () => {
+        mounted = false;
+        clearTimeout(timer);
+      };
     }
     
     return () => {
       mounted = false;
-      if (timer) clearTimeout(timer);
     };
   }, [router, isAuthenticated, isLoading]);
 

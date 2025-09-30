@@ -4,7 +4,7 @@ import * as SplashScreen from "expo-splash-screen";
 import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { AppProvider } from "@/hooks/useAppStore";
+import { AppProvider, useApp } from "@/hooks/useAppStore";
 import { VoyageFiltersProvider } from "@/components/voyages/filterContext";
 import { useBootstrapFx } from "@/lib/bootstrapFx";
 import { SessionProvider } from "@/hooks/useSession";
@@ -40,14 +40,32 @@ function RootLayoutNav() {
 }
 
 function AppInitializer({ children }: { children: React.ReactNode }) {
+  const { isInitialized } = useApp();
   const [isReady, setIsReady] = useState(false);
   
   useBootstrapFx();
   
   useEffect(() => {
-    // Set ready immediately to prevent blocking
-    setIsReady(true);
-  }, []);
+    let mounted = true;
+    
+    // Simple timeout to ensure app starts even if initialization is slow
+    const timeout = setTimeout(() => {
+      if (mounted) {
+        setIsReady(true);
+      }
+    }, 500); // Reduced timeout
+    
+    // Also set ready when initialized
+    if (isInitialized && mounted) {
+      setIsReady(true);
+      clearTimeout(timeout);
+    }
+    
+    return () => {
+      mounted = false;
+      clearTimeout(timeout);
+    };
+  }, [isInitialized]);
   
   if (!isReady) {
     return null;
