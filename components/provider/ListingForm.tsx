@@ -330,14 +330,24 @@ export default function ListingForm({
   }, [category]);
 
   return (
-    <KeyboardAvoidingView style={s.container} behavior={Platform.OS === "ios" ? "padding" : "height"} testID="listingForm-root">
+    <KeyboardAvoidingView 
+      style={s.container} 
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+      testID="listingForm-root"
+    >
       <Pressable
         style={s.keyboardDismiss}
         onPress={() => Keyboard.dismiss()}
       >
         <KeyboardHide size={20} color="#6b7280" />
       </Pressable>
-      <ScrollView contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+      <ScrollView 
+        contentContainerStyle={s.scrollContent} 
+        showsVerticalScrollIndicator={false} 
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+      >
         <Text style={s.section}>Médias</Text>
         <View style={s.row}>
           <Pressable onPress={pickCover} style={[s.cover, !cover && s.coverEmpty]} testID="cover-picker">
@@ -824,8 +834,8 @@ function Input(props: any) {
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1 },
-  scrollContent: { padding: 16, gap: 12, paddingBottom: 120 },
+  container: { flex: 1, backgroundColor: "#fff" },
+  scrollContent: { padding: 16, gap: 12, paddingBottom: Platform.OS === "ios" ? 40 : 120 },
   section: { fontSize: 16, fontWeight: "800", marginTop: 4, marginBottom: 6 },
   hint: { color: "#6b7280", marginTop: 4 },
   previewText: { color: "#065f46", marginTop: 6, fontWeight: "600", fontSize: 14 },

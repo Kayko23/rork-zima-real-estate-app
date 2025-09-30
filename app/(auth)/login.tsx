@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet, Alert, ScrollView, Switch } from "react-native";
+import { View, Text, TextInput, Pressable, StyleSheet, Alert, ScrollView, Switch, KeyboardAvoidingView, Platform } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { authApi } from "@/lib/authApi";
 import { useSession } from "@/hooks/useSession";
@@ -64,7 +64,16 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }} 
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+      >
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
         <View style={styles.wrap}>
           <Text style={styles.title}>Se connecter</Text>
           <Text style={styles.subtitle}>Connectez-vous à votre compte ZIMA</Text>
@@ -174,7 +183,8 @@ export default function LoginScreen() {
             <Text style={styles.linkSecondary}>Mot de passe oublié ?</Text>
           </Pressable>
         </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

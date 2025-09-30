@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert } from "react-native";
+import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert, KeyboardAvoidingView, Platform } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { AccountForm, ProfileForm, DocsForm, accountSchema, createProfileSchemaForRole, createDocsSchemaForRole } from "@/lib/signupSchema";
 import DocItem from "@/components/upload/DocItem";
@@ -149,7 +149,16 @@ export default function SignupWizard() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }} 
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
+      >
+        <ScrollView 
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+        >
         <View style={styles.wrap}>
           <Text style={styles.title}>Créer un compte</Text>
           <Text style={styles.step}>Étape {step} / 4</Text>
@@ -442,7 +451,8 @@ export default function SignupWizard() {
             )}
           </View>
         </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
