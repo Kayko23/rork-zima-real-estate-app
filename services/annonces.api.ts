@@ -104,5 +104,5 @@ export async function deleteListing(id: string): Promise<{ success: boolean }> {
 let DEMO: Listing[] = [
   { id:"101", title:"Villa · Accra", city:"Accra", country:"Ghana", price:274500000, currency:"XOF", type:"sale", surface:280, beds:4, baths:3, photos:["https://images.unsplash.com/photo-1505691938895-1758d7feb511?w=1200"], rating:4.8, reviews:67, contacts:3, status:"active", premium:true, views:1250 },
   { id:"102", title:"Appartement cosy", city:"Dakar", country:"Sénégal", price:850, currency:"USD", type:"rent", rentPeriod:"monthly", surface:85, beds:2, baths:2, photos:["https://images.unsplash.com/photo-1501183638710-841dd1904471?w=1200"], rating:4.6, reviews:23, contacts:1, status:"pending", views:890 },
-  { id:"103", title:"Studio centre-ville", city:"Abidjan", country:"Côte d'Ivoire", price:400, currency:"USD", type:"rent", rentPeriod:"daily", surface:30, beds:1, baths:1, photos:["https://images.unsplash.com/photo-1494526585095-c41746248156?w=1200"], status:"expired", views:456 }
+  { id:"103", title:"Studio centre-ville", city:"Abidjan", country:"Côte d\'Ivoire", price:400, currency:"USD", type:"rent", rentPeriod:"daily", surface:30, beds:1, baths:1, photos:["https://images.unsplash.com/photo-1494526585095-c41746248156?w=1200"], status:"expired", views:456 }
 ];
