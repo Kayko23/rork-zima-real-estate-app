@@ -387,7 +387,7 @@ export default function ListingForm({
           <Input style={s.flex1} value={baths} onChangeText={setBaths} placeholder="SDB" keyboardType="numeric" testID="input-baths" />
         </View>
 
-        <Text style={s.label}>Point fort (équipements)</Text>
+        <Text style={s.label}>Points forts (équipements)</Text>
         <Pressable style={s.pickerButton} onPress={() => setAmenitiesPickerVisible(true)} testID="picker-amenities">
           <Text style={s.pickerButtonText}>
             {amenities.length > 0 ? `${amenities.length} équipement(s) sélectionné(s)` : "Sélectionner des équipements"}
