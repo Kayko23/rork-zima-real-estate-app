@@ -5,7 +5,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  ScrollView,
   Linking,
 } from 'react-native';
 import {
@@ -86,65 +85,70 @@ export default function ServicesFeed() {
     console.log('Search params:', params);
   };
 
+  const sections = CATEGORY_ORDER.map(({ key, title }) => {
+    const data = grouped[key] || [];
+    return { key, title, data };
+  }).filter(s => s.data.length > 0);
+
+  const renderSection = ({ item: section }: { item: typeof sections[0] }) => (
+    <View style={styles.section}>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{section.title}</Text>
+
+        <TouchableOpacity
+          onPress={() => router.push('/(tabs)/professionnels')}
+          style={styles.more}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Text style={styles.moreTxt}>Voir tout</Text>
+          <ChevronRight size={18} color="#0E5A46" />
+        </TouchableOpacity>
+      </View>
+
+      <FlatList
+        horizontal
+        data={section.data}
+        keyExtractor={(i) => i.id}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.listContainer}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+        renderItem={({ item }) => (
+          <ProviderCard
+            item={item}
+            onPressProfile={goProfile}
+            onPressCall={call}
+            onPressWhatsApp={wa}
+            onPressMail={mail}
+          />
+        )}
+      />
+    </View>
+  );
+
+  const renderFooter = () => (
+    <View style={styles.joinCTA}>
+      <Text style={styles.joinTitle}>Vous êtes un professionnel de l&apos;immobilier ?</Text>
+      <Text style={styles.joinSubtitle}>
+        Rejoignez notre réseau de professionnels vérifiés et développez votre activité.
+      </Text>
+      <TouchableOpacity style={styles.joinButton} onPress={() => router.push('/(auth)/sign-up')}>
+        <Text style={styles.joinButtonText}>Rejoindre ZIMA</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <FusedSearch mode="services" onSubmit={handleSearchSubmit} />
       
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent} 
-        style={styles.scrollView}
+      <FlatList
+        data={sections}
+        renderItem={renderSection}
+        keyExtractor={(item) => item.key}
         showsVerticalScrollIndicator={false}
-        nestedScrollEnabled
-      >
-        {CATEGORY_ORDER.map(({ key, title }) => {
-          const data = grouped[key] || [];
-          if (!data.length) return null;
-          return (
-            <View key={key} style={styles.section}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>{title}</Text>
-
-                <TouchableOpacity
-                  onPress={() => router.push('/(tabs)/professionnels')}
-                  style={styles.more}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <Text style={styles.moreTxt}>Voir tout</Text>
-                  <ChevronRight size={18} color="#0E5A46" />
-                </TouchableOpacity>
-              </View>
-
-              <FlatList
-                horizontal
-                data={data}
-                keyExtractor={(i) => i.id}
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.listContainer}
-                ItemSeparatorComponent={() => <View style={styles.separator} />}
-                renderItem={({ item }) => (
-                  <ProviderCard
-                    item={item}
-                    onPressProfile={goProfile}
-                    onPressCall={call}
-                    onPressWhatsApp={wa}
-                    onPressMail={mail}
-                  />
-                )}
-              />
-            </View>
-          );
-        })}
-
-        <View style={styles.joinCTA}>
-          <Text style={styles.joinTitle}>Vous êtes un professionnel de l&apos;immobilier ?</Text>
-          <Text style={styles.joinSubtitle}>
-            Rejoignez notre réseau de professionnels vérifiés et développez votre activité.
-          </Text>
-          <TouchableOpacity style={styles.joinButton} onPress={() => router.push('/(auth)/sign-up')}>
-            <Text style={styles.joinButtonText}>Rejoindre ZIMA</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+        contentContainerStyle={styles.scrollContent}
+        ListFooterComponent={renderFooter}
+      />
     </View>
   );
 }
@@ -222,9 +226,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 120,
-  },
-  scrollView: {
-    flex: 1,
   },
   listContainer: {
     paddingHorizontal: 16,
