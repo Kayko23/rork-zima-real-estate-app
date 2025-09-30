@@ -1,7 +1,8 @@
 import React from "react";
-import { View, Text, Pressable, StyleSheet, Linking, ScrollView } from "react-native";
+import { View, Text, Pressable, StyleSheet, Linking } from "react-native";
 import { Mail, Phone, MessageCircle } from "lucide-react-native";
 import Colors from "@/constants/colors";
+import Screen from "@/components/layout/Screen";
 
 export default function HelpScreen() {
   const supportOptions = [
@@ -32,7 +33,7 @@ export default function HelpScreen() {
   ];
 
   return (
-    <ScrollView style={s.container} contentContainerStyle={s.content}>
+    <Screen scroll style={s.container}>
       <View style={s.header}>
         <Text style={s.title}>Comment pouvons-nous vous aider ?</Text>
         <Text style={s.desc}>
@@ -48,7 +49,6 @@ export default function HelpScreen() {
               key={option.id}
               style={s.optionCard}
               onPress={option.action}
-              android_ripple={{ color: Colors.primary + "20" }}
             >
               <View style={[s.iconContainer, { backgroundColor: option.color + "15" }]}>
                 <Icon size={24} color={option.color} />
@@ -68,7 +68,7 @@ export default function HelpScreen() {
         <Text style={s.infoText}>Samedi: 9h00 - 14h00</Text>
         <Text style={s.infoText}>Dimanche: Fermé</Text>
       </View>
-    </ScrollView>
+    </Screen>
   );
 }
 

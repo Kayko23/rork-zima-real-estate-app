@@ -6,22 +6,25 @@ import { useApp } from "@/hooks/useAppStore";
 import Type from "@/constants/typography";
 export default function ActionDouble() {
   const r = useRouter();
-  const { setHomeTab } = useApp();
+  const { setHomeTab, toggleAppMode } = useApp();
   
   const handleFindPro = () => {
-    // Set the home tab to services first
     setHomeTab('services');
-    // Then navigate to the professionals tab
-    r.push("/(tabs)/professionnels");
+    r.replace("/(tabs)/home");
+  };
+  
+  const handlePublish = async () => {
+    await toggleAppMode('provider');
+    r.replace('/(proTabs)/dashboard');
   };
   
   return (
     <View style={s.row}>
-      <Pressable style={s.big} onPress={() => r.push("/(proTabs)/listings")} accessibilityRole="button">
+      <Pressable style={s.big} onPress={handlePublish} accessibilityRole="button" testID="cta-publish">
         <Ionicons name="add-circle-outline" size={22} color="#19715C" />
         <Text style={s.bigText} numberOfLines={1} adjustsFontSizeToFit>Publier un bien</Text>
       </Pressable>
-      <Pressable style={s.big} onPress={handleFindPro} accessibilityRole="button">
+      <Pressable style={s.big} onPress={handleFindPro} accessibilityRole="button" testID="cta-find-pro">
         <Ionicons name="person-outline" size={22} color="#8B6A2B" />
         <Text style={s.bigText} numberOfLines={1} adjustsFontSizeToFit>Trouver un pro</Text>
       </Pressable>

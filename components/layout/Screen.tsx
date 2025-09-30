@@ -8,6 +8,7 @@ type Props = ViewProps & {
   scroll?: boolean;
   children: React.ReactNode;
   withTabBarPadding?: boolean;
+  stickyHeaderIndices?: number[];
 };
 
 export default function Screen({ 
@@ -15,6 +16,7 @@ export default function Screen({
   withTabBarPadding = true, 
   style, 
   children, 
+  stickyHeaderIndices,
   ...rest 
 }: Props) {
   const insets = useSafeAreaInsets();
@@ -26,6 +28,7 @@ export default function Screen({
         contentInsetAdjustmentBehavior="always"
         style={[styles.scrollView, { paddingTop: insets.top + 8 }, style]}
         contentContainerStyle={{ paddingBottom: padBottom }}
+        stickyHeaderIndices={stickyHeaderIndices}
         showsVerticalScrollIndicator={false}
         {...rest}>
         {children}

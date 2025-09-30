@@ -32,8 +32,10 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#F3F6F6" />
-      <Screen scroll>
-        <HomeHeader active={activeHomeTab} onChange={setHomeTab} />
+      <Screen scroll stickyHeaderIndices={[0]}>
+        <View>
+          <HomeHeader active={activeHomeTab} onChange={setHomeTab} />
+        </View>
         {renderContent()}
       </Screen>
     </View>
