@@ -1,4 +1,5 @@
 import { Stack } from "expo-router";
+import Colors from "@/constants/colors";
 
 export default function ProfileLayout() {
   return (
@@ -6,6 +7,13 @@ export default function ProfileLayout() {
       screenOptions={{
         headerShadowVisible: false,
         headerTitleAlign: "center",
+        headerStyle: {
+          backgroundColor: Colors.background.primary,
+        },
+        headerTintColor: Colors.primary,
+        contentStyle: {
+          backgroundColor: Colors.background.secondary,
+        },
       }}
     >
       <Stack.Screen name="edit" options={{ title: "Éditer le profil" }} />
@@ -14,7 +22,6 @@ export default function ProfileLayout() {
       <Stack.Screen name="language-currency" options={{ title: "Langue & Devise" }} />
       <Stack.Screen name="switch-mode" options={{ title: "Passer en mode prestataire" }} />
       <Stack.Screen name="help" options={{ title: "Aide & support" }} />
-      {/* ponts vers les onglets existants */}
       <Stack.Screen name="favorites-bridge" options={{ headerShown: false }} />
       <Stack.Screen name="messages-bridge" options={{ headerShown: false }} />
     </Stack>
