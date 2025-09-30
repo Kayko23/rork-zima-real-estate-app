@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Image, KeyboardAvoidingView, Platform, Modal, TouchableOpacity, Keyboard } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { Save, MapPin, Check, FilePlus, ChevronDown, ChevronDown as KeyboardHide } from "lucide-react-native";
+import { Save, MapPin, Check, FilePlus, ChevronDown, ChevronDown as KeyboardHide, Calendar } from "lucide-react-native";
 import { Listing, ListingType, RentPeriod } from "@/services/annonces.api";
 import CountryPickerSheet from "@/components/search/CountryPickerSheet";
 import CityPickerSheet from "@/components/search/CityPickerSheet";
@@ -191,6 +191,10 @@ export default function ListingForm({
   const [categoryPickerVisible, setCategoryPickerVisible] = useState<boolean>(false);
   const [docTypePickerVisible, setDocTypePickerVisible] = useState<boolean>(false);
   const [transactionPickerVisible, setTransactionPickerVisible] = useState<boolean>(false);
+  const [calendarVisible, setCalendarVisible] = useState<boolean>(false);
+  const [selectedDay, setSelectedDay] = useState<number>(1);
+  const [selectedMonth, setSelectedMonth] = useState<number>(1);
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
   useEffect(() => {
     if (countryCode) {
@@ -418,7 +422,10 @@ export default function ListingForm({
         )}
 
         <Text style={s.label}>Année de construction/certification (JJ-MM-AAAA)</Text>
-        <Input value={yearDate} onChangeText={setYearDate} placeholder="ex: 15-03-2020" keyboardType="numbers-and-punctuation" testID="input-yeardate" />
+        <Pressable style={s.pickerButton} onPress={() => setCalendarVisible(true)} testID="picker-calendar">
+          <Text style={s.pickerButtonText}>{yearDate || "Sélectionner une date"}</Text>
+          <Calendar size={20} color="#6b7280" />
+        </Pressable>
         {yearDate && !validateDate(yearDate) && <Text style={s.error}>Format requis: JJ-MM-AAAA (ex: 15-03-2020)</Text>}
 
         <Text style={s.label}>Type de document</Text>
@@ -657,6 +664,94 @@ export default function ListingForm({
           </View>
         </View>
       </Modal>
+
+      <Modal visible={calendarVisible} transparent animationType="slide" onRequestClose={() => setCalendarVisible(false)}>
+        <View style={s.modalOverlay}>
+          <View style={s.modalContent}>
+            <View style={s.modalHeader}>
+              <Text style={s.modalTitle}>Sélectionner une date</Text>
+              <TouchableOpacity onPress={() => setCalendarVisible(false)}>
+                <Text style={s.modalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={s.calendarContainer}>
+              <View style={s.calendarRow}>
+                <View style={s.calendarColumn}>
+                  <Text style={s.calendarLabel}>Jour</Text>
+                  <ScrollView style={s.calendarScroll} showsVerticalScrollIndicator={false}>
+                    {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+                      <TouchableOpacity
+                        key={day}
+                        style={[s.calendarItem, selectedDay === day && s.calendarItemActive]}
+                        onPress={() => setSelectedDay(day)}
+                      >
+                        <Text style={[s.calendarItemText, selectedDay === day && s.calendarItemTextActive]}>
+                          {String(day).padStart(2, '0')}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+                <View style={s.calendarColumn}>
+                  <Text style={s.calendarLabel}>Mois</Text>
+                  <ScrollView style={s.calendarScroll} showsVerticalScrollIndicator={false}>
+                    {[
+                      { num: 1, name: 'Janvier' },
+                      { num: 2, name: 'Février' },
+                      { num: 3, name: 'Mars' },
+                      { num: 4, name: 'Avril' },
+                      { num: 5, name: 'Mai' },
+                      { num: 6, name: 'Juin' },
+                      { num: 7, name: 'Juillet' },
+                      { num: 8, name: 'Août' },
+                      { num: 9, name: 'Septembre' },
+                      { num: 10, name: 'Octobre' },
+                      { num: 11, name: 'Novembre' },
+                      { num: 12, name: 'Décembre' },
+                    ].map(month => (
+                      <TouchableOpacity
+                        key={month.num}
+                        style={[s.calendarItem, selectedMonth === month.num && s.calendarItemActive]}
+                        onPress={() => setSelectedMonth(month.num)}
+                      >
+                        <Text style={[s.calendarItemText, selectedMonth === month.num && s.calendarItemTextActive]}>
+                          {month.name}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+                <View style={s.calendarColumn}>
+                  <Text style={s.calendarLabel}>Année</Text>
+                  <ScrollView style={s.calendarScroll} showsVerticalScrollIndicator={false}>
+                    {Array.from({ length: new Date().getFullYear() + 10 - 1900 + 1 }, (_, i) => 1900 + i).reverse().map(year => (
+                      <TouchableOpacity
+                        key={year}
+                        style={[s.calendarItem, selectedYear === year && s.calendarItemActive]}
+                        onPress={() => setSelectedYear(year)}
+                      >
+                        <Text style={[s.calendarItemText, selectedYear === year && s.calendarItemTextActive]}>
+                          {year}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              </View>
+              <TouchableOpacity
+                style={s.calendarConfirm}
+                onPress={() => {
+                  const formatted = `${String(selectedDay).padStart(2, '0')}-${String(selectedMonth).padStart(2, '0')}-${selectedYear}`;
+                  setYearDate(formatted);
+                  setCalendarVisible(false);
+                }}
+              >
+                <Text style={s.calendarConfirmText}>Confirmer</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -738,4 +833,15 @@ const s = StyleSheet.create({
     elevation: 5,
     zIndex: 1000,
   },
+  calendarContainer: { paddingHorizontal: 20, paddingVertical: 16 },
+  calendarRow: { flexDirection: "row", gap: 12, height: 300 },
+  calendarColumn: { flex: 1 },
+  calendarLabel: { fontSize: 14, fontWeight: "700", color: "#1f2937", marginBottom: 8, textAlign: "center" },
+  calendarScroll: { flex: 1 },
+  calendarItem: { paddingVertical: 12, paddingHorizontal: 8, alignItems: "center", borderRadius: 8, marginBottom: 4 },
+  calendarItemActive: { backgroundColor: "#f0fdf4" },
+  calendarItemText: { fontSize: 15, color: "#1f2937" },
+  calendarItemTextActive: { fontWeight: "700", color: "#065f46" },
+  calendarConfirm: { marginTop: 16, height: 48, backgroundColor: "#065f46", borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  calendarConfirmText: { color: "#fff", fontWeight: "700", fontSize: 16 },
 });
