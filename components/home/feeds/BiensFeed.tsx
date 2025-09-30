@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, Pressable, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, Pressable } from 'react-native';
 import { router } from 'expo-router';
 import PropertyCard from '@/components/ui/PropertyCard';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -187,115 +187,133 @@ export default function BiensFeed() {
     );
   }
 
-  return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 96 }}>
-      <View style={[styles.section, styles.firstSection]}>
-        <SectionHeader 
-          title="Biens premium" 
-          onSeeAllPress={() => handleSeeAllPress('premium')}
-        />
-        <FlatList
-          data={displayProperties.filter(p => p.isPremium)}
-          renderItem={renderPropertyCard}
-          keyExtractor={(item) => `premium-${item.id}`}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.horizontalList}
-          snapToInterval={316}
-          decelerationRate="fast"
-        />
-      </View>
+  const premiumProperties = displayProperties.filter(p => p.isPremium);
+  const newProperties = displayProperties.slice(0, 4);
 
-      <View style={styles.section}>
-        <SectionHeader 
-          title="Nouveautés" 
-          onSeeAllPress={() => handleSeeAllPress('new')}
-        />
-        <FlatList
-          data={displayProperties.slice(0, 4)}
-          renderItem={renderPropertyCard}
-          keyExtractor={(item) => `new-${item.id}`}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.horizontalList}
-          snapToInterval={316}
-          decelerationRate="fast"
-        />
-      </View>
+  const sections = [
+    { key: 'premium', title: 'Biens premium', data: premiumProperties },
+    { key: 'new', title: 'Nouveautés', data: newProperties },
+    ...categoryGroups.map(cat => ({ key: cat.id, title: cat.name, data: cat.properties, category: cat }))
+  ];
 
-      <View style={styles.section}>
-        <SectionHeader 
-          title="Par catégories" 
-          subtitle="Explorez par type de bien"
-          showSeeAll={false}
-        />
-        {categoryGroups.map((category) => (
-          <View key={category.id} style={styles.categorySection} testID={`home-category-${category.id}`}>
-            <View style={styles.categoryHeader}>
-              <Pressable
-                style={styles.categoryTitleRow}
-                onPress={() => handleSeeAllPress(category.id)}
-                accessibilityRole="button"
-                testID={`home-category-title-${category.id}`}
-              >
-                <Text style={styles.categoryEmoji}>{category.emoji}</Text>
-                <Text style={styles.categoryTitle}>{category.name}</Text>
-              </Pressable>
-              <TouchableOpacity 
-                style={styles.seeAllButton}
-                onPress={() => handleSeeAllPress(category.id)}
-                accessibilityRole="button"
-                testID={`home-category-seeall-${category.id}`}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.seeAllText}>Voir tout ›</Text>
-              </TouchableOpacity>
-            </View>
+  const renderSection = ({ item: section }: { item: typeof sections[0] }) => {
+    if (section.key === 'premium' || section.key === 'new') {
+      return (
+        <View style={[styles.section, section.key === 'premium' ? styles.firstSection : null]}>
+          <SectionHeader 
+            title={section.title}
+            onSeeAllPress={() => handleSeeAllPress(section.key)}
+          />
+          <FlatList
+            data={section.data}
+            renderItem={renderPropertyCard}
+            keyExtractor={(item) => `${section.key}-${item.id}`}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalList}
+            snapToInterval={316}
+            decelerationRate="fast"
+          />
+        </View>
+      );
+    }
 
-            <Pressable
-              style={styles.categoryImageContainer}
-              onPress={() => handleSeeAllPress(category.id)}
-              accessibilityRole="button"
-              testID={`home-category-image-${category.id}`}
-            >
-              <Image 
-                source={{ uri: category.image }}
-                style={styles.categoryImage}
-                resizeMode="cover"
-                accessibilityLabel={category.name}
-              />
-              <View style={styles.categoryImageOverlay}>
-                <Text style={styles.categoryImageText}>
-                  {`${category.properties.length} biens disponibles`}
-                </Text>
-              </View>
-            </Pressable>
+    if (section.key === 'categories-header') {
+      return (
+        <View style={styles.section}>
+          <SectionHeader 
+            title="Par catégories" 
+            subtitle="Explorez par type de bien"
+            showSeeAll={false}
+          />
+        </View>
+      );
+    }
 
-            {category.properties.length > 0 && (
-              <FlatList
-                data={category.properties}
-                renderItem={({ item }) => (
-                  <PropertyCard
-                    property={item}
-                    onPress={() => handlePropertyPress(item.id)}
-                    onToggleFavorite={() => handleToggleFavorite(item.id)}
-                    width={280}
-                  />
-                )}
-                keyExtractor={(item) => `${category.id}-${item.id}`}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.categoryPropertiesList}
-                snapToInterval={296}
-                decelerationRate="fast"
+    const category = (section as any).category;
+    if (!category) return null;
+
+    return (
+      <View style={styles.categorySection} testID={`home-category-${category.id}`}>
+        <View style={styles.categoryHeader}>
+          <Pressable
+            style={styles.categoryTitleRow}
+            onPress={() => handleSeeAllPress(category.id)}
+            accessibilityRole="button"
+            testID={`home-category-title-${category.id}`}
+          >
+            <Text style={styles.categoryEmoji}>{category.emoji}</Text>
+            <Text style={styles.categoryTitle}>{category.name}</Text>
+          </Pressable>
+          <TouchableOpacity 
+            style={styles.seeAllButton}
+            onPress={() => handleSeeAllPress(category.id)}
+            accessibilityRole="button"
+            testID={`home-category-seeall-${category.id}`}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.seeAllText}>Voir tout ›</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Pressable
+          style={styles.categoryImageContainer}
+          onPress={() => handleSeeAllPress(category.id)}
+          accessibilityRole="button"
+          testID={`home-category-image-${category.id}`}
+        >
+          <Image 
+            source={{ uri: category.image }}
+            style={styles.categoryImage}
+            resizeMode="cover"
+            accessibilityLabel={category.name}
+          />
+          <View style={styles.categoryImageOverlay}>
+            <Text style={styles.categoryImageText}>
+              {`${category.properties.length} biens disponibles`}
+            </Text>
+          </View>
+        </Pressable>
+
+        {category.properties.length > 0 && (
+          <FlatList
+            data={category.properties}
+            renderItem={({ item }) => (
+              <PropertyCard
+                property={item}
+                onPress={() => handlePropertyPress(item.id)}
+                onToggleFavorite={() => handleToggleFavorite(item.id)}
+                width={280}
               />
             )}
-          </View>
-        ))}
+            keyExtractor={(item) => `${category.id}-${item.id}`}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.categoryPropertiesList}
+            snapToInterval={296}
+            decelerationRate="fast"
+          />
+        )}
       </View>
+    );
+  };
 
-      <ActionDouble />
-    </ScrollView>
+  const allSections = [
+    sections[0],
+    sections[1],
+    { key: 'categories-header', title: '', data: [] },
+    ...sections.slice(2)
+  ];
+
+  return (
+    <FlatList
+      data={allSections}
+      renderItem={renderSection}
+      keyExtractor={(item) => item.key}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: 96 }}
+      ListFooterComponent={<ActionDouble />}
+    />
   );
 }
 
