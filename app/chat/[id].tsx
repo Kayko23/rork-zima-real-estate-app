@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
+  Image,
 } from 'react-native';
 import { useLocalSearchParams, Stack, router } from 'expo-router';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -23,12 +24,16 @@ type Message = {
 };
 
 export default function ChatScreen() {
-  const { id } = useLocalSearchParams<{ id: string; ctx?: string }>();
+  const { id, name, avatar } = useLocalSearchParams<{ id: string; name?: string; avatar?: string; ctx?: string }>();
   const insets = useSafeAreaInsets();
   const flatListRef = useRef<FlatList>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [message, setMessage] = useState('');
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  
+  const contactName = name || `Contact ${id}`;
+  const contactAvatar = avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(contactName)}&background=065f46&color=fff&size=128`;
+  
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -155,12 +160,35 @@ export default function ChatScreen() {
     <View style={styles.container}>
       <Stack.Screen 
         options={{
-          title: `Chat avec ${id}`,
+          headerTitle: () => (
+            <TouchableOpacity 
+              style={styles.headerTitleContainer}
+              onPress={() => {
+                console.log('Navigate to profile');
+              }}
+              activeOpacity={0.7}
+            >
+              <Image 
+                source={{ uri: contactAvatar }} 
+                style={styles.headerAvatar}
+              />
+              <View style={styles.headerTextContainer}>
+                <Text style={styles.headerName} numberOfLines={1}>
+                  {contactName}
+                </Text>
+                <Text style={styles.headerStatus}>En ligne</Text>
+              </View>
+            </TouchableOpacity>
+          ),
           headerLeft: () => (
             <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
               <ArrowLeft size={24} color={Colors.text.primary} />
             </TouchableOpacity>
           ),
+          headerStyle: {
+            backgroundColor: '#fff',
+          },
+          headerShadowVisible: true,
         }} 
       />
       
@@ -234,6 +262,33 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 8,
     marginLeft: -8,
+  },
+  headerTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 4,
+  },
+  headerAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.background.secondary,
+  },
+  headerTextContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  headerName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Colors.text.primary,
+    maxWidth: 180,
+  },
+  headerStatus: {
+    fontSize: 12,
+    color: Colors.primary,
+    marginTop: 1,
   },
   messagesList: {
     flex: 1,
