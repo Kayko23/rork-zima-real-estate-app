@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet, Linking, ScrollView } from "react-native";
-import { Mail, Phone, HelpCircle, AlertCircle, MessageCircle, FileText } from "lucide-react-native";
+
 import Colors from "@/constants/colors";
 
 export default function HelpScreen() {
@@ -9,48 +9,36 @@ export default function HelpScreen() {
       id: "whatsapp",
       title: "WhatsApp",
       description: "Chattez avec notre équipe support",
-      icon: MessageCircle,
-      color: "#25D366",
       action: () => Linking.openURL("https://wa.me/2250709090909?text=Bonjour, j'ai besoin d'aide"),
     },
     {
       id: "email",
       title: "Email",
       description: "support@zima.app",
-      icon: Mail,
-      color: Colors.primary,
       action: () => Linking.openURL("mailto:support@zima.app?subject=Demande de support"),
     },
     {
       id: "phone",
       title: "Téléphone",
       description: "+225 07 09 09 09 09",
-      icon: Phone,
-      color: Colors.primary,
       action: () => Linking.openURL("tel:+2250709090909"),
     },
     {
       id: "faq",
       title: "FAQ",
       description: "Questions fréquemment posées",
-      icon: HelpCircle,
-      color: Colors.text.secondary,
       action: () => console.log("FAQ - Coming soon"),
     },
     {
       id: "documentation",
       title: "Documentation",
       description: "Guides et tutoriels",
-      icon: FileText,
-      color: Colors.text.secondary,
       action: () => console.log("Documentation - Coming soon"),
     },
     {
       id: "report",
       title: "Signaler un problème",
       description: "Rapportez un bug ou une erreur",
-      icon: AlertCircle,
-      color: "#E53E3E",
       action: () => Linking.openURL("mailto:support@zima.app?subject=Signalement de problème"),
     },
   ];
@@ -65,25 +53,19 @@ export default function HelpScreen() {
       </View>
 
       <View style={s.optionsContainer}>
-        {supportOptions.map((option) => {
-          const Icon = option.icon;
-          return (
-            <Pressable
-              key={option.id}
-              style={s.optionCard}
-              onPress={option.action}
-              android_ripple={{ color: Colors.primary + "20" }}
-            >
-              <View style={[s.iconContainer, { backgroundColor: option.color + "15" }]}>
-                <Icon size={24} color={option.color} />
-              </View>
-              <View style={s.optionContent}>
-                <Text style={s.optionTitle}>{option.title}</Text>
-                <Text style={s.optionDescription}>{option.description}</Text>
-              </View>
-            </Pressable>
-          );
-        })}
+        {supportOptions.map((option) => (
+          <Pressable
+            key={option.id}
+            style={s.optionCard}
+            onPress={option.action}
+            android_ripple={{ color: Colors.primary + "20" }}
+          >
+            <View style={s.optionContent}>
+              <Text style={s.optionTitle}>{option.title}</Text>
+              <Text style={s.optionDescription}>{option.description}</Text>
+            </View>
+          </Pressable>
+        ))}
       </View>
 
       <View style={s.infoBox}>
@@ -107,8 +89,8 @@ const s = StyleSheet.create({
   },
   header: {
     alignItems: "center",
-    marginBottom: 20,
-    paddingTop: 4,
+    marginBottom: 32,
+    paddingTop: 8,
   },
   title: {
     fontSize: 22,
@@ -128,24 +110,14 @@ const s = StyleSheet.create({
     gap: 12,
   },
   optionCard: {
-    flexDirection: "row",
-    alignItems: "center",
     backgroundColor: Colors.background.primary,
     borderRadius: 12,
-    padding: 16,
+    padding: 20,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
-  },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 16,
   },
   optionContent: {
     flex: 1,
