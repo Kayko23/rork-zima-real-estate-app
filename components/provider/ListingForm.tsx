@@ -444,6 +444,49 @@ export default function ListingForm({
             ))}
           </View>
         )}
+        {amenities.includes("other") && (
+          <View style={s.customAmenityMainSection}>
+            <Text style={s.customAmenityMainHint}>Ajoutez jusqu&apos;à 6 équipements personnalisés</Text>
+            <View style={s.customAmenityInputRow}>
+              <TextInput
+                style={s.customAmenityInput}
+                value={customAmenityInput}
+                onChangeText={setCustomAmenityInput}
+                placeholder="Nom de l&apos;équipement"
+                maxLength={30}
+                testID="input-custom-amenity"
+              />
+              <TouchableOpacity
+                style={[s.customAmenityAddBtn, (customAmenities.length >= 6 || !customAmenityInput.trim()) && s.customAmenityAddBtnDisabled]}
+                disabled={customAmenities.length >= 6 || !customAmenityInput.trim()}
+                onPress={() => {
+                  if (customAmenityInput.trim() && customAmenities.length < 6) {
+                    setCustomAmenities(prev => [...prev, customAmenityInput.trim()]);
+                    setCustomAmenityInput("");
+                  }
+                }}
+                testID="btn-add-custom-amenity"
+              >
+                <Text style={s.customAmenityAddBtnText}>+</Text>
+              </TouchableOpacity>
+            </View>
+            {customAmenities.length > 0 && (
+              <View style={s.customAmenitiesList}>
+                {customAmenities.map((custom, idx) => (
+                  <View key={idx} style={s.customAmenityChip}>
+                    <Text style={s.customAmenityChipText}>{custom}</Text>
+                    <TouchableOpacity
+                      onPress={() => setCustomAmenities(prev => prev.filter((_, i) => i !== idx))}
+                    >
+                      <Text style={s.customAmenityRemove}>✕</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            )}
+            <Text style={s.customAmenityCount}>{customAmenities.length}/6 équipements ajoutés</Text>
+          </View>
+        )}
 
         <Text style={s.label}>Année de construction/certification (JJ-MM-AAAA)</Text>
         <Pressable style={s.pickerButton} onPress={() => setCalendarVisible(true)} testID="picker-calendar">
@@ -919,6 +962,8 @@ const s = StyleSheet.create({
   calendarConfirmText: { color: "#fff", fontWeight: "700", fontSize: 16 },
   customAmenitySection: { paddingHorizontal: 20, paddingVertical: 12, backgroundColor: "#f9fafb" },
   customAmenityHint: { fontSize: 12, color: "#6b7280", marginBottom: 8 },
+  customAmenityMainSection: { marginTop: 12, padding: 12, backgroundColor: "#f9fafb", borderRadius: 12, borderWidth: 1, borderColor: "#e5e7eb" },
+  customAmenityMainHint: { fontSize: 12, color: "#6b7280", marginBottom: 8, fontWeight: "600" },
   customAmenityInputRow: { flexDirection: "row", gap: 8, alignItems: "center" },
   customAmenityInput: { flex: 1, height: 40, borderRadius: 8, borderWidth: 1, borderColor: "#e5e7eb", paddingHorizontal: 10, backgroundColor: "#fff" },
   customAmenityAddBtn: { width: 40, height: 40, borderRadius: 8, backgroundColor: "#065f46", alignItems: "center", justifyContent: "center" },
