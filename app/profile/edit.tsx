@@ -208,7 +208,7 @@ export default function EditProfileScreen() {
           style={s.pickerList}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
-          contentContainerStyle={{ paddingBottom: 20 }}
+          contentContainerStyle={{ paddingBottom: 300 }}
         >
           {filteredCountries.map((c) => (
             <Pressable
@@ -244,7 +244,7 @@ export default function EditProfileScreen() {
           style={s.pickerList}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
-          contentContainerStyle={{ paddingBottom: 20 }}
+          contentContainerStyle={{ paddingBottom: 300 }}
         >
           {filteredCities.map((cityName) => (
             <Pressable
