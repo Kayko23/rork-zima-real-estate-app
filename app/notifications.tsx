@@ -14,6 +14,10 @@ interface Notification {
   message: string;
   timestamp: string;
   isRead: boolean;
+  chatId?: string;
+  propertyId?: string;
+  providerId?: string;
+  appointmentId?: string;
 }
 
 interface SwipeableNotificationProps {
@@ -161,6 +165,7 @@ export default function NotificationsScreen() {
       message: 'Kwame Asante vous a envoyé un message concernant la villa East Legon',
       timestamp: '2024-01-21T10:30:00Z',
       isRead: false,
+      chatId: 'chat-1',
     },
     {
       id: '2',
@@ -169,6 +174,7 @@ export default function NotificationsScreen() {
       message: 'Votre visite de demain à 14h00 a été confirmée',
       timestamp: '2024-01-21T09:15:00Z',
       isRead: false,
+      appointmentId: 'appt-1',
     },
     {
       id: '3',
@@ -177,6 +183,7 @@ export default function NotificationsScreen() {
       message: 'Un nouveau bien correspondant à vos critères a été ajouté',
       timestamp: '2024-01-20T16:45:00Z',
       isRead: true,
+      propertyId: '1',
     },
     {
       id: '4',
@@ -185,6 +192,7 @@ export default function NotificationsScreen() {
       message: 'Le prix de l\'appartement Victoria Island a été réduit de 10%',
       timestamp: '2024-01-20T14:20:00Z',
       isRead: true,
+      propertyId: '2',
     },
   ]);
 
@@ -247,32 +255,42 @@ export default function NotificationsScreen() {
 
   const handleNotificationPress = (notification: Notification) => {
     if (notification && notification.id && notification.id.trim()) {
-      console.log('Notification pressed:', notification.id);
-      // Mark as read when clicked
+      console.log('Notification pressed:', notification.id, notification);
+      
       if (!notification.isRead) {
         markAsRead(notification.id);
       }
       
-      // Navigate to appropriate section based on notification type
       switch (notification.type) {
         case 'message':
-          // Navigate to messages tab
-          router.push('/(tabs)/messages');
+          if (notification.chatId) {
+            router.push(`/chat/${notification.chatId}`);
+          } else {
+            router.push('/(tabs)/messages');
+          }
           break;
         case 'appointment':
-          // Navigate to agenda/calendar (if exists) or profile
-          router.push('/(tabs)/profile');
+          if (notification.appointmentId) {
+            router.push(`/appointment/book?id=${notification.appointmentId}`);
+          } else {
+            router.push('/(tabs)/profile');
+          }
           break;
         case 'favorite':
-          // Navigate to favorites tab
-          router.push('/(tabs)/favorites');
+          if (notification.propertyId) {
+            router.push(`/property/${notification.propertyId}`);
+          } else {
+            router.push('/(tabs)/favorites');
+          }
           break;
         case 'listing':
-          // Navigate to home or browse properties
-          router.push('/(tabs)/home');
+          if (notification.propertyId) {
+            router.push(`/property/${notification.propertyId}`);
+          } else {
+            router.push('/(tabs)/home');
+          }
           break;
         default:
-          // Default to home
           router.push('/(tabs)/home');
           break;
       }
