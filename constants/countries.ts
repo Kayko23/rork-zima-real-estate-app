@@ -1,5 +1,3 @@
-// UEMOA, CEDEAO/ECOWAS, CEMAC - Complete country and city data
-
 export type CountryBloc = 'UEMOA' | 'CEDEAO' | 'CEMAC';
 
 export interface CountryData {
@@ -10,7 +8,6 @@ export interface CountryData {
 }
 
 export const COUNTRY_CITIES: Record<string, CountryData> = {
-  // UEMOA + CEDEAO
   BJ: { 
     code: 'BJ', 
     name: 'Bénin',
@@ -59,8 +56,6 @@ export const COUNTRY_CITIES: Record<string, CountryData> = {
     bloc: ['UEMOA', 'CEDEAO'], 
     cities: ['Lomé', 'Sokodé', 'Kara', 'Kpalimé', 'Atakpamé', 'Dapaong', 'Tsévié', 'Aného', 'Mango', 'Badou'] 
   },
-
-  // CEDEAO only
   CV: { 
     code: 'CV', 
     name: 'Cap-Vert',
@@ -103,8 +98,6 @@ export const COUNTRY_CITIES: Record<string, CountryData> = {
     bloc: ['CEDEAO'], 
     cities: ['Freetown', 'Bo', 'Kenema', 'Makeni', 'Koidu', 'Lunsar', 'Port Loko', 'Waterloo', 'Kabala', 'Kailahun'] 
   },
-
-  // CEMAC
   CM: { 
     code: 'CM', 
     name: 'Cameroun',
@@ -143,25 +136,30 @@ export const COUNTRY_CITIES: Record<string, CountryData> = {
   },
 };
 
-// Helper functions
-export const getAllCountries = (): CountryData[] => Object.values(COUNTRY_CITIES);
+export function getAllCountries(): CountryData[] {
+  return Object.values(COUNTRY_CITIES).sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+}
 
-export const getCountriesByBloc = (bloc: CountryBloc): CountryData[] => 
-  getAllCountries().filter(c => c.bloc.includes(bloc));
+export function getCountriesByBloc(bloc: CountryBloc): CountryData[] {
+  return getAllCountries().filter(c => c.bloc.includes(bloc));
+}
 
-export const getCountryByCode = (code: string): CountryData | undefined => 
-  COUNTRY_CITIES[code];
+export function getCountryByCode(code: string): CountryData | undefined {
+  return COUNTRY_CITIES[code];
+}
 
-export const getCountryByName = (name: string): CountryData | undefined => 
-  getAllCountries().find(c => c.name === name);
+export function getCountryByName(name: string): CountryData | undefined {
+  return getAllCountries().find(c => c.name === name);
+}
 
-export const getCitiesByCountryCode = (code: string): string[] => 
-  COUNTRY_CITIES[code]?.cities || [];
+export function getCitiesByCountryCode(code: string): string[] {
+  return COUNTRY_CITIES[code]?.cities || [];
+}
 
-export const getCitiesByCountryName = (name: string): string[] => 
-  getCountryByName(name)?.cities || [];
+export function getCitiesByCountryName(name: string): string[] {
+  return getCountryByName(name)?.cities || [];
+}
 
-// Legacy exports for backward compatibility
 export const COUNTRIES = getAllCountries().map(c => c.name);
 
 export const CITIES: Record<string, string[]> = Object.values(COUNTRY_CITIES).reduce((acc, country) => {

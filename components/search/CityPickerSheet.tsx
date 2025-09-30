@@ -1,20 +1,8 @@
-import React, { useMemo } from 'react';
-import { Modal, View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Modal, View, Text, FlatList, Pressable, StyleSheet, TextInput } from 'react-native';
+import { Search } from 'lucide-react-native';
 import type { City } from './types';
-
-const CITIES: City[] = [
-  { id: 'abj', name: 'Abidjan', countryCode: 'CI' },
-  { id: 'yop', name: 'Yopougon', countryCode: 'CI' },
-  { id: 'dk', name: 'Dakar', countryCode: 'SN' },
-  { id: 'th', name: 'Thies', countryCode: 'SN' },
-  { id: 'acc', name: 'Accra', countryCode: 'GH' },
-  { id: 'lag', name: 'Lagos', countryCode: 'NG' },
-  { id: 'abjng', name: 'Abuja', countryCode: 'NG' },
-  { id: 'lom', name: 'Lomé', countryCode: 'TG' },
-  { id: 'cotonou', name: 'Cotonou', countryCode: 'BJ' },
-  { id: 'yao', name: 'Yaoundé', countryCode: 'CM' },
-  { id: 'lib', name: 'Libreville', countryCode: 'GA' },
-];
+import { getCitiesByCountryCode } from '@/constants/countries';
 
 export default function CityPickerSheet({
   visible,
@@ -27,13 +15,35 @@ export default function CityPickerSheet({
   countryCode: string | null;
   onSelect: (v: City) => void;
 }): React.ReactElement {
-  const cities = useMemo(() => (countryCode ? CITIES.filter((c) => c.countryCode === countryCode) : CITIES), [countryCode]);
+  const [search, setSearch] = useState("");
+
+  const allCities = useMemo(() => {
+    if (!countryCode) return [];
+    const cityNames = getCitiesByCountryCode(countryCode);
+    return cityNames.map((name, idx) => ({ id: `${countryCode}-${idx}`, name, countryCode }));
+  }, [countryCode]);
+
+  const cities = useMemo(() => {
+    if (!search.trim()) return allCities;
+    const q = search.toLowerCase();
+    return allCities.filter(c => c.name.toLowerCase().includes(q));
+  }, [allCities, search]);
 
   return (
-    <Modal animationType="slide" transparent visible={visible} onRequestClose={onClose}>
+    <Modal animationType="slide" transparent visible={visible} onRequestClose={() => { onClose(); setSearch(""); }}>
       <View style={s.backdrop}>
         <View style={s.sheet}>
           <Text style={s.title}>Choisir une ville</Text>
+          <View style={s.searchBox}>
+            <Search size={18} color="#6b7280" />
+            <TextInput
+              style={s.searchInput}
+              placeholder="Rechercher une ville..."
+              value={search}
+              onChangeText={setSearch}
+              autoFocus
+            />
+          </View>
           <FlatList
             data={cities}
             keyExtractor={(i) => i.id}
@@ -42,6 +52,7 @@ export default function CityPickerSheet({
                 onPress={() => {
                   onSelect(item);
                   onClose();
+                  setSearch("");
                 }}
                 style={s.row}
               >
@@ -57,8 +68,10 @@ export default function CityPickerSheet({
 
 const s = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' },
-  sheet: { backgroundColor: 'white', padding: 16, borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '70%' },
-  title: { fontSize: 18, fontWeight: '800', marginBottom: 8 },
+  sheet: { backgroundColor: 'white', padding: 16, borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '80%' },
+  title: { fontSize: 18, fontWeight: '800', marginBottom: 12 },
+  searchBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f3f4f6', borderRadius: 12, paddingHorizontal: 12, marginBottom: 12, gap: 8 },
+  searchInput: { flex: 1, height: 44, fontSize: 16 },
   row: { paddingVertical: 12 },
   name: { fontSize: 16, color: '#0B1D17' },
 });

@@ -1,9 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import { View, Text, TextInput, Image, Pressable, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { Save, Camera, UserRound, Mail, Phone, MapPin, Globe2, Lock, Eye, EyeOff, ChevronDown } from "lucide-react-native";
+import { Save, Camera, UserRound, Mail, Phone, MapPin, Globe2, Lock, Eye, EyeOff, ChevronDown, Search } from "lucide-react-native";
 import { useApp } from "@/hooks/useAppStore";
-import { getAllCountries, getCitiesByCountryName } from "@/constants/countries";
+import { getAllCountries, getCitiesByCountryCode, getCountryByName } from "@/constants/countries";
 import BottomSheet from "@/components/ui/BottomSheet";
 
 export default function EditProfileScreen() {
@@ -18,6 +18,8 @@ export default function EditProfileScreen() {
   const [showCountryPicker, setShowCountryPicker] = useState(false);
   const [showCityPicker, setShowCityPicker] = useState(false);
   const [availableCities, setAvailableCities] = useState<string[]>([]);
+  const [countrySearch, setCountrySearch] = useState("");
+  const [citySearch, setCitySearch] = useState("");
   const [bio, setBio] = useState(user?.bio ?? "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -86,16 +88,27 @@ export default function EditProfileScreen() {
 
   useEffect(() => {
     if (country) {
-      const cities = getCitiesByCountryName(country);
-      setAvailableCities(cities);
-      if (!cities.includes(city)) {
-        setCity("");
+      const countryData = getCountryByName(country);
+      if (countryData) {
+        const cities = getCitiesByCountryCode(countryData.code);
+        setAvailableCities(cities);
+        if (!cities.includes(city)) {
+          setCity("");
+        }
       }
     } else {
       setAvailableCities([]);
       setCity("");
     }
   }, [country]);
+
+  const filteredCountries = allCountries.filter(c => 
+    c.name.toLowerCase().includes(countrySearch.toLowerCase())
+  );
+
+  const filteredCities = availableCities.filter(cityName => 
+    cityName.toLowerCase().includes(citySearch.toLowerCase())
+  );
 
   return (
     <KeyboardAvoidingView
@@ -127,7 +140,7 @@ export default function EditProfileScreen() {
               <Globe2 size={18}/>
             </View>
             <Text style={[s.pickerText, !country && s.placeholder]}>
-              {country || "Pays"}
+              {country || "Sélectionner un pays"}
             </Text>
             <ChevronDown size={18} color="#6b7280" />
           </Pressable>
@@ -137,7 +150,7 @@ export default function EditProfileScreen() {
               <MapPin size={18} color={!country ? "#d1d5db" : "#000"}/>
             </View>
             <Text style={[s.pickerText, !city && s.placeholder, !country && s.disabledText]}>
-              {city || "Ville"}
+              {city || "Sélectionner une ville"}
             </Text>
             <ChevronDown size={18} color={!country ? "#d1d5db" : "#6b7280"} />
           </Pressable>
@@ -179,15 +192,26 @@ export default function EditProfileScreen() {
         </Pressable>
       </ScrollView>
 
-      <BottomSheet visible={showCountryPicker} onClose={() => setShowCountryPicker(false)} maxHeight={0.7}>
+      <BottomSheet visible={showCountryPicker} onClose={() => { setShowCountryPicker(false); setCountrySearch(""); }} maxHeight={0.8}>
         <Text style={s.sheetTitle}>Sélectionner un pays</Text>
+        <View style={s.searchBox}>
+          <Search size={18} color="#6b7280" />
+          <TextInput
+            style={s.searchInput}
+            placeholder="Rechercher un pays..."
+            value={countrySearch}
+            onChangeText={setCountrySearch}
+            autoFocus
+          />
+        </View>
         <ScrollView style={s.pickerList}>
-          {allCountries.map((c) => (
+          {filteredCountries.map((c) => (
             <Pressable
               key={c.code}
               onPress={() => {
                 setCountry(c.name);
                 setShowCountryPicker(false);
+                setCountrySearch("");
               }}
               style={s.pickerItem}
             >
@@ -199,15 +223,26 @@ export default function EditProfileScreen() {
         </ScrollView>
       </BottomSheet>
 
-      <BottomSheet visible={showCityPicker} onClose={() => setShowCityPicker(false)} maxHeight={0.7}>
+      <BottomSheet visible={showCityPicker} onClose={() => { setShowCityPicker(false); setCitySearch(""); }} maxHeight={0.8}>
         <Text style={s.sheetTitle}>Sélectionner une ville</Text>
+        <View style={s.searchBox}>
+          <Search size={18} color="#6b7280" />
+          <TextInput
+            style={s.searchInput}
+            placeholder="Rechercher une ville..."
+            value={citySearch}
+            onChangeText={setCitySearch}
+            autoFocus
+          />
+        </View>
         <ScrollView style={s.pickerList}>
-          {availableCities.map((cityName) => (
+          {filteredCities.map((cityName) => (
             <Pressable
               key={cityName}
               onPress={() => {
                 setCity(cityName);
                 setShowCityPicker(false);
+                setCitySearch("");
               }}
               style={s.pickerItem}
             >
@@ -283,7 +318,9 @@ const s = StyleSheet.create({
   disabled: { opacity: 0.5 },
   disabledText: { color: "#d1d5db" },
   sheetTitle: { fontSize: 18, fontWeight: "700", marginBottom: 12, textAlign: "center" },
-  pickerList: { maxHeight: 400 },
+  searchBox: { flexDirection: "row", alignItems: "center", backgroundColor: "#f3f4f6", borderRadius: 12, paddingHorizontal: 12, marginBottom: 12, gap: 8 },
+  searchInput: { flex: 1, height: 44, fontSize: 16 },
+  pickerList: { maxHeight: 500 },
   pickerItem: { paddingVertical: 14, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: "#f3f4f6" },
   pickerItemText: { fontSize: 16 },
   pickerItemSelected: { fontWeight: "700", color: "#0C5A45" },
