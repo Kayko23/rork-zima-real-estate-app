@@ -190,6 +190,7 @@ export default function ListingForm({
   const [amenitiesPickerVisible, setAmenitiesPickerVisible] = useState<boolean>(false);
   const [categoryPickerVisible, setCategoryPickerVisible] = useState<boolean>(false);
   const [docTypePickerVisible, setDocTypePickerVisible] = useState<boolean>(false);
+  const [transactionPickerVisible, setTransactionPickerVisible] = useState<boolean>(false);
 
   useEffect(() => {
     if (countryCode) {
@@ -359,16 +360,12 @@ export default function ListingForm({
         </Pressable>
 
         <Text style={s.label}>Transaction</Text>
-        <View style={s.segmentRow}>
-          <Seg active={type === "sale"} onPress={() => setType("sale")} label="Vente" testID="seg-sale" />
-          <Seg active={type === "rent"} onPress={() => setType("rent")} label="Location" testID="seg-rent" />
-          {type === "rent" && (
-            <>
-              <Seg active={rentPeriod === "monthly"} onPress={() => setRentPeriod("monthly")} label="Mensuel" testID="seg-monthly" />
-              <Seg active={rentPeriod === "daily"} onPress={() => setRentPeriod("daily")} label="Journalier" testID="seg-daily" />
-            </>
-          )}
-        </View>
+        <Pressable style={s.pickerButton} onPress={() => setTransactionPickerVisible(true)} testID="picker-transaction">
+          <Text style={s.pickerButtonText}>
+            {type === "sale" ? "Vente" : type === "rent" && rentPeriod === "monthly" ? "Location mensuelle" : "Location journalière"}
+          </Text>
+          <ChevronDown size={20} color="#6b7280" />
+        </Pressable>
 
         <Text style={s.label}>Prix et devise</Text>
         <View style={s.row}>
@@ -600,20 +597,59 @@ export default function ListingForm({
           </View>
         </View>
       </Modal>
+
+      <Modal visible={transactionPickerVisible} transparent animationType="slide" onRequestClose={() => setTransactionPickerVisible(false)}>
+        <View style={s.modalOverlay}>
+          <View style={s.modalContent}>
+            <View style={s.modalHeader}>
+              <Text style={s.modalTitle}>Transaction</Text>
+              <TouchableOpacity onPress={() => setTransactionPickerVisible(false)}>
+                <Text style={s.modalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={s.modalScroll}>
+              <TouchableOpacity
+                style={[s.modalItem, type === "sale" && s.modalItemActive]}
+                onPress={() => {
+                  setType("sale");
+                  setTransactionPickerVisible(false);
+                }}
+              >
+                <Text style={[s.modalItemText, type === "sale" && s.modalItemTextActive]}>Vente</Text>
+                {type === "sale" && <Check size={20} color="#065f46" />}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[s.modalItem, type === "rent" && rentPeriod === "monthly" && s.modalItemActive]}
+                onPress={() => {
+                  setType("rent");
+                  setRentPeriod("monthly");
+                  setTransactionPickerVisible(false);
+                }}
+              >
+                <Text style={[s.modalItemText, type === "rent" && rentPeriod === "monthly" && s.modalItemTextActive]}>Location mensuelle</Text>
+                {type === "rent" && rentPeriod === "monthly" && <Check size={20} color="#065f46" />}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[s.modalItem, type === "rent" && rentPeriod === "daily" && s.modalItemActive]}
+                onPress={() => {
+                  setType("rent");
+                  setRentPeriod("daily");
+                  setTransactionPickerVisible(false);
+                }}
+              >
+                <Text style={[s.modalItemText, type === "rent" && rentPeriod === "daily" && s.modalItemTextActive]}>Location journalière</Text>
+                {type === "rent" && rentPeriod === "daily" && <Check size={20} color="#065f46" />}
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
 
 function Input(props: any) {
   return <TextInput {...props} style={[s.input, props.style]} />;
-}
-
-function Seg({ label, active, onPress, testID }: { label: string; active?: boolean; onPress?: () => void; testID?: string }) {
-  return (
-    <Pressable testID={testID} onPress={onPress} style={[s.segBtn, active && s.segBtnActive]}>
-      <Text style={[s.segTxt, active && s.segTxtActive]}>{label}</Text>
-    </Pressable>
-  );
 }
 
 const s = StyleSheet.create({
@@ -639,11 +675,6 @@ const s = StyleSheet.create({
   currency: { width: 110 },
   btnLike: { justifyContent: "center" },
   textarea: { height: 120, textAlignVertical: "top", paddingTop: 12 },
-  segmentRow: { flexDirection: "row", gap: 10, alignItems: "center", flexWrap: "wrap" },
-  segBtn: { paddingHorizontal: 14, height: 36, borderRadius: 999, backgroundColor: "#F3F4F6", justifyContent: "center" },
-  segBtnActive: { backgroundColor: "#064e3b" },
-  segTxt: { fontWeight: "700" },
-  segTxtActive: { color: "#fff", fontWeight: "800" },
   locationHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
   chip: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 999, backgroundColor: "#F3F4F6" },
   chipActive: { backgroundColor: "#064e3b" },
