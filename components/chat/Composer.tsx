@@ -1,75 +1,73 @@
-import React, { useState } from "react";
-import { View, TextInput, Pressable, StyleSheet, KeyboardAvoidingView, Platform, Text } from "react-native";
+import React, { useState } from 'react';
+import { View, TextInput, Pressable, StyleSheet } from 'react-native';
+import { Paperclip, Send } from 'lucide-react-native';
 
-export default function ChatComposer({ onSend, onPickDocs }:{ onSend:(t:string)=>void; onPickDocs:()=>void; }) {
-  const [v, setV] = useState("");
-  
-  function submit() { 
-    const t = v.trim(); 
-    if (!t) return; 
-    onSend(t); 
-    setV(""); 
+export default function ChatInput({
+  placeholder,
+  onSend,
+  disabled,
+  bottomInset = 0,
+}: {
+  placeholder?: string;
+  onSend: (text: string) => void;
+  disabled?: boolean;
+  bottomInset?: number;
+}) {
+  const [text, setText] = useState('');
+
+  function submit() {
+    const t = text.trim();
+    if (!t || disabled) return;
+    onSend(t);
+    setText('');
   }
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <View style={s.wrap}>
-        <Pressable onPress={onPickDocs} style={s.icon}>
-          <Text style={s.iconText}>📎</Text>
-        </Pressable>
-        <TextInput
-          style={s.input}
-          placeholder="Tapez votre message…"
-          value={v}
-          onChangeText={setV}
-          multiline
-        />
-        <Pressable onPress={submit} style={s.send}>
-          <Text style={s.sendText}>Envoyer</Text>
-        </Pressable>
-      </View>
-    </KeyboardAvoidingView>
+    <View style={[s.wrap, { paddingBottom: bottomInset || 6 }]}>
+      <Pressable style={s.btn} hitSlop={10}>
+        <Paperclip size={20} color="#3A4A45" />
+      </Pressable>
+
+      <TextInput
+        style={s.input}
+        placeholder={placeholder}
+        value={text}
+        onChangeText={setText}
+        multiline
+        returnKeyType="send"
+        onSubmitEditing={submit}
+      />
+
+      <Pressable style={[s.btn, s.send]} onPress={submit} disabled={disabled} hitSlop={10}>
+        <Send size={20} color="#fff" />
+      </Pressable>
+    </View>
   );
 }
 
 const s = StyleSheet.create({
-  wrap: { 
-    flexDirection: "row", 
-    alignItems: "flex-end", 
-    gap: 8, 
-    padding: 10, 
-    backgroundColor: "#fff", 
-    borderTopWidth: 1, 
-    borderColor: "#E6ECE9" 
+  wrap: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    paddingHorizontal: 10,
+    paddingTop: 8,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#E5E9EC',
   },
-  icon: { 
-    width: 36, 
-    height: 36, 
-    borderRadius: 10, 
-    alignItems: "center", 
-    justifyContent: "center", 
-    backgroundColor: "#F1F6F4" 
+  btn: {
+    width: 38, height: 38, borderRadius: 19,
+    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#EEF3F1', marginRight: 8,
   },
-  iconText: { 
-    fontSize: 18 
+  input: {
+    flex: 1,
+    maxHeight: 140,
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    backgroundColor: '#F2F5F6',
+    fontSize: 16,
   },
-  input: { 
-    flex: 1, 
-    minHeight: 40, 
-    maxHeight: 120, 
-    borderRadius: 12, 
-    paddingHorizontal: 12, 
-    paddingVertical: 10, 
-    backgroundColor: "#F7F9F8" 
-  },
-  send: { 
-    paddingHorizontal: 14, 
-    paddingVertical: 10, 
-    borderRadius: 12, 
-    backgroundColor: "#1F2937" 
-  },
-  sendText: { 
-    color: "#fff", 
-    fontWeight: "700" 
-  },
+  send: { backgroundColor: '#165D47' },
 });
