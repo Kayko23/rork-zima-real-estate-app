@@ -1,8 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { View, Text, TextInput, Image, Pressable, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { Save, Camera, UserRound, Mail, Phone, MapPin, Globe2, Lock, Eye, EyeOff } from "lucide-react-native";
+import { Save, Camera, UserRound, Mail, Phone, MapPin, Globe2, Lock, Eye, EyeOff, ChevronDown } from "lucide-react-native";
 import { useApp } from "@/hooks/useAppStore";
+import { getAllCountries, getCitiesByCountryName } from "@/constants/countries";
+import BottomSheet from "@/components/ui/BottomSheet";
 
 export default function EditProfileScreen() {
   const { user, updateUser } = useApp();
@@ -11,8 +13,11 @@ export default function EditProfileScreen() {
   const [fullName, setFullName] = useState(user?.name ?? "");
   const [email, setEmail] = useState(user?.email ?? "");
   const [phone, setPhone] = useState(user?.phone ?? "");
-  const [city, setCity] = useState(user?.city ?? "");
   const [country, setCountry] = useState(user?.country ?? "");
+  const [city, setCity] = useState(user?.city ?? "");
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
+  const [showCityPicker, setShowCityPicker] = useState(false);
+  const [availableCities, setAvailableCities] = useState<string[]>([]);
   const [bio, setBio] = useState(user?.bio ?? "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -77,6 +82,20 @@ export default function EditProfileScreen() {
   }
 
   const scrollRef = useRef<ScrollView | null>(null);
+  const allCountries = getAllCountries();
+
+  useEffect(() => {
+    if (country) {
+      const cities = getCitiesByCountryName(country);
+      setAvailableCities(cities);
+      if (!cities.includes(city)) {
+        setCity("");
+      }
+    } else {
+      setAvailableCities([]);
+      setCity("");
+    }
+  }, [country]);
 
   return (
     <KeyboardAvoidingView
@@ -102,8 +121,26 @@ export default function EditProfileScreen() {
           <Field icon={<UserRound size={18}/>} value={fullName} onChangeText={setFullName} placeholder="Nom complet" returnKeyType="next" />
           <Field icon={<Mail size={18}/>} value={email} onChangeText={setEmail} placeholder="Email" keyboardType="email-address" autoCapitalize="none" returnKeyType="next" />
           <Field icon={<Phone size={18}/>} value={phone} onChangeText={setPhone} placeholder="Téléphone" keyboardType="phone-pad" returnKeyType="next" />
-          <Field icon={<MapPin size={18}/>} value={city} onChangeText={setCity} placeholder="Ville" returnKeyType="next" />
-          <Field icon={<Globe2 size={18}/>} value={country} onChangeText={setCountry} placeholder="Pays" returnKeyType="next" />
+          
+          <Pressable onPress={() => setShowCountryPicker(true)} style={s.row}>
+            <View style={s.icon}>
+              <Globe2 size={18}/>
+            </View>
+            <Text style={[s.pickerText, !country && s.placeholder]}>
+              {country || "Pays"}
+            </Text>
+            <ChevronDown size={18} color="#6b7280" />
+          </Pressable>
+
+          <Pressable onPress={() => country ? setShowCityPicker(true) : null} style={[s.row, !country && s.disabled]}>
+            <View style={s.icon}>
+              <MapPin size={18} color={!country ? "#d1d5db" : "#000"}/>
+            </View>
+            <Text style={[s.pickerText, !city && s.placeholder, !country && s.disabledText]}>
+              {city || "Ville"}
+            </Text>
+            <ChevronDown size={18} color={!country ? "#d1d5db" : "#6b7280"} />
+          </Pressable>
           <Text style={s.label}>Bio</Text>
           <View style={s.bioContainer}>
             <TextInput style={[s.input, s.multiline]} multiline numberOfLines={5} value={bio} onChangeText={setBio} placeholder="Présentez-vous…" textAlignVertical="top" returnKeyType="done" />
@@ -141,6 +178,46 @@ export default function EditProfileScreen() {
           <Text style={s.ctaTxt}>Enregistrer</Text>
         </Pressable>
       </ScrollView>
+
+      <BottomSheet visible={showCountryPicker} onClose={() => setShowCountryPicker(false)} maxHeight={0.7}>
+        <Text style={s.sheetTitle}>Sélectionner un pays</Text>
+        <ScrollView style={s.pickerList}>
+          {allCountries.map((c) => (
+            <Pressable
+              key={c.code}
+              onPress={() => {
+                setCountry(c.name);
+                setShowCountryPicker(false);
+              }}
+              style={s.pickerItem}
+            >
+              <Text style={[s.pickerItemText, country === c.name && s.pickerItemSelected]}>
+                {c.name}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </BottomSheet>
+
+      <BottomSheet visible={showCityPicker} onClose={() => setShowCityPicker(false)} maxHeight={0.7}>
+        <Text style={s.sheetTitle}>Sélectionner une ville</Text>
+        <ScrollView style={s.pickerList}>
+          {availableCities.map((cityName) => (
+            <Pressable
+              key={cityName}
+              onPress={() => {
+                setCity(cityName);
+                setShowCityPicker(false);
+              }}
+              style={s.pickerItem}
+            >
+              <Text style={[s.pickerItemText, city === cityName && s.pickerItemSelected]}>
+                {cityName}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </BottomSheet>
     </KeyboardAvoidingView>
   );
 }
@@ -201,4 +278,13 @@ const s = StyleSheet.create({
   cta:{ margin:16, height:52, backgroundColor:"#1F2937", borderRadius:14, alignItems:"center", justifyContent:"center", flexDirection:"row", gap:8 },
   ctaTxt:{ color:"#fff", fontWeight:"700" },
   eyeIcon: { padding: 4, marginLeft: 8 },
+  pickerText: { flex: 1, height: 48, lineHeight: 48, fontSize: 16 },
+  placeholder: { color: "#9ca3af" },
+  disabled: { opacity: 0.5 },
+  disabledText: { color: "#d1d5db" },
+  sheetTitle: { fontSize: 18, fontWeight: "700", marginBottom: 12, textAlign: "center" },
+  pickerList: { maxHeight: 400 },
+  pickerItem: { paddingVertical: 14, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: "#f3f4f6" },
+  pickerItemText: { fontSize: 16 },
+  pickerItemSelected: { fontWeight: "700", color: "#0C5A45" },
 });
