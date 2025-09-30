@@ -47,7 +47,7 @@ export default function ListingCard({ item }: { item: Listing }) {
       <View style={s.actions}>
         <Pill icon={<Pencil size={16}/>} label="Modifier" onPress={() => router.push(`/provider/annonces/${item.id}/edit`)} />
         <Pill icon={<TrendingUp size={16} color="#b45309"/>} label="Ajuster" onPress={() => router.push(`/provider/annonces/${item.id}/adjust`)} />
-        <Pill icon={<Pause size={16}/>} label={item.status==="active" ? "Pause" : "Reprendre"} onPress={() => router.push(`/provider/annonces/${item.id}/pause`)} />
+        <Pill icon={<Pause size={16}/>} label={item.status==="active" ? "Pause" : "Reprendre"} onPress={() => router.push(item.status==="active" ? `/provider/annonces/${item.id}/pause` : `/provider/annonces/${item.id}/pause?action=resume`)} />
         <Pill icon={<Rocket size={16} color="#065f46"/>} label="Boost" onPress={() => router.push(`/provider/annonces/${item.id}/boost`)} />
         <Pill danger icon={<Trash2 size={16} color="#b91c1c"/>} label="Supprimer" onPress={() => router.push(`/provider/annonces/${item.id}/delete`)} />
       </View>
