@@ -97,7 +97,7 @@ export default function BookAppointmentScreen() {
         }}
       />
       
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <User size={20} color={Colors.primary} />
@@ -293,7 +293,10 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  contentContainer: {
     padding: 16,
+    paddingBottom: 100,
   },
   section: {
     marginBottom: 24,
