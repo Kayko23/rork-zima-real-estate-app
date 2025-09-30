@@ -387,7 +387,7 @@ export default function ListingForm({
             {beds ? `${beds} chambre${Number(beds) > 1 ? "s" : ""}` : ""}{beds && (baths || salons) ? ", " : ""}
             {baths ? `${baths} salle${Number(baths) > 1 ? "s" : ""} de bain${Number(baths) > 1 ? "s" : ""}` : ""}{baths && salons ? ", " : ""}
             {salons ? `${salons} salon${Number(salons) > 1 ? "s" : ""}` : ""}
-            {beds || salons ? ` · ${Number(beds || 0) + Number(salons || 0)}+${salons || 0}` : ""}
+            {beds || salons ? ` · ${beds || 0}+${salons || 0}` : ""}
           </Text>
         )}
 
