@@ -1,17 +1,11 @@
 import React, { useMemo } from 'react';
 import { Modal, View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
 import type { Country } from './types';
+import { getAllCountries } from '../../constants/countries';
 
-const COUNTRIES: Country[] = [
-  { code: 'CI', name: "Côte d'Ivoire" },
-  { code: 'SN', name: 'Sénégal' },
-  { code: 'GH', name: 'Ghana' },
-  { code: 'NG', name: 'Nigeria' },
-  { code: 'TG', name: 'Togo' },
-  { code: 'BJ', name: 'Bénin' },
-  { code: 'CM', name: 'Cameroun' },
-  { code: 'GA', name: 'Gabon' },
-];
+const COUNTRIES: Country[] = getAllCountries()
+  .map(c => ({ code: c.code, name: c.name }))
+  .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
 
 export default function CountryPickerSheet({
   visible,

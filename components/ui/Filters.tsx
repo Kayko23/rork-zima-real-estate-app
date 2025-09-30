@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, StyleSheet, Pressable, Modal, FlatList, ScrollView } from "react-native";
 import { ChevronDown, MapPin, Globe, Filter } from "lucide-react-native";
-import { COUNTRIES, CITIES } from "@/constants/countries";
+import { getAllCountries, getCitiesByCountryName } from "@/constants/countries";
 import { GlassButton } from "./Glass";
 
 export type FiltersState = {
@@ -16,7 +16,7 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
   const [showCityModal, setShowCityModal] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
-  const cities = useMemo(() => (f.country ? (CITIES[f.country] ?? []) : []), [f.country]);
+  const cities = useMemo(() => (f.country ? getCitiesByCountryName(f.country) : []), [f.country]);
 
   const handleCountryChange = (value: string | null) => {
     setF({ ...f, country: value || null, city: null });
@@ -133,7 +133,7 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
           <View style={s.pickerModal}>
             <Text style={s.pickerTitle}>Choisir un pays</Text>
             <FlatList
-              data={[{ label: "Tous les pays", value: null }, ...COUNTRIES.map(c => ({ label: c, value: c }))]}
+              data={[{ label: "Tous les pays", value: null }, ...getAllCountries().map(c => ({ label: c.name, value: c.name }))]}
               keyExtractor={(item) => item.value || "all"}
               renderItem={({ item }) => (
                 <Pressable
