@@ -31,8 +31,8 @@ const categories = [
 
 const amenitiesByCategory: Record<string, { key: string; label: string }[]> = {
   residential: [
-    { key: "wifi", label: "Wifi gratuit" },
-    { key: "parking", label: "Parking gratuit" },
+    { key: "wifi", label: "Wifi" },
+    { key: "parking", label: "Parking" },
     { key: "ac", label: "Climatisation" },
     { key: "balcony", label: "Balcon/Terrasse" },
     { key: "pool", label: "Piscine" },
@@ -41,6 +41,7 @@ const amenitiesByCategory: Record<string, { key: string; label: string }[]> = {
     { key: "elevator", label: "Ascenseur" },
     { key: "kitchen", label: "Cuisine équipée" },
     { key: "furnished", label: "Meublé" },
+    { key: "other", label: "Autre (préciser)" },
   ],
   offices: [
     { key: "parking", label: "Parking" },
@@ -51,6 +52,7 @@ const amenitiesByCategory: Record<string, { key: string; label: string }[]> = {
     { key: "ac", label: "Climatisation" },
     { key: "meeting_room", label: "Salle de réunion" },
     { key: "reception", label: "Réception" },
+    { key: "other", label: "Autre (préciser)" },
   ],
   retail: [
     { key: "corner", label: "Emplacement d'angle" },
@@ -60,6 +62,7 @@ const amenitiesByCategory: Record<string, { key: string; label: string }[]> = {
     { key: "ac", label: "Climatisation" },
     { key: "security", label: "Système sécurité" },
     { key: "high_traffic", label: "Zone de passage" },
+    { key: "other", label: "Autre (préciser)" },
   ],
   land: [
     { key: "titled", label: "Terrain borné" },
@@ -68,6 +71,7 @@ const amenitiesByCategory: Record<string, { key: string; label: string }[]> = {
     { key: "road_access", label: "Accès routier" },
     { key: "flat", label: "Terrain plat" },
     { key: "corner_lot", label: "Terrain d'angle" },
+    { key: "other", label: "Autre (préciser)" },
   ],
   industrial: [
     { key: "height", label: "Grande hauteur sous plafond" },
@@ -76,17 +80,19 @@ const amenitiesByCategory: Record<string, { key: string; label: string }[]> = {
     { key: "crane", label: "Pont roulant" },
     { key: "truck_access", label: "Accès poids lourds" },
     { key: "power", label: "Alimentation électrique industrielle" },
+    { key: "other", label: "Autre (préciser)" },
   ],
   hotel: [
-    { key: "wifi", label: "Wifi gratuit" },
+    { key: "wifi", label: "Wifi" },
     { key: "breakfast", label: "Petit-déjeuner inclus" },
-    { key: "parking", label: "Parking gratuit" },
+    { key: "parking", label: "Parking" },
     { key: "pool", label: "Piscine" },
     { key: "ac", label: "Climatisation" },
     { key: "restaurant", label: "Restaurant" },
     { key: "spa", label: "Spa/Wellness" },
     { key: "conference", label: "Salle de conférence" },
     { key: "room_service", label: "Service en chambre" },
+    { key: "other", label: "Autre (préciser)" },
   ],
 };
 
@@ -177,6 +183,8 @@ export default function ListingForm({
   const [category, setCategory] = useState<string>("residential");
   const [subtype, setSubtype] = useState<string>(categories[0].types[0]);
   const [amenities, setAmenities] = useState<string[]>([]);
+  const [customAmenities, setCustomAmenities] = useState<string[]>([]);
+  const [customAmenityInput, setCustomAmenityInput] = useState<string>("");
   const [yearDate, setYearDate] = useState<string>("");
   const [docType, setDocType] = useState<DocType | null>(null);
   const [docTypeOther, setDocTypeOther] = useState<string>("");
@@ -292,6 +300,7 @@ export default function ListingForm({
         category,
         subtype,
         amenities,
+        customAmenities,
         yearDate,
         docType: docType || "",
         docTypeOther: docType === "autre" ? docTypeOther : "",
@@ -313,7 +322,7 @@ export default function ListingForm({
     } finally {
       setSubmitting(false);
     }
-  }, [title, type, price, currency, city, country, surface, beds, baths, salons, photos, cover, rentPeriod, category, subtype, amenities, yearDate, docType, docTypeOther, exactAddress, orientation, landmark, phone, attachments.length, consent, desc, onSubmit]);
+  }, [title, type, price, currency, city, country, surface, beds, baths, salons, photos, cover, rentPeriod, category, subtype, amenities, customAmenities, yearDate, docType, docTypeOther, exactAddress, orientation, landmark, phone, attachments.length, consent, desc, onSubmit]);
 
   const currentTypes = useMemo(() => {
     const found = categories.find(c => c.key === category);
@@ -408,7 +417,7 @@ export default function ListingForm({
           </Text>
           <ChevronDown size={20} color="#6b7280" />
         </Pressable>
-        {amenities.length > 0 && (
+        {(amenities.length > 0 || customAmenities.length > 0) && (
           <View style={s.selectedAmenities}>
             {amenities.map(k => {
               const found = availableAmenities.find(a => a.key === k);
@@ -418,6 +427,11 @@ export default function ListingForm({
                 </View>
               ) : null;
             })}
+            {customAmenities.map((custom, idx) => (
+              <View key={`custom-${idx}`} style={s.selectedChip}>
+                <Text style={s.selectedChipText}>{custom}</Text>
+              </View>
+            ))}
           </View>
         )}
 
@@ -542,17 +556,66 @@ export default function ListingForm({
             <ScrollView style={s.modalScroll}>
               {availableAmenities.map(a => {
                 const active = amenities.includes(a.key);
+                const isOther = a.key === "other";
                 return (
-                  <TouchableOpacity
-                    key={a.key}
-                    style={s.modalItem}
-                    onPress={() => setAmenities(prev => active ? prev.filter(k => k !== a.key) : [...prev, a.key])}
-                  >
-                    <Text style={s.modalItemText}>{a.label}</Text>
-                    <View style={[s.modalCheckbox, active && s.modalCheckboxActive]}>
-                      {active && <Check size={16} color="#fff" />}
-                    </View>
-                  </TouchableOpacity>
+                  <View key={a.key}>
+                    <TouchableOpacity
+                      style={s.modalItem}
+                      onPress={() => {
+                        if (isOther) {
+                          setAmenities(prev => active ? prev.filter(k => k !== a.key) : [...prev, a.key]);
+                        } else {
+                          setAmenities(prev => active ? prev.filter(k => k !== a.key) : [...prev, a.key]);
+                        }
+                      }}
+                    >
+                      <Text style={s.modalItemText}>{a.label}</Text>
+                      <View style={[s.modalCheckbox, active && s.modalCheckboxActive]}>
+                        {active && <Check size={16} color="#fff" />}
+                      </View>
+                    </TouchableOpacity>
+                    {isOther && active && (
+                      <View style={s.customAmenitySection}>
+                        <Text style={s.customAmenityHint}>Ajoutez jusqu&apos;à 6 équipements personnalisés</Text>
+                        <View style={s.customAmenityInputRow}>
+                          <TextInput
+                            style={s.customAmenityInput}
+                            value={customAmenityInput}
+                            onChangeText={setCustomAmenityInput}
+                            placeholder="Nom de l&apos;équipement"
+                            maxLength={30}
+                          />
+                          <TouchableOpacity
+                            style={[s.customAmenityAddBtn, (customAmenities.length >= 6 || !customAmenityInput.trim()) && s.customAmenityAddBtnDisabled]}
+                            disabled={customAmenities.length >= 6 || !customAmenityInput.trim()}
+                            onPress={() => {
+                              if (customAmenityInput.trim() && customAmenities.length < 6) {
+                                setCustomAmenities(prev => [...prev, customAmenityInput.trim()]);
+                                setCustomAmenityInput("");
+                              }
+                            }}
+                          >
+                            <Text style={s.customAmenityAddBtnText}>+</Text>
+                          </TouchableOpacity>
+                        </View>
+                        {customAmenities.length > 0 && (
+                          <View style={s.customAmenitiesList}>
+                            {customAmenities.map((custom, idx) => (
+                              <View key={idx} style={s.customAmenityChip}>
+                                <Text style={s.customAmenityChipText}>{custom}</Text>
+                                <TouchableOpacity
+                                  onPress={() => setCustomAmenities(prev => prev.filter((_, i) => i !== idx))}
+                                >
+                                  <Text style={s.customAmenityRemove}>✕</Text>
+                                </TouchableOpacity>
+                              </View>
+                            ))}
+                          </View>
+                        )}
+                        <Text style={s.customAmenityCount}>{customAmenities.length}/6 équipements ajoutés</Text>
+                      </View>
+                    )}
+                  </View>
                 );
               })}
             </ScrollView>
@@ -844,4 +907,16 @@ const s = StyleSheet.create({
   calendarItemTextActive: { fontWeight: "700", color: "#065f46" },
   calendarConfirm: { marginTop: 16, height: 48, backgroundColor: "#065f46", borderRadius: 12, alignItems: "center", justifyContent: "center" },
   calendarConfirmText: { color: "#fff", fontWeight: "700", fontSize: 16 },
+  customAmenitySection: { paddingHorizontal: 20, paddingVertical: 12, backgroundColor: "#f9fafb" },
+  customAmenityHint: { fontSize: 12, color: "#6b7280", marginBottom: 8 },
+  customAmenityInputRow: { flexDirection: "row", gap: 8, alignItems: "center" },
+  customAmenityInput: { flex: 1, height: 40, borderRadius: 8, borderWidth: 1, borderColor: "#e5e7eb", paddingHorizontal: 10, backgroundColor: "#fff" },
+  customAmenityAddBtn: { width: 40, height: 40, borderRadius: 8, backgroundColor: "#065f46", alignItems: "center", justifyContent: "center" },
+  customAmenityAddBtnDisabled: { backgroundColor: "#d1d5db" },
+  customAmenityAddBtnText: { color: "#fff", fontSize: 20, fontWeight: "700" },
+  customAmenitiesList: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 12 },
+  customAmenityChip: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, backgroundColor: "#d1fae5", borderWidth: 1, borderColor: "#065f46" },
+  customAmenityChipText: { fontSize: 12, fontWeight: "600", color: "#065f46" },
+  customAmenityRemove: { fontSize: 14, color: "#065f46", fontWeight: "700" },
+  customAmenityCount: { fontSize: 12, color: "#6b7280", marginTop: 8 },
 });
