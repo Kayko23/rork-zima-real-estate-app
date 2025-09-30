@@ -177,7 +177,6 @@ export default function ListingForm({
   const [subtype, setSubtype] = useState<string>(categories[0].types[0]);
   const [amenities, setAmenities] = useState<string[]>([]);
   const [yearDate, setYearDate] = useState<string>("");
-  const [charges, setCharges] = useState<string>("");
   const [docType, setDocType] = useState<DocType | null>(null);
   const [docTypeOther, setDocTypeOther] = useState<string>("");
   const [exactAddress, setExactAddress] = useState<string>("");
@@ -288,7 +287,6 @@ export default function ListingForm({
         subtype,
         amenities,
         yearDate,
-        charges,
         docType: docType || "",
         docTypeOther: docType === "autre" ? docTypeOther : "",
         exactAddress,
@@ -309,7 +307,7 @@ export default function ListingForm({
     } finally {
       setSubmitting(false);
     }
-  }, [title, type, price, currency, city, country, surface, beds, baths, photos, cover, rentPeriod, category, subtype, amenities, yearDate, charges, docType, docTypeOther, exactAddress, orientation, landmark, phone, attachments.length, consent, desc, onSubmit]);
+  }, [title, type, price, currency, city, country, surface, beds, baths, photos, cover, rentPeriod, category, subtype, amenities, yearDate, docType, docTypeOther, exactAddress, orientation, landmark, phone, attachments.length, consent, desc, onSubmit]);
 
   const currentTypes = useMemo(() => {
     const found = categories.find(c => c.key === category);
@@ -373,9 +371,6 @@ export default function ListingForm({
           <Input style={s.currency} value={currency} onChangeText={setCurrency} placeholder="Devise" testID="input-currency" />
         </View>
         {!!formattedPrice && <Text style={s.hint}>Aperçu: {formattedPrice}{type === "rent" ? (rentPeriod === "daily" ? " / jour" : " / mois") : ""}</Text>}
-
-        <Text style={s.label}>Charges</Text>
-        <Input value={charges} onChangeText={setCharges} placeholder={type === "rent" ? (rentPeriod === "daily" ? "ex: 5 000 XOF / jour" : "ex: 50 USD / mois") : "ex: 50 USD / mois"} testID="input-charges" />
 
         <Text style={s.label}>Surface / Chambres / SDB</Text>
         <View style={s.row}>
