@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet, Linking, ScrollView } from "react-native";
-import { LifeBuoy, Mail, Phone, HelpCircle, AlertCircle, MessageCircle, FileText } from "lucide-react-native";
+import { Mail, Phone, HelpCircle, AlertCircle, MessageCircle, FileText } from "lucide-react-native";
 import Colors from "@/constants/colors";
 
 export default function HelpScreen() {
@@ -58,9 +58,6 @@ export default function HelpScreen() {
   return (
     <ScrollView style={s.container} contentContainerStyle={s.content}>
       <View style={s.header}>
-        <View style={s.iconWrapper}>
-          <LifeBuoy size={48} color={Colors.primary} />
-        </View>
         <Text style={s.title}>Comment pouvons-nous vous aider ?</Text>
         <Text style={s.desc}>
           Notre équipe est disponible pour répondre à toutes vos questions
@@ -110,31 +107,22 @@ const s = StyleSheet.create({
   },
   header: {
     alignItems: "center",
-    marginBottom: 24,
-    paddingTop: 8,
-  },
-  iconWrapper: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Colors.primary + "15",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 16,
+    marginBottom: 20,
+    paddingTop: 4,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "700" as const,
     color: Colors.text.primary,
-    marginBottom: 8,
+    marginBottom: 10,
     textAlign: "center",
   },
   desc: {
     fontSize: 15,
     color: Colors.text.secondary,
     textAlign: "center",
-    lineHeight: 22,
-    paddingHorizontal: 16,
+    lineHeight: 21,
+    paddingHorizontal: 20,
   },
   optionsContainer: {
     gap: 12,
