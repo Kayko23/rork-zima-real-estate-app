@@ -1,510 +1,228 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
-  Pressable,
   TextInput,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
   Alert,
-  Modal,
-  TouchableOpacity,
 } from 'react-native';
-import { useRouter, useLocalSearchParams, Stack } from 'expo-router';
-import { Calendar, Clock, User, MessageSquare } from 'lucide-react-native';
-import Colors from '@/constants/colors';
+import { Stack, useLocalSearchParams, router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { Clock } from 'lucide-react-native';
 
-type TimeSlot = {
-  id: string;
-  time: string;
-  available: boolean;
-};
+import DateField from '@/components/appointment/DateField';
+import SlotButton from '@/components/appointment/SlotButton';
+import * as api from '@/services/appointments';
 
-const timeSlots: TimeSlot[] = [
-  { id: '1', time: '09:00', available: true },
-  { id: '2', time: '10:00', available: true },
-  { id: '3', time: '11:00', available: false },
-  { id: '4', time: '14:00', available: true },
-  { id: '5', time: '15:00', available: true },
-  { id: '6', time: '16:00', available: true },
-];
+export default function AppointmentScreen() {
+  const {
+    providerId = 'agent-1',
+    name = 'Agent immobilier',
+  } = useLocalSearchParams<{ providerId?: string; name?: string }>();
+  const insets = useSafeAreaInsets();
 
-export default function BookAppointmentScreen() {
-  const router = useRouter();
-  const { agent, property } = useLocalSearchParams<{
-    agent?: string;
-    property?: string;
-  }>();
-  
-  const [selectedDate, setSelectedDate] = useState<string>('');
-  const [selectedTime, setSelectedTime] = useState<string>('');
-  const [message, setMessage] = useState<string>('');
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [calendarVisible, setCalendarVisible] = useState<boolean>(false);
-  const [selectedDay, setSelectedDay] = useState<number>(1);
-  const [selectedMonth, setSelectedMonth] = useState<number>(1);
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
-  
-  const handleSubmit = async () => {
-    if (!selectedDate || !selectedTime) {
-      Alert.alert('Erreur', 'Veuillez sélectionner une date et une heure');
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+  const [date, setDate] = useState(() => {
+    const d = new Date();
+    d.setHours(12, 0, 0, 0);
+    return d;
+  });
+  const [pickedIso, setPickedIso] = useState<string | null>(null);
+  const [note, setNote] = useState('');
+
+  const dateIso = useMemo(() => date.toISOString().slice(0, 10), [date]);
+  const slotsQ = useQuery({
+    queryKey: ['slots', providerId, dateIso],
+    queryFn: () => api.fetchSlots(providerId, dateIso),
+  });
+
+  const book = useMutation({
+    mutationFn: () => {
+      if (!pickedIso) throw new Error('No slot');
+      return api.bookAppointment({
+        providerId,
+        datetimeIso: pickedIso,
+        message: note.trim() || undefined,
+      });
+    },
+    onSuccess: () => {
       Alert.alert(
-        'Rendez-vous demandé',
-        `Votre demande de rendez-vous avec ${agent || 'l\'agent'} a été envoyée. Vous recevrez une confirmation prochainement.`,
-        [
-          {
-            text: 'OK',
-            onPress: () => router.back(),
-          },
-        ]
+        'Demande envoyée',
+        'Votre demande de rendez-vous a bien été transmise.'
       );
-    } catch {
-      Alert.alert('Erreur', 'Une erreur est survenue. Veuillez réessayer.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-  
-  const getTomorrowDate = () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const day = String(tomorrow.getDate()).padStart(2, '0');
-    const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
-    const year = tomorrow.getFullYear();
-    return `${day}-${month}-${year}`;
-  };
-  
+      router.back();
+    },
+    onError: () =>
+      Alert.alert('Erreur', "Impossible d'envoyer la demande. Réessayez."),
+  });
+
+  const localSlots = useMemo(() => {
+    const now = new Date();
+    const isToday = new Date().toDateString() === date.toDateString();
+    return (slotsQ.data ?? []).map((s) => {
+      if (!isToday) return s;
+      const t = new Date(s.iso);
+      const disabledForPast = t.getTime() <= now.getTime();
+      return { ...s, available: s.available && !disabledForPast };
+    });
+  }, [slotsQ.data, date]);
+
+  const canSubmit = !!pickedIso && !book.isPending;
+
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1, backgroundColor: '#F7FAF9' }}>
       <Stack.Screen
         options={{
-          title: 'Prendre rendez-vous',
-          headerStyle: {
-            backgroundColor: Colors.background.primary,
-          },
-          headerTitleStyle: {
-            color: Colors.text.primary,
-          },
+          title: 'Rendez-vous',
+          headerTitleStyle: { fontWeight: '700' as const },
         }}
       />
-      
-      <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={false}>
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <User size={20} color={Colors.primary} />
-            <Text style={styles.sectionTitle}>Agent</Text>
-          </View>
-          <Text style={styles.agentName}>{agent || 'Agent immobilier'}</Text>
-          {property && (
-            <Text style={styles.propertyInfo}>Bien: #{property}</Text>
-          )}
-        </View>
-        
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Calendar size={20} color={Colors.primary} />
-            <Text style={styles.sectionTitle}>Date</Text>
-          </View>
-          <Pressable
-            style={styles.dateInput}
-            onPress={() => setCalendarVisible(true)}
-          >
-            <Text style={selectedDate ? styles.dateText : styles.datePlaceholder}>
-              {selectedDate || "JJ-MM-AAAA"}
-            </Text>
-            <Calendar size={18} color={Colors.text.secondary} />
-          </Pressable>
-          <Pressable
-            style={styles.quickDateButton}
-            onPress={() => setSelectedDate(getTomorrowDate())}
-          >
-            <Text style={styles.quickDateText}>Demain</Text>
-          </Pressable>
-        </View>
-        
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Clock size={20} color={Colors.primary} />
-            <Text style={styles.sectionTitle}>Heure</Text>
-          </View>
-          <View style={styles.timeSlotsGrid}>
-            {timeSlots.map((slot) => (
-              <Pressable
-                key={slot.id}
-                style={[
-                  styles.timeSlot,
-                  !slot.available && styles.timeSlotDisabled,
-                  selectedTime === slot.time && styles.timeSlotSelected,
-                ]}
-                onPress={() => slot.available && setSelectedTime(slot.time)}
-                disabled={!slot.available}
-              >
-                <Text
-                  style={[
-                    styles.timeSlotText,
-                    !slot.available && styles.timeSlotTextDisabled,
-                    selectedTime === slot.time && styles.timeSlotTextSelected,
-                  ]}
-                >
-                  {slot.time}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-        
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <MessageSquare size={20} color={Colors.primary} />
-            <Text style={styles.sectionTitle}>Message (optionnel)</Text>
-          </View>
-          <TextInput
-            style={styles.messageInput}
-            placeholder="Ajoutez un message pour l'agent..."
-            placeholderTextColor={Colors.text.secondary}
-            value={message}
-            onChangeText={setMessage}
-            multiline
-            numberOfLines={4}
-            maxLength={500}
-          />
-        </View>
-      </ScrollView>
-      
-      <View style={styles.footer}>
-        <Pressable
-          style={[
-            styles.submitButton,
-            (!selectedDate || !selectedTime || isSubmitting) && styles.submitButtonDisabled,
-          ]}
-          onPress={handleSubmit}
-          disabled={!selectedDate || !selectedTime || isSubmitting}
-        >
-          <Text style={styles.submitButtonText}>
-            {isSubmitting ? 'Envoi en cours...' : 'Demander le rendez-vous'}
-          </Text>
-        </Pressable>
-      </View>
 
-      <Modal visible={calendarVisible} transparent animationType="slide" onRequestClose={() => setCalendarVisible(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Sélectionner une date</Text>
-              <TouchableOpacity onPress={() => setCalendarVisible(false)}>
-                <Text style={styles.modalClose}>✕</Text>
-              </TouchableOpacity>
+      <KeyboardAvoidingView
+        behavior={Platform.select({ ios: 'padding', android: undefined })}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
+        style={{ flex: 1 }}
+      >
+        <ScrollView
+          contentContainerStyle={{
+            padding: 16,
+            paddingBottom: 24 + 64 + insets.bottom,
+          }}
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={s.sub}>{String(name)}</Text>
+
+          <DateField
+            value={date}
+            onChange={(d) => {
+              setDate(d);
+              setPickedIso(null);
+            }}
+          />
+
+          <Text style={[s.label, { marginTop: 22 }]}>
+            <Clock size={18} color="#0A1F17" /> Heure
+          </Text>
+
+          {slotsQ.isLoading ? (
+            <ActivityIndicator style={{ marginVertical: 16 }} />
+          ) : (
+            <View style={s.grid}>
+              {localSlots.length > 0 ? (
+                localSlots.map((sl) => (
+                  <SlotButton
+                    key={sl.iso}
+                    label={sl.label}
+                    disabled={!sl.available}
+                    selected={pickedIso === sl.iso}
+                    onPress={() => setPickedIso(sl.iso)}
+                  />
+                ))
+              ) : (
+                <Text style={{ color: '#6D7A75', marginTop: 8 }}>
+                  Aucun créneau disponible pour cette date.
+                </Text>
+              )}
             </View>
-            <View style={styles.calendarContainer}>
-              <View style={styles.calendarRow}>
-                <View style={styles.calendarColumn}>
-                  <Text style={styles.calendarLabel}>Jour</Text>
-                  <ScrollView style={styles.calendarScroll} showsVerticalScrollIndicator={false}>
-                    {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
-                      <TouchableOpacity
-                        key={day}
-                        style={[styles.calendarItem, selectedDay === day && styles.calendarItemActive]}
-                        onPress={() => setSelectedDay(day)}
-                      >
-                        <Text style={[styles.calendarItemText, selectedDay === day && styles.calendarItemTextActive]}>
-                          {String(day).padStart(2, '0')}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-                <View style={styles.calendarColumn}>
-                  <Text style={styles.calendarLabel}>Mois</Text>
-                  <ScrollView style={styles.calendarScroll} showsVerticalScrollIndicator={false}>
-                    {[
-                      { num: 1, name: 'Janvier' },
-                      { num: 2, name: 'Février' },
-                      { num: 3, name: 'Mars' },
-                      { num: 4, name: 'Avril' },
-                      { num: 5, name: 'Mai' },
-                      { num: 6, name: 'Juin' },
-                      { num: 7, name: 'Juillet' },
-                      { num: 8, name: 'Août' },
-                      { num: 9, name: 'Septembre' },
-                      { num: 10, name: 'Octobre' },
-                      { num: 11, name: 'Novembre' },
-                      { num: 12, name: 'Décembre' },
-                    ].map(month => (
-                      <TouchableOpacity
-                        key={month.num}
-                        style={[styles.calendarItem, selectedMonth === month.num && styles.calendarItemActive]}
-                        onPress={() => setSelectedMonth(month.num)}
-                      >
-                        <Text style={[styles.calendarItemText, selectedMonth === month.num && styles.calendarItemTextActive]}>
-                          {month.name}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-                <View style={styles.calendarColumn}>
-                  <Text style={styles.calendarLabel}>Année</Text>
-                  <ScrollView style={styles.calendarScroll} showsVerticalScrollIndicator={false}>
-                    {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map(year => (
-                      <TouchableOpacity
-                        key={year}
-                        style={[styles.calendarItem, selectedYear === year && styles.calendarItemActive]}
-                        onPress={() => setSelectedYear(year)}
-                      >
-                        <Text style={[styles.calendarItemText, selectedYear === year && styles.calendarItemTextActive]}>
-                          {year}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-              </View>
-              <TouchableOpacity
-                style={styles.calendarConfirm}
-                onPress={() => {
-                  const formatted = `${String(selectedDay).padStart(2, '0')}-${String(selectedMonth).padStart(2, '0')}-${selectedYear}`;
-                  setSelectedDate(formatted);
-                  setCalendarVisible(false);
-                }}
-              >
-                <Text style={styles.calendarConfirmText}>Confirmer</Text>
-              </TouchableOpacity>
-            </View>
+          )}
+
+          <Text style={[s.label, { marginTop: 10 }]}>Message (optionnel)</Text>
+          <TextInput
+            style={s.note}
+            placeholder="Ajoutez un message pour l'agent…"
+            placeholderTextColor="#9AA6A1"
+            value={note}
+            onChangeText={setNote}
+            multiline
+          />
+        </ScrollView>
+
+        <View
+          style={[s.ctaWrap, { paddingBottom: Math.max(insets.bottom, 12) }]}
+        >
+          <Text style={s.summary}>
+            {pickedIso
+              ? formatSummary(pickedIso)
+              : 'Sélectionnez une date et une heure'}
+          </Text>
+          <View
+            style={[s.cta, !canSubmit && { backgroundColor: '#A9B7B1' }]}
+            accessibilityRole="button"
+            accessibilityState={{ disabled: !canSubmit }}
+            onTouchEnd={() => {
+              if (canSubmit) book.mutate();
+            }}
+          >
+            <Text style={s.ctaTxt}>
+              {book.isPending ? 'Envoi…' : 'Demander le rendez-vous'}
+            </Text>
           </View>
         </View>
-      </Modal>
+      </KeyboardAvoidingView>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background.secondary,
-  },
-  content: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: 16,
-    paddingTop: 24,
-    paddingBottom: 100,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
-  },
-  sectionTitle: {
+function formatSummary(iso: string) {
+  const d = new Date(iso);
+  const dd = new Intl.DateTimeFormat('fr-FR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+  }).format(d);
+  const hh = new Intl.DateTimeFormat('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(d);
+  return `${dd} • ${hh}`;
+}
+
+const s = StyleSheet.create({
+  sub: { color: '#6D7A75', marginBottom: 6, fontSize: 14 },
+  label: {
     fontSize: 18,
-    fontWeight: '600',
-    color: Colors.text.primary,
-  },
-  agentName: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: Colors.text.primary,
-    marginBottom: 4,
-  },
-  propertyInfo: {
-    fontSize: 14,
-    color: Colors.text.secondary,
-  },
-  dateInput: {
-    backgroundColor: Colors.background.primary,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: Colors.text.primary,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
+    fontWeight: '700' as const,
+    color: '#0A1F17',
+    marginBottom: 10,
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
   },
-  dateText: {
-    color: Colors.text.primary,
-    fontSize: 16,
-  },
-  datePlaceholder: {
-    color: Colors.text.secondary,
-    fontSize: 16,
-  },
-  quickDateButton: {
-    alignSelf: 'flex-start',
-    marginTop: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: Colors.primary,
-    borderRadius: 8,
-  },
-  quickDateText: {
-    color: Colors.background.primary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  timeSlotsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  timeSlot: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: Colors.background.primary,
+  grid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 2 },
+  note: {
+    minHeight: 110,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: Colors.border.light,
-    minWidth: 80,
-    alignItems: 'center',
-  },
-  timeSlotSelected: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
-  timeSlotDisabled: {
-    backgroundColor: Colors.background.secondary,
-    borderColor: Colors.border.light,
-    opacity: 0.5,
-  },
-  timeSlotText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.text.primary,
-  },
-  timeSlotTextSelected: {
-    color: Colors.background.primary,
-  },
-  timeSlotTextDisabled: {
-    color: Colors.text.secondary,
-  },
-  messageInput: {
-    backgroundColor: Colors.background.primary,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: Colors.text.primary,
-    borderWidth: 1,
-    borderColor: Colors.border.light,
-    textAlignVertical: 'top',
-    minHeight: 100,
-  },
-  footer: {
-    padding: 16,
-    backgroundColor: Colors.background.primary,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border.light,
-  },
-  submitButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  submitButtonDisabled: {
-    backgroundColor: Colors.text.secondary,
-    opacity: 0.6,
-  },
-  submitButtonText: {
-    color: Colors.background.primary,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
+    borderColor: '#DCE4E0',
     backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '70%',
-    paddingBottom: 20,
+    padding: 14,
+    fontSize: 16,
+    color: '#0A1F17',
   },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+  ctaWrap: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: 16,
+    backgroundColor: '#F7FAF9',
+    borderTopColor: '#E6ECEF',
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: '800',
-  },
-  modalClose: {
-    fontSize: 24,
-    color: '#6b7280',
-  },
-  calendarContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
-  calendarRow: {
-    flexDirection: 'row',
-    gap: 12,
-    height: 300,
-  },
-  calendarColumn: {
-    flex: 1,
-  },
-  calendarLabel: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#1f2937',
-    marginBottom: 8,
+  summary: {
     textAlign: 'center',
+    color: '#0A1F17',
+    marginBottom: 8,
+    fontWeight: '600' as const,
   },
-  calendarScroll: {
-    flex: 1,
-  },
-  calendarItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    alignItems: 'center',
-    borderRadius: 8,
-    marginBottom: 4,
-  },
-  calendarItemActive: {
-    backgroundColor: '#f0fdf4',
-  },
-  calendarItemText: {
-    fontSize: 15,
-    color: '#1f2937',
-  },
-  calendarItemTextActive: {
-    fontWeight: '700',
-    color: '#065f46',
-  },
-  calendarConfirm: {
-    marginTop: 16,
-    height: 48,
-    backgroundColor: '#065f46',
-    borderRadius: 12,
+  cta: {
+    height: 52,
+    borderRadius: 14,
+    backgroundColor: '#0E5A44',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  calendarConfirmText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 16,
-  },
+  ctaTxt: { color: '#fff', fontSize: 16, fontWeight: '700' as const },
 });
