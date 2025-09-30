@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Image, KeyboardAvoidingView, Platform, Modal, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Image, KeyboardAvoidingView, Platform, Modal, TouchableOpacity, Keyboard } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { Save, MapPin, Check, FilePlus, ChevronDown } from "lucide-react-native";
+import { Save, MapPin, Check, FilePlus, ChevronDown, ChevronDown as KeyboardHide } from "lucide-react-native";
 import { Listing, ListingType, RentPeriod } from "@/services/annonces.api";
 import CountryPickerSheet from "@/components/search/CountryPickerSheet";
 import CityPickerSheet from "@/components/search/CityPickerSheet";
@@ -318,6 +318,12 @@ export default function ListingForm({
 
   return (
     <KeyboardAvoidingView style={s.container} behavior={Platform.OS === "ios" ? "padding" : "height"} testID="listingForm-root">
+      <Pressable
+        style={s.keyboardDismiss}
+        onPress={() => Keyboard.dismiss()}
+      >
+        <KeyboardHide size={20} color="#6b7280" />
+      </Pressable>
       <ScrollView contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <Text style={s.section}>Médias</Text>
         <View style={s.row}>
@@ -715,4 +721,21 @@ const s = StyleSheet.create({
   modalItemTextActive: { fontWeight: "700", color: "#065f46" },
   modalCheckbox: { width: 24, height: 24, borderRadius: 6, borderWidth: 1, borderColor: "#e5e7eb", alignItems: "center", justifyContent: "center", backgroundColor: "#fff" },
   modalCheckboxActive: { backgroundColor: "#065f46", borderColor: "#065f46" },
+  keyboardDismiss: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    zIndex: 1000,
+  },
 });
