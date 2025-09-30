@@ -60,12 +60,14 @@ export default function PropertyCard({ property, onPress, onToggleFavorite, widt
           style={styles.favoriteButton} 
           onPress={handleToggleFavorite}
           testID="favorite-button"
-          activeOpacity={0.8}
+          activeOpacity={0.7}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           <Heart 
-            size={18} 
+            size={20} 
             color={isFav ? Colors.error : 'white'}
             fill={isFav ? Colors.error : 'transparent'}
+            strokeWidth={2}
           />
         </TouchableOpacity>
         
@@ -186,15 +188,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 16,
     right: 16,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.35)',
-    // Removed backdropFilter for web compatibility
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.5)',
+    zIndex: 10,
   },
   bottomOverlay: {
     position: 'absolute',
