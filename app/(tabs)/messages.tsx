@@ -44,10 +44,17 @@ export default function MessagesScreen() {
     }
   };
 
-  const handleConversationPress = (conversation: { id: string; participants: Array<{ name: string }> }) => {
+  const handleConversationPress = (conversation: { id: string; participants: Array<{ name: string; avatar: string }> }) => {
     if (conversation && conversation.id && conversation.id.trim()) {
       console.log('Opening conversation:', conversation.id);
-      router.push(`/chat/${conversation.id}` as any);
+      const participant = conversation.participants[0];
+      router.push({
+        pathname: `/chat/${conversation.id}`,
+        params: {
+          name: participant.name,
+          avatar: participant.avatar,
+        }
+      } as any);
     }
   };
 

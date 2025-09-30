@@ -64,8 +64,14 @@ export default function MessagesScreen() {
     return true;
   });
 
-  const handleConversationPress = (conversationId: string) => {
-    router.push(`/chat/${conversationId}`);
+  const handleConversationPress = (conversation: Conversation) => {
+    router.push({
+      pathname: `/chat/${conversation.id}`,
+      params: {
+        name: conversation.clientName,
+        avatar: conversation.clientAvatar,
+      }
+    } as any);
   };
 
   const handleCallPress = (conversationId: string) => {
@@ -121,7 +127,7 @@ export default function MessagesScreen() {
             <TouchableOpacity
               key={conversation.id}
               style={styles.conversationCard}
-              onPress={() => handleConversationPress(conversation.id)}
+              onPress={() => handleConversationPress(conversation)}
             >
               <View style={styles.conversationHeader}>
                 <View style={styles.avatarContainer}>

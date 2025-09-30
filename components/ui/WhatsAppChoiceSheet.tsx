@@ -35,7 +35,12 @@ export default function WhatsAppChoiceSheet({
   const handleZiMessagePress = () => {
     onClose();
     const conversationId = `conv-${providerId}`;
-    router.push(`/chat/${conversationId}` as any);
+    router.push({
+      pathname: `/chat/${conversationId}`,
+      params: {
+        name: providerName,
+      }
+    } as any);
   };
 
   return (
