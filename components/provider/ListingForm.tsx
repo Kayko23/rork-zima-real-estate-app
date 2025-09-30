@@ -189,6 +189,7 @@ export default function ListingForm({
   const [subtypePickerVisible, setSubtypePickerVisible] = useState<boolean>(false);
   const [amenitiesPickerVisible, setAmenitiesPickerVisible] = useState<boolean>(false);
   const [categoryPickerVisible, setCategoryPickerVisible] = useState<boolean>(false);
+  const [docTypePickerVisible, setDocTypePickerVisible] = useState<boolean>(false);
 
   useEffect(() => {
     if (countryCode) {
@@ -411,13 +412,10 @@ export default function ListingForm({
         {yearDate && !validateDate(yearDate) && <Text style={s.error}>Format requis: JJ-MM-AAAA (ex: 15-03-2020)</Text>}
 
         <Text style={s.label}>Type de document</Text>
-        <View style={s.rowWrap}>
-          {docOptions.map(d => (
-            <Pressable key={d.key} onPress={() => setDocType(d.key)} style={[s.chip, docType === d.key && s.chipActive]} testID={`doc-${d.key}`}>
-              <Text style={[s.chipTxt, docType === d.key && s.chipTxtActive]}>{d.label}</Text>
-            </Pressable>
-          ))}
-        </View>
+        <Pressable style={s.pickerButton} onPress={() => setDocTypePickerVisible(true)} testID="picker-doctype">
+          <Text style={s.pickerButtonText}>{docType ? docOptions.find(d => d.key === docType)?.label || "Sélectionner un type" : "Sélectionner un type"}</Text>
+          <ChevronDown size={20} color="#6b7280" />
+        </Pressable>
         {docType === "autre" && (
           <Input value={docTypeOther} onChangeText={setDocTypeOther} placeholder="Préciser le type de document" testID="input-doc-other" />
         )}
@@ -568,6 +566,34 @@ export default function ListingForm({
                 >
                   <Text style={[s.modalItemText, category === c.key && s.modalItemTextActive]}>{c.label}</Text>
                   {category === c.key && <Check size={20} color="#065f46" />}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={docTypePickerVisible} transparent animationType="slide" onRequestClose={() => setDocTypePickerVisible(false)}>
+        <View style={s.modalOverlay}>
+          <View style={s.modalContent}>
+            <View style={s.modalHeader}>
+              <Text style={s.modalTitle}>Type de document</Text>
+              <TouchableOpacity onPress={() => setDocTypePickerVisible(false)}>
+                <Text style={s.modalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={s.modalScroll}>
+              {docOptions.map(d => (
+                <TouchableOpacity
+                  key={d.key}
+                  style={[s.modalItem, docType === d.key && s.modalItemActive]}
+                  onPress={() => {
+                    setDocType(d.key);
+                    setDocTypePickerVisible(false);
+                  }}
+                >
+                  <Text style={[s.modalItemText, docType === d.key && s.modalItemTextActive]}>{d.label}</Text>
+                  {docType === d.key && <Check size={20} color="#065f46" />}
                 </TouchableOpacity>
               ))}
             </ScrollView>
