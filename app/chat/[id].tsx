@@ -5,8 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ChatHeader from '@/components/chat/ChatHeader';
 import MessageBubble, { BubbleMessage } from '@/components/chat/MessageBubble';
 import ChatInput from '@/components/chat/Composer';
-import QuickReplyBar from '@/components/chat/QuickReplyBar';
-import { useQuickReplies } from '@/hooks/useQuickReplies';
+
 
 type Message = {
   id: string;
@@ -33,14 +32,7 @@ export default function ChatScreen() {
   const myId = 'u_me' as const;
   const peerId = id || 'u_2' as const;
   
-  const { replies, remember } = useQuickReplies({
-    role: 'client',
-    ctx: context || 'property',
-    locale: 'fr',
-    listingTitle: listingTitle,
-    hasAppointment: false,
-    hasDocs: false,
-  });
+
   
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -89,7 +81,6 @@ export default function ChatScreen() {
     };
     
     setMessages(prev => [...prev, newMessage]);
-    remember(text);
     
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -143,11 +134,6 @@ export default function ChatScreen() {
             backgroundColor: '#F7F9FA',
           }}
           renderItem={({ item }) => <MessageBubble message={item} />}
-        />
-
-        <QuickReplyBar
-          replies={replies}
-          onPick={(text) => sendMessage(text)}
         />
 
         <ChatInput
