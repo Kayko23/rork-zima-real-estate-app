@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Image, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, Image, KeyboardAvoidingView, Platform, Modal, TouchableOpacity } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { Save, MapPin, Check, FilePlus } from "lucide-react-native";
+import { Save, MapPin, Check, FilePlus, ChevronDown } from "lucide-react-native";
 import { Listing, ListingType, RentPeriod } from "@/services/annonces.api";
 import CountryPickerSheet from "@/components/search/CountryPickerSheet";
 import CityPickerSheet from "@/components/search/CityPickerSheet";
@@ -186,6 +186,8 @@ export default function ListingForm({
   const [phone, setPhone] = useState<string>("");
   const [consent, setConsent] = useState<boolean>(false);
   const [attachments, setAttachments] = useState<{ uri: string; name: string; type: string }[]>([]);
+  const [subtypePickerVisible, setSubtypePickerVisible] = useState<boolean>(false);
+  const [amenitiesPickerVisible, setAmenitiesPickerVisible] = useState<boolean>(false);
 
   useEffect(() => {
     if (countryCode) {
@@ -350,11 +352,10 @@ export default function ListingForm({
         </View>
 
         <Text style={s.label}>Type de bien</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.horizontalChips}>
-          {currentTypes.map(t => (
-            <Seg key={t} active={subtype === t} onPress={() => setSubtype(t)} label={t} />
-          ))}
-        </ScrollView>
+        <Pressable style={s.pickerButton} onPress={() => setSubtypePickerVisible(true)} testID="picker-subtype">
+          <Text style={s.pickerButtonText}>{subtype || "Sélectionner un type"}</Text>
+          <ChevronDown size={20} color="#6b7280" />
+        </Pressable>
 
         <Text style={s.label}>Transaction</Text>
         <View style={s.segmentRow}>
@@ -386,16 +387,24 @@ export default function ListingForm({
         </View>
 
         <Text style={s.label}>Point fort (équipements)</Text>
-        <View style={s.rowWrap}>
-          {availableAmenities.map(a => {
-            const active = amenities.includes(a.key);
-            return (
-              <Pressable key={a.key} onPress={() => setAmenities(prev => active ? prev.filter(k => k !== a.key) : [...prev, a.key])} style={[s.chip, active && s.chipActive]} testID={`amenity-${a.key}`}>
-                <Text style={[s.chipTxt, active && s.chipTxtActive]}>{a.label}</Text>
-              </Pressable>
-            );
-          })}
-        </View>
+        <Pressable style={s.pickerButton} onPress={() => setAmenitiesPickerVisible(true)} testID="picker-amenities">
+          <Text style={s.pickerButtonText}>
+            {amenities.length > 0 ? `${amenities.length} équipement(s) sélectionné(s)` : "Sélectionner des équipements"}
+          </Text>
+          <ChevronDown size={20} color="#6b7280" />
+        </Pressable>
+        {amenities.length > 0 && (
+          <View style={s.selectedAmenities}>
+            {amenities.map(k => {
+              const found = availableAmenities.find(a => a.key === k);
+              return found ? (
+                <View key={k} style={s.selectedChip}>
+                  <Text style={s.selectedChipText}>{found.label}</Text>
+                </View>
+              ) : null;
+            })}
+          </View>
+        )}
 
         <Text style={s.label}>Année de construction/certification (JJ-MM-AAAA)</Text>
         <Input value={yearDate} onChangeText={setYearDate} placeholder="ex: 15-03-2020" keyboardType="numbers-and-punctuation" testID="input-yeardate" />
@@ -477,6 +486,64 @@ export default function ListingForm({
           setCityVisible(false);
         }}
       />
+
+      <Modal visible={subtypePickerVisible} transparent animationType="slide" onRequestClose={() => setSubtypePickerVisible(false)}>
+        <View style={s.modalOverlay}>
+          <View style={s.modalContent}>
+            <View style={s.modalHeader}>
+              <Text style={s.modalTitle}>Type de bien</Text>
+              <TouchableOpacity onPress={() => setSubtypePickerVisible(false)}>
+                <Text style={s.modalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={s.modalScroll}>
+              {currentTypes.map(t => (
+                <TouchableOpacity
+                  key={t}
+                  style={[s.modalItem, subtype === t && s.modalItemActive]}
+                  onPress={() => {
+                    setSubtype(t);
+                    setSubtypePickerVisible(false);
+                  }}
+                >
+                  <Text style={[s.modalItemText, subtype === t && s.modalItemTextActive]}>{t}</Text>
+                  {subtype === t && <Check size={20} color="#065f46" />}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={amenitiesPickerVisible} transparent animationType="slide" onRequestClose={() => setAmenitiesPickerVisible(false)}>
+        <View style={s.modalOverlay}>
+          <View style={s.modalContent}>
+            <View style={s.modalHeader}>
+              <Text style={s.modalTitle}>Équipements</Text>
+              <TouchableOpacity onPress={() => setAmenitiesPickerVisible(false)}>
+                <Text style={s.modalDone}>Terminé</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={s.modalScroll}>
+              {availableAmenities.map(a => {
+                const active = amenities.includes(a.key);
+                return (
+                  <TouchableOpacity
+                    key={a.key}
+                    style={s.modalItem}
+                    onPress={() => setAmenities(prev => active ? prev.filter(k => k !== a.key) : [...prev, a.key])}
+                  >
+                    <Text style={s.modalItemText}>{a.label}</Text>
+                    <View style={[s.modalCheckbox, active && s.modalCheckboxActive]}>
+                      {active && <Check size={16} color="#fff" />}
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -535,4 +602,22 @@ const s = StyleSheet.create({
   ctaDisabled: { opacity: 0.6 },
   ctaTxt: { color: "#fff", fontWeight: "800" },
   error: { color: "#b91c1c", marginTop: 6, fontWeight: "700" },
+  pickerButton: { height: 48, borderRadius: 12, borderWidth: 1, borderColor: "#e5e7eb", paddingHorizontal: 12, backgroundColor: "#fff", flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  pickerButtonText: { flex: 1, color: "#1f2937" },
+  selectedAmenities: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
+  selectedChip: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, backgroundColor: "#d1fae5", borderWidth: 1, borderColor: "#065f46" },
+  selectedChipText: { fontSize: 12, fontWeight: "600", color: "#065f46" },
+  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
+  modalContent: { backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: "70%", paddingBottom: 20 },
+  modalHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: "#e5e7eb" },
+  modalTitle: { fontSize: 18, fontWeight: "800" },
+  modalClose: { fontSize: 24, color: "#6b7280" },
+  modalDone: { fontSize: 16, fontWeight: "700", color: "#065f46" },
+  modalScroll: { maxHeight: 400 },
+  modalItem: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: "#f3f4f6" },
+  modalItemActive: { backgroundColor: "#f0fdf4" },
+  modalItemText: { fontSize: 16, color: "#1f2937" },
+  modalItemTextActive: { fontWeight: "700", color: "#065f46" },
+  modalCheckbox: { width: 24, height: 24, borderRadius: 6, borderWidth: 1, borderColor: "#e5e7eb", alignItems: "center", justifyContent: "center", backgroundColor: "#fff" },
+  modalCheckboxActive: { backgroundColor: "#065f46", borderColor: "#065f46" },
 });
