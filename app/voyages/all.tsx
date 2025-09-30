@@ -1,22 +1,23 @@
 import React from "react";
 import { View, FlatList, StyleSheet } from "react-native";
 import { Stack, router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useContentInsets } from "@/hooks/useContentInsets";
 import VoyageCard from "@/components/voyages/VoyageCard";
 import { useTrips } from "@/hooks/useTrips";
 import SkeletonLine from "@/components/ui/SkeletonLine";
 
 export default function AllTripsScreen() {
   const { items, loading, loadMore, refresh } = useTrips("all");
+  const { top, bottom } = useContentInsets();
 
   return (
-    <SafeAreaView style={s.screen}>
+    <View style={[s.screen, { paddingTop: top }]}>
       <Stack.Screen options={{ title: "Tous les logements", headerShadowVisible:false }} />
 
       <FlatList
         data={items}
         keyExtractor={(it)=>it.id}
-        contentContainerStyle={s.listContent}
+        contentContainerStyle={[s.listContent, { paddingBottom: bottom }]}
         renderItem={({item})=> (
           <View style={s.cardWrap}>
             <VoyageCard item={item} onPress={()=>router.push(`/trip/${item.id}` as const)} />
@@ -28,7 +29,7 @@ export default function AllTripsScreen() {
         onRefresh={refresh}
         ListFooterComponent={()=>(loading ? <SkeletonLine height={100} radius={14}/> : null)}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 

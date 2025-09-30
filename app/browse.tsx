@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useContentInsets } from "@/hooks/useContentInsets";
 import PropertyCard from "@/components/ui/PropertyCard";
 import BackButton from "@/components/ui/BackButton";
 import Filters, { FiltersState } from "@/components/ui/Filters";
@@ -9,7 +9,7 @@ import { mockProperties } from "@/constants/data";
 import Colors from "@/constants/colors";
 
 export default function BrowseScreen() {
-  const insets = useSafeAreaInsets();
+  const { top, bottom } = useContentInsets();
   const router = useRouter();
   const { title = "Tous les biens", kind = "all" } = useLocalSearchParams<{
     title?: string;
@@ -107,7 +107,7 @@ export default function BrowseScreen() {
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: top }]}>
       <BackButton />
       <View style={styles.header}>
         <Text style={styles.title}>{title}</Text>
@@ -122,7 +122,7 @@ export default function BrowseScreen() {
         data={filteredData}
         renderItem={renderProperty}
         keyExtractor={(item) => `browse-${item.id}`}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: bottom }]}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListEmptyComponent={() => (
@@ -163,7 +163,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: 16,
-    paddingBottom: 100,
   },
   separator: {
     height: 16,

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Pressable, Image } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useContentInsets } from '@/hooks/useContentInsets';
 import { Search as SearchIcon, ChevronRight } from 'lucide-react-native';
 import SmartSearchBar from '@/components/search/SmartSearchBar';
 import CountryPickerSheet from '@/components/search/CountryPickerSheet';
@@ -79,14 +79,14 @@ const TRIP_CATEGORIES: CategoryItem[] = [
 ];
 
 export default function SearchTab(): React.ReactElement {
-  const insets = useSafeAreaInsets();
+  const { top, bottom } = useContentInsets();
   const [activeDomain, setActiveDomain] = useState<'property' | 'trip'>('property');
   const [country, setCountry] = useState<Country | null>(null);
   const [city, setCity] = useState<City | null>(null);
   const [showCountry, setShowCountry] = useState<boolean>(false);
   const [showCity, setShowCity] = useState<boolean>(false);
 
-  const headerBottom = insets.top + 12;
+  const headerBottom = top + 12;
 
   const categories: CategoryItem[] = useMemo(
     () => (activeDomain === 'property' ? PROPERTY_CATEGORIES : TRIP_CATEGORIES),
@@ -95,7 +95,7 @@ export default function SearchTab(): React.ReactElement {
 
   return (
     <View style={s.container} testID="search-tab">
-      <ScrollView contentContainerStyle={s.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[s.scrollContent, { paddingBottom: bottom }]} showsVerticalScrollIndicator={false}>
         <View style={[s.screenPadding, s.screenTopPadding, { paddingTop: headerBottom }]}>
           <Text style={s.title}>Recherche par catégorie</Text>
 
@@ -226,7 +226,7 @@ const s = StyleSheet.create({
     color: '#0B1D17',
   },
   sectionSub: { color: '#5B6A73', marginTop: 2 },
-  scrollContent: { paddingBottom: 28 },
+  scrollContent: {},
   screenTopPadding: {},
   catList: { gap: 12, marginTop: 12 },
   catCard: {

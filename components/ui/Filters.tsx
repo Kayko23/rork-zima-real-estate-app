@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from "react";
-import { View, Text, StyleSheet, Pressable, Modal, FlatList, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Pressable, FlatList } from "react-native";
 import { ChevronDown, MapPin, Globe, Filter } from "lucide-react-native";
 import { getAllCountries, getCitiesByCountryName } from "@/constants/countries";
 import { GlassButton } from "./Glass";
+import FilterSheet from "@/components/sheets/FilterSheet";
 
 export type FiltersState = {
   country: string | null;
@@ -51,22 +52,15 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
       </Pressable>
 
       {/* Modal des filtres */}
-      <Modal
-        visible={showFilters}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowFilters(false)}
-      >
-        <View style={s.modalBackdrop}>
-          <View style={s.filterModal}>
-            <View style={s.modalHeader}>
-              <Text style={s.modalTitle}>Filtres</Text>
-              <Pressable onPress={() => setShowFilters(false)}>
-                <Text style={s.closeButton}>✕</Text>
-              </Pressable>
-            </View>
+      <FilterSheet visible={showFilters} onClose={() => setShowFilters(false)}>
+        <View style={s.modalHeader}>
+          <Text style={s.modalTitle}>Filtres</Text>
+          <Pressable onPress={() => setShowFilters(false)}>
+            <Text style={s.closeButton}>✕</Text>
+          </Pressable>
+        </View>
 
-            <ScrollView style={s.modalContent} showsVerticalScrollIndicator={false}>
+        <View style={s.modalContent}>
               {/* Filtres de localisation */}
               <View style={s.section}>
                 <Text style={s.sectionLabel}>Localisation</Text>
@@ -107,76 +101,56 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
                 </View>
               </View>
               
-              <View style={s.buttonContainer}>
-                <GlassButton 
-                  title="Appliquer" 
-                  onPress={() => {
-                    applyFilters();
-                    setShowFilters(false);
-                  }} 
-                  style={s.applyButton} 
-                />
-              </View>
-            </ScrollView>
+          <View style={s.buttonContainer}>
+            <GlassButton 
+              title="Appliquer" 
+              onPress={() => {
+                applyFilters();
+                setShowFilters(false);
+              }} 
+              style={s.applyButton} 
+            />
           </View>
         </View>
-      </Modal>
+      </FilterSheet>
 
       {/* Modal Pays */}
-      <Modal
-        visible={showCountryModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowCountryModal(false)}
-      >
-        <View style={s.modalBackdrop}>
-          <View style={s.pickerModal}>
-            <Text style={s.pickerTitle}>Choisir un pays</Text>
-            <FlatList
-              data={[{ label: "Tous les pays", value: null }, ...getAllCountries().map(c => ({ label: c.name, value: c.name }))]}
-              keyExtractor={(item) => item.value || "all"}
-              renderItem={({ item }) => (
-                <Pressable
-                  style={[s.modalItem, f.country === item.value && s.modalItemSelected]}
-                  onPress={() => handleCountryChange(item.value)}
-                >
-                  <Text style={[s.modalItemText, f.country === item.value && s.modalItemTextSelected]}>
-                    {item.label}
-                  </Text>
-                </Pressable>
-              )}
-            />
-          </View>
-        </View>
-      </Modal>
+      <FilterSheet visible={showCountryModal} onClose={() => setShowCountryModal(false)}>
+        <Text style={s.pickerTitle}>Choisir un pays</Text>
+        <FlatList
+          data={[{ label: "Tous les pays", value: null }, ...getAllCountries().map(c => ({ label: c.name, value: c.name }))]}
+          keyExtractor={(item) => item.value || "all"}
+          renderItem={({ item }) => (
+            <Pressable
+              style={[s.modalItem, f.country === item.value && s.modalItemSelected]}
+              onPress={() => handleCountryChange(item.value)}
+            >
+              <Text style={[s.modalItemText, f.country === item.value && s.modalItemTextSelected]}>
+                {item.label}
+              </Text>
+            </Pressable>
+          )}
+        />
+      </FilterSheet>
 
       {/* Modal Ville */}
-      <Modal
-        visible={showCityModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowCityModal(false)}
-      >
-        <View style={s.modalBackdrop}>
-          <View style={s.pickerModal}>
-            <Text style={s.pickerTitle}>Choisir une ville</Text>
-            <FlatList
-              data={[{ label: "Toutes les villes", value: null }, ...cities.map(c => ({ label: c, value: c }))]}
-              keyExtractor={(item) => item.value || "all"}
-              renderItem={({ item }) => (
-                <Pressable
-                  style={[s.modalItem, f.city === item.value && s.modalItemSelected]}
-                  onPress={() => handleCityChange(item.value)}
-                >
-                  <Text style={[s.modalItemText, f.city === item.value && s.modalItemTextSelected]}>
-                    {item.label}
-                  </Text>
-                </Pressable>
-              )}
-            />
-          </View>
-        </View>
-      </Modal>
+      <FilterSheet visible={showCityModal} onClose={() => setShowCityModal(false)}>
+        <Text style={s.pickerTitle}>Choisir une ville</Text>
+        <FlatList
+          data={[{ label: "Toutes les villes", value: null }, ...cities.map(c => ({ label: c, value: c }))]}
+          keyExtractor={(item) => item.value || "all"}
+          renderItem={({ item }) => (
+            <Pressable
+              style={[s.modalItem, f.city === item.value && s.modalItemSelected]}
+              onPress={() => handleCityChange(item.value)}
+            >
+              <Text style={[s.modalItemText, f.city === item.value && s.modalItemTextSelected]}>
+                {item.label}
+              </Text>
+            </Pressable>
+          )}
+        />
+      </FilterSheet>
     </>
   );
 }
@@ -213,13 +187,7 @@ const s = StyleSheet.create({
   filterBadgeText: {
     fontSize: 0
   },
-  filterModal: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: "80%",
-    paddingTop: 20
-  },
+
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -240,8 +208,7 @@ const s = StyleSheet.create({
     padding: 4
   },
   modalContent: {
-    flex: 1,
-    padding: 20
+    paddingVertical: 20
   },
   buttonContainer: {
     paddingVertical: 20
@@ -310,24 +277,13 @@ const s = StyleSheet.create({
   applyButton: { 
     marginTop: 4 
   },
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "flex-end"
-  },
-  pickerModal: {
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: "70%",
-    paddingTop: 20
-  },
   pickerTitle: {
     fontSize: 18,
     fontWeight: "700",
     color: "#0F172A",
     textAlign: "center",
-    marginBottom: 20
+    marginBottom: 20,
+    marginTop: 10
   },
   modalItem: {
     paddingHorizontal: 20,
