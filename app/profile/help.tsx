@@ -1,19 +1,10 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet, Linking, ScrollView } from "react-native";
-import { LifeBuoy, Mail, MessageCircle, Phone, HelpCircle, AlertCircle } from "lucide-react-native";
-import { router } from "expo-router";
+import { LifeBuoy, Mail, Phone, HelpCircle, AlertCircle } from "lucide-react-native";
 import Colors from "@/constants/colors";
 
 export default function HelpScreen() {
   const supportOptions = [
-    {
-      id: "center",
-      title: "Centre d'aide",
-      description: "Accédez à toutes les ressources d'aide",
-      icon: MessageCircle,
-      color: Colors.primary,
-      action: () => router.push("/support"),
-    },
     {
       id: "email",
       title: "Email",
