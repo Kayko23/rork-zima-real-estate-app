@@ -296,6 +296,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 16,
+    paddingTop: 24,
     paddingBottom: 100,
   },
   section: {
