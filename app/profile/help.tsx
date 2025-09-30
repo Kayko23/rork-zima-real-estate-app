@@ -1,10 +1,18 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet, Linking, ScrollView } from "react-native";
-import { LifeBuoy, Mail, Phone, HelpCircle, AlertCircle } from "lucide-react-native";
+import { LifeBuoy, Mail, Phone, HelpCircle, AlertCircle, MessageCircle, FileText } from "lucide-react-native";
 import Colors from "@/constants/colors";
 
 export default function HelpScreen() {
   const supportOptions = [
+    {
+      id: "whatsapp",
+      title: "WhatsApp",
+      description: "Chattez avec notre équipe support",
+      icon: MessageCircle,
+      color: "#25D366",
+      action: () => Linking.openURL("https://wa.me/2250709090909?text=Bonjour, j'ai besoin d'aide"),
+    },
     {
       id: "email",
       title: "Email",
@@ -28,6 +36,14 @@ export default function HelpScreen() {
       icon: HelpCircle,
       color: Colors.text.secondary,
       action: () => console.log("FAQ - Coming soon"),
+    },
+    {
+      id: "documentation",
+      title: "Documentation",
+      description: "Guides et tutoriels",
+      icon: FileText,
+      color: Colors.text.secondary,
+      action: () => console.log("Documentation - Coming soon"),
     },
     {
       id: "report",
