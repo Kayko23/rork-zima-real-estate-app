@@ -5,6 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ChatHeader from '@/components/chat/ChatHeader';
 import MessageBubble, { BubbleMessage } from '@/components/chat/MessageBubble';
 import ChatInput from '@/components/chat/Composer';
+import QuickReplyBar from '@/components/chat/QuickReplyBar';
+import { useQuickReplies } from '@/hooks/useQuickReplies';
 
 type Message = {
   id: string;
@@ -14,7 +16,13 @@ type Message = {
 };
 
 export default function ChatScreen() {
-  const { id, name, avatar } = useLocalSearchParams<{ id: string; name?: string; avatar?: string }>();
+  const { id, name, avatar, context, listingTitle } = useLocalSearchParams<{ 
+    id: string; 
+    name?: string; 
+    avatar?: string;
+    context?: 'property' | 'service' | 'trip';
+    listingTitle?: string;
+  }>();
   const insets = useSafeAreaInsets();
   const listRef = useRef<FlatList<BubbleMessage>>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -24,6 +32,15 @@ export default function ChatScreen() {
   
   const myId = 'u_me' as const;
   const peerId = id || 'u_2' as const;
+  
+  const { replies, remember } = useQuickReplies({
+    role: 'client',
+    ctx: context || 'property',
+    locale: 'fr',
+    listingTitle: listingTitle,
+    hasAppointment: false,
+    hasDocs: false,
+  });
   
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -72,6 +89,7 @@ export default function ChatScreen() {
     };
     
     setMessages(prev => [...prev, newMessage]);
+    remember(text);
     
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -125,6 +143,11 @@ export default function ChatScreen() {
             backgroundColor: '#F7F9FA',
           }}
           renderItem={({ item }) => <MessageBubble message={item} />}
+        />
+
+        <QuickReplyBar
+          replies={replies}
+          onPick={(text) => sendMessage(text)}
         />
 
         <ChatInput
