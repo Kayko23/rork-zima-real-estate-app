@@ -152,77 +152,80 @@ function PropertyDetailScreen() {
           }
         }
         
+        const chips: string[] = [];
         if (foundListing) {
-          const chips: string[] = [];
           if ((foundListing as any).subtype) chips.push((foundListing as any).subtype);
           if (foundListing.beds) chips.push(`${foundListing.beds} pièces`);
           if (foundListing.baths) chips.push(`${foundListing.baths} SDB`);
           if (foundListing.surface) chips.push(`${foundListing.surface} m²`);
-          
-          const propertyData: PropertyData = {
-            id: foundListing.id,
-            title: foundListing.title || "Bien immobilier",
-            city: foundListing.city || "Ville",
-            country: foundListing.country || "Pays",
-            type: (foundListing as any).subtype || foundListing.type || "bien",
-            chips,
-            price: foundListing.price || 0,
-            currency: foundListing.currency || "XOF",
-            premium: foundListing.premium || false,
-            rating: foundListing.rating || 4.5,
-            reviewsCount: foundListing.reviews || 0,
-            images: foundListing.photos && foundListing.photos.length > 0 ? foundListing.photos : [
-              "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1600&auto=format&fit=crop",
-              "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1600&auto=format&fit=crop",
-            ],
-            description: (foundListing as any).description || "Magnifique bien immobilier.",
-            agent: {
-              id: "p1",
-              name: "Agent Zima",
-              verified: true,
-              stats: { reviews: 100, rating: 4.7, years: 3 },
-              role: "Agent immobilier",
-              avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
-            },
-            safety: [
-              { title: "Politique de vérification", subtitle: "Tous nos agents sont vérifiés et certifiés" },
-              { title: "Sécurité des visites", subtitle: "Visites accompagnées et sécurisées" },
-            ],
-            popularInCity: [],
-          };
-          
-          setData(propertyData);
-        } else {
-          console.log("Property not found, using fallback");
-          setData({
-            id,
-            title: "Bien immobilier",
-            city: "Ville",
-            country: "Pays",
-            type: "bien",
-            chips: [],
-            price: 0,
-            currency: "XOF",
-            premium: false,
-            rating: 4.5,
-            reviewsCount: 0,
-            images: ["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1600&auto=format&fit=crop"],
-            description: "Bien immobilier",
-            agent: {
-              id: "p1",
-              name: "Agent Zima",
-              verified: true,
-              stats: { reviews: 0, rating: 4.5, years: 1 },
-              role: "Agent immobilier",
-              avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
-            },
-            safety: [],
-            popularInCity: [],
-          });
         }
+        
+        const propertyData: PropertyData = {
+          id: foundListing?.id || id,
+          title: foundListing?.title || "Bien immobilier",
+          city: foundListing?.city || "Ville",
+          country: foundListing?.country || "Pays",
+          type: (foundListing as any)?.subtype || foundListing?.type || "bien",
+          chips,
+          price: foundListing?.price || 0,
+          currency: foundListing?.currency || "XOF",
+          premium: foundListing?.premium || false,
+          rating: foundListing?.rating || 4.5,
+          reviewsCount: foundListing?.reviews || 0,
+          images: foundListing?.photos && foundListing.photos.length > 0 ? foundListing.photos : [
+            "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1600&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1600&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1600&auto=format&fit=crop",
+          ],
+          description: (foundListing as any)?.description || "Magnifique bien immobilier situé dans un quartier recherché. Ce bien offre un cadre de vie exceptionnel avec des finitions de qualité et des équipements modernes.",
+          agent: {
+            id: "p1",
+            name: "Agent Zima",
+            verified: true,
+            stats: { reviews: 100, rating: 4.7, years: 3 },
+            role: "Agent immobilier",
+            avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
+          },
+          safety: [
+            { title: "Politique de vérification", subtitle: "Tous nos agents sont vérifiés et certifiés" },
+            { title: "Sécurité des visites", subtitle: "Visites accompagnées et sécurisées" },
+          ],
+          popularInCity: [],
+        };
+        
+        console.log("Property data loaded:", propertyData.title);
+        setData(propertyData);
       } catch (error) {
         console.error("Error loading property:", error);
-        setData(null);
+        const fallbackData: PropertyData = {
+          id: id || "unknown",
+          title: "Bien immobilier",
+          city: "Ville",
+          country: "Pays",
+          type: "bien",
+          chips: [],
+          price: 0,
+          currency: "XOF",
+          premium: false,
+          rating: 4.5,
+          reviewsCount: 0,
+          images: [
+            "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=1600&auto=format&fit=crop",
+            "https://images.unsplash.com/photo-1505691938895-1758d7feb511?q=80&w=1600&auto=format&fit=crop",
+          ],
+          description: "Bien immobilier",
+          agent: {
+            id: "p1",
+            name: "Agent Zima",
+            verified: true,
+            stats: { reviews: 0, rating: 4.5, years: 1 },
+            role: "Agent immobilier",
+            avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
+          },
+          safety: [],
+          popularInCity: [],
+        };
+        setData(fallbackData);
       } finally {
         setLoading(false);
       }
@@ -230,6 +233,8 @@ function PropertyDetailScreen() {
     
     if (id) {
       loadProperty();
+    } else {
+      setLoading(false);
     }
   }, [id]);
 
