@@ -299,8 +299,8 @@ export default function ListingForm({
         photos: photos.length ? photos : (cover ? [cover] : []),
         category,
         subtype,
-        amenities,
-        customAmenities,
+        amenities: [...amenities],
+        customAmenities: [...customAmenities],
         yearDate,
         docType: docType || "",
         docTypeOther: docType === "autre" ? docTypeOther : "",
@@ -314,7 +314,7 @@ export default function ListingForm({
       };
       if (type === "rent") payload.rentPeriod = rentPeriod;
 
-      console.log("Submitting listing:", JSON.stringify(payload, null, 2));
+      console.log("Submitting listing:", payload);
       onSubmit(payload);
     } catch (e) {
       console.log("submit error", e);
