@@ -90,17 +90,32 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const [favoriteVoyageIds, setFavoriteVoyageIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    // Load persisted data after component mounts
+    let mounted = true;
+    
     const initializeStore = async () => {
       try {
         await loadPersistedData();
       } catch (error) {
         console.error('Store initialization error:', error);
-        setIsInitialized(true); // Continue anyway
+        if (mounted) {
+          setIsInitialized(true);
+        }
       }
     };
     
+    // Very short timeout to prevent hydration issues
+    const timeout = setTimeout(() => {
+      if (mounted) {
+        setIsInitialized(true);
+      }
+    }, 200);
+    
     initializeStore();
+    
+    return () => {
+      mounted = false;
+      clearTimeout(timeout);
+    };
   }, []);
 
   const loadPersistedData = async () => {

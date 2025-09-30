@@ -122,13 +122,12 @@ export const [SessionProvider, useSession] = createContextHook(() => {
       }
     };
     
-    // Shorter timeout to prevent hydration issues
+    // Very short timeout to prevent hydration issues
     const timeout = setTimeout(() => {
       if (mounted) {
-        console.warn('Session hydration timeout');
         setIsLoading(false);
       }
-    }, 1000);
+    }, 300);
     
     initSession();
     

@@ -22,16 +22,14 @@ export default function Index() {
     };
 
     if (!isLoading) {
-      // Navigate immediately if not loading
       navigate();
     } else {
-      // Set a timeout to prevent infinite loading
+      // Very short timeout to prevent hydration issues
       const timer = setTimeout(() => {
         if (mounted) {
-          console.warn('Navigation timeout, proceeding with default route');
           navigate();
         }
-      }, 2000);
+      }, 500);
       
       return () => {
         mounted = false;
