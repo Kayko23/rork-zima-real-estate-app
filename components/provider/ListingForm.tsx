@@ -188,6 +188,7 @@ export default function ListingForm({
   const [attachments, setAttachments] = useState<{ uri: string; name: string; type: string }[]>([]);
   const [subtypePickerVisible, setSubtypePickerVisible] = useState<boolean>(false);
   const [amenitiesPickerVisible, setAmenitiesPickerVisible] = useState<boolean>(false);
+  const [categoryPickerVisible, setCategoryPickerVisible] = useState<boolean>(false);
 
   useEffect(() => {
     if (countryCode) {
@@ -345,11 +346,10 @@ export default function ListingForm({
         <Input value={title} onChangeText={setTitle} placeholder="Ex: Villa · Accra" testID="input-title" />
 
         <Text style={s.label}>Catégorie de bien</Text>
-        <View style={s.segmentRow}>
-          {categories.map(c => (
-            <Seg key={c.key} active={category === c.key} onPress={() => { setCategory(c.key); setSubtype(c.types[0]); setAmenities([]); }} label={c.label} />
-          ))}
-        </View>
+        <Pressable style={s.pickerButton} onPress={() => setCategoryPickerVisible(true)} testID="picker-category">
+          <Text style={s.pickerButtonText}>{categories.find(c => c.key === category)?.label || "Sélectionner une catégorie"}</Text>
+          <ChevronDown size={20} color="#6b7280" />
+        </Pressable>
 
         <Text style={s.label}>Type de bien</Text>
         <Pressable style={s.pickerButton} onPress={() => setSubtypePickerVisible(true)} testID="picker-subtype">
@@ -540,6 +540,36 @@ export default function ListingForm({
                   </TouchableOpacity>
                 );
               })}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal visible={categoryPickerVisible} transparent animationType="slide" onRequestClose={() => setCategoryPickerVisible(false)}>
+        <View style={s.modalOverlay}>
+          <View style={s.modalContent}>
+            <View style={s.modalHeader}>
+              <Text style={s.modalTitle}>Catégorie de bien</Text>
+              <TouchableOpacity onPress={() => setCategoryPickerVisible(false)}>
+                <Text style={s.modalClose}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView style={s.modalScroll}>
+              {categories.map(c => (
+                <TouchableOpacity
+                  key={c.key}
+                  style={[s.modalItem, category === c.key && s.modalItemActive]}
+                  onPress={() => {
+                    setCategory(c.key);
+                    setSubtype(c.types[0]);
+                    setAmenities([]);
+                    setCategoryPickerVisible(false);
+                  }}
+                >
+                  <Text style={[s.modalItemText, category === c.key && s.modalItemTextActive]}>{c.label}</Text>
+                  {category === c.key && <Check size={20} color="#065f46" />}
+                </TouchableOpacity>
+              ))}
             </ScrollView>
           </View>
         </View>
