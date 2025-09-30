@@ -4,7 +4,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Save, Camera, UserRound, Mail, Phone, MapPin, Globe2, Lock, Eye, EyeOff, ChevronDown, Search } from "lucide-react-native";
 import { useApp } from "@/hooks/useAppStore";
 import { getAllCountries, getCitiesByCountryCode, getCountryByName } from "@/constants/countries";
-import BottomSheet from "@/components/ui/BottomSheet";
+import BottomSheet from "@/components/BottomSheet";
 
 export default function EditProfileScreen() {
   const { user, updateUser } = useApp();
@@ -192,7 +192,7 @@ export default function EditProfileScreen() {
         </Pressable>
       </ScrollView>
 
-      <BottomSheet visible={showCountryPicker} onClose={() => { setShowCountryPicker(false); setCountrySearch(""); }} maxHeight={0.8}>
+      <BottomSheet visible={showCountryPicker} onClose={() => { setShowCountryPicker(false); setCountrySearch(""); }} height={0.8}>
         <Text style={s.sheetTitle}>Sélectionner un pays</Text>
         <View style={s.searchBox}>
           <Search size={18} color="#6b7280" />
@@ -223,7 +223,7 @@ export default function EditProfileScreen() {
         </ScrollView>
       </BottomSheet>
 
-      <BottomSheet visible={showCityPicker} onClose={() => { setShowCityPicker(false); setCitySearch(""); }} maxHeight={0.8}>
+      <BottomSheet visible={showCityPicker} onClose={() => { setShowCityPicker(false); setCitySearch(""); }} height={0.8}>
         <Text style={s.sheetTitle}>Sélectionner une ville</Text>
         <View style={s.searchBox}>
           <Search size={18} color="#6b7280" />
