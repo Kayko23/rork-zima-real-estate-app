@@ -18,7 +18,7 @@ export function buildQuickReplies(a: BuildArgs): Reply[] {
       const base: Reply[] = [
         { id: "docs",  text: t("Puis-je voir la documentation ?", "Could I see the paperwork?") },
         { id: "visit", text: t("Puis-je avoir un rendez-vous ?", "Can I book a viewing?") },
-        { id: "price", text: t("Quel est le prix ?", "What's the price?") },
+        { id: "price", text: t("Le prix est-il négociable ?", "Is the price negotiable?") },
         { id: "avail", text: t("Est-ce disponible ?", "Is it available?") },
       ];
       if (a.hasAppointment) base.unshift({ id: "confirm", text: t("Confirmer le rendez-vous 👍", "Confirm the appointment 👍") });
