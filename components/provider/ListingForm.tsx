@@ -875,9 +875,10 @@ export default function ListingForm({
   );
 }
 
-function Input(props: Omit<TextInputProps, 'value'> & { value?: string }) {
-  const normalizedValue = props.value ?? "";
-  return <TextInput {...props} value={normalizedValue} style={[s.input, props.style]} />;
+function Input(props: TextInputProps & { value?: string }) {
+  const { value, ...rest } = props;
+  const normalizedValue = value ?? "";
+  return <TextInput {...rest} value={normalizedValue} style={[s.input, props.style]} />;
 }
 
 const s = StyleSheet.create({
