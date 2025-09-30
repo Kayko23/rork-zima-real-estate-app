@@ -625,7 +625,7 @@ function Chip({ label }: { label: string }) {
   
   return (
     <View style={styles.chip}>
-      {icon && <View style={{ marginRight: 6 }}><Text>{icon}</Text></View>}
+      {icon && <View style={{ marginRight: 6 }}>{icon}</View>}
       <Text style={styles.chipText}>{label}</Text>
     </View>
   );
