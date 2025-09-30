@@ -268,7 +268,7 @@ export default function ListingForm({
     setSubmitting(true);
     setErrorText(null);
     try {
-      const payload: Partial<Listing> = {
+      const payload: Partial<Listing> & Record<string, any> = {
         title: title.trim(),
         type,
         price: Number(price || 0),
@@ -279,34 +279,24 @@ export default function ListingForm({
         beds: Number(beds || 0),
         baths: Number(baths || 0),
         photos: photos.length ? photos : (cover ? [cover] : []),
-      };
-      if (type === "rent") payload.rentPeriod = rentPeriod;
-
-      const extras = {
         category,
         subtype,
         amenities,
         yearDate,
         charges,
-        docType: docType ?? undefined,
-        docTypeOther: docType === "autre" ? docTypeOther : undefined,
+        docType: docType || "",
+        docTypeOther: docType === "autre" ? docTypeOther : "",
         exactAddress,
         orientation,
         landmark,
         phone,
+        description: desc,
         attachmentsCount: attachments.length,
         consent,
       };
-      const extrasText = `\n\n[Infos complémentaires]\nCatégorie: ${category} / Type: ${subtype}\nÉquipements: ${amenities.join(", ")}\nDate/Année: ${yearDate || "N/A"}\nCharges: ${charges || "N/A"}\nDocument: ${docType === "autre" ? docTypeOther : docType || "N/A"}\nAdresse exacte: ${exactAddress || city + ", " + country}\nOrientation: ${orientation || ""}\nRepère: ${landmark || ""}\nTéléphone: ${phone || ""}\nPièces jointes: ${attachments.length}`;
-      payload.title = payload.title;
-      const finalDesc = `${desc || ""}${extrasText}`.trim();
-      // Injecter via surface/desc non typé: on concatène dans title/description
-      // Comme Listing n'a pas description, on encode dans title s'il est vide
-      if (!finalDesc) {
-        // nothing
-      } else {
-        payload.title = `${payload.title}`;
-      }
+      if (type === "rent") payload.rentPeriod = rentPeriod;
+
+      console.log("Submitting listing:", JSON.stringify(payload, null, 2));
       onSubmit(payload);
     } catch (e) {
       console.log("submit error", e);
