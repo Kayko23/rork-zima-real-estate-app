@@ -17,7 +17,7 @@ export default function SettingsScreen() {
       <Row icon={<Moon />} label="Mode sombre" value={dark} onValueChange={setDark} />
 
       <Pressable style={s.link} onPress={() => router.push("/profile/language-currency")}>
-        <Globe2 />
+        <Globe2 size={20} color="#065F46" />
         <Text style={s.linkTxt}>Langue & Devise</Text>
       </Pressable>
     </View>
@@ -42,6 +42,6 @@ const s = StyleSheet.create({
   row:{ height:56, backgroundColor:"#fff", borderRadius:12, paddingHorizontal:12, borderWidth:1, borderColor:"#e5e7eb", flexDirection:"row", alignItems:"center", justifyContent:"space-between" },
   rowContent: { flexDirection:"row", alignItems:"center", gap:10 },
   rowLabel: { fontWeight:"600" },
-  link:{ height:56, borderRadius:12, borderWidth:1, borderColor:"#e5e7eb", backgroundColor:"#fff", flexDirection:"row", alignItems:"center", gap:10, paddingHorizontal:12 },
+  link:{ height:56, borderRadius:12, borderWidth:1, borderColor:"#e5e7eb", backgroundColor:"#fff", flexDirection:"row", alignItems:"center", gap:10, paddingHorizontal:12, opacity:1 },
   linkTxt:{ fontWeight:"700" },
 });
