@@ -298,7 +298,7 @@ function PasswordField(props: {
 }
 
 const s = StyleSheet.create({
-  container: { paddingBottom: 32 },
+  container: { paddingBottom: 100 },
   cover: { height: 160, backgroundColor: "#eef2ef", justifyContent: "center", alignItems: "center" },
   coverImg: { ...StyleSheet.absoluteFillObject, width: "100%", height: "100%" },
   avatarWrap:{ width:96, height:96, borderRadius:48, backgroundColor:"#e7ece9", alignSelf:"center", marginTop:-48, alignItems:"center", justifyContent:"center", overflow:"hidden", borderWidth:3, borderColor:"#fff" },
