@@ -7,7 +7,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { X } from 'lucide-react-native';
 
 type Props = {
-  sheetRef: React.RefObject<BottomSheet>;
+  sheetRef: React.RefObject<BottomSheet | null>;
   onApply?: () => void;
 };
 

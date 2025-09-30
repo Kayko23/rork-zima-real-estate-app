@@ -8,6 +8,7 @@ import PropertyFiltersSheet from '@/components/filters/PropertyFiltersSheet';
 import { useFiltersStore } from '@/stores/useFiltersStore';
 import { useQuery } from '@tanstack/react-query';
 import VoyageCard from '@/components/voyages/VoyageCard';
+import { TripItem } from '@/components/voyages/helpers';
 
 export default function AllVoyagesExample() {
   const tripSheetRef = useRef<BottomSheet>(null);
@@ -55,10 +56,10 @@ export default function AllVoyagesExample() {
           onChangeMode={setMode}
         />
 
-        <FlatList
-          data={data ?? []}
-          keyExtractor={(item: any) => item.id}
-          renderItem={({ item }) => <VoyageCard trip={item} />}
+        <FlatList<TripItem>
+          data={(data as TripItem[]) ?? []}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <VoyageCard item={item} />}
           contentContainerStyle={s.list}
           ListEmptyComponent={
             <View style={s.empty}>
