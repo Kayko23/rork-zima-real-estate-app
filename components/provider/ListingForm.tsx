@@ -165,6 +165,7 @@ export default function ListingForm({
   const [surface, setSurface] = useState<string>(String(initial?.surface ?? ""));
   const [beds, setBeds] = useState<string>(String(initial?.beds ?? ""));
   const [baths, setBaths] = useState<string>(String(initial?.baths ?? ""));
+  const [salons, setSalons] = useState<string>("");
   const [desc, setDesc] = useState<string>("");
   const [photos, setPhotos] = useState<string[]>(initial?.photos ?? []);
   const [cover, setCover] = useState<string | undefined>(initial?.photos?.[0]);
@@ -282,6 +283,7 @@ export default function ListingForm({
         surface: Number(surface || 0),
         beds: Number(beds || 0),
         baths: Number(baths || 0),
+        salons: Number(salons || 0),
         photos: photos.length ? photos : (cover ? [cover] : []),
         category,
         subtype,
@@ -307,7 +309,7 @@ export default function ListingForm({
     } finally {
       setSubmitting(false);
     }
-  }, [title, type, price, currency, city, country, surface, beds, baths, photos, cover, rentPeriod, category, subtype, amenities, yearDate, docType, docTypeOther, exactAddress, orientation, landmark, phone, attachments.length, consent, desc, onSubmit]);
+  }, [title, type, price, currency, city, country, surface, beds, baths, salons, photos, cover, rentPeriod, category, subtype, amenities, yearDate, docType, docTypeOther, exactAddress, orientation, landmark, phone, attachments.length, consent, desc, onSubmit]);
 
   const currentTypes = useMemo(() => {
     const found = categories.find(c => c.key === category);
@@ -372,11 +374,12 @@ export default function ListingForm({
         </View>
         {!!formattedPrice && <Text style={s.hint}>Aperçu: {formattedPrice}{type === "rent" ? (rentPeriod === "daily" ? " / jour" : " / mois") : ""}</Text>}
 
-        <Text style={s.label}>Surface / Chambres / SDB</Text>
+        <Text style={s.label}>Surface / Chambres / SDB / Salons</Text>
         <View style={s.row}>
           <Input style={s.flex1} value={surface} onChangeText={setSurface} placeholder="m²" keyboardType="numeric" testID="input-surface" />
           <Input style={s.flex1} value={beds} onChangeText={setBeds} placeholder="chambres" keyboardType="numeric" testID="input-beds" />
           <Input style={s.flex1} value={baths} onChangeText={setBaths} placeholder="SDB" keyboardType="numeric" testID="input-baths" />
+          <Input style={s.flex1} value={salons} onChangeText={setSalons} placeholder="salons" keyboardType="numeric" testID="input-salons" />
         </View>
 
         <Text style={s.label}>Points forts (équipements)</Text>
