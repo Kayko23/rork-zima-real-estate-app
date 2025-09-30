@@ -381,6 +381,15 @@ export default function ListingForm({
           <Input style={s.flex1} value={baths} onChangeText={setBaths} placeholder="SDB" keyboardType="numeric" testID="input-baths" />
           <Input style={s.flex1} value={salons} onChangeText={setSalons} placeholder="salons" keyboardType="numeric" testID="input-salons" />
         </View>
+        {(surface || beds || baths || salons) && (
+          <Text style={s.previewText}>
+            Aperçu: {surface ? `${surface} m²` : ""}{surface && (beds || baths || salons) ? ", " : ""}
+            {beds ? `${beds} chambre${Number(beds) > 1 ? "s" : ""}` : ""}{beds && (baths || salons) ? ", " : ""}
+            {baths ? `${baths} salle${Number(baths) > 1 ? "s" : ""} de bain${Number(baths) > 1 ? "s" : ""}` : ""}{baths && salons ? ", " : ""}
+            {salons ? `${salons} salon${Number(salons) > 1 ? "s" : ""}` : ""}
+            {beds || salons ? ` · ${Number(beds || 0) + Number(salons || 0)}+${salons || 0}` : ""}
+          </Text>
+        )}
 
         <Text style={s.label}>Points forts (équipements)</Text>
         <Pressable style={s.pickerButton} onPress={() => setAmenitiesPickerVisible(true)} testID="picker-amenities">
@@ -655,6 +664,7 @@ const s = StyleSheet.create({
   scrollContent: { padding: 16, gap: 12, paddingBottom: 120 },
   section: { fontSize: 16, fontWeight: "800", marginTop: 4, marginBottom: 6 },
   hint: { color: "#6b7280", marginTop: 4 },
+  previewText: { color: "#065f46", marginTop: 6, fontWeight: "600", fontSize: 14 },
   coverHint: { color: "#6b7280", fontWeight: "600" },
   row: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 10 },
   rowWrap: { flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: 8 },
