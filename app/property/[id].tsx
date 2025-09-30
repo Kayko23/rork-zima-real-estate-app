@@ -190,7 +190,11 @@ function PropertyDetailScreen() {
             { title: "Politique de vérification", subtitle: "Tous nos agents sont vérifiés et certifiés" },
             { title: "Sécurité des visites", subtitle: "Visites accompagnées et sécurisées" },
           ],
-          popularInCity: [],
+          popularInCity: [
+            { id: "pop1", title: "Villa Moderne", info1: "3 pièces", info2: "150 m²" },
+            { id: "pop2", title: "Appartement Standing", info1: "2 pièces", info2: "85 m²" },
+            { id: "pop3", title: "Duplex Luxueux", info1: "4 pièces", info2: "200 m²" },
+          ],
         };
         
         console.log("Property data loaded:", propertyData.title);
@@ -222,8 +226,15 @@ function PropertyDetailScreen() {
             role: "Agent immobilier",
             avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
           },
-          safety: [],
-          popularInCity: [],
+          safety: [
+            { title: "Politique de vérification", subtitle: "Tous nos agents sont vérifiés et certifiés" },
+            { title: "Sécurité des visites", subtitle: "Visites accompagnées et sécurisées" },
+          ],
+          popularInCity: [
+            { id: "pop1", title: "Villa Moderne", info1: "3 pièces", info2: "150 m²" },
+            { id: "pop2", title: "Appartement Standing", info1: "2 pièces", info2: "85 m²" },
+            { id: "pop3", title: "Duplex Luxueux", info1: "4 pièces", info2: "200 m²" },
+          ],
         };
         setData(fallbackData);
       } finally {
