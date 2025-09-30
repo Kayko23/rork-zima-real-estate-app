@@ -213,6 +213,7 @@ export default function BiensFeed() {
             contentContainerStyle={styles.horizontalList}
             snapToInterval={316}
             decelerationRate="fast"
+            nestedScrollEnabled
           />
         </View>
       );
@@ -292,6 +293,7 @@ export default function BiensFeed() {
             contentContainerStyle={styles.categoryPropertiesList}
             snapToInterval={296}
             decelerationRate="fast"
+            nestedScrollEnabled
           />
         )}
       </View>

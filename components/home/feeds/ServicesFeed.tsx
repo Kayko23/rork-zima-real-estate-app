@@ -112,6 +112,7 @@ export default function ServicesFeed() {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
+        nestedScrollEnabled
         renderItem={({ item }) => (
           <ProviderCard
             item={item}
