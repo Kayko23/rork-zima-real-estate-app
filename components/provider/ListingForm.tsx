@@ -21,12 +21,12 @@ const currencyMap: Record<string, { code: string }> = {
 };
 
 const categories = [
-  { key: "residential", label: "Résidentiel", types: ["appartement", "studio", "villa", "maison", "penthouse", "duplex", "triplex"] },
-  { key: "offices", label: "Bureaux", types: ["bureau", "plateau", "coworking", "espace de travail", "salle de réunion"] },
-  { key: "retail", label: "Commerces & Retail", types: ["boutique", "magasin", "showroom", "centre commercial", "local commercial"] },
-  { key: "land", label: "Terrains", types: ["terrain urbain", "terrain agricole", "lotissement", "terrain constructible", "terrain industriel"] },
-  { key: "industrial", label: "Industriel & Logistique", types: ["entrepôt", "usine", "atelier", "hangar", "zone industrielle"] },
-  { key: "hotel", label: "Hôtellerie & Événementiel", types: ["hôtel", "auberge", "maison d'hôte", "salle événementielle", "espace événementiel"] },
+  { key: "residential", label: "Résidentiel", types: ["Appartement", "Studio", "Villa", "Maison", "Penthouse", "Duplex", "Triplex", "Immeuble"] },
+  { key: "offices", label: "Bureaux", types: ["Bureau", "Plateau", "Coworking", "Espace de travail", "Salle de réunion"] },
+  { key: "retail", label: "Commerces & Retail", types: ["Boutique", "Magasin", "Showroom", "Centre commercial", "Local commercial"] },
+  { key: "land", label: "Terrains", types: ["Terrain urbain", "Terrain agricole", "Lotissement", "Terrain constructible", "Terrain industriel"] },
+  { key: "industrial", label: "Industriel & Logistique", types: ["Entrepôt", "Usine", "Atelier", "Hangar", "Zone industrielle"] },
+  { key: "hotel", label: "Hôtellerie & Événementiel", types: ["Hôtel", "Auberge", "Maison d'hôte", "Salle événementielle", "Espace événementiel"] },
 ] as const;
 
 const amenitiesByCategory: Record<string, { key: string; label: string }[]> = {
