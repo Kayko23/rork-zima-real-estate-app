@@ -192,7 +192,7 @@ export default function EditProfileScreen() {
         </Pressable>
       </ScrollView>
 
-      <BottomSheet visible={showCountryPicker} onClose={() => { setShowCountryPicker(false); setCountrySearch(""); }} height={0.8}>
+      <BottomSheet visible={showCountryPicker} onClose={() => { setShowCountryPicker(false); setCountrySearch(""); }} height={0.85}>
         <Text style={s.sheetTitle}>Sélectionner un pays</Text>
         <View style={s.searchBox}>
           <Search size={18} color="#6b7280" />
@@ -201,14 +201,14 @@ export default function EditProfileScreen() {
             placeholder="Rechercher un pays..."
             value={countrySearch}
             onChangeText={setCountrySearch}
-            autoFocus
           />
         </View>
         <ScrollView 
           style={s.pickerList}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
-          contentContainerStyle={{ paddingBottom: 300 }}
+          contentContainerStyle={{ paddingBottom: 400 }}
+          showsVerticalScrollIndicator={true}
         >
           {filteredCountries.map((c) => (
             <Pressable
@@ -228,7 +228,7 @@ export default function EditProfileScreen() {
         </ScrollView>
       </BottomSheet>
 
-      <BottomSheet visible={showCityPicker} onClose={() => { setShowCityPicker(false); setCitySearch(""); }} height={0.8}>
+      <BottomSheet visible={showCityPicker} onClose={() => { setShowCityPicker(false); setCitySearch(""); }} height={0.85}>
         <Text style={s.sheetTitle}>Sélectionner une ville</Text>
         <View style={s.searchBox}>
           <Search size={18} color="#6b7280" />
@@ -237,14 +237,14 @@ export default function EditProfileScreen() {
             placeholder="Rechercher une ville..."
             value={citySearch}
             onChangeText={setCitySearch}
-            autoFocus
           />
         </View>
         <ScrollView 
           style={s.pickerList}
           keyboardShouldPersistTaps="handled"
           keyboardDismissMode="on-drag"
-          contentContainerStyle={{ paddingBottom: 300 }}
+          contentContainerStyle={{ paddingBottom: 400 }}
+          showsVerticalScrollIndicator={true}
         >
           {filteredCities.map((cityName) => (
             <Pressable
