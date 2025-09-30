@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, Pressable, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import PropertyCard from '@/components/ui/PropertyCard';
 import SectionHeader from '@/components/ui/SectionHeader';
@@ -178,7 +178,7 @@ export default function BiensFeed() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 96 }}>
       <View style={[styles.section, styles.firstSection]}>
         <SectionHeader 
           title="Biens premium" 
@@ -285,7 +285,7 @@ export default function BiensFeed() {
       </View>
 
       <ActionDouble />
-    </View>
+    </ScrollView>
   );
 }
 

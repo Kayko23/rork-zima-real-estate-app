@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
 import { Filter } from 'lucide-react-native';
 import { router } from 'expo-router';
@@ -33,22 +33,24 @@ export default function VoyagesFeed() {
   }, [refetch]);
 
   return (
-    <View style={styles.container} testID="voyages-feed">
-      <View style={styles.hero}>
-        <Text style={styles.title}>Voyages</Text>
-        <Text style={styles.subtitle}>Découvrez des hébergements exceptionnels à travers l&apos;Afrique</Text>
-      </View>
+    <View style={{ flex: 1 }} testID="voyages-feed">
+      <View style={styles.container}>
+        <View style={styles.hero}>
+          <Text style={styles.title}>Voyages</Text>
+          <Text style={styles.subtitle}>Découvrez des hébergements exceptionnels à travers l&apos;Afrique</Text>
+        </View>
 
-      <View style={styles.searchWrap}>
-        <LiquidGlassView intensity={30} tint="light" style={styles.searchGlass}>
-          <VoyageSearchBar value={query} onPress={() => setOpenSearch(true)} />
-        </LiquidGlassView>
-      </View>
+        <View style={styles.searchWrap}>
+          <LiquidGlassView intensity={30} tint="light" style={styles.searchGlass}>
+            <VoyageSearchBar value={query} onPress={() => setOpenSearch(true)} />
+          </LiquidGlassView>
+        </View>
 
-      <TouchableOpacity style={styles.filtersBtn} onPress={() => setOpenFilters(true)} activeOpacity={0.8} testID="voyages-open-filters">
-        <Filter size={18} color="#134E48" />
-        <Text style={styles.filtersTxt}>Filtres</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.filtersBtn} onPress={() => setOpenFilters(true)} activeOpacity={0.8} testID="voyages-open-filters">
+          <Filter size={18} color="#134E48" />
+          <Text style={styles.filtersTxt}>Filtres</Text>
+        </TouchableOpacity>
+      </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}

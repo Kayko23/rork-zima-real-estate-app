@@ -94,6 +94,7 @@ export default function ServicesFeed() {
         contentContainerStyle={styles.scrollContent} 
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
       >
         {CATEGORY_ORDER.map(({ key, title }) => {
           const data = grouped[key] || [];

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { ScrollView, StatusBar, StyleSheet, View, Text } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StatusBar, StyleSheet, View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import HomeHeader from '@/components/home/HomeHeader';
 import BiensFeed from '@/components/home/feeds/BiensFeed';
@@ -32,15 +32,10 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container} testID="home-safe-area">
       <StatusBar barStyle="dark-content" backgroundColor="#F3F6F6" />
-      <ScrollView
-        contentContainerStyle={styles.contentContainer}
-        stickyHeaderIndices={[0]}
-        showsVerticalScrollIndicator={false}
-        testID="home-scroll"
-      >
+      <View style={{ flex: 1 }}>
         <HomeHeader active={activeHomeTab} onChange={setHomeTab} />
         {renderContent()}
-      </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -48,10 +43,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F3F6F6',
-  },
-  contentContainer: {
-    paddingBottom: 96,
     backgroundColor: '#F3F6F6',
   },
   loadingContainer: {
