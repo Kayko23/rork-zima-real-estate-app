@@ -15,21 +15,6 @@ export default function HelpScreen() {
       action: () => router.push("/support"),
     },
     {
-      id: "whatsapp",
-      title: "WhatsApp",
-      description: "Chattez avec notre équipe support",
-      icon: MessageCircle,
-      color: "#25D366",
-      action: () => {
-        const phoneNumber = "2250709090909";
-        const message = "Bonjour, j'ai besoin d'aide avec l'application Zima";
-        const url = `whatsapp://send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
-        Linking.openURL(url).catch(() => {
-          Linking.openURL(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`);
-        });
-      },
-    },
-    {
       id: "email",
       title: "Email",
       description: "support@zima.app",
