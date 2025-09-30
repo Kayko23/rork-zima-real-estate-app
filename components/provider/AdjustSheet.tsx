@@ -8,7 +8,7 @@ export default function AdjustSheet({ initial, onConfirm }:{
   onConfirm:(v:{ price:number; currency:string; from?:string; to?:string })=>void;
 }) {
   const [price, setPrice] = useState(String(initial.price));
-  const [currency, setCurrency] = useState(initial.currency);
+  const [currency, setCurrency] = useState<string>(initial.currency ?? "");
   const [from, setFrom] = useState(initial.from ?? "");
   const [to, setTo] = useState(initial.to ?? "");
   const [calendarVisible, setCalendarVisible] = useState<boolean>(false);
@@ -49,7 +49,7 @@ export default function AdjustSheet({ initial, onConfirm }:{
         />
         <TextInput 
           style={[s.input, s.currencyInput]} 
-          value={currency} 
+          value={currency ?? ''} 
           onChangeText={setCurrency} 
           placeholder="Devise" 
         />

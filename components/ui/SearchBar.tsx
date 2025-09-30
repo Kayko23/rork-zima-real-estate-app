@@ -4,7 +4,7 @@ import { Search, SlidersHorizontal } from 'lucide-react-native';
 import Colors from '@/constants/colors';
 
 interface SearchBarProps {
-  value: string;
+  value: string | undefined;
   onChangeText: (text: string) => void;
   onFilterPress: () => void;
   placeholder?: string;
@@ -22,7 +22,7 @@ export default function SearchBar({
         <Search size={20} color={Colors.text.secondary} />
         <TextInput
           style={styles.input}
-          value={value}
+          value={value ?? ''}
           onChangeText={onChangeText}
           placeholder={placeholder}
           placeholderTextColor={Colors.text.secondary}
