@@ -149,6 +149,7 @@ export default function ServicesFeed() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         ListFooterComponent={renderFooter}
+        removeClippedSubviews={true}
       />
     </View>
   );

@@ -332,6 +332,7 @@ export default function BiensFeed() {
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 96 }}
       ListFooterComponent={<ActionDouble />}
+      removeClippedSubviews={true}
     />
   );
 }

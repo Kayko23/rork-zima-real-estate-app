@@ -78,6 +78,7 @@ export default function VoyagesFeed() {
         contentContainerStyle={{ paddingBottom: 116 }}
         ListHeaderComponent={renderHeader}
         refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refetch} />}
+        removeClippedSubviews={true}
       />
 
       <VoyageSearchSheet visible={openSearch} initial={query} onClose={() => setOpenSearch(false)} onSubmit={onApplySearch} />
