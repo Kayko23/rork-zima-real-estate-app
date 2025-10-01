@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { View, Text, StyleSheet, Pressable, FlatList } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { ChevronDown, MapPin, Globe, Filter } from "lucide-react-native";
 import { getAllCountries, getCitiesByCountryName } from "@/constants/countries";
 import { GlassButton } from "./Glass";
@@ -123,11 +123,10 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
       {/* Modal Pays */}
       <FilterSheet visible={showCountryModal} onClose={() => setShowCountryModal(false)}>
         <Text style={s.pickerTitle}>Choisir un pays</Text>
-        <FlatList
-          data={[{ label: "Tous les pays", value: null }, ...getAllCountries().map(c => ({ label: c.name, value: c.name }))]}
-          keyExtractor={(item) => item.value || "all"}
-          renderItem={({ item }) => (
+        <View>
+          {[{ label: "Tous les pays", value: null }, ...getAllCountries().map(c => ({ label: c.name, value: c.name }))].map((item) => (
             <Pressable
+              key={item.value || "all"}
               style={[s.modalItem, f.country === item.value && s.modalItemSelected]}
               onPress={() => handleCountryChange(item.value)}
             >
@@ -135,18 +134,17 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
                 {item.label}
               </Text>
             </Pressable>
-          )}
-        />
+          ))}
+        </View>
       </FilterSheet>
 
       {/* Modal Ville */}
       <FilterSheet visible={showCityModal} onClose={() => setShowCityModal(false)}>
         <Text style={s.pickerTitle}>Choisir une ville</Text>
-        <FlatList
-          data={[{ label: "Toutes les villes", value: null }, ...cities.map(c => ({ label: c, value: c }))]}
-          keyExtractor={(item) => item.value || "all"}
-          renderItem={({ item }) => (
+        <View>
+          {[{ label: "Toutes les villes", value: null }, ...cities.map(c => ({ label: c, value: c }))].map((item) => (
             <Pressable
+              key={item.value || "all"}
               style={[s.modalItem, f.city === item.value && s.modalItemSelected]}
               onPress={() => handleCityChange(item.value)}
             >
@@ -154,8 +152,8 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
                 {item.label}
               </Text>
             </Pressable>
-          )}
-        />
+          ))}
+        </View>
       </FilterSheet>
     </>
   );
