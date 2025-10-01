@@ -4,6 +4,7 @@ import * as SplashScreen from "expo-splash-screen";
 import React, { useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AppProvider } from "@/hooks/useAppStore";
 import { VoyageFiltersProvider } from "@/components/voyages/filterContext";
 import { useBootstrapFx } from "@/lib/bootstrapFx";
@@ -54,21 +55,23 @@ export default function RootLayout() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <SessionProvider>
-        <AppProvider>
-          <AppInitializer>
-            <VoyageFiltersProvider>
-              <GestureHandlerRootView style={styles.container}>
-                <View style={styles.container} onLayout={onLayoutRootView}>
-                  <RootLayoutNav />
-                </View>
-              </GestureHandlerRootView>
-            </VoyageFiltersProvider>
-          </AppInitializer>
-        </AppProvider>
-      </SessionProvider>
-    </QueryClientProvider>
+    <SafeAreaProvider>
+      <QueryClientProvider client={queryClient}>
+        <SessionProvider>
+          <AppProvider>
+            <AppInitializer>
+              <VoyageFiltersProvider>
+                <GestureHandlerRootView style={styles.container}>
+                  <View style={styles.container} onLayout={onLayoutRootView}>
+                    <RootLayoutNav />
+                  </View>
+                </GestureHandlerRootView>
+              </VoyageFiltersProvider>
+            </AppInitializer>
+          </AppProvider>
+        </SessionProvider>
+      </QueryClientProvider>
+    </SafeAreaProvider>
   );
 }
 
