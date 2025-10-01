@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { ChevronDown, MapPin, Globe, Filter } from "lucide-react-native";
 import { getAllCountries, getCitiesByCountryName } from "@/constants/countries";
 import { GlassButton } from "./Glass";
@@ -123,7 +123,7 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
       {/* Modal Pays */}
       <FilterSheet visible={showCountryModal} onClose={() => setShowCountryModal(false)}>
         <Text style={s.pickerTitle}>Choisir un pays</Text>
-        <View>
+        <ScrollView showsVerticalScrollIndicator={false}>
           {[{ label: "Tous les pays", value: null }, ...getAllCountries().map(c => ({ label: c.name, value: c.name }))].map((item) => (
             <Pressable
               key={item.value || "all"}
@@ -135,13 +135,13 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
               </Text>
             </Pressable>
           ))}
-        </View>
+        </ScrollView>
       </FilterSheet>
 
       {/* Modal Ville */}
       <FilterSheet visible={showCityModal} onClose={() => setShowCityModal(false)}>
         <Text style={s.pickerTitle}>Choisir une ville</Text>
-        <View>
+        <ScrollView showsVerticalScrollIndicator={false}>
           {[{ label: "Toutes les villes", value: null }, ...cities.map(c => ({ label: c, value: c }))].map((item) => (
             <Pressable
               key={item.value || "all"}
@@ -153,7 +153,7 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
               </Text>
             </Pressable>
           ))}
-        </View>
+        </ScrollView>
       </FilterSheet>
     </>
   );
