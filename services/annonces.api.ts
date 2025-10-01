@@ -28,21 +28,32 @@ const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
 // === STUBS. Remplace baseURL + fetch réels plus tard ===
 export async function fetchListings(status: ListingStatus): Promise<Listing[]> {
   try {
-    await delay(300);
+    console.log(`[fetchListings] Starting fetch for status: ${status}`);
+    await delay(100);
     const filtered = DEMO.filter(l => l.status === status);
     console.log(`[fetchListings] Fetched ${filtered.length} listings with status: ${status}`);
     return filtered;
   } catch (error) {
     console.error('[fetchListings] Error:', error);
+    if (error instanceof Error) {
+      console.error('[fetchListings] Error message:', error.message);
+      console.error('[fetchListings] Error stack:', error.stack);
+    }
     return [];
   }
 }
 
 export async function getListingById(id: string): Promise<Listing | null> {
-  await delay(200);
-  const listing = DEMO.find(l => l.id === id);
-  console.log(`[getListingById] Found listing:`, listing?.id, listing?.title);
-  return listing || null;
+  try {
+    console.log(`[getListingById] Looking for listing with id: ${id}`);
+    await delay(100);
+    const listing = DEMO.find(l => l.id === id);
+    console.log(`[getListingById] Found listing:`, listing?.id, listing?.title);
+    return listing || null;
+  } catch (error) {
+    console.error('[getListingById] Error:', error);
+    return null;
+  }
 }
 
 export async function createListing(payload: Partial<Listing>): Promise<Listing> {

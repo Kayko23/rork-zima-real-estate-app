@@ -15,9 +15,25 @@ export default function BiensFeed() {
   useEffect(() => {
     async function loadProperties() {
       try {
+        console.log('[BiensFeed] Starting to load properties...');
         setLoading(true);
-        const activeListings = await fetchListings('active');
-        const pendingListings = await fetchListings('pending');
+        
+        let activeListings: any[] = [];
+        let pendingListings: any[] = [];
+        
+        try {
+          activeListings = await fetchListings('active');
+          console.log('[BiensFeed] Active listings loaded:', activeListings.length);
+        } catch (err) {
+          console.error('[BiensFeed] Error fetching active listings:', err);
+        }
+        
+        try {
+          pendingListings = await fetchListings('pending');
+          console.log('[BiensFeed] Pending listings loaded:', pendingListings.length);
+        } catch (err) {
+          console.error('[BiensFeed] Error fetching pending listings:', err);
+        }
         
         const mappedListings = [...activeListings, ...pendingListings].map(listing => {
           try {
@@ -67,6 +83,7 @@ export default function BiensFeed() {
           }
         }).filter(Boolean);
         
+        console.log('[BiensFeed] Mapped listings:', mappedListings.length);
         setAllProperties([...mockProperties, ...mappedListings]);
       } catch (error) {
         console.error('[BiensFeed] Error loading properties:', error);

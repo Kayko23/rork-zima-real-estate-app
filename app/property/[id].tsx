@@ -121,13 +121,28 @@ function PropertyDetailScreen() {
     async function loadProperty() {
       try {
         setLoading(true);
-        console.log("Loading property with ID:", id);
+        console.log("[PropertyDetail] Loading property with ID:", id);
         
         const { fetchListings } = await import("@/services/annonces.api");
         const { mockProperties } = await import("@/constants/data");
         
-        const allListings = await fetchListings("active");
-        const pendingListings = await fetchListings("pending");
+        let allListings: any[] = [];
+        let pendingListings: any[] = [];
+        
+        try {
+          allListings = await fetchListings("active");
+          console.log("[PropertyDetail] Active listings loaded:", allListings.length);
+        } catch (err) {
+          console.error("[PropertyDetail] Error fetching active listings:", err);
+        }
+        
+        try {
+          pendingListings = await fetchListings("pending");
+          console.log("[PropertyDetail] Pending listings loaded:", pendingListings.length);
+        } catch (err) {
+          console.error("[PropertyDetail] Error fetching pending listings:", err);
+        }
+        
         const all = [...allListings, ...pendingListings];
         
         let foundListing = all.find(l => l.id === id);
