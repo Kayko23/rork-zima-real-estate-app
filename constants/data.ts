@@ -1137,5 +1137,5 @@ export const countries = [
   { code: 'GH', name: 'Ghana', cities: ['Accra', 'Kumasi', 'Tamale', 'Cape Coast'] },
   { code: 'NG', name: 'Nigeria', cities: ['Lagos', 'Abuja', 'Kano', 'Port Harcourt'] },
   { code: 'CI', name: 'Côte d\'Ivoire', cities: ['Abidjan', 'Yamoussoukro', 'Bouaké', 'San-Pédro'] },
-  { code: 'SN', name: 'Sénégal', cities: ['Dakar', 'Thiès', 'Kaolack', 'Saint-Louis'] }
+  { code: 'SN', name: 'Sénégal', cities: ['Dakar', 'Thiès', 'Kaolack', 'Saint-Louis'] },
 ];
