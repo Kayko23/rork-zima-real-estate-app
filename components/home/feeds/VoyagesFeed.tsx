@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, RefreshControl, TouchableOpacity } from 'react-native';
 import { Filter } from 'lucide-react-native';
 import { router } from 'expo-router';
 import LiquidGlassView from '@/components/ui/LiquidGlassView';
@@ -32,54 +32,53 @@ export default function VoyagesFeed() {
     refetch();
   }, [refetch]);
 
-  return (
-    <View style={{ flex: 1 }} testID="voyages-feed">
-      <View style={styles.container}>
-        <View style={styles.hero}>
-          <Text style={styles.title}>Voyages</Text>
-          <Text style={styles.subtitle}>Découvrez des hébergements exceptionnels à travers l&apos;Afrique</Text>
-        </View>
+  const sections = [
+    { key: 'popular', title: 'Populaires près de vous', data: popular.items, onEndReached: fetchNextPopular },
+    { key: 'recommended', title: 'Hôtels recommandés', data: recommended.items, onEndReached: fetchNextRecommended },
+    { key: 'daily', title: 'Résidences à la journée', data: daily.items },
+  ];
 
-        <View style={styles.searchWrap}>
-          <LiquidGlassView intensity={30} tint="light" style={styles.searchGlass}>
-            <VoyageSearchBar value={query} onPress={() => setOpenSearch(true)} />
-          </LiquidGlassView>
-        </View>
-
-        <TouchableOpacity style={styles.filtersBtn} onPress={() => setOpenFilters(true)} activeOpacity={0.8} testID="voyages-open-filters">
-          <Filter size={18} color="#134E48" />
-          <Text style={styles.filtersTxt}>Filtres</Text>
-        </TouchableOpacity>
+  const renderHeader = () => (
+    <View style={styles.container}>
+      <View style={styles.hero}>
+        <Text style={styles.title}>Voyages</Text>
+        <Text style={styles.subtitle}>Découvrez des hébergements exceptionnels à travers l&apos;Afrique</Text>
       </View>
 
-      <ScrollView
+      <View style={styles.searchWrap}>
+        <LiquidGlassView intensity={30} tint="light" style={styles.searchGlass}>
+          <VoyageSearchBar value={query} onPress={() => setOpenSearch(true)} />
+        </LiquidGlassView>
+      </View>
+
+      <TouchableOpacity style={styles.filtersBtn} onPress={() => setOpenFilters(true)} activeOpacity={0.8} testID="voyages-open-filters">
+        <Filter size={18} color="#134E48" />
+        <Text style={styles.filtersTxt}>Filtres</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderSection = ({ item }: { item: typeof sections[0] }) => (
+    <VoyageCarousel
+      title={item.title}
+      onSeeAll={() => router.push('/browse?title='+encodeURIComponent(item.title)+'&kind=voyages')}
+      data={item.data}
+      loading={isLoading && item.data.length === 0}
+      onEndReached={item.onEndReached}
+    />
+  );
+
+  return (
+    <View style={{ flex: 1 }} testID="voyages-feed">
+      <FlatList
+        data={sections}
+        renderItem={renderSection}
+        keyExtractor={(item) => item.key}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 116 }}
-        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refetch} />}>
-
-        <VoyageCarousel
-          title="Populaires près de vous"
-          onSeeAll={() => router.push('/browse?title='+encodeURIComponent('Voyages populaires')+'&kind=voyages')}
-          data={popular.items}
-          loading={isLoading && popular.items.length === 0}
-          onEndReached={fetchNextPopular}
-        />
-
-        <VoyageCarousel
-          title="Hôtels recommandés"
-          onSeeAll={() => router.push('/browse?title='+encodeURIComponent("Hôtels recommandés")+'&kind=voyages')}
-          data={recommended.items}
-          loading={isLoading && recommended.items.length === 0}
-          onEndReached={fetchNextRecommended}
-        />
-
-        <VoyageCarousel
-          title="Résidences à la journée"
-          onSeeAll={() => router.push('/browse?title='+encodeURIComponent('Résidences à la journée')+'&kind=voyages')}
-          data={daily.items}
-          loading={isLoading && daily.items.length === 0}
-        />
-      </ScrollView>
+        ListHeaderComponent={renderHeader}
+        refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={refetch} />}
+      />
 
       <VoyageSearchSheet visible={openSearch} initial={query} onClose={() => setOpenSearch(false)} onSubmit={onApplySearch} />
       <TripsFilterSheet visible={openFilters} onClose={() => setOpenFilters(false)} />
