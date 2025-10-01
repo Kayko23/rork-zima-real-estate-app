@@ -24,7 +24,6 @@ import {
   MessageCircle,
   Camera,
   ChevronRight,
-  ChevronLeft as ChevronLeftMini,
   Home,
   Bed,
   Bath,
@@ -449,7 +448,7 @@ function PropertyDetailScreen() {
             listRef.current?.scrollToOffset({ offset: next * width, animated: true });
             setImgIndex(next);
           }}>
-            <LiquidGlassView style={styles.navBtn} intensity={14} tint="light"><ChevronLeftMini size={18} color="#0b3b35" /></LiquidGlassView>
+            <LiquidGlassView style={styles.navBtn} intensity={14} tint="light"><ChevronLeft size={18} color="#0b3b35" /></LiquidGlassView>
           </Pressable>
           <Pressable accessibilityLabel="next" testID="next" style={styles.navRight} onPress={() => {
             const next = Math.min(data.images.length - 1, imgIndex + 1);
