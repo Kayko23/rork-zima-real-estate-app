@@ -1,4 +1,4 @@
-import { Property, Provider, Conversation } from '@/types';
+import type { Property, Provider, Conversation } from '@/types';
 import { providers } from './professionals';
 
 export const mockProperties: Property[] = [

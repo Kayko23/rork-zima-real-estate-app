@@ -127,30 +127,32 @@ function PropertyDetailScreen() {
         let mockProperties: any[] = [];
         
         try {
-          const annoncesModule = await import("@/services/annonces.api");
-          const dataModule = await import("@/constants/data");
+          const { fetchListings } = await import("@/services/annonces.api");
           
-          if (annoncesModule && typeof annoncesModule.fetchListings === 'function') {
-            try {
-              allListings = await annoncesModule.fetchListings("active");
-              console.log("[PropertyDetail] Active listings loaded:", allListings.length);
-            } catch (err) {
-              console.error("[PropertyDetail] Error fetching active listings:", err);
-            }
-            
-            try {
-              pendingListings = await annoncesModule.fetchListings("pending");
-              console.log("[PropertyDetail] Pending listings loaded:", pendingListings.length);
-            } catch (err) {
-              console.error("[PropertyDetail] Error fetching pending listings:", err);
-            }
+          try {
+            allListings = await fetchListings("active");
+            console.log("[PropertyDetail] Active listings loaded:", allListings.length);
+          } catch (err) {
+            console.error("[PropertyDetail] Error fetching active listings:", err);
           }
           
-          if (dataModule && Array.isArray(dataModule.mockProperties)) {
-            mockProperties = dataModule.mockProperties;
+          try {
+            pendingListings = await fetchListings("pending");
+            console.log("[PropertyDetail] Pending listings loaded:", pendingListings.length);
+          } catch (err) {
+            console.error("[PropertyDetail] Error fetching pending listings:", err);
           }
         } catch (importErr) {
-          console.error("[PropertyDetail] Error importing modules:", importErr);
+          console.error("[PropertyDetail] Error importing annonces module:", importErr);
+        }
+        
+        try {
+          const { mockProperties: props } = await import("@/constants/data");
+          if (Array.isArray(props)) {
+            mockProperties = props;
+          }
+        } catch (importErr) {
+          console.error("[PropertyDetail] Error importing data module:", importErr);
         }
         
         const all = [...allListings, ...pendingListings];
