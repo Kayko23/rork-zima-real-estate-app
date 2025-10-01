@@ -123,32 +123,43 @@ function PropertyDetailScreen() {
         setLoading(true);
         console.log("[PropertyDetail] Loading property with ID:", id);
         
-        const { fetchListings } = await import("@/services/annonces.api");
-        const { mockProperties } = await import("@/constants/data");
-        
         let allListings: any[] = [];
         let pendingListings: any[] = [];
+        let mockProperties: any[] = [];
         
         try {
-          allListings = await fetchListings("active");
-          console.log("[PropertyDetail] Active listings loaded:", allListings.length);
-        } catch (err) {
-          console.error("[PropertyDetail] Error fetching active listings:", err);
-        }
-        
-        try {
-          pendingListings = await fetchListings("pending");
-          console.log("[PropertyDetail] Pending listings loaded:", pendingListings.length);
-        } catch (err) {
-          console.error("[PropertyDetail] Error fetching pending listings:", err);
+          const annoncesModule = await import("@/services/annonces.api");
+          const dataModule = await import("@/constants/data");
+          
+          if (annoncesModule && typeof annoncesModule.fetchListings === 'function') {
+            try {
+              allListings = await annoncesModule.fetchListings("active");
+              console.log("[PropertyDetail] Active listings loaded:", allListings.length);
+            } catch (err) {
+              console.error("[PropertyDetail] Error fetching active listings:", err);
+            }
+            
+            try {
+              pendingListings = await annoncesModule.fetchListings("pending");
+              console.log("[PropertyDetail] Pending listings loaded:", pendingListings.length);
+            } catch (err) {
+              console.error("[PropertyDetail] Error fetching pending listings:", err);
+            }
+          }
+          
+          if (dataModule && Array.isArray(dataModule.mockProperties)) {
+            mockProperties = dataModule.mockProperties;
+          }
+        } catch (importErr) {
+          console.error("[PropertyDetail] Error importing modules:", importErr);
         }
         
         const all = [...allListings, ...pendingListings];
         
-        let foundListing = all.find(l => l.id === id);
+        let foundListing = all.find(l => l && l.id === id);
         
-        if (!foundListing) {
-          const mockProp = mockProperties.find(p => p.id === id);
+        if (!foundListing && Array.isArray(mockProperties)) {
+          const mockProp = mockProperties.find(p => p && p.id === id);
           if (mockProp) {
             foundListing = {
               id: mockProp.id,
@@ -216,6 +227,10 @@ function PropertyDetailScreen() {
         setData(propertyData);
       } catch (error) {
         console.error("Error loading property:", error);
+        if (error instanceof Error) {
+          console.error("Error message:", error.message);
+          console.error("Error stack:", error.stack);
+        }
         const fallbackData: PropertyData = {
           id: id || "unknown",
           title: "Bien immobilier",
