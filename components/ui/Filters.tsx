@@ -20,17 +20,23 @@ export default function Filters({ onApply }: { onApply: (f: FiltersState) => voi
   const cities = useMemo(() => (f.country ? getCitiesByCountryName(f.country) : []), [f.country]);
 
   const handleCountryChange = (value: string | null) => {
-    setF({ ...f, country: value || null, city: null });
+    const newFilters = { ...f, country: value || null, city: null };
+    setF(newFilters);
+    onApply(newFilters);
     setShowCountryModal(false);
   };
 
   const handleCityChange = (value: string | null) => {
-    setF({ ...f, city: value || null });
+    const newFilters = { ...f, city: value || null };
+    setF(newFilters);
+    onApply(newFilters);
     setShowCityModal(false);
   };
 
   const handleIntentChange = (intent: "tous" | "à vendre" | "à louer") => {
-    setF({ ...f, intent });
+    const newFilters = { ...f, intent };
+    setF(newFilters);
+    onApply(newFilters);
   };
 
   const applyFilters = () => {
