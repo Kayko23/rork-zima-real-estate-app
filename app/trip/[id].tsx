@@ -82,7 +82,7 @@ export default function TripDetailScreen() {
                   <TouchableOpacity style={s.btnGhost} onPress={()=>router.push(`/professionnels/profile/${data.host.id}` as const)}>
                     <Text style={s.btnGhostTxt}>Voir le profil</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={s.btn} onPress={()=>router.push(`/provider/${data.host.id}` as const)}>
+                  <TouchableOpacity style={s.btn} onPress={()=>setOpenBook(true)}>
                     <Text style={s.btnTxt}>Réserver</Text>
                   </TouchableOpacity>
                 </View>
