@@ -33,6 +33,7 @@ export default function VoyageCarousel({ title, data, onSeeAll, loading, onEndRe
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={stylesInline.listContent as ViewStyle}
           renderItem={()=> <SkeletonCard width={300} height={250} style={stylesInline.skeleton} />}
+          nestedScrollEnabled
         />
       ) : (
         <FlatList
@@ -47,6 +48,7 @@ export default function VoyageCarousel({ title, data, onSeeAll, loading, onEndRe
             <VoyageCard item={item} />
           }
           ListFooterComponent={loading ? <ActivityIndicator style={stylesInline.footer} /> : null}
+          nestedScrollEnabled
         />
       )}
     </View>
