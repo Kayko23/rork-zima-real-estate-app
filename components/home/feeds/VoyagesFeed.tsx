@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { router } from 'expo-router';
 import LiquidGlassView from '@/components/ui/LiquidGlassView';
 import VoyageSearchBar from '@/components/voyages/VoyageSearchBar';
-import VoyageUnifiedSheet from '@/components/voyages/VoyageUnifiedSheet';
+import TravelFiltersSheet, { TravelFilters } from '@/components/travel/TravelFiltersSheet';
 import VoyageCarousel from '@/components/voyages/VoyageCarousel';
 import { VoyageQuery, VoyageFilters } from '@/components/voyages/helpers';
 import { useVoyageApi } from '@/hooks/useVoyageApi';
@@ -11,6 +11,7 @@ import { useVoyageApi } from '@/hooks/useVoyageApi';
 export default function VoyagesFeed() {
   const [query, setQuery] = useState<VoyageQuery>({ type: 'all' });
   const [filters, setFilters] = useState<VoyageFilters>({ priceMin: 0, priceMax: 1000000, ratingMin: 0, premiumOnly: false });
+  const [travelFilters, setTravelFilters] = useState<TravelFilters>({ country: undefined, city: undefined, checkIn: null, checkOut: null, guests: 1, priceMin: 10000, priceMax: 105000, ratingMin: undefined, amenities: [] });
   const [openUnified, setOpenUnified] = useState<boolean>(false);
 
   const { popular, recommended, daily, isLoading, isRefreshing, refetch, fetchNextPopular, fetchNextRecommended } = useVoyageApi({ query, filters });
@@ -67,12 +68,18 @@ export default function VoyagesFeed() {
         removeClippedSubviews={true}
       />
 
-      <VoyageUnifiedSheet
+      <TravelFiltersSheet
         visible={openUnified}
-        initialQuery={query}
-        initialFilters={filters}
+        initial={travelFilters}
+        resultCount={(popular.items?.length ?? 0) + (recommended.items?.length ?? 0) + (daily.items?.length ?? 0)}
         onClose={() => setOpenUnified(false)}
-        onSubmit={onApplyUnified}
+        onApply={(f) => {
+          setTravelFilters(f);
+          setOpenUnified(false);
+          // Optionally map into VoyageFilters/query to refetch API
+          refetch();
+        }}
+        onReset={() => setTravelFilters({ country: undefined, city: undefined, checkIn: null, checkOut: null, guests: 1, priceMin: 10000, priceMax: 105000, ratingMin: undefined, amenities: [] })}
       />
     </View>
   );
