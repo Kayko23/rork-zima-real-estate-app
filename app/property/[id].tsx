@@ -570,7 +570,7 @@ function PropertyDetailScreen() {
             <Text style={styles.sectionTitle}>Biens populaires • {data.city}</Text>
             <Pressable testID="see-all-popular" onPress={() => {
             console.log("Opening all popular properties in", data.city);
-            router.push(`/browse?city=${encodeURIComponent(data.city)}`);
+            router.push('/properties');
           }}><Text style={styles.linkText}>Voir tout</Text></Pressable>
           </View>
         </View>
