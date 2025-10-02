@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useContentInsets } from '@/hooks/useContentInsets';
 import { useQuery } from '@tanstack/react-query';
 import TravelFiltersSheet, { TravelFilters } from '@/components/travel/TravelFiltersSheet';
 import { api } from '@/lib/api';
+import SegmentedTabs from '@/components/home/SegmentedTabs';
 
 const INITIAL: TravelFilters = {
   country: undefined,
@@ -20,6 +22,7 @@ const INITIAL: TravelFilters = {
 
 export default function TripScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { bottom: bottomInset } = useContentInsets();
   const [open, setOpen] = useState<boolean>(false);
   const [filters, setFilters] = useState<TravelFilters>(INITIAL);
@@ -44,6 +47,16 @@ export default function TripScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Voyages</Text>
+      </View>
+
+      <View style={{ paddingHorizontal:16, paddingTop:16, paddingBottom:12, backgroundColor:'#fff' }}>
+        <SegmentedTabs 
+          value="trips" 
+          onChange={(k)=>{
+            if (k==='props') router.push('/properties');
+            else if (k==='pros') router.push('/professionals');
+          }} 
+        />
       </View>
 
       <View style={styles.controls}>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 
 import { useQuery } from '@tanstack/react-query';
 import { sortPremiumFirst } from '@/utils/sortProperties';
@@ -8,6 +9,7 @@ import { api } from '@/lib/api';
 import PropertyFiltersSheet, { type PropertyFilters } from '@/components/filters/PropertyFiltersSheet';
 import { useSettings } from '@/hooks/useSettings';
 import { useMoney } from '@/lib/money';
+import SegmentedTabs from '@/components/home/SegmentedTabs';
 
 const INITIAL: PropertyFilters = {
   country: undefined, city: undefined,
@@ -21,6 +23,7 @@ const INITIAL: PropertyFilters = {
 export default function PropertyScreen(){
   const insets = useSafeAreaInsets();
   const tabBarH = 56;
+  const router = useRouter();
   const { currency } = useSettings();
   const { format } = useMoney();
   const [open, setOpen] = useState<boolean>(false);
@@ -52,7 +55,17 @@ export default function PropertyScreen(){
         <Text style={{ fontSize:18, fontWeight:'800' }}>Propriétés</Text>
       </View>
 
-      <View style={{ padding:16 }}>
+      <View style={{ paddingHorizontal:16, paddingTop:16, paddingBottom:12, backgroundColor:'#fff' }}>
+        <SegmentedTabs 
+          value="props" 
+          onChange={(k)=>{
+            if (k==='pros') router.push('/professionals');
+            else if (k==='trips') router.push('/voyages');
+          }} 
+        />
+      </View>
+
+      <View style={{ paddingHorizontal:16, paddingBottom:16 }}>
         <Pressable onPress={()=>setOpen(true)} style={{ height:48, borderRadius:12, borderWidth:1, borderColor:'#E5E7EB', justifyContent:'center', paddingHorizontal:14 }}>
           <Text style={{ fontWeight:'700' }}>
             {filters.country ?? 'Pays'}, {filters.city ?? 'Ville'} • {filters.category ?? 'Catégorie'} {filters.trade ? `• ${filters.trade==='sale'?'Vente':'Location'}` : ''}

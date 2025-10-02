@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { providersApi, providerCategories } from '@/lib/api';
 import ProFiltersSheet, { type ProFilters } from '@/components/filters/ProFiltersSheet';
+import SegmentedTabs from '@/components/home/SegmentedTabs';
 
 const INITIAL: ProFilters = {
   country: undefined, city: undefined,
@@ -39,7 +40,17 @@ export default function ProfessionalScreen(){
         <Text style={{ fontSize:18, fontWeight:'800' }}>Professionnels</Text>
       </View>
 
-      <View style={{ padding:16 }}>
+      <View style={{ paddingHorizontal:16, paddingTop:16, paddingBottom:12, backgroundColor:'#fff' }}>
+        <SegmentedTabs 
+          value="pros" 
+          onChange={(k)=>{
+            if (k==='props') router.push('/properties');
+            else if (k==='trips') router.push('/voyages');
+          }} 
+        />
+      </View>
+
+      <View style={{ paddingHorizontal:16, paddingBottom:16 }}>
         <Pressable onPress={()=>setOpen(true)} style={{ height:48, borderRadius:12, borderWidth:1, borderColor:'#E5E7EB', justifyContent:'center', paddingHorizontal:14 }}>
           <Text style={{ fontWeight:'700' }}>
             {filters.country ?? 'Pays'}, {filters.city ?? 'Ville'} • {filters.category ?? 'Catégorie'} • {filters.ratingMin ? `${filters.ratingMin}+ ★` : 'Toutes notes'}
