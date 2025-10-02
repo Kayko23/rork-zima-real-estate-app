@@ -1,11 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, RefreshControl, TouchableOpacity } from 'react-native';
-import { Filter } from 'lucide-react-native';
+import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { router } from 'expo-router';
 import LiquidGlassView from '@/components/ui/LiquidGlassView';
 import VoyageSearchBar from '@/components/voyages/VoyageSearchBar';
-import VoyageSearchSheet from '@/components/voyages/VoyageSearchSheet';
-import TripsFilterSheet from '@/components/sheets/TripsFilterSheet';
+import VoyageUnifiedSheet from '@/components/voyages/VoyageUnifiedSheet';
 import VoyageCarousel from '@/components/voyages/VoyageCarousel';
 import { VoyageQuery, VoyageFilters } from '@/components/voyages/helpers';
 import { useVoyageApi } from '@/hooks/useVoyageApi';
@@ -13,22 +11,15 @@ import { useVoyageApi } from '@/hooks/useVoyageApi';
 export default function VoyagesFeed() {
   const [query, setQuery] = useState<VoyageQuery>({ type: 'all' });
   const [filters, setFilters] = useState<VoyageFilters>({ priceMin: 0, priceMax: 1000000, ratingMin: 0, premiumOnly: false });
-  const [openSearch, setOpenSearch] = useState<boolean>(false);
-  const [openFilters, setOpenFilters] = useState<boolean>(false);
+  const [openUnified, setOpenUnified] = useState<boolean>(false);
 
   const { popular, recommended, daily, isLoading, isRefreshing, refetch, fetchNextPopular, fetchNextRecommended } = useVoyageApi({ query, filters });
 
-  const onApplySearch = useCallback((q: VoyageQuery) => {
-    console.log('[VoyagesFeed] applySearch', q);
+  const onApplyUnified = useCallback((q: VoyageQuery, f: VoyageFilters) => {
+    console.log('[VoyagesFeed] applyUnified', q, f);
     setQuery(q);
-    setOpenSearch(false);
-    refetch();
-  }, [refetch]);
-
-  const onApplyFilters = useCallback((f: VoyageFilters) => {
-    console.log('[VoyagesFeed] applyFilters', f);
     setFilters(f);
-    setOpenFilters(false);
+    setOpenUnified(false);
     refetch();
   }, [refetch]);
 
@@ -47,21 +38,16 @@ export default function VoyagesFeed() {
 
       <View style={styles.searchWrap}>
         <LiquidGlassView intensity={30} tint="light" style={styles.searchGlass}>
-          <VoyageSearchBar value={query} onPress={() => setOpenSearch(true)} />
+          <VoyageSearchBar value={query} onPress={() => setOpenUnified(true)} />
         </LiquidGlassView>
       </View>
-
-      <TouchableOpacity style={styles.filtersBtn} onPress={() => setOpenFilters(true)} activeOpacity={0.8} testID="voyages-open-filters">
-        <Filter size={18} color="#134E48" />
-        <Text style={styles.filtersTxt}>Filtres</Text>
-      </TouchableOpacity>
     </View>
   );
 
   const renderSection = ({ item }: { item: typeof sections[0] }) => (
     <VoyageCarousel
       title={item.title}
-      onSeeAll={() => router.push('/browse?title='+encodeURIComponent(item.title)+'&kind=voyages')}
+      onSeeAll={() => router.push('/browse' as any)}
       data={item.data}
       loading={isLoading && item.data.length === 0}
       onEndReached={item.onEndReached}
@@ -81,8 +67,13 @@ export default function VoyagesFeed() {
         removeClippedSubviews={true}
       />
 
-      <VoyageSearchSheet visible={openSearch} initial={query} onClose={() => setOpenSearch(false)} onSubmit={onApplySearch} />
-      <TripsFilterSheet visible={openFilters} onClose={() => setOpenFilters(false)} />
+      <VoyageUnifiedSheet
+        visible={openUnified}
+        initialQuery={query}
+        initialFilters={filters}
+        onClose={() => setOpenUnified(false)}
+        onSubmit={onApplyUnified}
+      />
     </View>
   );
 }
@@ -94,6 +85,5 @@ const styles = StyleSheet.create({
   subtitle: { marginTop: 6, fontSize: 15, color: '#4B635F' },
   searchWrap: { paddingHorizontal: 16, marginTop: 12 },
   searchGlass: { borderRadius: 16, overflow: 'hidden', padding: 10, borderWidth: 1, borderColor: '#E6EFEC' },
-  filtersBtn: { flexDirection: 'row', alignItems: 'center', columnGap: 8, marginTop: 10, marginLeft: 18, paddingVertical: 6 },
-  filtersTxt: { color: '#134E48', fontWeight: '700' },
+
 });
