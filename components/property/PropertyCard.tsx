@@ -12,6 +12,8 @@ export type Property = {
   beds?: number; baths?: number; area?: number;
   rating?: number; photos: string[];
   badge?: "À VENDRE" | "À LOUER" | "Premium";
+  isPremium?: boolean;
+  createdAt?: string | number;
 };
 
 export default function PropertyCard({ item }: { item: Property }) {
