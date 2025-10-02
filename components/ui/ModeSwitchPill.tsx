@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { 
   TouchableOpacity, 
   Text, 
@@ -100,28 +100,12 @@ export default function ModeSwitchPill() {
     }
   };
 
-  const spin = rotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
-  });
-
-  const PillContent = () => (
-    <View style={styles.content}>
-      <Animated.View 
-        style={[
-          styles.iconContainer,
-          { 
-            transform: [
-              { rotate: spin },
-              { scale: scaleAnim }
-            ]
-          }
-        ]}
-      >
-        <ArrowLeftRight size={18} color={Colors.text.primary} />
-      </Animated.View>
-      <Text style={styles.label}>{label}</Text>
-    </View>
+  const spin = useMemo(
+    () => rotateAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0deg', '360deg'],
+    }),
+    [rotateAnim]
   );
 
   return (
@@ -138,11 +122,41 @@ export default function ModeSwitchPill() {
     >
       {Platform.OS === 'web' ? (
         <View style={styles.webGlass}>
-          <PillContent />
+          <View style={styles.content}>
+            <Animated.View 
+              style={[
+                styles.iconContainer,
+                { 
+                  transform: [
+                    { rotate: spin },
+                    { scale: scaleAnim }
+                  ]
+                }
+              ]}
+            >
+              <ArrowLeftRight size={18} color={Colors.text.primary} />
+            </Animated.View>
+            <Text style={styles.label}>{label}</Text>
+          </View>
         </View>
       ) : (
         <BlurView intensity={30} tint="light" style={styles.glass}>
-          <PillContent />
+          <View style={styles.content}>
+            <Animated.View 
+              style={[
+                styles.iconContainer,
+                { 
+                  transform: [
+                    { rotate: spin },
+                    { scale: scaleAnim }
+                  ]
+                }
+              ]}
+            >
+              <ArrowLeftRight size={18} color={Colors.text.primary} />
+            </Animated.View>
+            <Text style={styles.label}>{label}</Text>
+          </View>
         </BlurView>
       )}
     </TouchableOpacity>
