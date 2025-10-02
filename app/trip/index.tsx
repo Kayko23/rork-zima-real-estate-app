@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import TravelFiltersSheet, { TravelFilters } from '@/components/travel/TravelFiltersSheet';
 import { api } from '@/lib/api';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
+import ZimaBrand from '@/components/ui/ZimaBrand';
 
 const INITIAL: TravelFilters = {
   country: undefined,
@@ -44,31 +45,31 @@ export default function TripScreen() {
   const resultCount = data.length;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Voyages</Text>
-      </View>
+    <View style={styles.container}>
+      <View style={[styles.stickyHeader, { paddingTop: insets.top }]}>
+        <ZimaBrand />
+        
+        <View style={{ paddingHorizontal:16, paddingTop:16, paddingBottom:12 }}>
+          <SegmentedTabs 
+            value="trips" 
+            onChange={(k)=>{
+              if (k==='props') router.push('/properties');
+              else if (k==='pros') router.push('/professionals');
+            }} 
+          />
+        </View>
 
-      <View style={{ paddingHorizontal:16, paddingTop:16, paddingBottom:12, backgroundColor:'#fff' }}>
-        <SegmentedTabs 
-          value="trips" 
-          onChange={(k)=>{
-            if (k==='props') router.push('/properties');
-            else if (k==='pros') router.push('/professionals');
-          }} 
-        />
-      </View>
-
-      <View style={styles.controls}>
-        <Pressable testID="openFilters" onPress={() => setOpen(true)} style={styles.searchStub}>
-          <Text style={styles.searchTitle}>
-            {filters.country ?? 'Pays'}, {filters.city ?? 'Ville'} • {filters.guests} voyageur(s)
-          </Text>
-          <Text style={styles.searchSub}>
-            Budget: {fmt(filters.priceMin)} – {fmt(filters.priceMax)} •{' '}
-            {filters.ratingMin ? `${filters.ratingMin}+ ★` : 'Toutes notes'}
-          </Text>
-        </Pressable>
+        <View style={styles.controls}>
+          <Pressable testID="openFilters" onPress={() => setOpen(true)} style={styles.searchStub}>
+            <Text style={styles.searchTitle}>
+              {filters.country ?? 'Pays'}, {filters.city ?? 'Ville'} • {filters.guests} voyageur(s)
+            </Text>
+            <Text style={styles.searchSub}>
+              Budget: {fmt(filters.priceMin)} – {fmt(filters.priceMax)} •{' '}
+              {filters.ratingMin ? `${filters.ratingMin}+ ★` : 'Toutes notes'}
+            </Text>
+          </Pressable>
+        </View>
       </View>
 
       <FlatList
@@ -103,6 +104,7 @@ export default function TripScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
+  stickyHeader: { backgroundColor: '#fff', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
   header: { height: 56, justifyContent: 'center', paddingHorizontal: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
   headerTitle: { fontSize: 18, fontWeight: '800' },
   controls: { padding: 16, gap: 10 },

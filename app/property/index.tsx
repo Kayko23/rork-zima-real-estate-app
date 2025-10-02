@@ -10,6 +10,7 @@ import PropertyFiltersSheet, { type PropertyFilters } from '@/components/filters
 import { useSettings } from '@/hooks/useSettings';
 import { useMoney } from '@/lib/money';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
+import ZimaBrand from '@/components/ui/ZimaBrand';
 
 const INITIAL: PropertyFilters = {
   country: undefined, city: undefined,
@@ -50,30 +51,30 @@ export default function PropertyScreen(){
   const resultCount = data.length;
 
   return (
-    <View style={{ flex:1, backgroundColor:'#fff', paddingTop: insets.top }}>
-      <View style={{ height:56, justifyContent:'center', paddingHorizontal:16, borderBottomWidth:0.5, borderBottomColor:'#E5E7EB' }}>
-        <Text style={{ fontSize:18, fontWeight:'800' }}>Propriétés</Text>
-      </View>
+    <View style={{ flex:1, backgroundColor:'#fff' }}>
+      <View style={{ paddingTop: insets.top, backgroundColor:'#fff', borderBottomWidth:0.5, borderBottomColor:'#E5E7EB' }}>
+        <ZimaBrand />
+        
+        <View style={{ paddingHorizontal:16, paddingTop:16, paddingBottom:12 }}>
+          <SegmentedTabs 
+            value="props" 
+            onChange={(k)=>{
+              if (k==='pros') router.push('/professionals');
+              else if (k==='trips') router.push('/voyages');
+            }} 
+          />
+        </View>
 
-      <View style={{ paddingHorizontal:16, paddingTop:16, paddingBottom:12, backgroundColor:'#fff' }}>
-        <SegmentedTabs 
-          value="props" 
-          onChange={(k)=>{
-            if (k==='pros') router.push('/professionals');
-            else if (k==='trips') router.push('/voyages');
-          }} 
-        />
-      </View>
-
-      <View style={{ paddingHorizontal:16, paddingBottom:16 }}>
-        <Pressable onPress={()=>setOpen(true)} style={{ height:48, borderRadius:12, borderWidth:1, borderColor:'#E5E7EB', justifyContent:'center', paddingHorizontal:14 }}>
-          <Text style={{ fontWeight:'700' }}>
-            {filters.country ?? 'Pays'}, {filters.city ?? 'Ville'} • {filters.category ?? 'Catégorie'} {filters.trade ? `• ${filters.trade==='sale'?'Vente':'Location'}` : ''}
-          </Text>
-          <Text style={{ color:'#6B7280', marginTop:2 }}>
-            Budget {fmt(filters.priceMin)} – {fmt(filters.priceMax)}
-          </Text>
-        </Pressable>
+        <View style={{ paddingHorizontal:16, paddingBottom:16 }}>
+          <Pressable onPress={()=>setOpen(true)} style={{ height:48, borderRadius:12, borderWidth:1, borderColor:'#E5E7EB', justifyContent:'center', paddingHorizontal:14 }}>
+            <Text style={{ fontWeight:'700' }}>
+              {filters.country ?? 'Pays'}, {filters.city ?? 'Ville'} • {filters.category ?? 'Catégorie'} {filters.trade ? `• ${filters.trade==='sale'?'Vente':'Location'}` : ''}
+            </Text>
+            <Text style={{ color:'#6B7280', marginTop:2 }}>
+              Budget {fmt(filters.priceMin)} – {fmt(filters.priceMax)}
+            </Text>
+          </Pressable>
+        </View>
       </View>
 
       <FlatList
