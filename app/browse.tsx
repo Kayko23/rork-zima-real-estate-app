@@ -107,13 +107,15 @@ export default function BrowseScreen() {
   );
 
   return (
-    <View style={[styles.container, { paddingTop: top }]}>
-      <BackButton />
-      <View style={styles.header}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>
-          {filteredData.length} bien{filteredData.length > 1 ? "s" : ""} trouvé{filteredData.length > 1 ? "s" : ""}
-        </Text>
+    <View style={styles.container}>
+      <View style={[styles.headerContainer, { paddingTop: top + 8 }]}>
+        <BackButton />
+        <View style={styles.headerContent}>
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.subtitle}>
+            {filteredData.length} bien{filteredData.length > 1 ? "s" : ""} trouvé{filteredData.length > 1 ? "s" : ""}
+          </Text>
+        </View>
       </View>
 
       <Filters onApply={setFilters} />
@@ -122,7 +124,7 @@ export default function BrowseScreen() {
         data={filteredData}
         renderItem={renderProperty}
         keyExtractor={(item) => `browse-${item.id}`}
-        contentContainerStyle={[styles.listContent, { paddingBottom: bottom }]}
+        contentContainerStyle={[styles.listContent, { paddingBottom: bottom + 16 }]}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListEmptyComponent={() => (
@@ -143,23 +145,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background.secondary,
   },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+  headerContainer: {
     backgroundColor: "#fff",
     borderBottomWidth: 1,
     borderBottomColor: "#E6E8EB",
+    paddingBottom: 16,
+  },
+  headerContent: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
   },
   title: {
     fontSize: 24,
-    fontWeight: "800",
+    fontWeight: "800" as const,
     color: "#0F172A",
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
     color: "#64748B",
-    fontWeight: "500",
+    fontWeight: "500" as const,
   },
   listContent: {
     paddingHorizontal: 16,
