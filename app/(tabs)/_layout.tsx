@@ -68,16 +68,17 @@ export default function TabsLayout() {
 
 function GlassTabBar({ state, descriptors, navigation }: any) {
   const insets = useSafeAreaInsets();
+  const r = useRouter();
   const activeColor = '#0F6B56';
   const idle = '#273142CC';
   return (
-    <View pointerEvents="box-none" style={[styles.wrap, { paddingBottom: Math.max(insets.bottom, 10) }]}>
+    <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 10) }]}>
       {Platform.OS === 'web' ? (
         <View style={[styles.glass, { backgroundColor: '#FFFFFFCC' }]}> 
           {state.routes.map((route: any, index: number) => {
             if (route.name === 'publish') {
               return (
-                <Pressable key="center" onPress={() => navigation.navigate('/property/new')} style={styles.centerBtn} testID="tab-center">
+                <Pressable key="center" onPress={() => r.push('/property/new')} style={styles.centerBtn} testID="tab-center">
                   <Plus color="#fff" size={24} />
                 </Pressable>
               );
@@ -100,7 +101,7 @@ function GlassTabBar({ state, descriptors, navigation }: any) {
           {state.routes.map((route: any, index: number) => {
             if (route.name === 'publish') {
               return (
-                <Pressable key="center" onPress={() => navigation.navigate('/property/new')} style={styles.centerBtn} testID="tab-center">
+                <Pressable key="center" onPress={() => r.push('/property/new')} style={styles.centerBtn} testID="tab-center">
                   <Plus color="#fff" size={24} />
                 </Pressable>
               );
@@ -124,7 +125,7 @@ function GlassTabBar({ state, descriptors, navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  wrap: { position: 'absolute', left: 0, right: 0, bottom: 0, alignItems: 'center' },
+  container: { height: 88, alignItems: 'center', justifyContent: 'flex-end' },
   glass: {
     flexDirection: 'row',
     alignItems: 'center',
