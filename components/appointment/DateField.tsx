@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { Calendar } from 'lucide-react-native';
 
 export default function DateField({
@@ -27,6 +26,8 @@ export default function DateField({
     onChange(d);
   }
 
+  const today = useMemo(() => new Date(), []);
+
   return (
     <View>
       <Text style={s.label}>Date</Text>
@@ -35,26 +36,51 @@ export default function DateField({
           onPress={() => setOpen(true)}
           style={s.input}
           accessibilityRole="button"
+          testID="datefield-open"
         >
           <Text style={s.inputText}>{format(value)}</Text>
           <Calendar size={20} color="#0A1F17" />
         </Pressable>
-        <Pressable onPress={setTomorrow} style={s.tomorrow}>
+        <Pressable onPress={setTomorrow} style={s.tomorrow} testID="datefield-tomorrow">
           <Text style={s.tomTxt}>Demain</Text>
         </Pressable>
       </View>
 
       {open && (
-        <DateTimePicker
-          value={value}
-          mode="date"
-          display={Platform.select({ ios: 'inline', android: 'calendar' })}
-          onChange={(_, d) => {
-            if (d) onChange(d);
-            setOpen(false);
-          }}
-          minimumDate={new Date()}
-        />
+        Platform.OS === 'web' ? (
+          <View style={s.webPicker}>
+            {[0,1,2,3,4,5,6].map((add)=>{
+              const d = new Date(today);
+              d.setDate(today.getDate() + add);
+              d.setHours(12,0,0,0);
+              const disabled = d < today;
+              return (
+                <Pressable
+                  key={`d-${add}`}
+                  onPress={()=>{ onChange(d); setOpen(false); }}
+                  disabled={disabled}
+                  style={[s.webOption, disabled && { opacity: 0.5 }]}
+                  testID={`datefield-web-${add}`}
+                >
+                  <Text style={s.webTxt}>{format(d)}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        ) : (
+          // Lazy require to avoid web importing native picker
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          React.createElement(require('@react-native-community/datetimepicker').default, {
+            value,
+            mode: 'date',
+            display: Platform.select({ ios: 'inline', android: 'calendar' }),
+            onChange: (_: unknown, d?: Date) => {
+              if (d) onChange(d);
+              setOpen(false);
+            },
+            minimumDate: new Date(),
+          })
+        )
       )}
     </View>
   );
@@ -91,4 +117,7 @@ const s = StyleSheet.create({
     backgroundColor: '#0E5A44',
   },
   tomTxt: { color: '#fff', fontWeight: '700' as const },
+  webPicker: { marginTop: 10, borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 12, overflow: 'hidden' },
+  webOption: { paddingVertical: 12, paddingHorizontal: 14, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#F1F5F9' },
+  webTxt: { color: '#0A1F17', fontWeight: '600' as const },
 });
