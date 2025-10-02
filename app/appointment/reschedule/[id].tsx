@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, FlatList, Pressable, ActivityIndicator, Alert, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Pressable, ActivityIndicator, Alert, StyleSheet, RefreshControl } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Calendar, Clock, ArrowLeft } from 'lucide-react-native';
@@ -19,6 +19,7 @@ export default function RescheduleScreen() {
   });
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
   const [selectedIso, setSelectedIso] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
@@ -30,12 +31,11 @@ export default function RescheduleScreen() {
       setLoading(true);
       const s = await fetchSlots('pro_1', dateIso);
       setSlots(s);
-      // auto select first available
       const first = s.find(x => x.available);
       setSelectedIso(first?.iso);
     } catch (e) {
       console.error('[Reschedule] slots error', e);
-      Alert.alert('Erreur', "Impossible de charger les créneaux. Réessayez.");
+      Alert.alert('Erreur', 'Impossible de charger les créneaux. Réessayez.');
     } finally {
       setLoading(false);
     }
@@ -99,6 +99,21 @@ export default function RescheduleScreen() {
                 onPress={() => item.available && setSelectedIso(item.iso)}
               />
             )}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={async () => {
+                  try {
+                    setRefreshing(true);
+                    await load();
+                  } finally {
+                    setRefreshing(false);
+                  }
+                }}
+                tintColor={Colors.primary}
+                colors={[Colors.primary]}
+              />
+            }
           />
         )}
       </View>
