@@ -4,6 +4,7 @@ import { Heart, Star, Bath, BedDouble, Ruler } from "lucide-react-native";
 import { colors, radius, shadow } from "@/theme/tokens";
 import { formatPrice } from "@/lib/format";
 import { useRouter } from "expo-router";
+import { useApp } from "@/hooks/useAppStore";
 
 export type Property = {
   id: string;
@@ -17,7 +18,8 @@ export type Property = {
 };
 
 export default function PropertyCard({ item }: { item: Property }) {
-  const [fav, setFav] = React.useState<boolean>(false);
+  const { isFavoriteProperty, toggleFavoriteProperty } = useApp();
+  const fav = isFavoriteProperty(item.id);
   const router = useRouter();
   const go = () => router.push({ pathname: "/property/[id]", params: { id: item.id }} as any);
 
@@ -29,8 +31,8 @@ export default function PropertyCard({ item }: { item: Property }) {
         {item.badge && (
           <View style={styles.badge}><Text style={styles.badgeTxt}>{item.badge}</Text></View>
         )}
-        <Pressable onPress={() => setFav(v => !v)} style={styles.heart} hitSlop={10} accessibilityLabel="Ajouter aux favoris">
-          <Heart size={20} color={fav ? "#fff" : "#fff"} fill={fav ? "#EC4899" : "transparent"} />
+        <Pressable onPress={() => toggleFavoriteProperty(String(item.id))} style={styles.heart} hitSlop={10} accessibilityLabel="Ajouter aux favoris" testID={`favorite-toggle-${item.id}`}>
+          <Heart size={20} color="#fff" fill={fav ? "#EC4899" : "transparent"} />
         </Pressable>
       </View>
       <View style={styles.bottom}>
