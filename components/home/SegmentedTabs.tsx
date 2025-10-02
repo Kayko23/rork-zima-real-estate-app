@@ -6,8 +6,8 @@ import { colors, radius } from "@/theme/tokens";
 type TabKey = "props" | "pros" | "trips";
 const tabs: { key: TabKey; label: string; Icon: any }[] = [
   { key: "props", label: "Propriétés", Icon: Home },
-  { key: "pros",  label: "Professionnels", Icon: Briefcase },
   { key: "trips", label: "Voyages", Icon: BedDouble },
+  { key: "pros",  label: "Professionnels", Icon: Briefcase },
 ];
 
 export default function SegmentedTabs({ value, onChange }: { value: TabKey; onChange: (k:TabKey)=>void }) {
