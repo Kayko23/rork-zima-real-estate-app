@@ -84,27 +84,6 @@ export default function Home() {
           testID="premium-slider"
         />
 
-        <View style={styles.ctaRow}>
-          <Pressable
-            onPress={()=>router.push("/property/new")}
-            android_ripple={{ color: colors.primarySoft }}
-            style={({pressed})=>[styles.cta, pressed && { transform:[{scale:.98}] }]}
-            testID="cta-publish"
-          >
-            <Text style={styles.ctaIcon}>＋</Text>
-            <Text style={styles.ctaTxt}>Publier un bien</Text>
-          </Pressable>
-
-          <Pressable
-            onPress={goPros}
-            android_ripple={{ color: colors.primarySoft }}
-            style={({pressed})=>[styles.cta, styles.ctaOutline, pressed && { opacity:.85 }]}
-            testID="cta-find-pro"
-          >
-            <Text style={[styles.ctaTxt, { color: colors.primary }]}>Trouver un pro</Text>
-          </Pressable>
-        </View>
-
         <SectionHeader title="Par catégories" />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal:12, gap:8 }}>
           {categories.map((c)=> (
@@ -133,6 +112,27 @@ export default function Home() {
           }
           testID="categories-slider"
         />
+
+        <View style={styles.ctaRow}>
+          <Pressable
+            onPress={()=>router.push("/property/new")}
+            android_ripple={{ color: colors.primarySoft }}
+            style={({pressed})=>[styles.cta, pressed && { transform:[{scale:.98}] }]}
+            testID="cta-publish"
+          >
+            <Text style={styles.ctaIcon}>＋</Text>
+            <Text style={styles.ctaTxt}>Publier un bien</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={goPros}
+            android_ripple={{ color: colors.primarySoft }}
+            style={({pressed})=>[styles.cta, styles.ctaOutline, pressed && { opacity:.85 }]}
+            testID="cta-find-pro"
+          >
+            <Text style={[styles.ctaTxt, { color: colors.primary }]}>Trouver un pro</Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -141,7 +141,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   safe:{ flex:1, backgroundColor: colors.bg },
   brand:{ textAlign:"center", fontSize:32, fontWeight:"800", color: colors.text, letterSpacing: 3, marginVertical: 10 },
-  ctaRow:{ paddingHorizontal:12, flexDirection:"row", gap:12, marginTop:10 },
+  ctaRow:{ paddingHorizontal:12, flexDirection:"row", gap:12, marginTop:24, marginBottom:16 },
   cta:{ flex:1, backgroundColor: colors.primary, paddingVertical:16, borderRadius: radius.lg, alignItems:"center" },
   ctaOutline:{ backgroundColor: colors.panel, borderWidth:1, borderColor: colors.primary },
   ctaIcon:{ color:"#fff", fontWeight:"900", fontSize:18, marginBottom:2 },
