@@ -1,21 +1,17 @@
-// theme/tokens.ts
 export const colors = {
-  bg: '#F4F7F6',
-  text: '#0F172A',
-  textMuted: '#475569',
-  primary: '#0E5A46',       // Vert ZIMA
-  premium: '#A9802B',
-  card: '#FFFFFF',
-  border: 'rgba(15, 23, 42, 0.08)',
-  shadow: 'rgba(15, 23, 42, 0.08)',
+  bg: "#F5F7F6",
+  panel: "#FFFFFF",
+  text: "#0F1A17",
+  sub: "#5D6B66",
+  primary: "#0C5C4C",
+  primarySoft: "#E7F2EF",
+  danger: "#D83A34",
+  muted: "#E9EEEC",
+  cardOverlay: "rgba(0,0,0,0.35)",
+  chip: "#111827",
 };
 
-export const radius = {
-  xl: 24,
-  lg: 18,
-  md: 14,
-  sm: 10,
-  pill: 999,
-};
-
-export const spacing = (n: number) => n * 8; // 8-pt grid
+export const radius = { sm: 10, md: 14, lg: 18, xl: 22 } as const;
+export const shadow = {
+  card: { shadowColor: "#000", shadowOpacity: 0.08, shadowRadius: 12, elevation: 3 },
+} as const;
