@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   TouchableOpacity, 
   Text, 
@@ -19,8 +19,8 @@ export default function ModeSwitchPill() {
   const { userMode, toggleAppMode } = useApp();
   const insets = useSafeAreaInsets();
   const [isAnimating, setIsAnimating] = useState(false);
-  const [rotateAnim] = useState(new Animated.Value(0));
-  const [scaleAnim] = useState(new Animated.Value(1));
+  const rotateAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const label = userMode === 'user' 
     ? 'Passer en mode prestataire' 
