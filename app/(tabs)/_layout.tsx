@@ -1,7 +1,7 @@
 import { Tabs, useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
-import { Home, Heart, Search, MessageCircle, User2 } from 'lucide-react-native';
+import { Home, Heart, Search, MessageCircle, User2, Plane, Building2, Briefcase } from 'lucide-react-native';
 import { useApp } from '@/hooks/useAppStore';
 
 export default function TabsLayout() {
@@ -58,6 +58,27 @@ export default function TabsLayout() {
         options={{
           title: 'Messages',
           tabBarIcon: ({ color, size }) => <MessageCircle color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="voyages"
+        options={{
+          title: 'Voyages',
+          tabBarIcon: ({ color, size }) => <Plane color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="properties"
+        options={{
+          title: 'Biens',
+          tabBarIcon: ({ color, size }) => <Building2 color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="professionals"
+        options={{
+          title: 'Pros',
+          tabBarIcon: ({ color, size }) => <Briefcase color={color} size={size} />,
         }}
       />
       <Tabs.Screen
