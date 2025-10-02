@@ -37,6 +37,7 @@ import {
   ArrowUp,
   Trees,
   Mail,
+  Sofa,
 } from "lucide-react-native";
 import { Ionicons } from '@expo/vector-icons';
 import LiquidGlassView from "@/components/ui/LiquidGlassView";
@@ -170,6 +171,7 @@ function PropertyDetailScreen() {
           if ((foundListing as any).subtype) chips.push((foundListing as any).subtype);
           if (foundListing.beds) chips.push(`${foundListing.beds} pièces`);
           if (foundListing.baths) chips.push(`${foundListing.baths} SDB`);
+          if ((foundListing as any).livingRooms) chips.push(`${(foundListing as any).livingRooms} salon${(foundListing as any).livingRooms > 1 ? 's' : ''}`);
           if (foundListing.surface) chips.push(`${foundListing.surface} m²`);
         }
         
@@ -647,6 +649,9 @@ function Chip({ label }: { label: string }) {
     }
     if (lowerLabel.includes('sdb') || lowerLabel.includes('salle de bain')) {
       return <Bath size={14} color="#0b3b35" />;
+    }
+    if (lowerLabel.includes('salon')) {
+      return <Sofa size={14} color="#0b3b35" />;
     }
     if (lowerLabel.includes('m²') || lowerLabel.includes('surface')) {
       return <Maximize2 size={14} color="#0b3b35" />;
