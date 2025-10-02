@@ -142,4 +142,60 @@ export const api = {
   },
 };
 
+// ===== Providers (professionnels) =====
+const PROVIDERS_KEY = 'mock/providers' as const;
+
+export const providerCategories = [
+  'Agent immobilier',
+  'Gestionnaire de biens',
+  'Agence immobilière',
+  'Resp. réservation hôtel',
+  'Resp. réservation résidence',
+  'Gestionnaire évènementiel',
+] as const;
+
+async function seedProvidersIfEmpty() {
+  const arr = await read<any[]>(PROVIDERS_KEY, []);
+  if (arr.length) return arr;
+  const seed = Array.from({ length: 24 }).map((_, i) => ({
+    id: `pro_${i + 1}`,
+    name: `Prestataire ${i + 1}`,
+    category: providerCategories[i % providerCategories.length],
+    country: ['Côte d’Ivoire', 'Sénégal', 'Bénin', 'Cameroun', 'Togo'][i % 5],
+    city: ['Abidjan', 'Dakar', 'Cotonou', 'Douala', 'Lomé'][i % 5],
+    rating: [3, 3.5, 4, 4.5, 5][i % 5],
+    services: ['Visite', 'Estimation', 'Gestion locative', 'Conciergerie'].slice(0, (i % 4) + 1),
+    visible: true,
+  }));
+  await write(PROVIDERS_KEY, seed);
+  return seed;
+}
+
+export const providersApi = {
+  async list(params?: Record<string, string | number | undefined>) {
+    const all = await seedProvidersIfEmpty();
+    return all.filter((p) => {
+      if (params?.country && p.country !== params.country) return false;
+      if (params?.city && p.city !== params.city) return false;
+      if (params?.category && p.category !== params.category) return false;
+      if (params?.ratingMin && p.rating < Number(params.ratingMin)) return false;
+      return p.visible !== false;
+    });
+  },
+  async get(id: string) {
+    const all = await read<any[]>(PROVIDERS_KEY, []);
+    const p = all.find((x) => x.id === id);
+    if (!p) throw new Error('NOT_FOUND');
+    return p;
+  },
+  async update(id: string, patch: any) {
+    const all = await read<any[]>(PROVIDERS_KEY, []);
+    const i = all.findIndex((x) => x.id === id);
+    if (i < 0) throw new Error('NOT_FOUND');
+    all[i] = { ...all[i], ...patch };
+    await write(PROVIDERS_KEY, all);
+    return all[i];
+  },
+};
+
 export type Api = typeof api;

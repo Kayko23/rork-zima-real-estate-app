@@ -1,0 +1,101 @@
+import React, { useState } from 'react';
+import { View, Text, FlatList, Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import { useQuery } from '@tanstack/react-query';
+import { providersApi, providerCategories } from '@/lib/api';
+import ProFiltersSheet, { type ProFilters } from '@/components/filters/ProFiltersSheet';
+
+const INITIAL: ProFilters = {
+  country: undefined, city: undefined,
+  category: undefined,
+  ratingMin: undefined,
+  services: [],
+};
+
+export default function ProfessionalScreen(){
+  const insets = useSafeAreaInsets();
+  const tabBarH = 56;
+  const [open, setOpen] = useState<boolean>(false);
+  const [filters, setFilters] = useState<ProFilters>(INITIAL);
+
+  const { data = [], isLoading } = useQuery({
+    queryKey: ['providers', filters],
+    queryFn: () => providersApi.list({
+      country: filters.country,
+      city: filters.city,
+      category: filters.category,
+      ratingMin: filters.ratingMin,
+    }),
+  });
+
+  const resultCount = data.length;
+
+  return (
+    <View style={{ flex:1, backgroundColor:'#fff', paddingTop: insets.top }}>
+      <View style={{ height:56, justifyContent:'center', paddingHorizontal:16, borderBottomWidth:0.5, borderBottomColor:'#E5E7EB' }}>
+        <Text style={{ fontSize:18, fontWeight:'800' }}>Professionnels</Text>
+      </View>
+
+      <View style={{ padding:16 }}>
+        <Pressable onPress={()=>setOpen(true)} style={{ height:48, borderRadius:12, borderWidth:1, borderColor:'#E5E7EB', justifyContent:'center', paddingHorizontal:14 }}>
+          <Text style={{ fontWeight:'700' }}>
+            {filters.country ?? 'Pays'}, {filters.city ?? 'Ville'} • {filters.category ?? 'Catégorie'} • {filters.ratingMin ? `${filters.ratingMin}+ ★` : 'Toutes notes'}
+          </Text>
+        </Pressable>
+      </View>
+
+      <FlatList
+        data={providerCategories as readonly string[]}
+        keyExtractor={(k)=>k}
+        contentContainerStyle={{ paddingBottom: insets.bottom + tabBarH + 16 }}
+        renderItem={({ item: cat }) => {
+          const items = (data as any[]).filter((p)=>p.category===cat);
+          if (!items.length) return null as any;
+          return (
+            <View style={{ marginBottom: 18 }}>
+              <Text style={{ fontWeight:'800', fontSize:16, marginLeft:16, marginBottom:8 }}>{cat}</Text>
+              <FlatList
+                horizontal
+                data={items}
+                keyExtractor={(p:any)=>p.id}
+                contentContainerStyle={{ paddingHorizontal: 16 }}
+                ItemSeparatorComponent={()=><View style={{ width:12 }}/>} 
+                renderItem={({item})=> (
+                  <View style={{ width:260, borderWidth:1, borderColor:'#E5E7EB', borderRadius:16, padding:14 }}>
+                    <Text style={{ fontWeight:'800' }}>{item.name}</Text>
+                    <Text style={{ color:'#6B7280', marginTop:2 }}>{item.city}, {item.country}</Text>
+                    <Text style={{ marginTop:6 }}>★ {item.rating}</Text>
+                    <View style={{ flexDirection:'row', flexWrap:'wrap', gap:6, marginTop:8 }}>
+                      {item.services.map((s:string)=>(<Tag key={s} label={s}/>))}
+                    </View>
+                    <Pressable style={{ marginTop:10, backgroundColor:'#0B6B53', borderRadius:10, paddingVertical:10, alignItems:'center' }}>
+                      <Text style={{ color:'#fff', fontWeight:'700' }}>Voir profil</Text>
+                    </Pressable>
+                  </View>
+                )}
+                showsHorizontalScrollIndicator={false}
+              />
+            </View>
+          );
+        }}
+        ListEmptyComponent={!isLoading ? <Text style={{ color:'#64748B', paddingHorizontal:16 }}>Aucun prestataire.</Text> : null}
+      />
+
+      <ProFiltersSheet
+        visible={open}
+        initial={filters}
+        resultCount={resultCount}
+        onClose={()=>setOpen(false)}
+        onApply={(f)=>{ setFilters(f); setOpen(false); }}
+        presetKey="zima/pro/lastFilters"
+      />
+    </View>
+  );
+}
+
+function Tag({ label }:{label:string}){ return (
+  <View style={{ borderWidth:1, borderColor:'#DADADA', borderRadius:999, paddingHorizontal:10, paddingVertical:6 }}>
+    <Text style={{ fontSize:12 }}>{label}</Text>
+  </View>
+); }
