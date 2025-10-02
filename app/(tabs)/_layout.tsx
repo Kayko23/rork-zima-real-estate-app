@@ -1,10 +1,11 @@
 import { Tabs, useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
-import { Platform, StyleSheet, View, Pressable } from 'react-native';
+import { Platform, StyleSheet, View, Pressable, Text } from 'react-native';
 import { Home as HomeIcon, Heart, Building2, MessageCircle, User } from 'lucide-react-native';
 import { useApp } from '@/hooks/useAppStore';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { colors, TABBAR_HEIGHT, TABBAR_RADIUS } from '@/theme/tokens';
 
 export default function TabsLayout() {
   const { userMode } = useApp();
@@ -65,74 +66,125 @@ export default function TabsLayout() {
   );
 }
 
+const ICONS: Record<string, { label: string }> = {
+  home: { label: 'Accueil' },
+  favorites: { label: 'Favoris' },
+  properties: { label: 'Biens' },
+  messages: { label: 'Messages' },
+  profile: { label: 'Profil' },
+};
+
 function GlassTabBar({ state, descriptors, navigation }: any) {
   const insets = useSafeAreaInsets();
-  const activeColor = '#0F6B56';
-  const idle = '#273142CC';
+  const bottomPad = Math.max(insets.bottom, 10);
+  const barH = TABBAR_HEIGHT + bottomPad;
+
   return (
-    <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 10) }]}>
-      {Platform.OS === 'web' ? (
-        <View style={[styles.glass, { backgroundColor: '#FFFFFFCC' }]}> 
-          {state.routes.map((route: any, index: number) => {
-            const isFocused = state.index === index;
-            const onPress = () => {
-              const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
-              if (!isFocused && !event.defaultPrevented) navigation.navigate(route.name);
-            };
-            const Icon = descriptors[route.key].options.tabBarIcon;
-            return (
-              <Pressable key={route.key} onPress={onPress} style={styles.item} testID={`tab-${route.name}`}>
-                {Icon ? <Icon focused={isFocused} color={isFocused ? activeColor : idle} size={22} /> : null}
-              </Pressable>
-            );
-          })}
-        </View>
-      ) : (
-        <BlurView intensity={50} tint="light" style={styles.glass}>
-          {state.routes.map((route: any, index: number) => {
-            const isFocused = state.index === index;
-            const onPress = () => {
-              const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
-              if (!isFocused && !event.defaultPrevented) navigation.navigate(route.name);
-            };
-            const Icon = descriptors[route.key].options.tabBarIcon;
-            return (
-              <Pressable key={route.key} onPress={onPress} style={styles.item} testID={`tab-${route.name}`}>
-                {Icon ? <Icon focused={isFocused} color={isFocused ? activeColor : idle} size={22} /> : null}
-              </Pressable>
-            );
-          })}
-        </BlurView>
-      )}
+    <View style={{ height: barH, backgroundColor: 'transparent' }}>
+      <View style={[styles.wrap, { paddingBottom: bottomPad }]}>
+        {Platform.OS === 'web' ? (
+          <View style={[styles.glass, { backgroundColor: colors.glassBg }]}>
+            <View style={styles.row}>
+              {state.routes.map((route: any, index: number) => {
+                const isFocused = state.index === index;
+                const onPress = () => {
+                  const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+                  if (!isFocused && !event.defaultPrevented) navigation.navigate(route.name);
+                };
+                const Icon = descriptors[route.key].options.tabBarIcon;
+                const meta = ICONS[route.name] ?? { label: route.name };
+                const isCenter = route.name === 'properties';
+
+                return (
+                  <Pressable
+                    key={route.key}
+                    onPress={onPress}
+                    style={[styles.item, isCenter && styles.centerItem]}
+                    testID={`tab-${route.name}`}
+                  >
+                    <View style={[styles.iconWrap, isCenter && styles.centerIconWrap, isFocused && styles.iconActive]}>
+                      {Icon ? <Icon focused={isFocused} color={isFocused ? colors.tabActive : colors.tabInactive} size={isCenter ? 26 : 22} /> : null}
+                    </View>
+                    {!isCenter && (
+                      <Text style={[styles.label, { color: isFocused ? colors.tabActive : colors.tabInactive }]}>
+                        {meta.label}
+                      </Text>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        ) : (
+          <BlurView intensity={30} tint="light" style={styles.glass}>
+            <View style={styles.row}>
+              {state.routes.map((route: any, index: number) => {
+                const isFocused = state.index === index;
+                const onPress = () => {
+                  const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
+                  if (!isFocused && !event.defaultPrevented) navigation.navigate(route.name);
+                };
+                const Icon = descriptors[route.key].options.tabBarIcon;
+                const meta = ICONS[route.name] ?? { label: route.name };
+                const isCenter = route.name === 'properties';
+
+                return (
+                  <Pressable
+                    key={route.key}
+                    onPress={onPress}
+                    style={[styles.item, isCenter && styles.centerItem]}
+                    testID={`tab-${route.name}`}
+                  >
+                    <View style={[styles.iconWrap, isCenter && styles.centerIconWrap, isFocused && styles.iconActive]}>
+                      {Icon ? <Icon focused={isFocused} color={isFocused ? colors.tabActive : colors.tabInactive} size={isCenter ? 26 : 22} /> : null}
+                    </View>
+                    {!isCenter && (
+                      <Text style={[styles.label, { color: isFocused ? colors.tabActive : colors.tabInactive }]}>
+                        {meta.label}
+                      </Text>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </View>
+          </BlurView>
+        )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { height: 88, alignItems: 'center', justifyContent: 'flex-end' },
+  wrap: { position: 'absolute', left: 12, right: 12, bottom: 0 },
   glass: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '92%',
-    borderRadius: 28,
+    height: TABBAR_HEIGHT,
+    borderRadius: TABBAR_RADIUS,
     overflow: 'hidden',
-    paddingVertical: 10,
-    gap: 6,
+    backgroundColor: colors.glassBg,
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    ...Platform.select({
+      android: { backgroundColor: 'rgba(255,255,255,0.80)' },
+    }),
   },
-  item: { flex: 1, alignItems: 'center', justifyContent: 'center', height: 44 },
-  centerBtn: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: '#0F6B56',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 6,
-    transform: [{ translateY: -18 }],
-    shadowColor: '#0F6B56',
+  row: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14 },
+  item: { alignItems: 'center', justifyContent: 'center', gap: 2, width: '19%' },
+  label: { fontSize: 11, fontWeight: '700' },
+  iconWrap: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  iconActive: { backgroundColor: 'rgba(14,96,73,0.10)' },
+  centerItem: { width: '24%' },
+  centerIconWrap: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    marginTop: -16,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: colors.glassBorder,
+    shadowColor: colors.shadow,
     shadowOpacity: 0.35,
-    shadowRadius: 8,
     shadowOffset: { width: 0, height: 6 },
+    shadowRadius: 10,
     elevation: 8,
   },
 });
