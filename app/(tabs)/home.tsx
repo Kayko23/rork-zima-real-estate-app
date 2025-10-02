@@ -8,17 +8,21 @@ import NewArrivals from "@/components/home/NewArrivals";
 import { colors, radius } from "@/theme/tokens";
 import { useRouter } from "expo-router";
 
-const premium: Property[] = [
-  { id:"p1", title:"Villa", city:"Accra", price:274500000, currency:"XOF", beds:4, baths:3, area:280, rating:4.8,
-    photos:["https://images.unsplash.com/photo-1505691723518-36a5ac3b2d91?q=80&w=1400"], badge:"À VENDRE" },
-];
+import { sortPremiumFirst } from "@/utils/sortProperties";
 
-const arrivals: Property[] = [
+const premium: Property[] = sortPremiumFirst([
+  { id:"p1", title:"Villa", city:"Accra", price:274500000, currency:"XOF", beds:4, baths:3, area:280, rating:4.8,
+    photos:["https://images.unsplash.com/photo-1505691723518-36a5ac3b2d91?q=80&w=1400"], badge:'À VENDRE' as const, isPremium: true, createdAt: "2025-01-10T10:00:00Z" },
+  { id:"p2", title:"Studio", city:"Lagos", price:35000000, currency:"XOF", beds:1, baths:1, area:40, rating:4.2,
+    photos:["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1400"], badge:'À LOUER' as const, isPremium: false, createdAt: "2025-01-05T10:00:00Z" },
+]);
+
+const arrivals: Property[] = sortPremiumFirst([
   { id:"n1", title:"Appartement", city:"Lagos", price:732792, currency:"XOF", beds:2, baths:2, area:85, rating:4.6,
-    photos:["https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1400"], badge:"À LOUER" },
+    photos:["https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1400"], badge:'À LOUER' as const, isPremium: false, createdAt: "2025-01-08T10:00:00Z" },
   { id:"n2", title:"Penthouse", city:"Abidjan", price:520000000, currency:"XOF", beds:3, baths:3, area:210, rating:4.7,
-    photos:["https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1400"], badge:"Premium" },
-];
+    photos:["https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1400"], badge:'Premium' as const, isPremium: true, createdAt: "2025-01-12T10:00:00Z" },
+]);
 
 export default function Home() {
   const [tab,setTab] = React.useState<"props"|"pros"|"trips">("props");

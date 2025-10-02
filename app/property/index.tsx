@@ -3,6 +3,7 @@ import { View, Text, FlatList, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useQuery } from '@tanstack/react-query';
+import { sortPremiumFirst } from '@/utils/sortProperties';
 import { api } from '@/lib/api';
 import PropertyFiltersSheet, { type PropertyFilters } from '@/components/filters/PropertyFiltersSheet';
 import { useSettings } from '@/hooks/useSettings';
@@ -39,7 +40,8 @@ export default function PropertyScreen(){
       priceMin: filters.priceMin,
       priceMax: filters.priceMax,
       sort: filters.sort,
-    })
+    }),
+    select: (items) => sortPremiumFirst(items as any[])
   });
 
   const resultCount = data.length;
