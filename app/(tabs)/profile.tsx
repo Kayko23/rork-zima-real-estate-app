@@ -31,6 +31,7 @@ export default function ProfileScreen() {
 
   const handleBecomeProvider = () => {
     console.log('Become provider pressed');
+    router.push('/profile/switch-mode');
   };
 
   const handleNotificationPress = () => {
