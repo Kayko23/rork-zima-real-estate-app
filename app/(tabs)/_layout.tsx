@@ -1,7 +1,7 @@
 import { Tabs, useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Platform, StyleSheet, View, Pressable } from 'react-native';
-import { Home as HomeIcon, Search as SearchIcon, Plane, Briefcase, Plus } from 'lucide-react-native';
+import { Home as HomeIcon, Heart, Building2, MessageCircle, User } from 'lucide-react-native';
 import { useApp } from '@/hooks/useAppStore';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -34,32 +34,31 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="search"
+        name="favorites"
         options={{
-          title: 'Recherche',
-          tabBarIcon: ({ color, size }) => <SearchIcon color={color} size={size} />,
+          title: 'Favoris',
+          tabBarIcon: ({ color, size }) => <Heart color={color} size={size} />,
         }}
       />
       <Tabs.Screen
-        name="publish"
+        name="properties"
         options={{
-          title: 'Publier',
-          tabBarIcon: () => null,
-          href: null,
+          title: 'Biens',
+          tabBarIcon: ({ color, size }) => <Building2 color={color} size={size} />,
         }}
       />
       <Tabs.Screen
-        name="voyages"
+        name="messages"
         options={{
-          title: 'Voyages',
-          tabBarIcon: ({ color, size }) => <Plane color={color} size={size} />,
+          title: 'Messages',
+          tabBarIcon: ({ color, size }) => <MessageCircle color={color} size={size} />,
         }}
       />
       <Tabs.Screen
-        name="professionals"
+        name="profile"
         options={{
-          title: 'Pros',
-          tabBarIcon: ({ color, size }) => <Briefcase color={color} size={size} />,
+          title: 'Profil',
+          tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
         }}
       />
     </Tabs>
@@ -68,7 +67,6 @@ export default function TabsLayout() {
 
 function GlassTabBar({ state, descriptors, navigation }: any) {
   const insets = useSafeAreaInsets();
-  const r = useRouter();
   const activeColor = '#0F6B56';
   const idle = '#273142CC';
   return (
@@ -76,13 +74,6 @@ function GlassTabBar({ state, descriptors, navigation }: any) {
       {Platform.OS === 'web' ? (
         <View style={[styles.glass, { backgroundColor: '#FFFFFFCC' }]}> 
           {state.routes.map((route: any, index: number) => {
-            if (route.name === 'publish') {
-              return (
-                <Pressable key="center" onPress={() => r.push('/property/new')} style={styles.centerBtn} testID="tab-center">
-                  <Plus color="#fff" size={24} />
-                </Pressable>
-              );
-            }
             const isFocused = state.index === index;
             const onPress = () => {
               const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
@@ -99,13 +90,6 @@ function GlassTabBar({ state, descriptors, navigation }: any) {
       ) : (
         <BlurView intensity={50} tint="light" style={styles.glass}>
           {state.routes.map((route: any, index: number) => {
-            if (route.name === 'publish') {
-              return (
-                <Pressable key="center" onPress={() => r.push('/property/new')} style={styles.centerBtn} testID="tab-center">
-                  <Plus color="#fff" size={24} />
-                </Pressable>
-              );
-            }
             const isFocused = state.index === index;
             const onPress = () => {
               const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
