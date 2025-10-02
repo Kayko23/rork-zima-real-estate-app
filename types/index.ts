@@ -21,6 +21,8 @@ export interface Property {
   views: number;
   createdAt: string;
   provider: Provider;
+  status: 'active' | 'paused' | 'draft';
+  ownerPlan: 'pro-monthly' | 'pro-yearly' | 'none';
 }
 
 export interface Provider {

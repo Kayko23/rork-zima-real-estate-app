@@ -12,6 +12,22 @@ type CurrencyState = {
   fxRates: Record<string, number>;
 };
 
+type Plan = 'pro-monthly' | 'pro-yearly' | 'none';
+
+type PaymentMethod = {
+  id: string;
+  brand: 'visa' | 'mc' | 'amex';
+  last4: string;
+  exp: string;
+  isDefault?: boolean;
+};
+
+type SubscriptionState = {
+  plan: Plan;
+  nextBillingAt?: string | null;
+  paymentMethods: PaymentMethod[];
+};
+
 // Cross-platform storage
 const storage = {
   getItem: async (key: string): Promise<string | null> => {
@@ -88,6 +104,11 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const [favoritePropertyIds, setFavoritePropertyIds] = useState<Set<string>>(new Set());
   const [favoriteProviderIds, setFavoriteProviderIds] = useState<Set<string>>(new Set());
   const [favoriteVoyageIds, setFavoriteVoyageIds] = useState<Set<string>>(new Set());
+  const [subscription, setSubscription] = useState<SubscriptionState>({
+    plan: 'none',
+    nextBillingAt: null,
+    paymentMethods: [],
+  });
 
   useEffect(() => {
     let mounted = true;
@@ -128,6 +149,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       const savedFavProperties = await storage.getItem('favoriteProperties');
       const savedFavProviders = await storage.getItem('favoriteProviders');
       const savedFavVoyages = await storage.getItem('favoriteVoyages');
+      const savedSubscription = await storage.getItem('subscription');
       
       if (savedMode && savedMode.trim()) {
         setUserMode(savedMode as UserMode);
@@ -180,6 +202,14 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
           setFavoriteVoyageIds(new Set(parsed));
         } catch (e) {
           console.log('Error parsing favorite voyages', e);
+        }
+      }
+      if (savedSubscription) {
+        try {
+          const parsed = JSON.parse(savedSubscription);
+          setSubscription(parsed);
+        } catch (e) {
+          console.log('Error parsing subscription', e);
         }
       }
       
@@ -323,6 +353,24 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const isFavoriteProvider = useCallback((id: string) => favoriteProviderIds.has(id), [favoriteProviderIds]);
   const isFavoriteVoyage = useCallback((id: string) => favoriteVoyageIds.has(id), [favoriteVoyageIds]);
 
+  const setPlan = useCallback(async (plan: Plan, nextBillingAt?: string | null) => {
+    const updated = { ...subscription, plan, nextBillingAt: nextBillingAt ?? subscription.nextBillingAt };
+    setSubscription(updated);
+    await storage.setItem('subscription', JSON.stringify(updated));
+  }, [subscription]);
+
+  const setPaymentMethods = useCallback(async (methods: PaymentMethod[]) => {
+    const updated = { ...subscription, paymentMethods: methods };
+    setSubscription(updated);
+    await storage.setItem('subscription', JSON.stringify(updated));
+  }, [subscription]);
+
+  const cancelSubscription = useCallback(async () => {
+    const updated = { ...subscription, plan: 'none' as Plan, nextBillingAt: null };
+    setSubscription(updated);
+    await storage.setItem('subscription', JSON.stringify(updated));
+  }, [subscription]);
+
   return useMemo(() => ({
     userMode,
     user,
@@ -339,6 +387,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     favoritePropertyIds,
     favoriteProviderIds,
     favoriteVoyageIds,
+    subscription,
     switchMode,
     toggleAppMode,
     updateUser,
@@ -356,8 +405,11 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     toggleFavoriteVoyage,
     isFavoriteProperty,
     isFavoriteProvider,
-    isFavoriteVoyage
-  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, activeHomeTab, currency, fxBase, fxRates, favoritePropertyIds, favoriteProviderIds, favoriteVoyageIds, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding, setHomeTab, setCurrency, setFx, hydrate, toggleFavoriteProperty, toggleFavoriteProvider, toggleFavoriteVoyage, isFavoriteProperty, isFavoriteProvider, isFavoriteVoyage]);
+    isFavoriteVoyage,
+    setPlan,
+    setPaymentMethods,
+    cancelSubscription
+  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, activeHomeTab, currency, fxBase, fxRates, favoritePropertyIds, favoriteProviderIds, favoriteVoyageIds, subscription, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding, setHomeTab, setCurrency, setFx, hydrate, toggleFavoriteProperty, toggleFavoriteProvider, toggleFavoriteVoyage, isFavoriteProperty, isFavoriteProvider, isFavoriteVoyage, setPlan, setPaymentMethods, cancelSubscription]);
 });
 
 // Export a safe version of the hook that always returns a valid object
@@ -382,6 +434,7 @@ export const useApp = () => {
       favoritePropertyIds: new Set<string>(),
       favoriteProviderIds: new Set<string>(),
       favoriteVoyageIds: new Set<string>(),
+      subscription: { plan: 'none' as const, nextBillingAt: null, paymentMethods: [] },
       switchMode: async () => {},
       toggleAppMode: async () => {},
       updateUser: async () => {},
@@ -399,7 +452,10 @@ export const useApp = () => {
       toggleFavoriteVoyage: async () => {},
       isFavoriteProperty: () => false,
       isFavoriteProvider: () => false,
-      isFavoriteVoyage: () => false
+      isFavoriteVoyage: () => false,
+      setPlan: async () => {},
+      setPaymentMethods: async () => {},
+      cancelSubscription: async () => {}
     };
   }
   

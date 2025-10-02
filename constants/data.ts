@@ -28,6 +28,8 @@ export const mockProperties: Property[] = [
     isFavorite: false,
     views: 1250,
     createdAt: '2024-01-15',
+    status: 'active' as const,
+    ownerPlan: 'pro-yearly' as const,
     provider: {
       id: 'p1',
       name: 'Kwame Asante Realty',
@@ -71,6 +73,8 @@ export const mockProperties: Property[] = [
     isFavorite: true,
     views: 890,
     createdAt: '2024-01-20',
+    status: 'active' as const,
+    ownerPlan: 'pro-monthly' as const,
     provider: {
       id: 'p2',
       name: 'Adebayo Properties',
@@ -116,6 +120,8 @@ export const mockProperties: Property[] = [
     isFavorite: false,
     views: 2100,
     createdAt: '2024-01-18',
+    status: 'active' as const,
+    ownerPlan: 'pro-yearly' as const,
     provider: {
       id: 'p1',
       name: 'Kwame Asante Realty',
@@ -159,6 +165,8 @@ export const mockProperties: Property[] = [
     isFavorite: false,
     views: 650,
     createdAt: '2024-01-22',
+    status: 'active' as const,
+    ownerPlan: 'pro-monthly' as const,
     provider: {
       id: 'p2',
       name: 'Adebayo Properties',
@@ -203,6 +211,8 @@ export const mockProperties: Property[] = [
     isFavorite: true,
     views: 1450,
     createdAt: '2024-01-19',
+    status: 'active' as const,
+    ownerPlan: 'pro-yearly' as const,
     provider: {
       id: 'p1',
       name: 'Kwame Asante Realty',
