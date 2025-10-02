@@ -105,14 +105,15 @@ export default function Home() {
           </Pressable>
         </View>
 
-        <SectionHeader title="Par catégories" />
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal:12, gap:8 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal:12, gap:8, marginBottom: 8 }}>
           {categories.map((c)=> (
             <Pressable key={c} onPress={()=>setCat(c)} style={({pressed})=>[styles.chip, cat===c && styles.chipA, pressed && { opacity:.85 }]} testID={`chip-${c}`}>
               <Text style={[styles.chipTx, cat===c && styles.chipTxA]}>{c}</Text>
             </Pressable>
           ))}
         </ScrollView>
+
+        <SectionHeader title="Par catégories" />
 
         <FlatList
           horizontal
