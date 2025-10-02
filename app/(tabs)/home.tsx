@@ -4,6 +4,7 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import SegmentedTabs from "@/components/home/SegmentedTabs";
 import SectionHeader from "@/components/home/SectionHeader";
 import PropertyCard, { type Property } from "@/components/property/PropertyCard";
+import NewArrivals from "@/components/home/NewArrivals";
 import { colors, radius } from "@/theme/tokens";
 import { useRouter } from "expo-router";
 
@@ -12,11 +13,24 @@ const premium: Property[] = [
     photos:["https://images.unsplash.com/photo-1505691723518-36a5ac3b2d91?q=80&w=1400"], badge:"À VENDRE" },
 ];
 
+const arrivals: Property[] = [
+  { id:"n1", title:"Appartement", city:"Lagos", price:732792, currency:"XOF", beds:2, baths:2, area:85, rating:4.6,
+    photos:["https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1400"], badge:"À LOUER" },
+  { id:"n2", title:"Penthouse", city:"Abidjan", price:520000000, currency:"XOF", beds:3, baths:3, area:210, rating:4.7,
+    photos:["https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1400"], badge:"Premium" },
+];
+
 export default function Home() {
   const [tab,setTab] = React.useState<"props"|"pros"|"trips">("props");
+  const [loadingNew, setLoadingNew] = React.useState<boolean>(true);
   const { bottom, top } = useSafeAreaInsets();
   const router = useRouter();
   const { width } = useWindowDimensions();
+
+  React.useEffect(() => {
+    const t = setTimeout(()=>setLoadingNew(false), 1200);
+    return () => clearTimeout(t);
+  }, []);
 
   const goPros = () => router.push("/professionals");
   const goTrips = () => router.push("/voyages");
@@ -67,6 +81,8 @@ export default function Home() {
             <Text style={[styles.ctaTxt, { color: colors.primary }]}>Trouver un pro</Text>
           </Pressable>
         </View>
+
+        <NewArrivals data={arrivals} loading={loadingNew} />
 
         <SectionHeader title="Par catégories" />
         <ScrollView
