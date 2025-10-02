@@ -37,15 +37,15 @@ export default function ProfessionalScreen(){
 
   return (
     <View style={{ flex:1, backgroundColor:'#fff' }}>
-      <View style={{ paddingTop: insets.top, backgroundColor:'#fff', borderBottomWidth:0.5, borderBottomColor:'#E5E7EB' }}>
+      <View style={{ paddingTop: insets.top, backgroundColor:'#fff', borderBottomWidth:0.5, borderBottomColor:'#E5E7EB', position: 'relative', zIndex: 10 }}>
         <ZimaBrand />
         
         <View style={{ paddingHorizontal:16, paddingTop:16, paddingBottom:12 }}>
           <SegmentedTabs 
             value="pros" 
             onChange={(k)=>{
-              if (k==='props') router.push('/properties');
-              else if (k==='trips') router.push('/voyages');
+              if (k==='props') router.push('/(tabs)/properties');
+              else if (k==='trips') router.push('/(tabs)/voyages');
             }} 
           />
         </View>

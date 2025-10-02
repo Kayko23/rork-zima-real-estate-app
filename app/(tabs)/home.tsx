@@ -38,8 +38,8 @@ export default function Home() {
     return () => clearTimeout(t);
   }, []);
 
-  const goPros = () => router.push("/professionals");
-  const goTrips = () => router.push("/voyages");
+  const goPros = () => router.push("/(tabs)/professionals");
+  const goTrips = () => router.push("/(tabs)/voyages");
 
   const all: Property[] = React.useMemo(() => sortPremiumFirst([...premiumSeed, ...arrivalsSeed]), []);
   const categories = React.useMemo(() => ["Résidentiel","Bureaux","Commerces","Terrains","Industriel","Luxe"], []);
@@ -52,17 +52,20 @@ export default function Home() {
         showsVerticalScrollIndicator={false}
         bounces
       >
-        <Text style={styles.brand}>ZIMA</Text>
+        <Pressable onPress={() => router.push('/(tabs)/home')} style={{ alignSelf: 'center' }}>
+          <Text style={styles.brand}>ZIMA</Text>
+        </Pressable>
 
         <View style={{ paddingHorizontal:16 }}>
           <SegmentedTabs value={tab} onChange={(k)=>{
             setTab(k);
+            if (k==="props") router.push("/(tabs)/properties");
             if (k==="pros") goPros();
             if (k==="trips") goTrips();
           }}/>
         </View>
 
-        <SectionHeader title="Biens premium" onSeeAll={()=>router.push("/property")} />
+        <SectionHeader title="Biens premium" onSeeAll={()=>router.push("/(tabs)/properties")} />
         <FlatList
           horizontal
           data={premiumSeed}
@@ -124,7 +127,7 @@ export default function Home() {
             </View>
           )}
           ListFooterComponent={
-            <Pressable onPress={()=>router.push({ pathname:'/properties', params:{ category: cat } } as any)} style={styles.more} testID="see-all-cat">
+            <Pressable onPress={()=>router.push({ pathname:'/(tabs)/properties', params:{ category: cat } } as any)} style={styles.more} testID="see-all-cat">
               <Text style={{ color: colors.primary, fontWeight: '700' }}>Voir tout {cat} ›</Text>
             </Pressable>
           }

@@ -46,15 +46,15 @@ export default function TripScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.stickyHeader, { paddingTop: insets.top }]}>
+      <View style={[styles.stickyHeader, { paddingTop: insets.top, position: 'relative', zIndex: 10 }]}>
         <ZimaBrand />
         
         <View style={{ paddingHorizontal:16, paddingTop:16, paddingBottom:12 }}>
           <SegmentedTabs 
             value="trips" 
             onChange={(k)=>{
-              if (k==='props') router.push('/properties');
-              else if (k==='pros') router.push('/professionals');
+              if (k==='props') router.push('/(tabs)/properties');
+              else if (k==='pros') router.push('/(tabs)/professionals');
             }} 
           />
         </View>

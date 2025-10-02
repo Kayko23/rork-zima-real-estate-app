@@ -1,11 +1,22 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { Text, StyleSheet, Pressable } from "react-native";
+import { useRouter } from "expo-router";
 
-export default function ZimaBrand() {
+export default function ZimaBrand({ onPress }: { onPress?: () => void }) {
+  const router = useRouter();
+  
+  const handlePress = () => {
+    if (onPress) {
+      onPress();
+    } else {
+      router.push('/(tabs)/home');
+    }
+  };
+
   return (
-    <View style={styles.wrap}>
+    <Pressable onPress={handlePress} style={styles.wrap}>
       <Text style={styles.wordmark}>ZIMA</Text>
-    </View>
+    </Pressable>
   );
 }
 
