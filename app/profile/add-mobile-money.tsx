@@ -1,36 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Pressable, Alert, StyleSheet, ScrollView } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useApp } from '@/hooks/useAppStore';
-import { currencyForCountry, validateMsisdn } from '@/utils/mobileMoney';
+import { currencyForCountry, validateMsisdn, providersForCountry } from '@/utils/mobileMoney';
 import type { MobileMoneyProvider } from '@/types';
 import { colors, radius } from '@/theme/tokens';
-import { ChevronLeft } from 'lucide-react-native';
 
 const COUNTRIES = [
-  'Sénégal', "Côte d'Ivoire", 'Bénin', 'Togo', 'Mali', 'Burkina Faso', 'Niger', 'Guinée-Bissau',
-  'Cameroun', 'Gabon', 'Congo', 'Tchad', 'RCA', 'Guinée Équatoriale',
-  'Ghana', 'Nigeria',
-];
-
-const PROVIDERS: { key: MobileMoneyProvider; label: string }[] = [
-  { key: 'orange', label: 'Orange Money' },
-  { key: 'mtn', label: 'MTN MoMo' },
-  { key: 'moov', label: 'Moov Money' },
-  { key: 'wave', label: 'Wave' },
+  "Sénégal", "Côte d'Ivoire", "Bénin", "Togo", "Mali", "Burkina Faso", "Niger", "Guinée-Bissau",
+  "Cameroun", "Gabon", "Congo", "Tchad", "RCA", "Guinée Équatoriale", "Ghana", "Nigeria",
 ];
 
 export default function AddMobileMoneyScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { addPaymentMethod } = useApp();
-  const [country, setCountry] = useState<string>('Sénégal');
+  const [country, setCountry] = useState<string>("Sénégal");
   const [provider, setProvider] = useState<MobileMoneyProvider>('orange');
   const [phone, setPhone] = useState<string>('');
   const [accountName, setAccountName] = useState<string>('');
 
   const currency = currencyForCountry(country);
+  const providers = providersForCountry(country);
+
+  useEffect(() => {
+    if (!providers.includes(provider)) {
+      setProvider(providers[0]);
+    }
+  }, [country, provider, providers]);
 
   const onSave = async () => {
     if (!validateMsisdn(country, phone)) {
@@ -38,11 +34,10 @@ export default function AddMobileMoneyScreen() {
       return;
     }
     
-    const id = `mm_${Date.now()}`;
     await addPaymentMethod({
-      id,
+      id: `mm_${Date.now()}`,
       type: 'mobile_money',
-      isDefault: false,
+      isDefault: true,
       provider,
       country,
       phone: phone.replace(/[^\d]/g, ''),
@@ -50,60 +45,31 @@ export default function AddMobileMoneyScreen() {
       currency,
     });
     
-    Alert.alert('Ajouté', `Mobile money ${PROVIDERS.find(p => p.key === provider)?.label} — ${currency}`);
+    Alert.alert('Ajouté', `${provider.toUpperCase()} • ${country} • ${currency}`);
     router.back();
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.bg, paddingTop: insets.top }}>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          title: 'Ajouter Mobile Money',
-          headerLeft: () => (
-            <Pressable onPress={() => router.back()} hitSlop={8}>
-              <ChevronLeft color={colors.text} size={24} />
-            </Pressable>
-          ),
-        }}
-      />
-      
-      <ScrollView contentContainerStyle={s.container}>
-        <Text style={s.label}>Pays</Text>
-        <ChipRow items={COUNTRIES} value={country} onChange={setCountry} />
+    <ScrollView contentContainerStyle={s.container} style={s.scrollView}>
+        <Label>Pays</Label>
+        <Chips value={country} items={COUNTRIES} onChange={setCountry} />
 
-        <Text style={s.label}>Opérateur</Text>
-        <View style={s.providerGrid}>
-          {PROVIDERS.map(p => (
-            <Pressable
-              key={p.key}
-              onPress={() => setProvider(p.key)}
-              style={[s.providerChip, provider === p.key && s.providerChipActive]}
-            >
-              <Text style={[s.providerText, provider === p.key && s.providerTextActive]}>
-                {p.label}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-
-        <Text style={s.label}>Titulaire (optionnel)</Text>
-        <TextInput
-          placeholder="Nom du compte"
-          value={accountName}
-          onChangeText={setAccountName}
-          style={s.input}
-          placeholderTextColor={colors.sub}
+        <Label>Opérateur</Label>
+        <Chips
+          value={provider.toUpperCase()}
+          items={providers.map(p => p.toUpperCase())}
+          onChange={(v) => setProvider(v.toLowerCase() as MobileMoneyProvider)}
         />
 
-        <Text style={s.label}>Téléphone (Mobile Money)</Text>
-        <TextInput
+        <Label>Titulaire (optionnel)</Label>
+        <Input placeholder="Nom du compte" value={accountName} onChangeText={setAccountName} />
+
+        <Label>Téléphone (Mobile Money)</Label>
+        <Input
           placeholder="ex: 770000000"
           keyboardType="phone-pad"
           value={phone}
           onChangeText={setPhone}
-          style={s.input}
-          placeholderTextColor={colors.sub}
         />
 
         <View style={s.currencyRow}>
@@ -112,85 +78,80 @@ export default function AddMobileMoneyScreen() {
         </View>
 
         <Pressable onPress={onSave} style={s.cta}>
-          <Text style={s.ctaText}>Enregistrer</Text>
+          <Text style={s.ctaTx}>Enregistrer</Text>
         </Pressable>
-      </ScrollView>
-    </View>
+    </ScrollView>
   );
 }
 
-function ChipRow({ items, value, onChange }: { items: string[]; value: string; onChange: (v: string) => void }) {
-  return (
-    <View style={s.chipRow}>
-      {items.map(it => (
-        <Pressable
-          key={it}
-          onPress={() => onChange(it)}
-          style={[s.chip, value === it && s.chipActive]}
-        >
-          <Text style={[s.chipText, value === it && s.chipTextActive]}>{it}</Text>
-        </Pressable>
-      ))}
-    </View>
-  );
-}
+const Label = ({ children }: { children: React.ReactNode }) => (
+  <Text style={s.label}>{children}</Text>
+);
+
+const Input = (props: any) => <TextInput {...props} style={s.input} />;
+
+const Chips = ({
+  items,
+  value,
+  onChange,
+}: {
+  items: string[];
+  value: string;
+  onChange: (v: string) => void;
+}) => (
+  <View style={s.chipsContainer}>
+    {items.map((it) => (
+      <Pressable
+        key={it}
+        onPress={() => onChange(it)}
+        style={[s.chip, value === it && s.chipActive]}
+      >
+        <Text style={[s.chipTx, value === it && s.chipTxActive]}>{it}</Text>
+      </Pressable>
+    ))}
+  </View>
+);
 
 const s = StyleSheet.create({
-  container: { padding: 16, gap: 16, paddingBottom: 40 },
-  label: { fontWeight: '800', color: colors.text, fontSize: 15 },
+  scrollView: { flex: 1, backgroundColor: colors.bg },
+  container: { padding: 16, gap: 12, paddingBottom: 24 },
+  label: { fontWeight: '800', marginTop: 6, color: colors.text },
   input: {
     backgroundColor: colors.panel,
     borderColor: colors.muted,
     borderWidth: 1,
     borderRadius: radius.md,
-    paddingHorizontal: 14,
-    height: 48,
-    fontSize: 15,
+    paddingHorizontal: 12,
+    height: 46,
     color: colors.text,
   },
-  chipRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+  chipsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: radius.xl,
+    borderRadius: 999,
     borderWidth: 1,
     borderColor: colors.muted,
     backgroundColor: colors.panel,
   },
   chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chipText: { color: colors.text, fontWeight: '700', fontSize: 13 },
-  chipTextActive: { color: '#fff' },
-  providerGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  providerChip: {
-    flex: 1,
-    minWidth: '45%',
-    paddingVertical: 14,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.muted,
-    backgroundColor: colors.panel,
-    alignItems: 'center',
-  },
-  providerChipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  providerText: { color: colors.text, fontWeight: '700', fontSize: 14 },
-  providerTextActive: { color: '#fff' },
+  chipTx: { color: colors.text, fontWeight: '700', fontSize: 13 },
+  chipTxActive: { color: '#fff' },
   currencyRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    backgroundColor: colors.primarySoft,
-    borderRadius: radius.md,
+    marginTop: 6,
+    paddingVertical: 8,
   },
-  currencyLabel: { color: colors.text, fontWeight: '600' },
-  currencyValue: { color: colors.primary, fontWeight: '800', fontSize: 16 },
+  currencyLabel: { color: colors.sub, fontSize: 14 },
+  currencyValue: { fontWeight: '800', color: colors.text, fontSize: 16 },
   cta: {
-    marginTop: 8,
+    marginTop: 10,
     backgroundColor: colors.primary,
     borderRadius: radius.md,
-    paddingVertical: 16,
+    paddingVertical: 14,
     alignItems: 'center',
   },
-  ctaText: { color: '#fff', fontWeight: '800', fontSize: 16 },
+  ctaTx: { color: '#fff', fontWeight: '800', fontSize: 15 },
 });

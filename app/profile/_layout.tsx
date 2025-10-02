@@ -22,6 +22,7 @@ export default function ProfileLayout() {
       <Stack.Screen name="language-currency" options={{ title: "Langue & Devise" }} />
       <Stack.Screen name="switch-mode" options={{ title: "Passer en mode prestataire" }} />
       <Stack.Screen name="help" options={{ title: "Aide & support" }} />
+      <Stack.Screen name="add-mobile-money" options={{ title: "Ajouter Mobile Money" }} />
       <Stack.Screen name="favorites-bridge" options={{ headerShown: false }} />
       <Stack.Screen name="messages-bridge" options={{ headerShown: false }} />
     </Stack>
