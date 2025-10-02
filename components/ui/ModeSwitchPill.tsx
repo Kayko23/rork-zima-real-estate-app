@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { 
   TouchableOpacity, 
   Text, 
@@ -21,6 +21,11 @@ export default function ModeSwitchPill() {
   const [isAnimating, setIsAnimating] = useState(false);
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const label = userMode === 'user' 
     ? 'Passer en mode prestataire' 
@@ -29,8 +34,7 @@ export default function ModeSwitchPill() {
   const handlePress = async () => {
     if (isAnimating) return;
 
-    // Check for dirty forms (placeholder for future implementation)
-    const isDirty = false; // This would be set by form contexts
+    const isDirty = false;
     
     if (isDirty) {
       Alert.alert(
@@ -54,7 +58,6 @@ export default function ModeSwitchPill() {
   const performSwitch = async () => {
     setIsAnimating(true);
 
-    // Haptic feedback
     if (Platform.OS !== 'web') {
       try {
         await Haptics.selectionAsync();
@@ -63,7 +66,6 @@ export default function ModeSwitchPill() {
       }
     }
 
-    // Rotation animation
     Animated.parallel([
       Animated.timing(rotateAnim, {
         toValue: 1,
@@ -83,15 +85,12 @@ export default function ModeSwitchPill() {
         }),
       ]),
     ]).start(() => {
-      // Reset rotation
       rotateAnim.setValue(0);
       setIsAnimating(false);
     });
 
-    // Switch mode
     await toggleAppMode();
 
-    // Fire custom event for telemetry
     if (Platform.OS === 'web') {
       const newMode = userMode === 'user' ? 'provider' : 'user';
       window.dispatchEvent(new CustomEvent('appModeChanged', {
@@ -108,6 +107,15 @@ export default function ModeSwitchPill() {
     [rotateAnim]
   );
 
+  if (!mounted) {
+    return null;
+  }
+
+  const iconTransform = [
+    { rotate: spin },
+    { scale: scaleAnim }
+  ];
+
   return (
     <TouchableOpacity
       style={[
@@ -120,45 +128,31 @@ export default function ModeSwitchPill() {
       accessibilityLabel={label}
       accessibilityHint="Basculer entre les modes utilisateur et prestataire"
     >
-      {Platform.OS === 'web' ? (
-        <View style={styles.webGlass}>
-          <View style={styles.content}>
-            <Animated.View 
-              style={[
-                styles.iconContainer,
-                { 
-                  transform: [
-                    { rotate: spin },
-                    { scale: scaleAnim }
-                  ]
-                }
-              ]}
-            >
-              <ArrowLeftRight size={18} color={Colors.text.primary} />
-            </Animated.View>
-            <Text style={styles.label}>{label}</Text>
+      <View style={styles.wrapper}>
+        {Platform.OS === 'web' ? (
+          <View style={styles.webGlass}>
+            <View style={styles.content}>
+              <View style={styles.iconContainer}>
+                <Animated.View style={{ transform: iconTransform }}>
+                  <ArrowLeftRight size={18} color={Colors.text.primary} />
+                </Animated.View>
+              </View>
+              <Text style={styles.label}>{label}</Text>
+            </View>
           </View>
-        </View>
-      ) : (
-        <BlurView intensity={30} tint="light" style={styles.glass}>
-          <View style={styles.content}>
-            <Animated.View 
-              style={[
-                styles.iconContainer,
-                { 
-                  transform: [
-                    { rotate: spin },
-                    { scale: scaleAnim }
-                  ]
-                }
-              ]}
-            >
-              <ArrowLeftRight size={18} color={Colors.text.primary} />
-            </Animated.View>
-            <Text style={styles.label}>{label}</Text>
-          </View>
-        </BlurView>
-      )}
+        ) : (
+          <BlurView intensity={30} tint="light" style={styles.glass}>
+            <View style={styles.content}>
+              <View style={styles.iconContainer}>
+                <Animated.View style={{ transform: iconTransform }}>
+                  <ArrowLeftRight size={18} color={Colors.text.primary} />
+                </Animated.View>
+              </View>
+              <Text style={styles.label}>{label}</Text>
+            </View>
+          </BlurView>
+        )}
+      </View>
     </TouchableOpacity>
   );
 }
@@ -169,6 +163,8 @@ const styles = StyleSheet.create({
     left: '50%',
     marginLeft: -100,
     zIndex: 1000,
+  },
+  wrapper: {
     borderRadius: 32,
     overflow: 'hidden',
     shadowColor: '#000',
