@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, Pressable, ScrollView, Modal, TextInput, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
+import RangeSlider from '@/components/inputs/RangeSlider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -123,10 +124,13 @@ export default function PropertyFiltersSheet({
             </Section>
 
             <Section title="Budget">
-              <Row>
-                <NumberInput label="Min" value={f.priceMin} onChange={v=>setF(s=>({...s, priceMin:v}))}/>
-                <NumberInput label="Max" value={f.priceMax} onChange={v=>setF(s=>({...s, priceMax:v}))}/>
-              </Row>
+              <RangeSlider
+                min={0}
+                max={2_000_000}
+                values={[f.priceMin ?? 0, f.priceMax ?? 2_000_000]}
+                onChange={([minV, maxV])=>setF(s=>({...s, priceMin:minV, priceMax:maxV}))}
+              />
+              <Text style={{ color:'#6B7280', marginTop:6 }}>{fmt(f.priceMin)} – {fmt(f.priceMax)}</Text>
             </Section>
 
             <Section title="Tri">
@@ -186,6 +190,7 @@ function NumberInput({ label, value, onChange }:{label:string, value?:number, on
   <TextInput value={value!=null?String(value):''} onChangeText={t=>onChange(t?Number(t.replace(/[^\d]/g,''))||0:undefined)} keyboardType="numeric"
     style={{ borderWidth:1, borderColor:'#D9D9D9', borderRadius:12, paddingHorizontal:12, paddingVertical:10, marginTop:6 }}/>
 </View>; }
+const fmt = (n?: number) => n!=null ? new Intl.NumberFormat('fr-FR', { maximumFractionDigits:0 }).format(n) : '—';
 function Search({ value, onChange, placeholder }:{value:string, onChange:(s:string)=>void, placeholder:string}){ return <TextInput value={value} onChangeText={onChange} placeholder={placeholder} style={{ borderWidth:1, borderColor:'#E5E7EB', borderRadius:12, paddingHorizontal:12, paddingVertical:10, marginBottom:10 }} />; }
 function Close({ onPress }:{onPress:()=>void}){ return <Pressable onPress={onPress} style={{ alignSelf:'center', marginTop:10, paddingVertical:10, paddingHorizontal:16, backgroundColor:'#0B6B53', borderRadius:10 }}><Text style={{ color:'#fff', fontWeight:'800' }}>Fermer</Text></Pressable>; }
 

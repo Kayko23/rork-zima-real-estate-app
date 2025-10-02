@@ -34,6 +34,7 @@ export const api = {
   async listProperties(params?: Record<string, string | number | undefined>) {
     const all = await read<any[]>(KEYS.properties, []);
     return all.filter((p) => {
+      if (p.deletedAt) return false;
       if (params?.category && p.category !== params.category) return false;
       if (params?.country && p.country !== params.country) return false;
       if (params?.city && p.city !== params.city) return false;
@@ -69,6 +70,30 @@ export const api = {
     const all = await read<any[]>(KEYS.properties, []);
     const next = all.filter((x) => x.id !== id);
     await write(KEYS.properties, next);
+    return true as const;
+  },
+  async pauseProperty(id: string) {
+    const all = await read<any[]>(KEYS.properties, []);
+    const i = all.findIndex((x) => x.id === id);
+    if (i < 0) throw new Error('NOT_FOUND');
+    all[i].visible = false;
+    all[i].updatedAt = Date.now();
+    await write(KEYS.properties, all);
+    return all[i];
+  },
+  async publishProperty(id: string) {
+    const all = await read<any[]>(KEYS.properties, []);
+    const i = all.findIndex((x) => x.id === id);
+    if (i < 0) throw new Error('NOT_FOUND');
+    all[i].visible = true;
+    all[i].updatedAt = Date.now();
+    await write(KEYS.properties, all);
+    return all[i];
+  },
+  async softDeleteProperty(id: string) {
+    let all = await read<any[]>(KEYS.properties, []);
+    all = all.map((p) => (p.id === id ? { ...p, deletedAt: Date.now(), visible: false } : p));
+    await write(KEYS.properties, all);
     return true as const;
   },
   async listProviderProperties(providerId: string) {

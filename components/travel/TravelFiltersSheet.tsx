@@ -10,6 +10,7 @@ import {
   TextInput,
   StyleSheet,
 } from 'react-native';
+import RangeSlider from '@/components/inputs/RangeSlider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -190,22 +191,12 @@ export default function TravelFiltersSheet({
             </Section>
 
             <Section title="Budget (par nuit)">
-              <Row>
-                <Input
-                  label="Min"
-                  keyboardType="numeric"
-                  value={String(f.priceMin ?? '')}
-                  onChangeText={setPriceMin}
-                  placeholder="0"
-                />
-                <Input
-                  label="Max"
-                  keyboardType="numeric"
-                  value={String(f.priceMax ?? '')}
-                  onChangeText={setPriceMax}
-                  placeholder="2 000 000"
-                />
-              </Row>
+              <RangeSlider
+                min={0}
+                max={2_000_000}
+                values={[f.priceMin ?? 0, f.priceMax ?? 2_000_000]}
+                onChange={([minV, maxV]) => setF(s=>({ ...s, priceMin: minV, priceMax: maxV }))}
+              />
               <Text style={styles.hint}>{fmt(f.priceMin ?? 0)} – {fmt(f.priceMax ?? 0)}</Text>
             </Section>
 
@@ -346,9 +337,9 @@ function Chip({ label, selected, onPress }: { label: string; selected?: boolean;
 function Stepper({ value, onMinus, onPlus }: { value: number; onMinus: () => void; onPlus: () => void }) {
   return (
     <View style={styles.stepperRow}>
-      <BtnSquare onPress={onMinus}>−</BtnSquare>
+      <BtnSquare onPress={onMinus}><Text style={styles.btnSquareTxt}>−</Text></BtnSquare>
       <Text style={styles.stepperValue}>{value} voyageur(s)</Text>
-      <BtnSquare onPress={onPlus}>＋</BtnSquare>
+      <BtnSquare onPress={onPlus}><Text style={styles.btnSquareTxt}>＋</Text></BtnSquare>
     </View>
   );
 }
@@ -356,7 +347,7 @@ function Stepper({ value, onMinus, onPlus }: { value: number; onMinus: () => voi
 function BtnSquare({ onPress, children }: { onPress: () => void; children: React.ReactNode }) {
   return (
     <Pressable onPress={onPress} style={styles.btnSquare}>
-      <Text style={styles.btnSquareTxt}>{children}</Text>
+      {children}
     </Pressable>
   );
 }
