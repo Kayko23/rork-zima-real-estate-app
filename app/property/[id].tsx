@@ -41,6 +41,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import LiquidGlassView from "@/components/ui/LiquidGlassView";
 import WhatsAppChoiceSheet from "@/components/ui/WhatsAppChoiceSheet";
+import { fetchListings } from "@/services/annonces.api";
+import { mockProperties } from "@/constants/data";
 
 const { width } = Dimensions.get("window");
 const CARD = 16;
@@ -124,35 +126,19 @@ function PropertyDetailScreen() {
         
         let allListings: any[] = [];
         let pendingListings: any[] = [];
-        let mockProperties: any[] = [];
         
         try {
-          const { fetchListings } = await import("@/services/annonces.api");
-          
-          try {
-            allListings = await fetchListings("active");
-            console.log("[PropertyDetail] Active listings loaded:", allListings.length);
-          } catch (err) {
-            console.error("[PropertyDetail] Error fetching active listings:", err);
-          }
-          
-          try {
-            pendingListings = await fetchListings("pending");
-            console.log("[PropertyDetail] Pending listings loaded:", pendingListings.length);
-          } catch (err) {
-            console.error("[PropertyDetail] Error fetching pending listings:", err);
-          }
-        } catch (importErr) {
-          console.error("[PropertyDetail] Error importing annonces module:", importErr);
+          allListings = await fetchListings("active");
+          console.log("[PropertyDetail] Active listings loaded:", allListings.length);
+        } catch (err) {
+          console.error("[PropertyDetail] Error fetching active listings:", err);
         }
         
         try {
-          const { mockProperties: props } = await import("@/constants/data");
-          if (Array.isArray(props)) {
-            mockProperties = props;
-          }
-        } catch (importErr) {
-          console.error("[PropertyDetail] Error importing data module:", importErr);
+          pendingListings = await fetchListings("pending");
+          console.log("[PropertyDetail] Pending listings loaded:", pendingListings.length);
+        } catch (err) {
+          console.error("[PropertyDetail] Error fetching pending listings:", err);
         }
         
         const all = [...allListings, ...pendingListings];
