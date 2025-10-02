@@ -6,7 +6,6 @@ import { VoyageQuery, VoyageFilters, Option } from "./helpers";
 import { getCities, getCountries } from "./worlddata";
 import { useVoyageFilters } from "@/components/voyages/filterContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 type Props = {
   visible: boolean;
@@ -25,14 +24,13 @@ export default function VoyageUnifiedSheet({ visible, onClose, initialQuery, ini
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const { setCountry, set } = useVoyageFilters();
   const insets = useSafeAreaInsets();
-  const tabBarHeight = useBottomTabBarHeight();
 
   const maxSheetHeight = useMemo(
     () => ({
       maxHeight: 720 - insets.top,
-      paddingBottom: insets.bottom + tabBarHeight + 12,
+      paddingBottom: insets.bottom + 80,
     }),
-    [insets.top, insets.bottom, tabBarHeight]
+    [insets.top, insets.bottom]
   );
 
   if (!visible) return null;
