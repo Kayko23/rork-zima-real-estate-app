@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet, FlatList, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { X, Calendar, MapPin, Star, ChevronDown } from "lucide-react-native";
 import { VoyageQuery, VoyageFilters, Option } from "./helpers";
 import { getCities, getCountries } from "./worlddata";
@@ -20,6 +21,8 @@ export default function VoyageUnifiedSheet({ visible, onClose, initialQuery, ini
   const [filters, setFilters] = useState<VoyageFilters>(initialFilters || { priceMin: 0, priceMax: 1000000, ratingMin: 0, premiumOnly: false, amenities: [] });
   const [keyword, setKeyword] = useState("");
   const [expandedSection, setExpandedSection] = useState<string>("destination");
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const { setCountry, set } = useVoyageFilters();
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
@@ -114,19 +117,46 @@ export default function VoyageUnifiedSheet({ visible, onClose, initialQuery, ini
             <View style={styles.rowPills}>
               <Pressable
                 style={styles.pill}
-                onPress={() => setQuery({ ...query, startDate: new Date().toISOString().slice(0, 10) })}
+                onPress={() => setShowStartDatePicker(true)}
               >
                 <Calendar size={16} color="#0B3B36" />
                 <Text style={styles.pillTxt}>{query.startDate ?? "Arrivée"}</Text>
               </Pressable>
               <Pressable
                 style={styles.pill}
-                onPress={() => setQuery({ ...query, endDate: new Date(Date.now() + 86400000).toISOString().slice(0, 10) })}
+                onPress={() => setShowEndDatePicker(true)}
               >
                 <Calendar size={16} color="#0B3B36" />
                 <Text style={styles.pillTxt}>{query.endDate ?? "Départ"}</Text>
               </Pressable>
             </View>
+            {showStartDatePicker && (
+              <DateTimePicker
+                value={query.startDate ? new Date(query.startDate) : new Date()}
+                mode="date"
+                display={Platform.OS === "ios" ? "inline" : "default"}
+                onChange={(event, selectedDate) => {
+                  setShowStartDatePicker(Platform.OS === "ios");
+                  if (selectedDate) {
+                    setQuery({ ...query, startDate: selectedDate.toISOString().slice(0, 10) });
+                  }
+                }}
+              />
+            )}
+            {showEndDatePicker && (
+              <DateTimePicker
+                value={query.endDate ? new Date(query.endDate) : new Date(Date.now() + 86400000)}
+                mode="date"
+                display={Platform.OS === "ios" ? "inline" : "default"}
+                minimumDate={query.startDate ? new Date(query.startDate) : new Date()}
+                onChange={(event, selectedDate) => {
+                  setShowEndDatePicker(Platform.OS === "ios");
+                  if (selectedDate) {
+                    setQuery({ ...query, endDate: selectedDate.toISOString().slice(0, 10) });
+                  }
+                }}
+              />
+            )}
           </Section>
 
           <Section
