@@ -2,14 +2,12 @@ import React from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Building2, CheckCircle2 } from "lucide-react-native";
 import { router } from "expo-router";
-import { useApp } from "@/hooks/useAppStore";
+
 
 export default function SwitchModeScreen() {
-  const { switchMode } = useApp();
 
   const handleContinue = () => {
-    switchMode('provider');
-    router.replace('/(proTabs)/dashboard');
+    router.push('/pro/onboarding');
   };
 
   return (

@@ -1,9 +1,12 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert, ScrollView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { router } from 'expo-router';
+import { assertCanPublish, PublicationGuardError } from '@/lib/proGuards';
+import { PublicationGuardModal } from '@/components/pro/PublicationGuardModal';
+import { ProStatus } from '@/types/pro';
 
  type FormState = {
   title: string;
@@ -36,8 +39,30 @@ export default function NewPropertyScreen() {
     photos: ''
   });
 
+  const [guardModal, setGuardModal] = useState<{
+    visible: boolean;
+    message: string;
+    action?: { label: string; route: string };
+  }>({ visible: false, message: '' });
+
+  const proStatus: ProStatus = 'verified';
+
   const createMutation = useMutation({
     mutationFn: async () => {
+      try {
+        assertCanPublish(proStatus, true);
+      } catch (error) {
+        if (error instanceof PublicationGuardError) {
+          setGuardModal({
+            visible: true,
+            message: error.message,
+            action: error.action,
+          });
+          throw error;
+        }
+        throw error;
+      }
+
       const priceNum = Number(form.price);
       if (!form.title || !form.country || !form.city || !priceNum) {
         throw new Error('Veuillez renseigner titre, pays, ville et prix.');
@@ -65,7 +90,9 @@ export default function NewPropertyScreen() {
     },
     onError: (e: unknown) => {
       console.log('[NewProperty] error', e);
-      Alert.alert('Erreur', e instanceof Error ? e.message : 'Impossible de créer l\'annonce');
+      if (!(e instanceof PublicationGuardError)) {
+        Alert.alert('Erreur', e instanceof Error ? e.message : 'Impossible de créer l\'annonce');
+      }
     }
   });
 
@@ -73,6 +100,12 @@ export default function NewPropertyScreen() {
 
   return (
     <View style={styles.screen} testID="property-new-screen">
+      <PublicationGuardModal
+        visible={guardModal.visible}
+        onClose={() => setGuardModal({ visible: false, message: '' })}
+        message={guardModal.message}
+        action={guardModal.action}
+      />
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 20 }} showsVerticalScrollIndicator={false}>
         <Text style={[styles.h1, { paddingTop: insets.top + 8 }]}>Nouvelle annonce</Text>
 
