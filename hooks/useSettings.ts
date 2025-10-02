@@ -2,10 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import createContextHook from '@nkzw/create-context-hook';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
+import { ALLOWED_COUNTRY_CODES, DEFAULT_COUNTRY, CfaCountryCode } from '@/constants/cfa';
 
 export type Settings = {
   language: string;
   currency: string;
+  allowedCountries: readonly CfaCountryCode[];
+  defaultCountry: CfaCountryCode;
   setLanguage: (lang: string) => void;
   setCurrency: (cur: string) => void;
   isLoading: boolean;
@@ -52,6 +55,8 @@ export const [SettingsProvider, useSettings] = createContextHook<Settings>(() =>
   return useMemo<Settings>(() => ({
     language,
     currency,
+    allowedCountries: ALLOWED_COUNTRY_CODES,
+    defaultCountry: DEFAULT_COUNTRY,
     setLanguage,
     setCurrency,
     isLoading: settingsQuery.isLoading || isPending,

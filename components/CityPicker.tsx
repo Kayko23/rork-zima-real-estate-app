@@ -2,9 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, TextInput, FlatList, Pressable, StyleSheet } from 'react-native';
 import { loadCitiesByCountry, CityItem } from '../data/cities';
 import { normalize } from '../utils/text';
+import { isCfaCountry } from '@/constants/cfa';
 
 type Props = {
-  country?: string;              // si fourni => on restreint
+  country?: string;              // code pays (ex: 'CI')
   placeholder?: string;
   onSelect: (fullLabel: string) => void; // ex "Abidjan, Côte d'Ivoire"
 };
@@ -17,6 +18,7 @@ export default function CityPicker({ country, placeholder='Rechercher une ville'
     let mounted = true;
     (async () => {
       if (!country) { setSource([]); return; }
+      if (!isCfaCountry(country)) { setSource([]); return; }
       const data = await loadCitiesByCountry(country);
       if (mounted) setSource(data);
     })();

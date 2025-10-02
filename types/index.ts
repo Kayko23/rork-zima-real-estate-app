@@ -99,7 +99,7 @@ export type PaymentMethod = {
   last4?: string;
   exp?: string;
   provider?: MobileMoneyProvider;
-  country?: string;
+  countryCode?: string;
   phone?: string;
   accountName?: string;
   currency?: string;

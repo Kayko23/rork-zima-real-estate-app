@@ -1,35 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Pressable, Alert, StyleSheet, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useApp } from '@/hooks/useAppStore';
 import { currencyForCountry, validateMsisdn, providersForCountry } from '@/utils/mobileMoney';
 import type { MobileMoneyProvider } from '@/types';
 import { colors, radius } from '@/theme/tokens';
+import { getCfaCountriesList, CfaCountryCode } from '@/constants/cfa';
 
-const COUNTRIES = [
-  "Sénégal", "Côte d'Ivoire", "Bénin", "Togo", "Mali", "Burkina Faso", "Niger", "Guinée-Bissau",
-  "Cameroun", "Gabon", "Congo", "Tchad", "RCA", "Guinée Équatoriale", "Ghana", "Nigeria",
-];
+const CFA_COUNTRIES_LIST = getCfaCountriesList();
 
 export default function AddMobileMoneyScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { addPaymentMethod } = useApp();
-  const [country, setCountry] = useState<string>("Sénégal");
+  const [countryCode, setCountryCode] = useState<CfaCountryCode>('SN');
   const [provider, setProvider] = useState<MobileMoneyProvider>('orange');
   const [phone, setPhone] = useState<string>('');
   const [accountName, setAccountName] = useState<string>('');
 
-  const currency = currencyForCountry(country);
-  const providers = providersForCountry(country);
+  const currency = currencyForCountry(countryCode);
+  const providers = providersForCountry(countryCode);
+  const countryName = CFA_COUNTRIES_LIST.find(c => c.code === countryCode)?.name ?? 'Sénégal';
 
   useEffect(() => {
     if (!providers.includes(provider)) {
       setProvider(providers[0]);
     }
-  }, [country, provider, providers]);
+  }, [countryCode, provider, providers]);
 
   const onSave = async () => {
-    if (!validateMsisdn(country, phone)) {
+    if (!validateMsisdn(countryCode, phone)) {
       Alert.alert('Numéro invalide', 'Vérifie le format du numéro pour le pays choisi.');
       return;
     }
@@ -39,32 +40,37 @@ export default function AddMobileMoneyScreen() {
       type: 'mobile_money',
       isDefault: true,
       provider,
-      country,
+      countryCode,
       phone: phone.replace(/[^\d]/g, ''),
       accountName: accountName || 'Compte Mobile Money',
       currency,
     });
     
-    Alert.alert('Ajouté', `${provider.toUpperCase()} • ${country} • ${currency}`);
+    Alert.alert('Ajouté', `${provider.toUpperCase()} • ${countryName} • ${currency}`);
     router.back();
   };
 
   return (
-    <ScrollView contentContainerStyle={s.container} style={s.scrollView}>
-        <Label>Pays</Label>
-        <Chips value={country} items={COUNTRIES} onChange={setCountry} />
+    <>
+      <Stack.Screen options={{ title: 'Ajouter Mobile Money', headerShown: true }} />
+      <ScrollView 
+        contentContainerStyle={[s.container, { paddingBottom: insets.bottom + 24 }]} 
+        style={s.scrollView}
+      >
+        <Label><Text>Pays</Text></Label>
+        <CountryChips value={countryCode} onChange={setCountryCode} />
 
-        <Label>Opérateur</Label>
+        <Label><Text>Opérateur</Text></Label>
         <Chips
           value={provider.toUpperCase()}
           items={providers.map(p => p.toUpperCase())}
           onChange={(v) => setProvider(v.toLowerCase() as MobileMoneyProvider)}
         />
 
-        <Label>Titulaire (optionnel)</Label>
+        <Label><Text>Titulaire (optionnel)</Text></Label>
         <Input placeholder="Nom du compte" value={accountName} onChangeText={setAccountName} />
 
-        <Label>Téléphone (Mobile Money)</Label>
+        <Label><Text>Téléphone (Mobile Money)</Text></Label>
         <Input
           placeholder="ex: 770000000"
           keyboardType="phone-pad"
@@ -80,15 +86,38 @@ export default function AddMobileMoneyScreen() {
         <Pressable onPress={onSave} style={s.cta}>
           <Text style={s.ctaTx}>Enregistrer</Text>
         </Pressable>
-    </ScrollView>
+      </ScrollView>
+    </>
   );
 }
 
 const Label = ({ children }: { children: React.ReactNode }) => (
-  <Text style={s.label}>{children}</Text>
+  <View style={s.label}>{children}</View>
 );
 
 const Input = (props: any) => <TextInput {...props} style={s.input} />;
+
+const CountryChips = ({
+  value,
+  onChange,
+}: {
+  value: CfaCountryCode;
+  onChange: (v: CfaCountryCode) => void;
+}) => (
+  <View style={s.chipsContainer}>
+    {CFA_COUNTRIES_LIST.map((country) => (
+      <Pressable
+        key={country.code}
+        onPress={() => onChange(country.code)}
+        style={[s.chip, value === country.code && s.chipActive]}
+      >
+        <Text style={[s.chipTx, value === country.code && s.chipTxActive]}>
+          {country.name}
+        </Text>
+      </Pressable>
+    ))}
+  </View>
+);
 
 const Chips = ({
   items,
@@ -114,8 +143,8 @@ const Chips = ({
 
 const s = StyleSheet.create({
   scrollView: { flex: 1, backgroundColor: colors.bg },
-  container: { padding: 16, gap: 12, paddingBottom: 24 },
-  label: { fontWeight: '800', marginTop: 6, color: colors.text },
+  container: { padding: 16, gap: 12 },
+  label: { fontWeight: '800' as const, marginTop: 6 },
   input: {
     backgroundColor: colors.panel,
     borderColor: colors.muted,
@@ -135,7 +164,7 @@ const s = StyleSheet.create({
     backgroundColor: colors.panel,
   },
   chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chipTx: { color: colors.text, fontWeight: '700', fontSize: 13 },
+  chipTx: { color: colors.text, fontWeight: '700' as const, fontSize: 13 },
   chipTxActive: { color: '#fff' },
   currencyRow: {
     flexDirection: 'row',
@@ -145,7 +174,7 @@ const s = StyleSheet.create({
     paddingVertical: 8,
   },
   currencyLabel: { color: colors.sub, fontSize: 14 },
-  currencyValue: { fontWeight: '800', color: colors.text, fontSize: 16 },
+  currencyValue: { fontWeight: '800' as const, color: colors.text, fontSize: 16 },
   cta: {
     marginTop: 10,
     backgroundColor: colors.primary,
@@ -153,5 +182,5 @@ const s = StyleSheet.create({
     paddingVertical: 14,
     alignItems: 'center',
   },
-  ctaTx: { color: '#fff', fontWeight: '800', fontSize: 15 },
+  ctaTx: { color: '#fff', fontWeight: '800' as const, fontSize: 15 },
 });

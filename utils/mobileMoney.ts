@@ -1,59 +1,45 @@
 import type { MobileMoneyProvider } from '@/types';
+import { CfaCountryCode, CurrencyCode, getCfaCurrencyForCountry } from '@/constants/cfa';
 
-const XOF = ['Bénin', 'Burkina Faso', "Côte d'Ivoire", 'Guinée-Bissau', 'Mali', 'Niger', 'Sénégal', 'Togo'];
-const XAF = ['Cameroun', 'Congo', 'Gabon', 'Tchad', 'RCA', 'Guinée Équatoriale'];
-const GHS = ['Ghana'];
-const NGN = ['Nigeria'];
-
-export function currencyForCountry(country?: string): string {
-  if (!country) return 'XOF';
-  if (XOF.includes(country)) return 'XOF';
-  if (XAF.includes(country)) return 'XAF';
-  if (GHS.includes(country)) return 'GHS';
-  if (NGN.includes(country)) return 'NGN';
-  return 'XOF';
+export function currencyForCountry(countryCode?: string): CurrencyCode {
+  if (!countryCode) return 'XOF';
+  return getCfaCurrencyForCountry(countryCode);
 }
 
-export const PROVIDERS_BY_COUNTRY: Record<string, MobileMoneyProvider[]> = {
-  "Sénégal": ['orange', 'wave'],
-  "Côte d'Ivoire": ['orange', 'mtn', 'moov', 'wave'],
-  "Bénin": ['mtn', 'moov'],
-  "Togo": ['mtn', 'moov'],
-  "Mali": ['orange', 'moov'],
-  "Burkina Faso": ['orange', 'moov'],
-  "Niger": ['mtn', 'moov'],
-  "Guinée-Bissau": ['orange'],
-  "Cameroun": ['mtn', 'orange'],
-  "Gabon": ['mtn', 'moov'],
-  "Congo": ['mtn', 'moov'],
-  "Tchad": ['moov'],
-  "RCA": ['orange'],
-  "Guinée Équatoriale": ['mtn'],
-  "Ghana": ['mtn'],
-  "Nigeria": ['mtn'],
+export const PROVIDERS_BY_COUNTRY: Record<CfaCountryCode, MobileMoneyProvider[]> = {
+  SN: ['orange', 'wave'],
+  CI: ['orange', 'mtn', 'moov', 'wave'],
+  BJ: ['mtn', 'moov'],
+  TG: ['mtn', 'moov'],
+  ML: ['orange', 'moov'],
+  BF: ['orange', 'moov'],
+  NE: ['mtn', 'moov'],
+  GW: ['orange'],
+  CM: ['mtn', 'orange'],
+  GA: ['mtn', 'moov'],
+  CG: ['mtn', 'moov'],
+  TD: ['moov'],
+  CF: ['orange'],
+  GQ: ['mtn'],
 };
 
-export function providersForCountry(country?: string): MobileMoneyProvider[] {
-  if (!country) return ['orange', 'mtn', 'moov', 'wave'];
-  return PROVIDERS_BY_COUNTRY[country] ?? ['orange', 'mtn', 'moov', 'wave'];
+export function providersForCountry(countryCode?: string): MobileMoneyProvider[] {
+  if (!countryCode) return ['orange', 'mtn', 'moov', 'wave'];
+  return PROVIDERS_BY_COUNTRY[countryCode as CfaCountryCode] ?? ['orange', 'mtn', 'moov', 'wave'];
 }
 
-export function validateMsisdn(country: string, phone: string): boolean {
+export function validateMsisdn(countryCode: string, phone: string): boolean {
   const d = phone.replace(/[^\d]/g, '');
   const len = d.length;
-  if (XOF.includes(country)) return len >= 8 && len <= 10;
-  if (XAF.includes(country)) return len >= 8 && len <= 10;
-  if (country === 'Ghana') return len >= 9 && len <= 10;
-  if (country === 'Nigeria') return len === 10 || len === 11;
   return len >= 8 && len <= 12;
 }
 
 export type MobileMoneyCharge = {
   provider: MobileMoneyProvider;
-  country: string;
+  countryCode: CfaCountryCode;
   phone: string;
   amount: number;
-  currency: string;
+  currency: CurrencyCode;
   description?: string;
 };
 
