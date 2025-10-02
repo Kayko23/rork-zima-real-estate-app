@@ -13,19 +13,21 @@ export default function SearchBarWithFilters({
   onChangeText?: (text: string) => void;
   value?: string;
 }) {
+  const normalizedValue = value ?? '';
   return (
-    <View style={s.wrap}>
+    <View style={s.wrap} testID="searchbar-with-filters">
       <Search size={18} color="#64748B" />
       <TextInput
         style={s.input}
         placeholder={placeholder}
-        value={value}
+        value={normalizedValue}
         onChangeText={onChangeText}
         placeholderTextColor="#9AA0A6"
         returnKeyType="search"
+        testID="searchbar-input"
       />
       {onFilterPress && (
-        <Pressable onPress={onFilterPress} hitSlop={12}>
+        <Pressable onPress={onFilterPress} hitSlop={12} testID="searchbar-filters-btn">
           <SlidersHorizontal size={20} color="#1F2937" />
         </Pressable>
       )}
