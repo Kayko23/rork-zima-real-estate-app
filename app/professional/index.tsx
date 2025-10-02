@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 
 import { useQuery } from '@tanstack/react-query';
 import { providersApi, providerCategories } from '@/lib/api';
@@ -16,6 +17,7 @@ const INITIAL: ProFilters = {
 export default function ProfessionalScreen(){
   const insets = useSafeAreaInsets();
   const tabBarH = 56;
+  const router = useRouter();
   const [open, setOpen] = useState<boolean>(false);
   const [filters, setFilters] = useState<ProFilters>(INITIAL);
 
@@ -69,7 +71,10 @@ export default function ProfessionalScreen(){
                     <View style={{ flexDirection:'row', flexWrap:'wrap', gap:6, marginTop:8 }}>
                       {item.services.map((s:string)=>(<Tag key={s} label={s}/>))}
                     </View>
-                    <Pressable style={{ marginTop:10, backgroundColor:'#0B6B53', borderRadius:10, paddingVertical:10, alignItems:'center' }}>
+                    <Pressable 
+                      style={{ marginTop:10, backgroundColor:'#0B6B53', borderRadius:10, paddingVertical:10, alignItems:'center' }}
+                      onPress={()=> router.push(`/professional/${item.id}`)}
+                    >
                       <Text style={{ color:'#fff', fontWeight:'700' }}>Voir profil</Text>
                     </Pressable>
                   </View>

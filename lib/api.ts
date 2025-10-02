@@ -51,7 +51,7 @@ export const api = {
   },
   async createProperty(p: any) {
     const all = await read<any[]>(KEYS.properties, []);
-    const doc = { ...p, id: uid(), createdAt: Date.now(), visible: true };
+    const doc = { ...p, id: uid(), createdAt: Date.now(), visible: true, ownerId: p?.ownerId ?? null };
     const next = [doc, ...all];
     await write(KEYS.properties, next);
     return doc;
@@ -70,6 +70,10 @@ export const api = {
     const next = all.filter((x) => x.id !== id);
     await write(KEYS.properties, next);
     return true as const;
+  },
+  async listProviderProperties(providerId: string) {
+    const all = await read<any[]>(KEYS.properties, []);
+    return all.filter((p) => p.ownerId === providerId);
   },
   payments: {
     async listMethods() {
@@ -140,7 +144,7 @@ export const api = {
     await write(KEYS.settings, next);
     return next;
   },
-};
+  };
 
 // ===== Providers (professionnels) =====
 const PROVIDERS_KEY = 'mock/providers' as const;
@@ -195,6 +199,52 @@ export const providersApi = {
     all[i] = { ...all[i], ...patch };
     await write(PROVIDERS_KEY, all);
     return all[i];
+  },
+};
+
+// ===== Provider Reviews (mock) =====
+const REVIEWS_KEY = 'mock/providerReviews' as const;
+
+export type ProviderReview = {
+  id: string;
+  providerId: string;
+  author: string;
+  rating: number;
+  text: string;
+  createdAt: number;
+};
+
+async function seedReviewsIfEmpty() {
+  const cur = await read<ProviderReview[]>(REVIEWS_KEY, []);
+  if (cur.length) return cur;
+  const demo: ProviderReview[] = Array.from({ length: 12 }).map((_, i) => ({
+    id: `rev_${i + 1}`,
+    providerId: `pro_${(i % 6) + 1}`,
+    author: ['Awa', 'Jean', 'Moussa', 'Dora', 'Linda'][i % 5],
+    rating: [3, 4, 5, 4.5, 5][i % 5] as number,
+    text: ['Très pro', 'Bon suivi', 'Réponse rapide', 'Service impeccable', 'Rien à dire'][i % 5],
+    createdAt: Date.now() - i * 86400000,
+  }));
+  await write(REVIEWS_KEY, demo);
+  return demo;
+}
+
+export const providerReviewsApi = {
+  async list(providerId: string) {
+    const all = await seedReviewsIfEmpty();
+    return all
+      .filter((r) => r.providerId === providerId)
+      .sort((a, b) => b.createdAt - a.createdAt);
+  },
+  async add(
+    providerId: string,
+    payload: Omit<ProviderReview, 'id' | 'providerId' | 'createdAt'>,
+  ) {
+    const all = await read<ProviderReview[]>(REVIEWS_KEY, []);
+    const doc: ProviderReview = { id: uid(), providerId, createdAt: Date.now(), ...payload };
+    all.unshift(doc);
+    await write(REVIEWS_KEY, all);
+    return doc;
   },
 };
 
