@@ -88,6 +88,23 @@ export interface User {
   };
 }
 
+export type CardBrand = 'visa' | 'mc' | 'amex';
+export type MobileMoneyProvider = 'orange' | 'mtn' | 'moov' | 'wave';
+
+export type PaymentMethod = {
+  id: string;
+  type: 'card' | 'mobile_money';
+  isDefault?: boolean;
+  brand?: CardBrand;
+  last4?: string;
+  exp?: string;
+  provider?: MobileMoneyProvider;
+  country?: string;
+  phone?: string;
+  accountName?: string;
+  currency?: string;
+};
+
 export interface Appointment {
   id: string;
   title: string;

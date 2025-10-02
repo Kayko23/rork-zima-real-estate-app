@@ -14,13 +14,8 @@ type CurrencyState = {
 
 type Plan = 'pro-monthly' | 'pro-yearly' | 'none';
 
-type PaymentMethod = {
-  id: string;
-  brand: 'visa' | 'mc' | 'amex';
-  last4: string;
-  exp: string;
-  isDefault?: boolean;
-};
+import type { PaymentMethod } from '@/types';
+import { startMobileMoneyCharge, currencyForCountry } from '@/utils/mobileMoney';
 
 type SubscriptionState = {
   plan: Plan;
@@ -359,11 +354,69 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     await storage.setItem('subscription', JSON.stringify(updated));
   }, [subscription]);
 
+  const addPaymentMethod = useCallback(async (pm: PaymentMethod) => {
+    const list = [...subscription.paymentMethods, pm];
+    if (list.length === 1) list[0].isDefault = true;
+    const updated = { ...subscription, paymentMethods: list };
+    setSubscription(updated);
+    await storage.setItem('subscription', JSON.stringify(updated));
+  }, [subscription]);
+
+  const removePaymentMethod = useCallback(async (id: string) => {
+    const list = subscription.paymentMethods.filter(p => p.id !== id);
+    if (!list.some(p => p.isDefault) && list[0]) list[0].isDefault = true;
+    const updated = { ...subscription, paymentMethods: list };
+    setSubscription(updated);
+    await storage.setItem('subscription', JSON.stringify(updated));
+  }, [subscription]);
+
+  const setDefaultPaymentMethod = useCallback(async (id: string) => {
+    const methods = subscription.paymentMethods.map(pm => ({ ...pm, isDefault: pm.id === id }));
+    const updated = { ...subscription, paymentMethods: methods };
+    setSubscription(updated);
+    await storage.setItem('subscription', JSON.stringify(updated));
+  }, [subscription]);
+
   const setPaymentMethods = useCallback(async (methods: PaymentMethod[]) => {
     const updated = { ...subscription, paymentMethods: methods };
     setSubscription(updated);
     await storage.setItem('subscription', JSON.stringify(updated));
   }, [subscription]);
+
+  const subscribeWithDefault = useCallback(async (plan: Exclude<Plan, 'none'>) => {
+    const def = subscription.paymentMethods.find(p => p.isDefault);
+    if (!def) return { ok: false, msg: 'Aucun moyen de paiement par défaut.' };
+
+    const amount = plan === 'pro-monthly' ? 15000 : 150000;
+    
+    if (def.type === 'mobile_money') {
+      const currency = def.currency || currencyForCountry(def.country);
+      const res = await startMobileMoneyCharge({
+        provider: def.provider!,
+        country: def.country!,
+        phone: def.phone!,
+        amount,
+        currency,
+        description: plan === 'pro-monthly' ? 'ZIMA Pro Mensuel' : 'ZIMA Pro Annuel',
+      });
+      
+      if (res.status === 'success') {
+        const days = plan === 'pro-monthly' ? 30 : 365;
+        const next = new Date();
+        next.setDate(next.getDate() + days);
+        await setPlan(plan, next.toISOString());
+        return { ok: true, msg: `Abonnement activé. Prochaine échéance: ${next.toLocaleDateString('fr-FR')}` };
+      } else {
+        return { ok: false, msg: res.reason || 'Paiement refusé.' };
+      }
+    }
+
+    const days = plan === 'pro-monthly' ? 30 : 365;
+    const next = new Date();
+    next.setDate(next.getDate() + days);
+    await setPlan(plan, next.toISOString());
+    return { ok: true, msg: `Abonnement activé. Prochaine échéance: ${next.toLocaleDateString('fr-FR')}` };
+  }, [subscription, setPlan]);
 
   const cancelSubscription = useCallback(async () => {
     const updated = { ...subscription, plan: 'none' as Plan, nextBillingAt: null };
@@ -407,9 +460,13 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     isFavoriteProvider,
     isFavoriteVoyage,
     setPlan,
+    addPaymentMethod,
+    removePaymentMethod,
+    setDefaultPaymentMethod,
     setPaymentMethods,
+    subscribeWithDefault,
     cancelSubscription
-  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, activeHomeTab, currency, fxBase, fxRates, favoritePropertyIds, favoriteProviderIds, favoriteVoyageIds, subscription, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding, setHomeTab, setCurrency, setFx, hydrate, toggleFavoriteProperty, toggleFavoriteProvider, toggleFavoriteVoyage, isFavoriteProperty, isFavoriteProvider, isFavoriteVoyage, setPlan, setPaymentMethods, cancelSubscription]);
+  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, activeHomeTab, currency, fxBase, fxRates, favoritePropertyIds, favoriteProviderIds, favoriteVoyageIds, subscription, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding, setHomeTab, setCurrency, setFx, hydrate, toggleFavoriteProperty, toggleFavoriteProvider, toggleFavoriteVoyage, isFavoriteProperty, isFavoriteProvider, isFavoriteVoyage, setPlan, addPaymentMethod, removePaymentMethod, setDefaultPaymentMethod, setPaymentMethods, subscribeWithDefault, cancelSubscription]);
 });
 
 // Export a safe version of the hook that always returns a valid object
@@ -454,7 +511,11 @@ export const useApp = () => {
       isFavoriteProvider: () => false,
       isFavoriteVoyage: () => false,
       setPlan: async () => {},
+      addPaymentMethod: async () => {},
+      removePaymentMethod: async () => {},
+      setDefaultPaymentMethod: async () => {},
       setPaymentMethods: async () => {},
+      subscribeWithDefault: async () => ({ ok: false, msg: '' }),
       cancelSubscription: async () => {}
     };
   }
