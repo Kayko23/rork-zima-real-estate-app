@@ -37,6 +37,9 @@ export function FavoriteProCard({ pro, onViewProfile, onCall, onWhatsApp, onEmai
             </Text>
           </View>
         </View>
+        <View style={styles.favoriBadge} testID={`fav-pro-${pro.id}-badge`}>
+          <Text style={styles.favoriText}>Favori</Text>
+        </View>
       </View>
 
       <View style={styles.tagsRow}>
@@ -90,6 +93,8 @@ const styles = StyleSheet.create({
   cta: { flex: 1, height: 44, borderRadius: 22, backgroundColor: '#fff', borderWidth: 2, borderColor: Colors.primary, alignItems: 'center', justifyContent: 'center' },
   ctaTxt: { color: Colors.primary, fontWeight: '800' },
   iconBtn: { height: 44, width: 44, borderRadius: 22, backgroundColor: '#eef2f4', alignItems: 'center', justifyContent: 'center' },
+  favoriBadge: { backgroundColor: '#0B1220', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12 },
+  favoriText: { color: 'white', fontSize: 12, fontWeight: '700' },
 });
 
 export default FavoriteProCard;

@@ -47,6 +47,13 @@ export function FavoritePropertyCard({ item, layout, onPress }: Props) {
             {item.type === 'sale' ? 'À VENDRE' : 'À LOUER'}
           </Text>
         </View>
+
+        {/* Favori Badge */}
+        {item.isFavorite && (
+          <View style={styles.favoriBadge} testID={`fav-prop-${item.id}-badge`}>
+            <Text style={styles.favoriText}>Favori</Text>
+          </View>
+        )}
         
         {/* Premium Badge */}
         {item.isPremium && (
@@ -166,6 +173,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+  },
+  favoriBadge: {
+    position: 'absolute',
+    top: 56,
+    left: 16,
+    backgroundColor: '#0B1220',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.35)'
+  },
+  favoriText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
   premiumText: {
     color: 'white',

@@ -38,19 +38,36 @@ export default function FavoritesScreen() {
   const [sort, setSort] = useState<SortType>('recent');
 
   const { favoritePropertyIds, favoriteProviderIds } = useApp();
+
+  const premiumFirst = <T extends { isPremium?: boolean }>(a: T, b: T) => {
+    if (!!a.isPremium === !!b.isPremium) return 0;
+    return a.isPremium ? -1 : 1;
+  };
   
   const favoriteProperties = useMemo(() => {
-    const arr = mockProperties.filter((p) => favoritePropertyIds.has(p.id));
-    if (sort === 'priceAsc') return [...arr].sort((a, b) => a.price - b.price);
-    if (sort === 'priceDesc') return [...arr].sort((a, b) => b.price - a.price);
-    if (sort === 'rating') return [...arr].sort((a, b) => (b.provider?.rating ?? 0) - (a.provider?.rating ?? 0));
-    return arr;
+    const base = mockProperties.filter((p) => favoritePropertyIds.has(p.id));
+    const sorted = [...base].sort((a, b) => {
+      const pf = premiumFirst(a, b);
+      if (pf !== 0) return pf;
+      if (sort === 'priceAsc') return a.price - b.price;
+      if (sort === 'priceDesc') return b.price - a.price;
+      if (sort === 'rating') return (b.provider?.rating ?? 0) - (a.provider?.rating ?? 0);
+      const da = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const db = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return db - da;
+    });
+    return sorted;
   }, [sort, favoritePropertyIds]);
 
   const favoriteProviders = useMemo(() => {
-    const arr = mockProviders.filter((p) => favoriteProviderIds.has(p.id));
-    if (sort === 'rating') return [...arr].sort((a, b) => b.rating - a.rating);
-    return arr;
+    const base = mockProviders.filter((p) => favoriteProviderIds.has(p.id));
+    const sorted = [...base].sort((a, b) => {
+      const pf = premiumFirst(a, b);
+      if (pf !== 0) return pf;
+      if (sort === 'rating') return b.rating - a.rating;
+      return 0;
+    });
+    return sorted;
   }, [sort, favoriteProviderIds]);
 
   const onCycleSort = useCallback(() => {
