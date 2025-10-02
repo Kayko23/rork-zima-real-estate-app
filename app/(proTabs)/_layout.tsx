@@ -36,9 +36,9 @@ export default function ProTabsLayout() {
 
     const tabs = [
       { name: 'dashboard', icon: BarChart3, label: 'Dashboard' },
-      { name: 'agenda', icon: Calendar, label: 'Agenda' },
-      { name: 'listings', icon: FileText, label: 'Annonces', isCenter: true },
       { name: 'messages', icon: MessageCircle, label: 'Messages' },
+      { name: 'listings', icon: FileText, label: 'Annonces', isCenter: true },
+      { name: 'agenda', icon: Calendar, label: 'Agenda' },
       { name: 'profile', icon: Settings, label: 'Profil' },
     ];
 
