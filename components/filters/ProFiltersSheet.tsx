@@ -3,6 +3,7 @@ import { View, Text, Pressable, ScrollView, Modal, TextInput, KeyboardAvoidingVi
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { providerCategories } from '@/lib/api';
+import RangeSlider from '@/components/inputs/RangeSlider';
 
 
 const COUNTRIES: Record<string,string[]> = {
@@ -107,6 +108,20 @@ export default function ProFiltersSheet({ visible, initial, resultCount, onClose
                   }} label={s} />
                 ))}
               </Row>
+            </Section>
+
+            <Section title="Budget (FCFA)">
+              <View style={{ marginBottom: 8 }}>
+                <Text style={{ fontSize: 14, color: '#6B7280', marginBottom: 12 }}>
+                  {(f.budgetMin ?? 0).toLocaleString('fr-FR')} - {(f.budgetMax ?? 10000000).toLocaleString('fr-FR')} FCFA
+                </Text>
+                <RangeSlider
+                  min={0}
+                  max={10000000}
+                  values={[f.budgetMin ?? 0, f.budgetMax ?? 10000000]}
+                  onChange={([min, max]) => setF(s => ({ ...s, budgetMin: min === 0 ? undefined : min, budgetMax: max === 10000000 ? undefined : max }))}
+                />
+              </View>
             </Section>
           </ScrollView>
 
