@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import RangeSlider from '@/components/inputs/RangeSlider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AMENITIES = [
@@ -372,23 +372,62 @@ function Input(
 
 function DateField({ label, value, onChange }: { label: string; value: Date | null; onChange: (d: Date) => void }) {
   const [open, setOpen] = useState<boolean>(false);
-  const onPickerChange = (_: DateTimePickerEvent, d?: Date) => {
-    setOpen(false);
-    if (d) onChange(d);
+  const today = useMemo(() => new Date(), []);
+
+  const formatDate = (d: Date | null) => {
+    if (!d) return 'Choisir';
+    return new Intl.DateTimeFormat('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(d);
   };
+
   return (
     <View style={styles.dateFieldWrap}>
       <Pressable onPress={() => setOpen(true)} style={styles.dateFieldPress}>
         <Text style={styles.inputLabel}>{label}</Text>
-        <Text style={styles.dateValue}>{value ? value.toLocaleDateString() : 'Choisir'}</Text>
+        <Text style={styles.dateValue}>{formatDate(value)}</Text>
       </Pressable>
       {open && (
-        <DateTimePicker
-          value={value ?? new Date()}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'inline' : 'default'}
-          onChange={onPickerChange}
-        />
+        Platform.OS === 'web' ? (
+          <View style={styles.webDatePicker}>
+            {[0, 1, 2, 3, 4, 5, 6, 7].map((add) => {
+              const d = new Date(today);
+              d.setDate(today.getDate() + add);
+              d.setHours(12, 0, 0, 0);
+              return (
+                <Pressable
+                  key={`d-${add}`}
+                  onPress={() => {
+                    onChange(d);
+                    setOpen(false);
+                  }}
+                  style={styles.webDateOption}
+                >
+                  <Text style={styles.webDateText}>{formatDate(d)}</Text>
+                </Pressable>
+              );
+            })}
+            <Pressable onPress={() => setOpen(false)} style={styles.webDateClose}>
+              <Text style={styles.webDateCloseTxt}>Fermer</Text>
+            </Pressable>
+          </View>
+        ) : (
+          React.createElement(
+            require('@react-native-community/datetimepicker').default,
+            {
+              value: value ?? new Date(),
+              mode: 'date',
+              display: Platform.OS === 'ios' ? 'inline' : 'default',
+              onChange: (_: unknown, d?: Date) => {
+                setOpen(false);
+                if (d) onChange(d);
+              },
+              minimumDate: new Date(),
+            }
+          )
+        )
       )}
     </View>
   );
@@ -479,6 +518,33 @@ const styles = StyleSheet.create({
   closeBtn: { marginTop: 10, alignSelf: 'center', paddingVertical: 10, paddingHorizontal: 16, borderRadius: 10, backgroundColor: '#0B6B53' },
   closeTxt: { color: '#fff', fontWeight: '800' as const },
   emptyCity: { color: '#6B7280', paddingVertical: 12 },
+  webDatePicker: {
+    marginTop: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+  },
+  webDateOption: {
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
+  },
+  webDateText: {
+    color: '#0A1F17',
+    fontWeight: '600' as const,
+  },
+  webDateClose: {
+    paddingVertical: 12,
+    alignItems: 'center',
+    backgroundColor: '#0B6B53',
+  },
+  webDateCloseTxt: {
+    color: '#fff',
+    fontWeight: '700' as const,
+  },
 });
 
 const fmt = (n: number) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(n);
