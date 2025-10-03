@@ -165,8 +165,10 @@ function ActionBar({
         <Text style={styles.roundActionText}>Appeler</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={onWhatsApp} style={styles.roundAction}>
-        <MessageCircle size={24} color="#0F4C3A" />
-        <Text style={styles.roundActionText}>WhatsApp</Text>
+        <Image
+          source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg' }}
+          style={{ width: 28, height: 28 }}
+        />
       </TouchableOpacity>
       <TouchableOpacity onPress={onBook} style={[styles.roundAction, { backgroundColor: '#0F4C3A' }]}>
         <Calendar size={24} color="#fff" />
