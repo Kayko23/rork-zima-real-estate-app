@@ -77,7 +77,7 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.stickyHeader, { paddingTop: top }]}>
+      <View style={[styles.stickyHeader, { paddingTop: top, position: 'relative', zIndex: 10 }]}>
         <Pressable onPress={() => router.push('/(tabs)/home')} style={{ alignSelf: 'center' }}>
           <Text style={styles.brand}>ZIMA</Text>
         </Pressable>
@@ -233,7 +233,7 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  stickyHeader: { backgroundColor: colors.bg, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', zIndex: 10 },
+  stickyHeader: { backgroundColor: colors.bg, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
   brand:{ textAlign:"center", fontSize:32, fontWeight:"800", color: colors.text, letterSpacing: 3, marginVertical: 10 },
   ctaRow:{ paddingHorizontal:12, flexDirection:"row", gap:12, marginTop:24, marginBottom:16 },
   cta:{ flex:1, backgroundColor: colors.primary, paddingVertical:16, borderRadius: radius.lg, alignItems:"center" },
