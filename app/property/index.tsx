@@ -52,7 +52,7 @@ export default function PropertyScreen(){
 
   return (
     <View style={{ flex:1, backgroundColor:'#fff' }}>
-      <View style={{ paddingTop: insets.top, backgroundColor:'#fff', borderBottomWidth:0.5, borderBottomColor:'#E5E7EB', position: 'relative', zIndex: 10 }}>
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, paddingTop: insets.top, backgroundColor:'#fff', borderBottomWidth:0.5, borderBottomColor:'#E5E7EB', zIndex: 10 }}>
         <ZimaBrand />
         
         <View style={{ paddingHorizontal:16, paddingTop:16, paddingBottom:12 }}>
@@ -80,7 +80,7 @@ export default function PropertyScreen(){
       <FlatList
         data={data}
         keyExtractor={(i:any)=>String(i.id)}
-        contentContainerStyle={{ paddingHorizontal:16, paddingBottom: insets.bottom + tabBarH + 16 }}
+        contentContainerStyle={{ paddingTop: insets.top + 200, paddingHorizontal:16, paddingBottom: insets.bottom + tabBarH + 16 }}
         ListEmptyComponent={!isLoading ? <Text style={{ color:'#64748B' }}>Aucun résultat.</Text> : null}
         renderItem={({item})=>(
           <View style={{ borderWidth:1, borderColor:'#E5E7EB', borderRadius:16, overflow:'hidden', marginBottom:12 }}>
