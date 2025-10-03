@@ -21,8 +21,8 @@ import {
   Heart,
   Share,
   ChevronLeft,
-  MessageSquare,
 } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export interface ProProfile {
   id: string;
@@ -166,7 +166,7 @@ function ActionBar({
         <Text style={styles.roundActionText}>Appeler</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={onWhatsApp} style={styles.roundAction}>
-        <MessageSquare size={24} color="#25D366" />
+        <Ionicons name="logo-whatsapp" size={24} color="#25D366" />
         <Text style={[styles.roundActionText, { color: '#25D366' }]}>WhatsApp</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={onBook} style={[styles.roundAction, { backgroundColor: '#0F4C3A' }]}>
