@@ -157,19 +157,19 @@ function ActionBar({
   return (
     <View style={styles.actions}>
       <TouchableOpacity onPress={onMessage} style={styles.roundAction}>
-        <MessageCircle size={18} color="#0F4C3A" />
+        <MessageCircle size={24} color="#0F4C3A" />
         <Text style={styles.roundActionText}>Message</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={onCall} style={styles.roundAction}>
-        <Phone size={18} color="#0F4C3A" />
+        <Phone size={24} color="#0F4C3A" />
         <Text style={styles.roundActionText}>Appeler</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={onWhatsApp} style={styles.roundAction}>
-        <MessageCircle size={18} color="#0F4C3A" />
+        <MessageCircle size={24} color="#0F4C3A" />
         <Text style={styles.roundActionText}>WhatsApp</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={onBook} style={[styles.roundAction, { backgroundColor: '#0F4C3A' }]}>
-        <Calendar size={18} color="#fff" />
+        <Calendar size={24} color="#fff" />
         <Text style={[styles.roundActionText, { color: 'white' }]}>RDV</Text>
       </TouchableOpacity>
     </View>
@@ -551,10 +551,10 @@ const styles = StyleSheet.create({
   },
   roundAction: {
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
     backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 12,
     flex: 1,
     borderWidth: 1,
