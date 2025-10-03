@@ -7,6 +7,7 @@ import { authApi } from "@/lib/authApi";
 import { useSession } from "@/hooks/useSession";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import CountryPicker from "@/components/inputs/CountryPicker";
 
 export default function SignupWizard() {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
@@ -278,12 +279,10 @@ export default function SignupWizard() {
                 name="country"
                 rules={{ required: true, minLength: 2 }} 
                 render={({ field: { onChange, value } }) => (
-                  <TextInput 
-                    style={styles.input} 
-                    value={value ?? ""} 
-                    onChangeText={onChange} 
-                    placeholder="Côte d'Ivoire…" 
-                    testID="signup-country-input"
+                  <CountryPicker
+                    value={value ?? ""}
+                    onChange={onChange}
+                    placeholder="Sélectionner un pays"
                   />
                 )}
               />
