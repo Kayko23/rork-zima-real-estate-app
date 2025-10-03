@@ -9,7 +9,9 @@ import CommercialChips from "@/components/home/CommercialChips";
 import { colors, radius } from "@/theme/tokens";
 import { useRouter } from "expo-router";
 import { useSearchPreset } from "@/hooks/useSearchPreset";
-import { premiumPreset, categoryPreset } from "@/lib/filters";
+import { premiumPreset } from "@/lib/filters";
+import { seeAllCategory } from "@/lib/navigation";
+import { CategorySlug } from "@/types/taxonomy";
 
 import { sortPremiumFirst } from "@/utils/sortProperties";
 
@@ -43,18 +45,7 @@ const categoriesData: { key: string; title: string; items: Property[] }[] = [
     { id:"r2", title:"Studio", city:"Lagos", price:35000000, currency:"XOF", beds:1, baths:1, area:40, rating:4.2,
       photos:["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-05T10:00:00Z" },
   ]},
-  { key: "hotel", title: "Hôtel", items: [
-    { id:"h1", title:"Hôtel Ivoire", city:"Abidjan", price:85000, currency:"XOF", beds:2, baths:1, area:45, rating:4.9,
-      photos:["https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-09T10:00:00Z" },
-    { id:"h2", title:"Hôtel Azalaï", city:"Dakar", price:95000, currency:"XOF", beds:1, baths:1, area:35, rating:4.7,
-      photos:["https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-08T10:00:00Z" },
-  ]},
-  { key: "residence-journaliere", title: "Résidence journalière", items: [
-    { id:"rj1", title:"Résidence Plateau", city:"Abidjan", price:45000, currency:"XOF", beds:1, baths:1, area:30, rating:4.5,
-      photos:["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-07T10:00:00Z" },
-    { id:"rj2", title:"Studio Cocody", city:"Abidjan", price:35000, currency:"XOF", beds:1, baths:1, area:25, rating:4.3,
-      photos:["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-06T10:00:00Z" },
-  ]},
+
   { key: "espaces-evenementiels", title: "Espaces événementiels", items: [
     { id:"ev1", title:"Salle de réception", city:"Abidjan", price:250000, currency:"XOF", beds:0, baths:2, area:200, rating:4.6,
       photos:["https://images.unsplash.com/photo-1519167758481-83f29da8c2b0?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-08T10:00:00Z" },
@@ -180,8 +171,7 @@ export default function Home() {
               <Text style={styles.categoryTitle}>{category.title}</Text>
               <Pressable 
                 onPress={()=>{
-                  setPreset(categoryPreset(category.key as any));
-                  router.push('/(tabs)/properties');
+                  seeAllCategory(category.key as CategorySlug);
                 }} 
                 style={({pressed})=>[styles.categoryLink, pressed && { opacity:.7 }]}
                 testID={`see-all-${category.key}`}

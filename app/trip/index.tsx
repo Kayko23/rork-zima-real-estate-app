@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useContentInsets } from '@/hooks/useContentInsets';
 import { useSearchPreset } from '@/hooks/useSearchPreset';
 import { X } from 'lucide-react-native';
+import { CATEGORIES, CategorySlug } from '@/types/taxonomy';
+import { openCategory } from '@/lib/navigation';
 import { useQuery } from '@tanstack/react-query';
 import TravelFiltersSheet, { TravelFilters } from '@/components/travel/TravelFiltersSheet';
 import { api } from '@/lib/api';
@@ -26,10 +28,18 @@ const INITIAL: TravelFilters = {
 export default function TripScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const params = useLocalSearchParams<{ category?: string }>();
   const { bottom: bottomInset } = useContentInsets();
   const { preset, reset: resetPreset } = useSearchPreset();
   const [open, setOpen] = useState<boolean>(false);
   const [filters, setFilters] = useState<TravelFilters>(INITIAL);
+
+  useEffect(() => {
+    const cat = params.category as CategorySlug;
+    if (cat && CATEGORIES[cat]?.domain !== 'travel') {
+      openCategory(cat, {}, 'replace');
+    }
+  }, [params.category]);
 
   useEffect(() => {
     if (preset?.domain === 'travel' && preset.premium) {
