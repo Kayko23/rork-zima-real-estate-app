@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Pressable } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, Text, FlatList, Pressable, Linking, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useSearchPreset } from '@/hooks/useSearchPreset';
 import { X } from 'lucide-react-native';
 
 import { useQuery } from '@tanstack/react-query';
-import { providersApi, providerCategories } from '@/lib/api';
+import { providersApi } from '@/lib/api';
 import ProFiltersSheet, { type ProFilters } from '@/components/filters/ProFiltersSheet';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
+import ProfessionalCard from '@/components/professionals/ProfessionalCard';
 
 const INITIAL: ProFilters = {
   country: undefined, city: undefined,
@@ -18,6 +19,15 @@ const INITIAL: ProFilters = {
   services: [],
   budgetMin: undefined,
   budgetMax: undefined,
+};
+
+const CATEGORY_LABEL: Record<string, string> = {
+  agent: "Agents immobiliers",
+  property_manager: "Gestionnaires de biens",
+  agency: "Agences immobilières",
+  hotel_booking: "Réservation – Hôtels",
+  short_stay: "Réservation – Séjours à la nuit",
+  event_space: "Gestion d'espaces évènementiels",
 };
 
 export default function ProfessionalScreen(){
@@ -45,7 +55,43 @@ export default function ProfessionalScreen(){
     }),
   });
 
+  const byCategory = useMemo(() => {
+    const map = new Map<string, any[]>();
+    data.forEach((p: any) => {
+      if (!map.has(p.category)) map.set(p.category, []);
+      map.get(p.category)!.push(p);
+    });
+    return Array.from(map.entries());
+  }, [data]);
+
   const resultCount = data.length;
+
+  const mailto = (email?: string) => {
+    if (!email) return;
+    Linking.openURL(`mailto:${email}`);
+  };
+
+  const tel = (phone?: string) => {
+    if (!phone) return;
+    Linking.openURL(`tel:${phone}`);
+  };
+
+  const whatsapp = async (msisdn?: string) => {
+    if (!msisdn) return;
+    const text = "Bonjour 👋";
+    const deep = `whatsapp://send?phone=${msisdn}&text=${encodeURIComponent(text)}`;
+    const web = `https://wa.me/${msisdn}?text=${encodeURIComponent(text)}`;
+    const can = await Linking.canOpenURL("whatsapp://send");
+    Linking.openURL(can ? deep : web);
+  };
+
+  const openProfile = (id: string) => {
+    router.push(`/professional/${id}`);
+  };
+
+  const goSeeAll = (category: string) => {
+    router.push({ pathname: "/professional", params: { category } });
+  };
 
   return (
     <View style={{ flex:1, backgroundColor:'#fff' }}>
@@ -84,45 +130,39 @@ export default function ProfessionalScreen(){
         </View>
       </View>
 
-      <FlatList
-        data={providerCategories as readonly string[]}
-        keyExtractor={(k)=>k}
-        contentContainerStyle={{ paddingBottom: insets.bottom + tabBarH + 16 }}
-        renderItem={({ item: cat }) => {
-          const items = (data as any[]).filter((p)=>p.category===cat);
-          if (!items.length) return null as any;
-          return (
-            <View style={{ marginBottom: 18 }}>
-              <Text style={{ fontWeight:'800', fontSize:16, marginLeft:16, marginBottom:8 }}>{cat}</Text>
-              <FlatList
-                horizontal
-                data={items}
-                keyExtractor={(p:any)=>p.id}
-                contentContainerStyle={{ paddingHorizontal: 16 }}
-                ItemSeparatorComponent={()=><View style={{ width:12 }}/>} 
-                renderItem={({item})=> (
-                  <View style={{ width:260, borderWidth:1, borderColor:'#E5E7EB', borderRadius:16, padding:14 }}>
-                    <Text style={{ fontWeight:'800' }}>{item.name}</Text>
-                    <Text style={{ color:'#6B7280', marginTop:2 }}>{item.city}, {item.country}</Text>
-                    <Text style={{ marginTop:6 }}>★ {item.rating}</Text>
-                    <View style={{ flexDirection:'row', flexWrap:'wrap', gap:6, marginTop:8 }}>
-                      {item.services.map((s:string)=>(<Tag key={s} label={s}/>))}
-                    </View>
-                    <Pressable 
-                      style={{ marginTop:10, backgroundColor:'#0B6B53', borderRadius:10, paddingVertical:10, alignItems:'center' }}
-                      onPress={()=> router.push(`/professional/${item.id}`)}
-                    >
-                      <Text style={{ color:'#fff', fontWeight:'700' }}>Voir profil</Text>
-                    </Pressable>
-                  </View>
-                )}
-                showsHorizontalScrollIndicator={false}
-              />
+      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + tabBarH + 16 }}>
+        {byCategory.map(([cat, items]) => (
+          <View key={cat} style={{ marginBottom: 20 }}>
+            <View style={{ paddingHorizontal: 4, marginBottom: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <Text style={{ fontSize: 18, fontWeight: '800', color: '#13251C' }}>{CATEGORY_LABEL[cat] || cat}</Text>
+              <Pressable onPress={() => goSeeAll(cat)}>
+                <Text style={{ color: '#0E4D3A', fontWeight: '800' }}>Voir tout ›</Text>
+              </Pressable>
             </View>
-          );
-        }}
-        ListEmptyComponent={!isLoading ? <Text style={{ color:'#64748B', paddingHorizontal:16 }}>Aucun prestataire.</Text> : null}
-      />
+
+            <FlatList
+              data={items}
+              keyExtractor={(i: any) => i.id}
+              numColumns={2}
+              scrollEnabled={false}
+              columnWrapperStyle={{ justifyContent: 'space-between' }}
+              renderItem={({ item }) => (
+                <ProfessionalCard
+                  item={item}
+                  onPressProfile={openProfile}
+                  onPressMail={mailto}
+                  onPressCall={tel}
+                  onPressWhatsApp={whatsapp}
+                />
+              )}
+            />
+          </View>
+        ))}
+
+        {!isLoading && data.length === 0 && (
+          <Text style={{ color:'#64748B', textAlign: 'center', marginTop: 24 }}>Aucun prestataire.</Text>
+        )}
+      </ScrollView>
 
       <ProFiltersSheet
         visible={open}
@@ -135,9 +175,3 @@ export default function ProfessionalScreen(){
     </View>
   );
 }
-
-function Tag({ label }:{label:string}){ return (
-  <View style={{ borderWidth:1, borderColor:'#DADADA', borderRadius:999, paddingHorizontal:10, paddingVertical:6 }}>
-    <Text style={{ fontSize:12 }}>{label}</Text>
-  </View>
-); }

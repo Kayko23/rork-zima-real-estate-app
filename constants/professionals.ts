@@ -1,4 +1,4 @@
-import { Provider } from "@/components/professionals/ProviderCard";
+import { Provider } from "@/components/professionals/ProfessionalCard";
 
 export const CATEGORY_ORDER: {
   key: Provider["category"];
@@ -27,6 +27,9 @@ export const providers: Provider[] = [
     tags: ["Résidentiel", "Commercial", "Conseil"],
     avatar: "https://i.pravatar.cc/150?img=15",
     cover: "https://images.unsplash.com/photo-1560448075-bb4caa6c0f11?q=80&w=1200&auto=format",
+    email: "aminata.diallo@zima.sn",
+    phone: "+221771234567",
+    whatsapp: "221771234567",
   },
   {
     id: "2",
@@ -41,6 +44,9 @@ export const providers: Provider[] = [
     tags: ["Résidentiel", "Investissement", "Luxe"],
     avatar: "https://i.pravatar.cc/150?img=12",
     cover: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?q=80&w=1200&auto=format",
+    email: "kwame@zimaghana.com",
+    phone: "+233241234567",
+    whatsapp: "233241234567",
   },
   {
     id: "3",
@@ -55,6 +61,9 @@ export const providers: Provider[] = [
     tags: ["Résidentiel", "Commercial", "Terrain"],
     avatar: "https://i.pravatar.cc/150?img=25",
     cover: "https://images.unsplash.com/photo-1523217582562-09d0def993a6?q=80&w=1200&auto=format",
+    email: "fatou.kone@zimamali.ml",
+    phone: "+22376543210",
+    whatsapp: "22376543210",
   },
   {
     id: "4",
