@@ -569,6 +569,7 @@ const styles = StyleSheet.create({
     color: '#0F4C3A',
     fontWeight: '700',
     fontSize: 12,
+    textAlign: 'center',
   },
   section: {
     padding: 20,
