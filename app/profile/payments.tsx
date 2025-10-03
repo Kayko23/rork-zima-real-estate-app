@@ -121,6 +121,14 @@ export default function PaymentsScreen() {
             <Text style={s.addTxt}>Ajouter Mobile Money</Text>
           </Pressable>
 
+          <Pressable
+            style={s.addBtnCard}
+            onPress={() => Alert.alert('Carte bancaire', 'Fonctionnalité en cours de développement')}
+          >
+            <Plus size={20} color={colors.primary} />
+            <Text style={s.addTxt}>Ajouter carte bancaire</Text>
+          </Pressable>
+
           <Text style={[s.h2, s.sectionTitle]}>Abonnement</Text>
           
           {loading && (
@@ -208,6 +216,18 @@ const s = StyleSheet.create({
     marginBottom: 16,
   },
   addTxt: { fontWeight: '700', color: colors.primary },
+  addBtnCard: {
+    height: 48,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    backgroundColor: colors.primarySoft,
+    marginBottom: 16,
+  },
   sectionTitle: { marginTop: 24 },
   loadingContainer: { alignItems: 'center', paddingVertical: 24, gap: 12 },
   loadingText: { color: colors.sub, fontWeight: '600' },
