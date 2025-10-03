@@ -171,12 +171,12 @@ export default function TravelFiltersSheet({
 
             <Section title="Dates">
               <Row>
-                <DateField
+                <DateFieldLocal
                   label="Arrivée"
                   value={f.checkIn ?? null}
                   onChange={(d) => setF((s) => ({ ...s, checkIn: d }))}
                 />
-                <DateField
+                <DateFieldLocal
                   label="Départ"
                   value={f.checkOut ?? null}
                   onChange={(d) => setF((s) => ({ ...s, checkOut: d }))}
@@ -370,7 +370,7 @@ function Input(
   );
 }
 
-function DateField({ label, value, onChange }: { label: string; value: Date | null; onChange: (d: Date) => void }) {
+function DateFieldLocal({ label, value, onChange }: { label: string; value: Date | null; onChange: (d: Date) => void }) {
   const [open, setOpen] = useState<boolean>(false);
   const today = useMemo(() => new Date(), []);
 
