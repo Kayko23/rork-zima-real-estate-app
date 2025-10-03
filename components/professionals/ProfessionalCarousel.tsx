@@ -83,9 +83,9 @@ const styles = StyleSheet.create({
     color: '#0E2F26',
   },
   seeAll: {
-    fontWeight: '600',
-    color: '#0E4D3A',
-    fontSize: 14,
+    fontWeight: '700',
+    color: '#0B6B53',
+    fontSize: 15,
   },
   listContent: {
     paddingHorizontal: 16,
