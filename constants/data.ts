@@ -1062,33 +1062,27 @@ export const propertyCategories: PropertyCategoryGroup[] = [
   {
     group: 'Résidentiel',
     items: [
-      { name: 'Maisons individuelles', slug: 'single_family' },
-      { name: 'Cités résidentielles', slug: 'gated_community' },
-      { name: 'Immeubles & copropriétés', slug: 'multifamily' },
-      { name: 'Colocation', slug: 'flatshare' },
-      { name: 'Logements étudiants privés', slug: 'student_private' },
       { name: 'Appartement', slug: 'apartment' },
-      { name: 'Villa', slug: 'villa' },
-      { name: 'Maison', slug: 'house' },
+      { name: 'Maison individuelle / Villa', slug: 'villa' },
+      { name: 'Maison jumelée / Mitoyenne', slug: 'house' },
+      { name: 'Chambre meublée', slug: 'room' },
+      { name: 'Résidence journalière (type Airbnb)', slug: 'daily-residence' },
+      { name: 'Coliving', slug: 'coliving' },
+      { name: 'Résidence étudiante', slug: 'student-residence' },
+      { name: 'Résidence senior', slug: 'senior-residence' },
       { name: 'Duplex', slug: 'duplex' },
       { name: 'Penthouse', slug: 'penthouse' },
-      { name: 'Loft', slug: 'loft' },
-      { name: 'Studio', slug: 'studio' }
+      { name: 'Loft', slug: 'loft' }
     ]
   },
   {
-    group: 'Commerces',
-    items: [
-      { name: 'Boutiques & Retail', slug: 'retail' },
-      { name: 'Restaurants & Cafés', slug: 'restaurant' },
-      { name: 'Magasins & Entrepôts', slug: 'warehouse' }
-    ]
-  },
-  {
-    group: 'Bureaux',
+    group: 'Commercial & Bureaux',
     items: [
       { name: 'Bureau / Plateau de bureaux', slug: 'office' },
-      { name: 'Espace de coworking', slug: 'coworking' },
+      { name: 'Local commercial / Boutique', slug: 'retail' },
+      { name: 'Showroom', slug: 'showroom' },
+      { name: 'Entrepôt / Dépôt', slug: 'warehouse' },
+      { name: 'Atelier / Petite industrie', slug: 'workshop' },
       { name: 'Espace évènementiel', slug: 'event-space' }
     ]
   },

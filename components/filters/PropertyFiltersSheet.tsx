@@ -21,19 +21,14 @@ const COUNTRIES: Record<string,string[]> = {
   "Guinée Équatoriale": ["Malabo","Bata"],
 };
 
-const MAIN_CATEGORIES = ['Résidentiel','Commerces','Bureaux','Terrains','Hôtellerie'] as const;
-const RESIDENTIAL_SUBS = ['Maisons individuelles','Cités résidentielles','Immeubles & copropriétés','Colocation','Logements étudiants'] as const;
-const COMMERCIAL_SUBS = ['Boutiques & Retail','Restaurants & Cafés','Magasins & Entrepôts'] as const;
+const CATEGORIES = ['Appartement','Maison','Villa','Terrain','Immeuble','Bureau','Entrepôt','Commercial'] as const;
 
 export type PropertyFilters = {
   country?: string;
   city?: string;
   trade?: 'sale'|'rent';
   period?: 'monthly'|'daily';
-  mainCategory?: typeof MAIN_CATEGORIES[number];
-  residentialSub?: typeof RESIDENTIAL_SUBS[number];
-  commercialSub?: typeof COMMERCIAL_SUBS[number];
-  category?: string;
+  category?: 'Appartement'|'Maison'|'Villa'|'Terrain'|'Immeuble'|'Bureau'|'Entrepôt'|'Commercial'|undefined;
   rooms?: number;
   baths?: number;
   livingRooms?: number;
@@ -60,14 +55,10 @@ export default function PropertyFiltersSheet({
   const [openCountry, setOpenCountry] = useState<boolean>(false);
   const [openCity, setOpenCity] = useState<boolean>(false);
   const [openCategory, setOpenCategory] = useState<boolean>(false);
-  const [openResidentialSub, setOpenResidentialSub] = useState<boolean>(false);
-  const [openCommercialSub, setOpenCommercialSub] = useState<boolean>(false);
   const [openTransaction, setOpenTransaction] = useState<boolean>(false);
   const [qCountry, setQCountry] = useState<string>('');
   const [qCity, setQCity] = useState<string>('');
   const [qCategory, setQCategory] = useState<string>('');
-  const [qResidentialSub, setQResidentialSub] = useState<string>('');
-  const [qCommercialSub, setQCommercialSub] = useState<string>('');
 
   useEffect(()=>{ (async()=>{
     try { const raw = await AsyncStorage.getItem(presetKey); if (raw) setF(JSON.parse(raw) as PropertyFilters); } catch(e){ console.log('filters/preset read error', e); }
@@ -118,23 +109,9 @@ export default function PropertyFiltersSheet({
             <Section title="Catégorie">
               <Row>
                 <Pill onPress={()=>{ setOpenCategory(true); setQCategory(''); }}>
-                  {f.mainCategory ?? 'Catégorie principale'}
+                  {f.category ?? 'Type de bien'}
                 </Pill>
               </Row>
-              {f.mainCategory === 'Résidentiel' && (
-                <Row style={{ marginTop:8 }}>
-                  <Pill onPress={()=>{ setOpenResidentialSub(true); setQResidentialSub(''); }}>
-                    {f.residentialSub ?? 'Sous-catégorie'}
-                  </Pill>
-                </Row>
-              )}
-              {f.mainCategory === 'Commerces' && (
-                <Row style={{ marginTop:8 }}>
-                  <Pill onPress={()=>{ setOpenCommercialSub(true); setQCommercialSub(''); }}>
-                    {f.commercialSub ?? 'Type de commerce'}
-                  </Pill>
-                </Row>
-              )}
             </Section>
 
             <Section title="Caractéristiques">
@@ -205,44 +182,14 @@ export default function PropertyFiltersSheet({
         <Modal visible={openCategory} transparent animationType="slide">
           <View style={styles.pickerWrap}>
             <View style={[styles.pickerSheet, { paddingBottom: insets.bottom+12 }]}>
-              <Text style={styles.pickerTitle}>Catégorie principale</Text>
+              <Text style={styles.pickerTitle}>Catégorie</Text>
               <Search value={qCategory} onChange={setQCategory} placeholder="Rechercher une catégorie…" />
               <ScrollView>
-                {(qCategory?MAIN_CATEGORIES.filter(c=>c.toLowerCase().includes(qCategory.toLowerCase())):MAIN_CATEGORIES).map(c=> (
-                  <Pressable key={c} onPress={()=>{ setF(s=>({...s, mainCategory:c, residentialSub:undefined, commercialSub:undefined })); setOpenCategory(false); }} style={styles.rowPick}><Text>{c}</Text></Pressable>
+                {(qCategory?CATEGORIES.filter(c=>c.toLowerCase().includes(qCategory.toLowerCase())):CATEGORIES).map(c=> (
+                  <Pressable key={c} onPress={()=>{ setF(s=>({...s, category:c })); setOpenCategory(false); }} style={styles.rowPick}><Text>{c}</Text></Pressable>
                 ))}
               </ScrollView>
               <Close onPress={()=>setOpenCategory(false)} />
-            </View>
-          </View>
-        </Modal>
-
-        <Modal visible={openResidentialSub} transparent animationType="slide">
-          <View style={styles.pickerWrap}>
-            <View style={[styles.pickerSheet, { paddingBottom: insets.bottom+12 }]}>
-              <Text style={styles.pickerTitle}>Sous-catégorie résidentielle</Text>
-              <Search value={qResidentialSub} onChange={setQResidentialSub} placeholder="Rechercher…" />
-              <ScrollView>
-                {(qResidentialSub?RESIDENTIAL_SUBS.filter(c=>c.toLowerCase().includes(qResidentialSub.toLowerCase())):RESIDENTIAL_SUBS).map(c=> (
-                  <Pressable key={c} onPress={()=>{ setF(s=>({...s, residentialSub:c })); setOpenResidentialSub(false); }} style={styles.rowPick}><Text>{c}</Text></Pressable>
-                ))}
-              </ScrollView>
-              <Close onPress={()=>setOpenResidentialSub(false)} />
-            </View>
-          </View>
-        </Modal>
-
-        <Modal visible={openCommercialSub} transparent animationType="slide">
-          <View style={styles.pickerWrap}>
-            <View style={[styles.pickerSheet, { paddingBottom: insets.bottom+12 }]}>
-              <Text style={styles.pickerTitle}>Type de commerce</Text>
-              <Search value={qCommercialSub} onChange={setQCommercialSub} placeholder="Rechercher…" />
-              <ScrollView>
-                {(qCommercialSub?COMMERCIAL_SUBS.filter(c=>c.toLowerCase().includes(qCommercialSub.toLowerCase())):COMMERCIAL_SUBS).map(c=> (
-                  <Pressable key={c} onPress={()=>{ setF(s=>({...s, commercialSub:c })); setOpenCommercialSub(false); }} style={styles.rowPick}><Text>{c}</Text></Pressable>
-                ))}
-              </ScrollView>
-              <Close onPress={()=>setOpenCommercialSub(false)} />
             </View>
           </View>
         </Modal>

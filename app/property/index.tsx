@@ -15,11 +15,8 @@ import ZimaBrand from '@/components/ui/ZimaBrand';
 const INITIAL: PropertyFilters = {
   country: undefined, city: undefined,
   trade: undefined, period: undefined,
-  mainCategory: undefined,
-  residentialSub: undefined,
-  commercialSub: undefined,
   category: undefined,
-  rooms: undefined, baths: undefined, livingRooms: undefined, surfaceMin: undefined,
+  rooms: undefined, baths: undefined, surfaceMin: undefined,
   priceMin: undefined, priceMax: undefined,
   sort: 'recent',
 };
@@ -71,7 +68,7 @@ export default function PropertyScreen(){
         <View style={{ paddingHorizontal:16, paddingBottom:16 }}>
           <Pressable onPress={()=>setOpen(true)} style={{ height:48, borderRadius:12, borderWidth:1, borderColor:'#E5E7EB', justifyContent:'center', paddingHorizontal:14 }}>
             <Text style={{ fontWeight:'700' }}>
-              {filters.country ?? 'Pays'}, {filters.city ?? 'Ville'} • {filters.mainCategory ?? 'Catégorie'} {filters.residentialSub ? `• ${filters.residentialSub}` : ''} {filters.commercialSub ? `• ${filters.commercialSub}` : ''} {filters.trade ? `• ${filters.trade==='sale'?'Vente':'Location'}` : ''}
+              {filters.country ?? 'Pays'}, {filters.city ?? 'Ville'} • {filters.category ?? 'Catégorie'} {filters.trade ? `• ${filters.trade==='sale'?'Vente':'Location'}` : ''}
             </Text>
             <Text style={{ color:'#6B7280', marginTop:2 }}>
               Budget {fmt(filters.priceMin)} – {fmt(filters.priceMax)}
