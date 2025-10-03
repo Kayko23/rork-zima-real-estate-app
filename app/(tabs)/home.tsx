@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, ScrollView, StyleSheet, Pressable, useWindowDimensions, FlatList, Dimensions } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Pressable, FlatList, Dimensions } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import SegmentedTabs from "@/components/home/SegmentedTabs";
 import SectionHeader from "@/components/home/SectionHeader";
@@ -11,39 +11,55 @@ import { sortPremiumFirst } from "@/utils/sortProperties";
 
 const W = Dimensions.get('window').width;
 
-const premiumSeed: Property[] = sortPremiumFirst([
+const premiumProperties: Property[] = sortPremiumFirst([
   { id:"p1", title:"Villa", city:"Accra", price:274500000, currency:"XOF", beds:4, baths:3, area:280, rating:4.8,
     photos:["https://images.unsplash.com/photo-1505691723518-36a5ac3b2d91?q=80&w=1400"], badge:'À VENDRE' as const, isPremium: true, createdAt: "2025-01-10T10:00:00Z" },
-  { id:"p2", title:"Studio", city:"Lagos", price:35000000, currency:"XOF", beds:1, baths:1, area:40, rating:4.2,
-    photos:["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1400"], badge:'À LOUER' as const, isPremium: false, createdAt: "2025-01-05T10:00:00Z" },
-]);
-
-const arrivalsSeed: Property[] = sortPremiumFirst([
-  { id:"n1", title:"Appartement", city:"Lagos", price:732792, currency:"XOF", beds:2, baths:2, area:85, rating:4.6,
-    photos:["https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1400"], badge:'À LOUER' as const, isPremium: false, createdAt: "2025-01-08T10:00:00Z" },
-  { id:"n2", title:"Penthouse", city:"Abidjan", price:520000000, currency:"XOF", beds:3, baths:3, area:210, rating:4.7,
+  { id:"p2", title:"Penthouse", city:"Abidjan", price:520000000, currency:"XOF", beds:3, baths:3, area:210, rating:4.7,
     photos:["https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1400"], badge:'Premium' as const, isPremium: true, createdAt: "2025-01-12T10:00:00Z" },
 ]);
 
+const premiumTrips: Property[] = [
+  { id:"t1", title:"Hôtel Ivoire", city:"Abidjan", price:85000, currency:"XOF", beds:2, baths:1, area:45, rating:4.9,
+    photos:["https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1400"], badge:'Premium' as const, isPremium: true, createdAt: "2025-01-10T10:00:00Z" },
+  { id:"t2", title:"Resort Baobab", city:"Dakar", price:120000, currency:"XOF", beds:1, baths:1, area:35, rating:4.7,
+    photos:["https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1400"], badge:'Premium' as const, isPremium: true, createdAt: "2025-01-11T10:00:00Z" },
+];
+
+const premiumPros: Property[] = [
+  { id:"pr1", title:"Architecte Kofi", city:"Accra", price:0, currency:"XOF", rating:4.9,
+    photos:["https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1400"], badge:'Premium' as const, isPremium: true, createdAt: "2025-01-10T10:00:00Z" },
+  { id:"pr2", title:"Agent Amina", city:"Lagos", price:0, currency:"XOF", rating:4.8,
+    photos:["https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1400"], badge:'Premium' as const, isPremium: true, createdAt: "2025-01-11T10:00:00Z" },
+];
+
+const categoriesData: { key: string; title: string; items: Property[] }[] = [
+  { key: "residentiel", title: "Résidentiel", items: [
+    { id:"r1", title:"Appartement", city:"Lagos", price:732792, currency:"XOF", beds:2, baths:2, area:85, rating:4.6,
+      photos:["https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-08T10:00:00Z" },
+    { id:"r2", title:"Studio", city:"Lagos", price:35000000, currency:"XOF", beds:1, baths:1, area:40, rating:4.2,
+      photos:["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-05T10:00:00Z" },
+  ]},
+  { key: "bureaux", title: "Bureaux", items: [
+    { id:"b1", title:"Bureau moderne", city:"Abidjan", price:150000000, currency:"XOF", beds:0, baths:0, area:120, rating:4.5,
+      photos:["https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-09T10:00:00Z" },
+  ]},
+  { key: "commerces", title: "Commerces", items: [
+    { id:"c1", title:"Boutique centre-ville", city:"Dakar", price:95000000, currency:"XOF", beds:0, baths:0, area:80, rating:4.3,
+      photos:["https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1400"], badge:'À VENDRE', isPremium: false, createdAt: "2025-01-07T10:00:00Z" },
+  ]},
+  { key: "terrains", title: "Terrains", items: [
+    { id:"te1", title:"Terrain constructible", city:"Accra", price:180000000, currency:"XOF", beds:0, baths:0, area:500, rating:4.4,
+      photos:["https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1400"], badge:'À VENDRE', isPremium: false, createdAt: "2025-01-06T10:00:00Z" },
+  ]},
+];
+
 export default function Home() {
   const [tab,setTab] = React.useState<"props"|"pros"|"trips">("props");
-  const [cat, setCat] = React.useState<string>("Résidentiel");
-  const [loading, setLoading] = React.useState<boolean>(false);
   const { bottom, top } = useSafeAreaInsets();
   const router = useRouter();
-  const { width } = useWindowDimensions();
-
-  React.useEffect(() => {
-    const t = setTimeout(()=>setLoading(false), 600);
-    return () => clearTimeout(t);
-  }, []);
 
   const goPros = () => router.push("/(tabs)/professionals");
   const goTrips = () => router.push("/(tabs)/voyages");
-
-  const all: Property[] = React.useMemo(() => sortPremiumFirst([...premiumSeed, ...arrivalsSeed]), []);
-  const categories = React.useMemo(() => ["Résidentiel","Bureaux","Commerces","Terrains","Industriel","Luxe"], []);
-  const filteredByCat = React.useMemo(() => all.filter(p => (p.title+" "+p.city).toLowerCase().includes(cat.toLowerCase())), [all, cat]);
 
   return (
     <SafeAreaView edges={["top"]} style={[styles.safe,{ paddingTop: Math.max(top, 12)}]} testID="home-safe">
@@ -65,10 +81,10 @@ export default function Home() {
           }}/>
         </View>
 
-        <SectionHeader title="Biens premium" onSeeAll={()=>router.push("/(tabs)/properties")} />
+        <SectionHeader title="Propriétés premium" onSeeAll={()=>router.push("/(tabs)/properties?premium=true")} />
         <FlatList
           horizontal
-          data={premiumSeed}
+          data={premiumProperties}
           keyExtractor={(i)=>i.id}
           showsHorizontalScrollIndicator={false}
           pagingEnabled
@@ -81,37 +97,76 @@ export default function Home() {
               <PropertyCard item={item}/>
             </View>
           )}
-          testID="premium-slider"
+          testID="premium-properties-slider"
         />
 
-        <SectionHeader title="Par catégories" />
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal:12, gap:8 }}>
-          {categories.map((c)=> (
-            <Pressable key={c} onPress={()=>setCat(c)} style={({pressed})=>[styles.chip, cat===c && styles.chipA, pressed && { opacity:.85 }]} testID={`chip-${c}`}>
-              <Text style={[styles.chipTx, cat===c && styles.chipTxA]}>{c}</Text>
-            </Pressable>
-          ))}
-        </ScrollView>
-
+        <SectionHeader title="Voyages premium" onSeeAll={()=>router.push("/(tabs)/voyages?premium=true")} />
         <FlatList
           horizontal
-          data={filteredByCat}
+          data={premiumTrips}
           keyExtractor={(i)=>i.id}
           showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal:12 }}
+          pagingEnabled
+          snapToInterval={Math.round(W*0.86)}
+          decelerationRate="fast"
+          contentContainerStyle={{ paddingHorizontal: 12 }}
           ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
           renderItem={({item}) => (
-            <View style={{ width: Math.round(W*0.72) }}>
+            <View style={{ width: Math.round(W*0.86) }}>
               <PropertyCard item={item}/>
             </View>
           )}
-          ListFooterComponent={
-            <Pressable onPress={()=>router.push({ pathname:'/(tabs)/properties', params:{ category: cat } } as any)} style={styles.more} testID="see-all-cat">
-              <Text style={{ color: colors.primary, fontWeight: '700' }}>Voir tout {cat} ›</Text>
-            </Pressable>
-          }
-          testID="categories-slider"
+          testID="premium-trips-slider"
         />
+
+        <SectionHeader title="Professionnels premium" onSeeAll={()=>router.push("/(tabs)/professionals?premium=true")} />
+        <FlatList
+          horizontal
+          data={premiumPros}
+          keyExtractor={(i)=>i.id}
+          showsHorizontalScrollIndicator={false}
+          pagingEnabled
+          snapToInterval={Math.round(W*0.86)}
+          decelerationRate="fast"
+          contentContainerStyle={{ paddingHorizontal: 12 }}
+          ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
+          renderItem={({item}) => (
+            <View style={{ width: Math.round(W*0.86) }}>
+              <PropertyCard item={item}/>
+            </View>
+          )}
+          testID="premium-pros-slider"
+        />
+
+        <SectionHeader title="Par catégories" />
+        {categoriesData.map((category) => (
+          <View key={category.key} style={{ marginBottom: 16 }}>
+            <View style={styles.categoryHeader}>
+              <Text style={styles.categoryTitle}>{category.title}</Text>
+              <Pressable 
+                onPress={()=>router.push({ pathname:'/(tabs)/properties', params:{ category: category.key } } as any)} 
+                style={({pressed})=>[styles.categoryLink, pressed && { opacity:.7 }]}
+                testID={`see-all-${category.key}`}
+              >
+                <Text style={{ color: colors.primary, fontWeight: '700', fontSize: 14 }}>Voir tout ›</Text>
+              </Pressable>
+            </View>
+            <FlatList
+              horizontal
+              data={category.items}
+              keyExtractor={(i)=>i.id}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal:12 }}
+              ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
+              renderItem={({item}) => (
+                <View style={{ width: Math.round(W*0.72) }}>
+                  <PropertyCard item={item}/>
+                </View>
+              )}
+              testID={`category-${category.key}-slider`}
+            />
+          </View>
+        ))}
 
         <View style={styles.ctaRow}>
           <Pressable
@@ -146,9 +201,7 @@ const styles = StyleSheet.create({
   ctaOutline:{ backgroundColor: colors.panel, borderWidth:1, borderColor: colors.primary },
   ctaIcon:{ color:"#fff", fontWeight:"900", fontSize:18, marginBottom:2 },
   ctaTxt:{ color:"#fff", fontWeight:"800", fontSize:16 },
-  chip:{ paddingHorizontal:14, paddingVertical:8, borderRadius:999, backgroundColor:'#FFFFFF', borderWidth:1, borderColor:'#E6EBF2' },
-  chipA:{ backgroundColor:'#0F6B56', borderColor:'#0F6B56' },
-  chipTx:{ color:'#6A7687', fontWeight:'700' },
-  chipTxA:{ color:'#fff' },
-  more:{ justifyContent:'center', paddingRight:12 },
+  categoryHeader:{ flexDirection:"row", justifyContent:"space-between", alignItems:"center", paddingHorizontal:12, marginTop:12, marginBottom:8 },
+  categoryTitle:{ fontSize:20, fontWeight:"700", color:"#0b1720" },
+  categoryLink:{ padding:6, borderRadius:10 },
 });
