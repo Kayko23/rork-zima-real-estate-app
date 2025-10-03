@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, ScrollView, StyleSheet, Pressable, FlatList, Dimensions } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SegmentedTabs from "@/components/home/SegmentedTabs";
 import SectionHeader from "@/components/home/SectionHeader";
 import PropertyCard, { type Property } from "@/components/property/PropertyCard";
@@ -81,17 +81,13 @@ export default function Home() {
   const goTrips = () => router.push("/(tabs)/voyages");
 
   return (
-    <SafeAreaView edges={["top"]} style={[styles.safe,{ paddingTop: Math.max(top, 12)}]} testID="home-safe">
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: bottom + 100 }}
-        showsVerticalScrollIndicator={false}
-        bounces
-      >
+    <View style={styles.container}>
+      <View style={[styles.stickyHeader, { paddingTop: top, position: 'relative', zIndex: 10 }]}>
         <Pressable onPress={() => router.push('/(tabs)/home')} style={{ alignSelf: 'center' }}>
           <Text style={styles.brand}>ZIMA</Text>
         </Pressable>
 
-        <View style={{ paddingHorizontal:16 }}>
+        <View style={{ paddingHorizontal:16, paddingBottom:12 }}>
           <SegmentedTabs value={tab} onChange={(k)=>{
             setTab(k);
             if (k==="props") router.push("/(tabs)/properties");
@@ -99,6 +95,13 @@ export default function Home() {
             if (k==="trips") goTrips();
           }}/>
         </View>
+      </View>
+
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: bottom + 100 }}
+        showsVerticalScrollIndicator={false}
+        bounces
+      >
 
         <SectionHeader title="Propriétés premium" onSeeAll={()=>router.push("/(tabs)/properties?premium=true")} />
         <FlatList
@@ -213,12 +216,13 @@ export default function Home() {
           </Pressable>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe:{ flex:1, backgroundColor: colors.bg },
+  container: { flex: 1, backgroundColor: colors.bg },
+  stickyHeader: { backgroundColor: colors.bg, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB' },
   brand:{ textAlign:"center", fontSize:32, fontWeight:"800", color: colors.text, letterSpacing: 3, marginVertical: 10 },
   ctaRow:{ paddingHorizontal:12, flexDirection:"row", gap:12, marginTop:24, marginBottom:16 },
   cta:{ flex:1, backgroundColor: colors.primary, paddingVertical:16, borderRadius: radius.lg, alignItems:"center" },
