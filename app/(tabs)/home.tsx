@@ -39,18 +39,6 @@ const categoriesData: { key: string; title: string; items: Property[] }[] = [
     { id:"r2", title:"Studio", city:"Lagos", price:35000000, currency:"XOF", beds:1, baths:1, area:40, rating:4.2,
       photos:["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-05T10:00:00Z" },
   ]},
-  { key: "bureaux", title: "Bureaux", items: [
-    { id:"b1", title:"Bureau moderne", city:"Abidjan", price:150000000, currency:"XOF", beds:0, baths:0, area:120, rating:4.5,
-      photos:["https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-09T10:00:00Z" },
-  ]},
-  { key: "commerces", title: "Commerces", items: [
-    { id:"c1", title:"Boutique centre-ville", city:"Dakar", price:95000000, currency:"XOF", beds:0, baths:0, area:80, rating:4.3,
-      photos:["https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1400"], badge:'À VENDRE', isPremium: false, createdAt: "2025-01-07T10:00:00Z" },
-  ]},
-  { key: "terrains", title: "Terrains", items: [
-    { id:"te1", title:"Terrain constructible", city:"Accra", price:180000000, currency:"XOF", beds:0, baths:0, area:500, rating:4.4,
-      photos:["https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1400"], badge:'À VENDRE', isPremium: false, createdAt: "2025-01-06T10:00:00Z" },
-  ]},
   { key: "hotel", title: "Hôtel", items: [
     { id:"h1", title:"Hôtel Ivoire", city:"Abidjan", price:85000, currency:"XOF", beds:2, baths:1, area:45, rating:4.9,
       photos:["https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-09T10:00:00Z" },
@@ -62,6 +50,24 @@ const categoriesData: { key: string; title: string; items: Property[] }[] = [
       photos:["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-07T10:00:00Z" },
     { id:"rj2", title:"Studio Cocody", city:"Abidjan", price:35000, currency:"XOF", beds:1, baths:1, area:25, rating:4.3,
       photos:["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-06T10:00:00Z" },
+  ]},
+  { key: "espaces-evenementiels", title: "Espaces événementiels", items: [
+    { id:"ev1", title:"Salle de réception", city:"Abidjan", price:250000, currency:"XOF", beds:0, baths:2, area:200, rating:4.6,
+      photos:["https://images.unsplash.com/photo-1519167758481-83f29da8c2b0?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-08T10:00:00Z" },
+    { id:"ev2", title:"Centre de conférence", city:"Dakar", price:350000, currency:"XOF", beds:0, baths:3, area:300, rating:4.7,
+      photos:["https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-07T10:00:00Z" },
+  ]},
+  { key: "terrains", title: "Terrains", items: [
+    { id:"te1", title:"Terrain constructible", city:"Accra", price:180000000, currency:"XOF", beds:0, baths:0, area:500, rating:4.4,
+      photos:["https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1400"], badge:'À VENDRE', isPremium: false, createdAt: "2025-01-06T10:00:00Z" },
+  ]},
+  { key: "commerces", title: "Commerces", items: [
+    { id:"c1", title:"Boutique centre-ville", city:"Dakar", price:95000000, currency:"XOF", beds:0, baths:0, area:80, rating:4.3,
+      photos:["https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1400"], badge:'À VENDRE', isPremium: false, createdAt: "2025-01-07T10:00:00Z" },
+  ]},
+  { key: "bureaux", title: "Bureaux", items: [
+    { id:"b1", title:"Bureau moderne", city:"Abidjan", price:150000000, currency:"XOF", beds:0, baths:0, area:120, rating:4.5,
+      photos:["https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-09T10:00:00Z" },
   ]},
 ];
 
