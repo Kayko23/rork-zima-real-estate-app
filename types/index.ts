@@ -1,3 +1,12 @@
+export type Category =
+  | 'residential' | 'commercial' | 'office' | 'land' | 'hospitality';
+
+export type ResidentialSubcategory =
+  | 'single_family' | 'gated_community' | 'multifamily'
+  | 'flatshare' | 'student_private';
+
+export type CommercialSubcategory = 'retail' | 'restaurant' | 'warehouse';
+
 export interface Property {
   id: string;
   title: string;
@@ -10,8 +19,12 @@ export interface Property {
   };
   type: 'sale' | 'rent';
   category: string;
+  mainCategory?: Category;
+  residentialSubcategory?: ResidentialSubcategory | null;
+  commercialSubcategory?: CommercialSubcategory | null;
   bedrooms?: number;
   bathrooms?: number;
+  livingRooms?: number;
   area?: number;
   images: string[];
   description: string;
@@ -125,9 +138,13 @@ export interface FilterState {
   country?: string;
   city?: string;
   category?: string;
+  mainCategory?: Category;
+  residentialSubcategory?: ResidentialSubcategory;
+  commercialSubcategory?: CommercialSubcategory;
   priceRange?: [number, number];
   bedrooms?: number;
   bathrooms?: number;
+  livingRooms?: number;
   area?: [number, number];
   type?: 'sale' | 'rent';
   sortBy: 'recent' | 'price_asc' | 'price_desc' | 'popular';

@@ -42,18 +42,18 @@ export default function PropertyCard({ item }: { item: Property }) {
         <View style={styles.pricePill}><Text style={styles.price}>{formatPrice(item.price, item.currency)}</Text></View>
         <View style={styles.meta}>
           {shouldShowLivingRoom(item.category) && item.livingRooms !== undefined && (
-            <View style={styles.metaItem}><Sofa size={14} color="#fff" /><Text style={styles.metaTxt}>{item.livingRooms}</Text></View>
+            <View style={styles.metaItem}><Sofa size={13} color="#fff" /><Text style={styles.metaTxt}>{item.livingRooms}</Text></View>
           )}
           {shouldShowBeds(item.category) && item.beds !== undefined && (
-            <View style={styles.metaItem}><BedDouble size={14} color="#fff" /><Text style={styles.metaTxt}>{item.beds}</Text></View>
+            <View style={styles.metaItem}><BedDouble size={13} color="#fff" /><Text style={styles.metaTxt}>{item.beds}</Text></View>
           )}
           {shouldShowBaths(item.category) && item.baths !== undefined && (
-            <View style={styles.metaItem}><Bath size={14} color="#fff" /><Text style={styles.metaTxt}>{item.baths}</Text></View>
+            <View style={styles.metaItem}><Bath size={13} color="#fff" /><Text style={styles.metaTxt}>{item.baths}</Text></View>
           )}
           {shouldShowArea(item.category) && item.area !== undefined && (
-            <View style={styles.metaItem}><Ruler size={14} color="#fff" /><Text style={styles.metaTxt}>{item.area} m²</Text></View>
+            <View style={styles.metaItem}><Ruler size={13} color="#fff" /><Text style={styles.metaTxt}>{item.area} m²</Text></View>
           )}
-          <View style={[styles.metaItem,{marginLeft:"auto"}]}><Star size={14} color="#FFD166" /><Text style={styles.metaTxt}>{item.rating ?? "—"}</Text></View>
+          <View style={[styles.metaItem,{marginLeft:"auto"}]}><Star size={13} color="#FFD166" /><Text style={styles.metaTxt}>{item.rating ?? "—"}</Text></View>
         </View>
       </View>
     </Pressable>
@@ -65,7 +65,8 @@ const shouldShowLivingRoom = (category?: string) => {
   const cat = category.toLowerCase();
   return cat.includes('appartement') || cat.includes('villa') || cat.includes('maison') || 
          cat.includes('penthouse') || cat.includes('duplex') || cat.includes('loft') ||
-         cat.includes('residence') || cat.includes('coliving');
+         cat.includes('residence') || cat.includes('coliving') || cat.includes('residentiel') ||
+         cat.includes('single_family') || cat.includes('gated_community') || cat.includes('multifamily');
 };
 
 const shouldShowBeds = (category?: string) => {
@@ -100,6 +101,6 @@ const styles = StyleSheet.create({
   pricePill:{ alignSelf:"flex-start", backgroundColor:"rgba(255,255,255,.9)", paddingHorizontal:12, paddingVertical:6, borderRadius:999 },
   price:{ color: colors.chip, fontWeight:"800", letterSpacing:0.2, fontSize:13 },
   meta:{ flexDirection:"row", alignItems:"center", gap:8, marginTop:10, flexWrap:"wrap" },
-  metaItem:{ flexDirection:"row", alignItems:"center", gap:4, paddingHorizontal:8, paddingVertical:5, backgroundColor:"rgba(17,24,39,.35)", borderRadius:999 },
-  metaTxt:{ color:"#fff", fontWeight:"600", fontSize:12 },
+  metaItem:{ flexDirection:"row", alignItems:"center", gap:3, paddingHorizontal:7, paddingVertical:4, backgroundColor:"rgba(17,24,39,.35)", borderRadius:999 },
+  metaTxt:{ color:"#fff", fontWeight:"600", fontSize:11 },
 });

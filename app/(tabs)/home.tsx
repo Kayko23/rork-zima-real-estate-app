@@ -33,12 +33,6 @@ const premiumPros: Property[] = [
 ];
 
 const categoriesData: { key: string; title: string; items: Property[] }[] = [
-  { key: "residentiel", title: "Résidentiel", items: [
-    { id:"r1", title:"Appartement", city:"Lagos", price:732792, currency:"XOF", beds:2, baths:2, area:85, rating:4.6,
-      photos:["https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-08T10:00:00Z" },
-    { id:"r2", title:"Studio", city:"Lagos", price:35000000, currency:"XOF", beds:1, baths:1, area:40, rating:4.2,
-      photos:["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-05T10:00:00Z" },
-  ]},
   { key: "hotel", title: "Hôtel", items: [
     { id:"h1", title:"Hôtel Ivoire", city:"Abidjan", price:85000, currency:"XOF", beds:2, baths:1, area:45, rating:4.9,
       photos:["https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-09T10:00:00Z" },
@@ -68,6 +62,12 @@ const categoriesData: { key: string; title: string; items: Property[] }[] = [
   { key: "bureaux", title: "Bureaux", items: [
     { id:"b1", title:"Bureau moderne", city:"Abidjan", price:150000000, currency:"XOF", beds:0, baths:0, area:120, rating:4.5,
       photos:["https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-09T10:00:00Z" },
+  ]},
+  { key: "residentiel", title: "Résidentiel", items: [
+    { id:"r1", title:"Appartement", city:"Lagos", price:732792, currency:"XOF", beds:2, baths:2, area:85, rating:4.6,
+      photos:["https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-08T10:00:00Z" },
+    { id:"r2", title:"Studio", city:"Lagos", price:35000000, currency:"XOF", beds:1, baths:1, area:40, rating:4.2,
+      photos:["https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-05T10:00:00Z" },
   ]},
 ];
 
