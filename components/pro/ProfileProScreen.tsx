@@ -21,6 +21,7 @@ import {
   Heart,
   Share,
   ChevronLeft,
+  MessageSquare,
 } from 'lucide-react-native';
 
 export interface ProProfile {
@@ -165,10 +166,8 @@ function ActionBar({
         <Text style={styles.roundActionText}>Appeler</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={onWhatsApp} style={styles.roundAction}>
-        <Image
-          source={{ uri: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg' }}
-          style={{ width: 28, height: 28 }}
-        />
+        <MessageSquare size={24} color="#25D366" />
+        <Text style={[styles.roundActionText, { color: '#25D366' }]}>WhatsApp</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={onBook} style={[styles.roundAction, { backgroundColor: '#0F4C3A' }]}>
         <Calendar size={24} color="#fff" />
