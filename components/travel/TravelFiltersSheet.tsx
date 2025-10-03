@@ -375,7 +375,7 @@ function DateFieldLocal({ label, value, onChange }: { label: string; value: Date
   const today = useMemo(() => new Date(), []);
 
   const formatDate = (d: Date | null) => {
-    if (!d) return 'Choisir';
+    if (!d || !(d instanceof Date) || isNaN(d.getTime())) return 'Choisir';
     return new Intl.DateTimeFormat('fr-FR', {
       day: '2-digit',
       month: '2-digit',
