@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, FlatList, Pressable, StyleSheet, Linking } from 'react-native';
+import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import ProfessionalCard, { type Provider } from './ProfessionalCard';
 
@@ -13,7 +13,7 @@ export default function ProfessionalCarousel({ title, category, data }: Props) {
   const router = useRouter();
 
   const goSeeAll = () => {
-    router.push({ pathname: '/professional', params: { category } });
+    router.push({ pathname: '/professional/category', params: { category } });
   };
 
   return (
@@ -39,25 +39,6 @@ export default function ProfessionalCarousel({ title, category, data }: Props) {
             <ProfessionalCard
               item={item}
               onPressProfile={(id) => router.push(`/professional/${id}`)}
-              onPressMail={(email) => {
-                if (email) {
-                  Linking.openURL(`mailto:${email}`);
-                }
-              }}
-              onPressCall={(phone) => {
-                if (phone) {
-                  Linking.openURL(`tel:${phone}`);
-                }
-              }}
-              onPressWhatsApp={async (whatsapp) => {
-                if (whatsapp) {
-                  const text = 'Bonjour 👋';
-                  const deep = `whatsapp://send?phone=${whatsapp}&text=${encodeURIComponent(text)}`;
-                  const web = `https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`;
-                  const can = await Linking.canOpenURL('whatsapp://send');
-                  Linking.openURL(can ? deep : web);
-                }
-              }}
             />
           </View>
         )}
