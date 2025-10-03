@@ -24,7 +24,7 @@ const currencyMap: Record<string, { code: string }> = {
 const categories = [
   { key: "residential", label: "Résidentiel", types: ["Appartement", "Studio", "Villa", "Maison", "Penthouse", "Duplex", "Triplex", "Immeuble"] },
   { key: "offices", label: "Bureaux", types: ["Bureau", "Plateau", "Coworking", "Espace de travail", "Salle de réunion"] },
-  { key: "retail", label: "Commerces & Retail", types: ["Boutique", "Magasin", "Showroom", "Centre commercial", "Local commercial"] },
+  { key: "commercial", label: "Commerces", types: ["Boutique", "Restaurant", "Magasin", "Entrepôt"] },
   { key: "land", label: "Terrains", types: ["Terrain urbain", "Terrain agricole", "Lotissement", "Terrain constructible", "Terrain industriel"] },
   { key: "industrial", label: "Industriel & Logistique", types: ["Entrepôt", "Usine", "Atelier", "Hangar", "Zone industrielle"] },
   { key: "hotel", label: "Hôtellerie & Événementiel", types: ["Hôtel", "Auberge", "Maison d'hôte", "Salle événementielle", "Espace événementiel"] },
