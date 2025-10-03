@@ -5,6 +5,7 @@ import SegmentedTabs from "@/components/home/SegmentedTabs";
 import SectionHeader from "@/components/home/SectionHeader";
 import PropertyCard, { type Property } from "@/components/property/PropertyCard";
 import ResidentialChips from "@/components/home/ResidentialChips";
+import CommercialChips from "@/components/home/CommercialChips";
 import { colors, radius } from "@/theme/tokens";
 import { useRouter } from "expo-router";
 
@@ -176,6 +177,11 @@ export default function Home() {
             {category.key === 'residentiel' && (
               <View style={{ marginBottom: 12 }}>
                 <ResidentialChips />
+              </View>
+            )}
+            {category.key === 'commerces' && (
+              <View style={{ marginBottom: 12 }}>
+                <CommercialChips />
               </View>
             )}
             <FlatList
