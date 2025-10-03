@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, FlatList, Pressable, Linking, ScrollView } from 'react-native';
+import { View, Text, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useSearchPreset } from '@/hooks/useSearchPreset';
@@ -10,7 +10,7 @@ import { providersApi } from '@/lib/api';
 import ProFiltersSheet, { type ProFilters } from '@/components/filters/ProFiltersSheet';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
-import ProfessionalCard from '@/components/professionals/ProfessionalCard';
+import ProfessionalCarousel from '@/components/professionals/ProfessionalCarousel';
 
 const INITIAL: ProFilters = {
   country: undefined, city: undefined,
@@ -66,33 +66,6 @@ export default function ProfessionalScreen(){
 
   const resultCount = data.length;
 
-  const mailto = (email?: string) => {
-    if (!email) return;
-    Linking.openURL(`mailto:${email}`);
-  };
-
-  const tel = (phone?: string) => {
-    if (!phone) return;
-    Linking.openURL(`tel:${phone}`);
-  };
-
-  const whatsapp = async (msisdn?: string) => {
-    if (!msisdn) return;
-    const text = "Bonjour 👋";
-    const deep = `whatsapp://send?phone=${msisdn}&text=${encodeURIComponent(text)}`;
-    const web = `https://wa.me/${msisdn}?text=${encodeURIComponent(text)}`;
-    const can = await Linking.canOpenURL("whatsapp://send");
-    Linking.openURL(can ? deep : web);
-  };
-
-  const openProfile = (id: string) => {
-    router.push(`/professional/${id}`);
-  };
-
-  const goSeeAll = (category: string) => {
-    router.push({ pathname: "/professional", params: { category } });
-  };
-
   return (
     <View style={{ flex:1, backgroundColor:'#fff' }}>
       <View style={{ paddingTop: insets.top, backgroundColor:'#fff', borderBottomWidth:0.5, borderBottomColor:'#E5E7EB', position: 'relative', zIndex: 10 }}>
@@ -130,37 +103,27 @@ export default function ProfessionalScreen(){
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + tabBarH + 16 }}>
-        {byCategory.map(([cat, items]) => (
-          <View key={cat} style={{ marginBottom: 20 }}>
-            <View style={{ paddingHorizontal: 4, marginBottom: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
-              <Text style={{ fontSize: 18, fontWeight: '800', color: '#13251C' }}>{CATEGORY_LABEL[cat] || cat}</Text>
-              <Pressable onPress={() => goSeeAll(cat)}>
-                <Text style={{ color: '#0E4D3A', fontWeight: '800' }}>Voir tout ›</Text>
-              </Pressable>
-            </View>
-
-            <FlatList
-              data={items}
-              keyExtractor={(i: any) => i.id}
-              numColumns={2}
-              scrollEnabled={false}
-              columnWrapperStyle={{ justifyContent: 'space-between' }}
-              renderItem={({ item }) => (
-                <ProfessionalCard
-                  item={item}
-                  onPressProfile={openProfile}
-                  onPressMail={mailto}
-                  onPressCall={tel}
-                  onPressWhatsApp={whatsapp}
-                />
-              )}
-            />
+      <ScrollView 
+        contentContainerStyle={{ paddingBottom: insets.bottom + tabBarH + 16 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {isLoading ? (
+          <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
+            <Text style={{ color:'#64748B', textAlign: 'center' }}>Chargement...</Text>
           </View>
-        ))}
-
-        {!isLoading && data.length === 0 && (
-          <Text style={{ color:'#64748B', textAlign: 'center', marginTop: 24 }}>Aucun prestataire.</Text>
+        ) : data.length === 0 ? (
+          <View style={{ paddingHorizontal: 16, marginTop: 24 }}>
+            <Text style={{ color:'#64748B', textAlign: 'center' }}>Aucun prestataire.</Text>
+          </View>
+        ) : (
+          byCategory.map(([cat, items]) => (
+            <ProfessionalCarousel
+              key={cat}
+              title={CATEGORY_LABEL[cat] || cat}
+              category={cat as any}
+              data={items}
+            />
+          ))
         )}
       </ScrollView>
 

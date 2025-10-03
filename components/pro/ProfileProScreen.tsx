@@ -167,7 +167,7 @@ function ActionBar({
       </TouchableOpacity>
       <TouchableOpacity onPress={onWhatsApp} style={styles.roundAction}>
         <Ionicons name="logo-whatsapp" size={24} color="#25D366" />
-        <Text style={[styles.roundActionText, { color: '#25D366' }]}>WhatsApp</Text>
+        <Text style={[styles.roundActionText, { color: '#25D366' }]} numberOfLines={1}>WhatsApp</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={onBook} style={[styles.roundAction, { backgroundColor: '#0F4C3A' }]}>
         <Calendar size={24} color="#fff" />

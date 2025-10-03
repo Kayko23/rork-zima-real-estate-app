@@ -34,9 +34,10 @@ export default function ProfessionalCard({ item, onPressProfile, onPressCall, on
   const CARD_GAP = 12;
   const sidePadding = 16;
   const cardWidth = (width - sidePadding * 2 - CARD_GAP) / 2;
+  const isHorizontal = false;
 
   return (
-    <View style={[s.card, { width: cardWidth }]}>
+    <View style={[s.card, isHorizontal ? { width: 248 } : { width: cardWidth }]}>
       <View style={s.header}>
         <Image
           source={{ uri: item.avatar || "https://i.pravatar.cc/150" }}
