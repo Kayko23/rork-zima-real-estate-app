@@ -1,6 +1,6 @@
 import React from "react";
-import { View, Text, ImageBackground, StyleSheet, Pressable } from "react-native";
-import { Heart } from "lucide-react-native";
+import { View, Text, ImageBackground, StyleSheet, Pressable, Linking } from "react-native";
+import { Heart, Mail, Phone } from "lucide-react-native";
 
 export type Provider = {
   id: string;
@@ -20,16 +20,44 @@ export type Provider = {
   whatsapp?: string;
 };
 
+const ROLE_LABELS: Record<Provider["category"], string> = {
+  agent: "Agent immobilier",
+  property_manager: "Gestionnaire de biens",
+  agency: "Agence immobilière",
+  hotel_booking: "Réservation – Hôtels",
+  short_stay: "Réservation – Séjours",
+  event_space: "Gestion d'espaces",
+};
+
 type Props = {
   item: Provider;
   onPressProfile?: (id: string) => void;
-  onPressCall?: (phone?: string) => void;
-  onPressWhatsApp?: (whatsapp?: string) => void;
-  onPressMail?: (email?: string) => void;
+  onToggleFavorite?: (id: string) => void;
 };
 
-export default function ProfessionalCard({ item, onPressProfile }: Props) {
+export default function ProfessionalCard({ item, onPressProfile, onToggleFavorite }: Props) {
   const imageUri = item.cover || item.avatar || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800";
+
+  const handleEmail = (e: any) => {
+    e.stopPropagation();
+    if (item.email) {
+      Linking.openURL(`mailto:${item.email}`);
+    }
+  };
+
+  const handleCall = (e: any) => {
+    e.stopPropagation();
+    if (item.phone) {
+      Linking.openURL(`tel:${item.phone}`);
+    }
+  };
+
+  const handleWhatsApp = (e: any) => {
+    e.stopPropagation();
+    if (item.whatsapp) {
+      Linking.openURL(`whatsapp://send?phone=${item.whatsapp}`);
+    }
+  };
 
   return (
     <Pressable
@@ -54,9 +82,10 @@ export default function ProfessionalCard({ item, onPressProfile }: Props) {
             accessibilityLabel="Ajouter aux favoris"
             onPress={(e) => {
               e.stopPropagation();
+              onToggleFavorite?.(item.id);
             }}
           >
-            <Heart size={18} color="#fff" />
+            <Heart size={18} color="#fff" fill="none" />
           </Pressable>
         </View>
 
@@ -64,9 +93,38 @@ export default function ProfessionalCard({ item, onPressProfile }: Props) {
           <Text style={s.name} numberOfLines={1}>
             {item.name} • {item.city}
           </Text>
+          <Text style={s.role} numberOfLines={1}>
+            {ROLE_LABELS[item.category]}
+          </Text>
 
-          <View style={s.priceTag}>
-            <Text style={s.priceText}>0 FCFA</Text>
+          <View style={s.actionsRow}>
+            {item.email && (
+              <Pressable
+                onPress={handleEmail}
+                style={s.actionBtn}
+                accessibilityLabel={`Envoyer un mail à ${item.name}`}
+              >
+                <Mail size={18} color="#0E2F26" />
+              </Pressable>
+            )}
+            {item.phone && (
+              <Pressable
+                onPress={handleCall}
+                style={s.actionBtn}
+                accessibilityLabel={`Appeler ${item.name}`}
+              >
+                <Phone size={18} color="#0E2F26" />
+              </Pressable>
+            )}
+            {item.whatsapp && (
+              <Pressable
+                onPress={handleWhatsApp}
+                style={s.actionBtn}
+                accessibilityLabel={`Envoyer un WhatsApp à ${item.name}`}
+              >
+                <Text style={s.whatsappIcon}>💬</Text>
+              </Pressable>
+            )}
           </View>
         </View>
 
@@ -124,24 +182,41 @@ const s = StyleSheet.create({
   },
   name: {
     color: "#fff",
-    fontWeight: "700" as const,
-    fontSize: 16,
-    textShadowColor: "rgba(0,0,0,0.5)",
+    fontWeight: "800" as const,
+    fontSize: 18,
+    textShadowColor: "rgba(0,0,0,0.6)",
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 4,
   },
-  priceTag: {
-    marginTop: 6,
-    backgroundColor: "#fff",
-    alignSelf: "flex-start",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+  role: {
+    color: "#F2F2F2",
+    fontWeight: "600" as const,
+    fontSize: 14,
+    marginTop: 2,
+    textShadowColor: "rgba(0,0,0,0.5)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
-  priceText: {
-    fontWeight: "700" as const,
-    fontSize: 13,
-    color: "#0E2F26",
+  actionsRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 10,
+  },
+  actionBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(255,255,255,0.95)",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  whatsappIcon: {
+    fontSize: 18,
   },
   ratingBadge: {
     position: "absolute",
