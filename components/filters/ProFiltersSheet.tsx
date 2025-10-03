@@ -3,8 +3,7 @@ import { View, Text, Pressable, ScrollView, Modal, TextInput, KeyboardAvoidingVi
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { providerCategories } from '@/lib/api';
-import RangeSlider from '@/components/inputs/RangeSlider';
-import { formatPrice } from '@/lib/format';
+
 
 const COUNTRIES: Record<string,string[]> = {
   "Côte d’Ivoire": ["Abidjan","Yamoussoukro","Bouaké","San-Pédro","Daloa","Korhogo"],
@@ -87,21 +86,6 @@ export default function ProFiltersSheet({ visible, initial, resultCount, onClose
               <Row>
                 <Pill onPress={()=>{ setOpenCategory(true); setQCategory(''); }}>{f.category ?? 'Toutes catégories'}</Pill>
               </Row>
-            </Section>
-
-            <Section title="Budget (FCFA / mois)">
-              <View style={{ paddingHorizontal: 4 }}>
-                <RangeSlider
-                  min={0}
-                  max={10000000}
-                  values={[f.budgetMin ?? 0, f.budgetMax ?? 10000000]}
-                  onChange={([min, max])=>setF(s=>({...s, budgetMin: min===0?undefined:min, budgetMax: max===10000000?undefined:max}))}
-                />
-                <View style={{ flexDirection:'row', justifyContent:'space-between', marginTop:8 }}>
-                  <Text style={{ fontSize:14, color:'#6B7280' }}>{formatPrice(f.budgetMin ?? 0, 'XOF')}</Text>
-                  <Text style={{ fontSize:14, color:'#6B7280' }}>{formatPrice(f.budgetMax ?? 10000000, 'XOF')}</Text>
-                </View>
-              </View>
             </Section>
 
             <Section title="Note minimale">
