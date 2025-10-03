@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useSearchPreset } from '@/hooks/useSearchPreset';
+import { X } from 'lucide-react-native';
 
 import { useQuery } from '@tanstack/react-query';
 import { sortPremiumFirst } from '@/utils/sortProperties';
@@ -27,8 +29,19 @@ export default function PropertyScreen(){
   const router = useRouter();
   const { currency } = useSettings();
   const { format } = useMoney();
+  const { preset, reset: resetPreset } = useSearchPreset();
   const [open, setOpen] = useState<boolean>(false);
   const [filters, setFilters] = useState<PropertyFilters>(INITIAL);
+
+  useEffect(() => {
+    if (preset?.domain === 'properties') {
+      const newFilters: PropertyFilters = { ...INITIAL };
+      if (preset.premium) {
+        newFilters.sort = 'recent';
+      }
+      setFilters(newFilters);
+    }
+  }, [preset]);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['properties', filters],
@@ -66,6 +79,29 @@ export default function PropertyScreen(){
         </View>
 
         <View style={{ paddingHorizontal:16, paddingBottom:16 }}>
+          {preset?.domain === 'properties' && (
+            <View style={{ flexDirection:'row', flexWrap:'wrap', gap:8, marginBottom:12 }}>
+              {preset.premium && (
+                <View style={{ backgroundColor:'#0B6B53', paddingHorizontal:12, paddingVertical:6, borderRadius:999, flexDirection:'row', alignItems:'center', gap:6 }}>
+                  <Text style={{ color:'#fff', fontWeight:'700', fontSize:12 }}>Premium</Text>
+                </View>
+              )}
+              {preset.category && (
+                <View style={{ backgroundColor:'#E8F2EE', paddingHorizontal:12, paddingVertical:6, borderRadius:999, flexDirection:'row', alignItems:'center', gap:6 }}>
+                  <Text style={{ color:'#0B6B53', fontWeight:'700', fontSize:12 }}>{preset.category}</Text>
+                </View>
+              )}
+              {preset.subcategory && (
+                <View style={{ backgroundColor:'#E8F2EE', paddingHorizontal:12, paddingVertical:6, borderRadius:999, flexDirection:'row', alignItems:'center', gap:6 }}>
+                  <Text style={{ color:'#0B6B53', fontWeight:'700', fontSize:12 }}>{preset.subcategory}</Text>
+                </View>
+              )}
+              <Pressable onPress={resetPreset} style={{ backgroundColor:'#F3F4F6', paddingHorizontal:12, paddingVertical:6, borderRadius:999, flexDirection:'row', alignItems:'center', gap:4 }}>
+                <X size={14} color="#6B7280" strokeWidth={2.5} />
+                <Text style={{ color:'#6B7280', fontWeight:'700', fontSize:12 }}>Réinitialiser</Text>
+              </Pressable>
+            </View>
+          )}
           <Pressable onPress={()=>setOpen(true)} style={{ height:48, borderRadius:12, borderWidth:1, borderColor:'#E5E7EB', justifyContent:'center', paddingHorizontal:14 }}>
             <Text style={{ fontWeight:'700' }}>
               {filters.country ?? 'Pays'}, {filters.city ?? 'Ville'} • {filters.category ?? 'Catégorie'} {filters.trade ? `• ${filters.trade==='sale'?'Vente':'Location'}` : ''}

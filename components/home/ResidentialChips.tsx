@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ScrollView, Text, Pressable, StyleSheet, View, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Home, ShieldCheck, Building2, Users, GraduationCap } from 'lucide-react-native';
+import { useSearchPreset } from '@/hooks/useSearchPreset';
+import { categoryPreset } from '@/lib/filters';
 
 type ResidentialSubcategory = 
   | 'single_family'
@@ -20,14 +22,13 @@ const chips: { label: string; value: ResidentialSubcategory; icon: any }[] = [
 
 export default function ResidentialChips() {
   const router = useRouter();
+  const { setPreset } = useSearchPreset();
   const [activeKey, setActiveKey] = useState<ResidentialSubcategory | null>(null);
 
   const handleSelect = (value: ResidentialSubcategory) => {
     setActiveKey(value);
-    router.push({
-      pathname: '/(tabs)/properties',
-      params: { category: 'residentiel', subcategory: value }
-    } as any);
+    setPreset(categoryPreset('residentiel', value));
+    router.push('/(tabs)/properties');
   };
 
   return (

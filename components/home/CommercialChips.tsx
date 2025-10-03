@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { ScrollView, Text, Pressable, StyleSheet, View, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ShoppingBag, UtensilsCrossed, Warehouse } from 'lucide-react-native';
+import { useSearchPreset } from '@/hooks/useSearchPreset';
+import { categoryPreset } from '@/lib/filters';
 
 export type CommercialSubcategory = 
   | 'retail'
@@ -16,14 +18,13 @@ const chips: { label: string; value: CommercialSubcategory; icon: any }[] = [
 
 export default function CommercialChips() {
   const router = useRouter();
+  const { setPreset } = useSearchPreset();
   const [activeKey, setActiveKey] = useState<CommercialSubcategory | null>(null);
 
   const handleSelect = (value: CommercialSubcategory) => {
     setActiveKey(value);
-    router.push({
-      pathname: '/(tabs)/properties',
-      params: { category: 'commerces', subcategory: value }
-    } as any);
+    setPreset(categoryPreset('commerces', value));
+    router.push('/(tabs)/properties');
   };
 
   return (

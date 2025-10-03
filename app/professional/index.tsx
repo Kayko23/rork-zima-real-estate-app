@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useSearchPreset } from '@/hooks/useSearchPreset';
+import { X } from 'lucide-react-native';
 
 import { useQuery } from '@tanstack/react-query';
 import { providersApi, providerCategories } from '@/lib/api';
@@ -22,8 +24,16 @@ export default function ProfessionalScreen(){
   const insets = useSafeAreaInsets();
   const tabBarH = 56;
   const router = useRouter();
+  const { preset, reset: resetPreset } = useSearchPreset();
   const [open, setOpen] = useState<boolean>(false);
   const [filters, setFilters] = useState<ProFilters>(INITIAL);
+
+  useEffect(() => {
+    if (preset?.domain === 'pros' && preset.premium) {
+      const newFilters: ProFilters = { ...INITIAL };
+      setFilters(newFilters);
+    }
+  }, [preset]);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['providers', filters],
@@ -53,6 +63,19 @@ export default function ProfessionalScreen(){
         </View>
 
         <View style={{ paddingHorizontal:16, paddingBottom:16 }}>
+          {preset?.domain === 'pros' && (
+            <View style={{ flexDirection:'row', flexWrap:'wrap', gap:8, marginBottom:12 }}>
+              {preset.premium && (
+                <View style={{ backgroundColor:'#0B6B53', paddingHorizontal:12, paddingVertical:6, borderRadius:999, flexDirection:'row', alignItems:'center', gap:6 }}>
+                  <Text style={{ color:'#fff', fontWeight:'700', fontSize:12 }}>Premium</Text>
+                </View>
+              )}
+              <Pressable onPress={resetPreset} style={{ backgroundColor:'#F3F4F6', paddingHorizontal:12, paddingVertical:6, borderRadius:999, flexDirection:'row', alignItems:'center', gap:4 }}>
+                <X size={14} color="#6B7280" strokeWidth={2.5} />
+                <Text style={{ color:'#6B7280', fontWeight:'700', fontSize:12 }}>Réinitialiser</Text>
+              </Pressable>
+            </View>
+          )}
           <Pressable onPress={()=>setOpen(true)} style={{ height:48, borderRadius:12, borderWidth:1, borderColor:'#E5E7EB', justifyContent:'center', paddingHorizontal:14 }}>
             <Text style={{ fontWeight:'700' }}>
               {filters.country ?? 'Pays'}, {filters.city ?? 'Ville'} • {filters.category ?? 'Catégorie'} • {filters.ratingMin ? `${filters.ratingMin}+ ★` : 'Toutes notes'}

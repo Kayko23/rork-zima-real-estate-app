@@ -10,6 +10,7 @@ import { VoyageFiltersProvider } from "@/components/voyages/filterContext";
 import { useBootstrapFx } from "@/lib/bootstrapFx";
 import { SessionProvider } from "@/hooks/useSession";
 import { SettingsProvider } from "@/hooks/useSettings";
+import { SearchPresetProvider } from "@/hooks/useSearchPreset";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -61,15 +62,17 @@ export default function RootLayout() {
         <SettingsProvider>
           <SessionProvider>
             <AppProvider>
-              <AppInitializer>
-                <VoyageFiltersProvider>
-                  <GestureHandlerRootView style={styles.container}>
-                    <View style={styles.container} onLayout={onLayoutRootView}>
-                      <RootLayoutNav />
-                    </View>
-                  </GestureHandlerRootView>
-                </VoyageFiltersProvider>
-              </AppInitializer>
+              <SearchPresetProvider>
+                <AppInitializer>
+                  <VoyageFiltersProvider>
+                    <GestureHandlerRootView style={styles.container}>
+                      <View style={styles.container} onLayout={onLayoutRootView}>
+                        <RootLayoutNav />
+                      </View>
+                    </GestureHandlerRootView>
+                  </VoyageFiltersProvider>
+                </AppInitializer>
+              </SearchPresetProvider>
             </AppProvider>
           </SessionProvider>
         </SettingsProvider>

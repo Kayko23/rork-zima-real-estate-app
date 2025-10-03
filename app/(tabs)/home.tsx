@@ -8,6 +8,8 @@ import ResidentialChips from "@/components/home/ResidentialChips";
 import CommercialChips from "@/components/home/CommercialChips";
 import { colors, radius } from "@/theme/tokens";
 import { useRouter } from "expo-router";
+import { useSearchPreset } from "@/hooks/useSearchPreset";
+import { premiumPreset, categoryPreset } from "@/lib/filters";
 
 import { sortPremiumFirst } from "@/utils/sortProperties";
 
@@ -77,6 +79,7 @@ export default function Home() {
   const [tab,setTab] = React.useState<"props"|"pros"|"trips">("props");
   const { bottom, top } = useSafeAreaInsets();
   const router = useRouter();
+  const { setPreset } = useSearchPreset();
 
   const goPros = () => router.push("/(tabs)/professionals");
   const goTrips = () => router.push("/(tabs)/voyages");
@@ -104,7 +107,10 @@ export default function Home() {
         bounces
       >
 
-        <SectionHeader title="Propriétés premium" onSeeAll={()=>router.push("/(tabs)/properties?premium=true")} />
+        <SectionHeader title="Propriétés premium" onSeeAll={()=>{
+          setPreset(premiumPreset('properties'));
+          router.push("/(tabs)/properties");
+        }} />
         <FlatList
           horizontal
           data={premiumProperties}
@@ -123,7 +129,10 @@ export default function Home() {
           testID="premium-properties-slider"
         />
 
-        <SectionHeader title="Voyages premium" onSeeAll={()=>router.push("/(tabs)/voyages?premium=true")} />
+        <SectionHeader title="Voyages premium" onSeeAll={()=>{
+          setPreset(premiumPreset('travel'));
+          router.push("/(tabs)/voyages");
+        }} />
         <FlatList
           horizontal
           data={premiumTrips}
@@ -142,7 +151,10 @@ export default function Home() {
           testID="premium-trips-slider"
         />
 
-        <SectionHeader title="Professionnels premium" onSeeAll={()=>router.push("/(tabs)/professionals?premium=true")} />
+        <SectionHeader title="Professionnels premium" onSeeAll={()=>{
+          setPreset(premiumPreset('pros'));
+          router.push("/(tabs)/professionals");
+        }} />
         <FlatList
           horizontal
           data={premiumPros}
@@ -167,7 +179,10 @@ export default function Home() {
             <View style={styles.categoryHeader}>
               <Text style={styles.categoryTitle}>{category.title}</Text>
               <Pressable 
-                onPress={()=>router.push({ pathname:'/(tabs)/properties', params:{ category: category.key } } as any)} 
+                onPress={()=>{
+                  setPreset(categoryPreset(category.key as any));
+                  router.push('/(tabs)/properties');
+                }} 
                 style={({pressed})=>[styles.categoryLink, pressed && { opacity:.7 }]}
                 testID={`see-all-${category.key}`}
               >
