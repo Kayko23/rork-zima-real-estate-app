@@ -39,7 +39,7 @@ export function useBootstrapFx() {
     };
     
     // Load rates immediately without waiting for hydration
-    const timer = setTimeout(loadRates, 50);
+    const timer = setTimeout(loadRates, 10);
     
     return () => {
       mounted = false;

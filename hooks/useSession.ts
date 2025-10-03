@@ -109,31 +109,31 @@ export const [SessionProvider, useSession] = createContextHook(() => {
 
   useEffect(() => {
     let mounted = true;
+    let timeoutId: NodeJS.Timeout;
     
     const initSession = async () => {
       try {
         await hydrate();
       } catch (error) {
         console.error('Session initialization error:', error);
-      } finally {
         if (mounted) {
           setIsLoading(false);
         }
       }
     };
     
-    // Very short timeout to prevent hydration issues
-    const timeout = setTimeout(() => {
+    // Force loading to false after max 200ms to prevent hydration timeout
+    timeoutId = setTimeout(() => {
       if (mounted) {
         setIsLoading(false);
       }
-    }, 300);
+    }, 200);
     
     initSession();
     
     return () => {
       mounted = false;
-      clearTimeout(timeout);
+      clearTimeout(timeoutId);
     };
   }, [hydrate]);
 

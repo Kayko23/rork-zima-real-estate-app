@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import { View, StyleSheet, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -7,40 +7,24 @@ import { useSession } from "@/hooks/useSession";
 export default function Index() {
   const router = useRouter();
   const { isAuthenticated, isLoading } = useSession();
+  const [hasNavigated, setHasNavigated] = useState(false);
 
   useEffect(() => {
-    let mounted = true;
+    if (hasNavigated) return;
     
-    const navigate = () => {
-      if (!mounted) return;
-      
-      if (isAuthenticated) {
-        router.replace("/(tabs)/home");
-      } else {
-        router.replace("/(onboarding)/splash");
-      }
-    };
-
-    if (!isLoading) {
-      navigate();
-    } else {
-      // Very short timeout to prevent hydration issues
-      const timer = setTimeout(() => {
-        if (mounted) {
-          navigate();
+    const timer = setTimeout(() => {
+      if (!hasNavigated) {
+        setHasNavigated(true);
+        if (isAuthenticated) {
+          router.replace("/(tabs)/home");
+        } else {
+          router.replace("/(onboarding)/splash");
         }
-      }, 500);
-      
-      return () => {
-        mounted = false;
-        clearTimeout(timer);
-      };
-    }
+      }
+    }, isLoading ? 100 : 0);
     
-    return () => {
-      mounted = false;
-    };
-  }, [router, isAuthenticated, isLoading]);
+    return () => clearTimeout(timer);
+  }, [isAuthenticated, isLoading, hasNavigated, router]);
 
   return (
     <SafeAreaView style={styles.container}>
