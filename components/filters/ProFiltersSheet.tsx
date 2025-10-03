@@ -3,6 +3,8 @@ import { View, Text, Pressable, ScrollView, Modal, TextInput, KeyboardAvoidingVi
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { providerCategories } from '@/lib/api';
+import RangeSlider from '@/components/inputs/RangeSlider';
+import { formatPrice } from '@/lib/format';
 
 const COUNTRIES: Record<string,string[]> = {
   "Côte d’Ivoire": ["Abidjan","Yamoussoukro","Bouaké","San-Pédro","Daloa","Korhogo"],
@@ -18,6 +20,8 @@ export type ProFilters = {
   category?: typeof providerCategories[number];
   ratingMin?: number;
   services?: string[];
+  budgetMin?: number;
+  budgetMax?: number;
 };
 
 type Props = {
@@ -34,8 +38,10 @@ export default function ProFiltersSheet({ visible, initial, resultCount, onClose
   const [f, setF] = useState<ProFilters>(initial);
   const [openCountry, setOpenCountry] = useState<boolean>(false);
   const [openCity, setOpenCity] = useState<boolean>(false);
+  const [openCategory, setOpenCategory] = useState<boolean>(false);
   const [qCountry, setQCountry] = useState<string>('');
   const [qCity, setQCity] = useState<string>('');
+  const [qCategory, setQCategory] = useState<string>('');
 
   useEffect(()=>{ (async()=>{ try { const raw=await AsyncStorage.getItem(presetKey); if(raw) setF(JSON.parse(raw) as ProFilters); } catch(e){ console.log('pro/preset read error', e);} })(); },[presetKey]);
   useEffect(()=>{ AsyncStorage.setItem(presetKey, JSON.stringify(f)).catch((e)=>console.log('pro/preset write error', e)); },[f, presetKey]);
@@ -50,6 +56,11 @@ export default function ProFiltersSheet({ visible, initial, resultCount, onClose
     const list = f.country ? (COUNTRIES[f.country] ?? []) : [];
     return qCity ? list.filter(c=>c.toLowerCase().includes(qCity.toLowerCase())) : list;
   }, [f.country, qCity]);
+
+  const categories = useMemo(()=> {
+    const all = providerCategories as readonly string[];
+    return qCategory ? all.filter(c=>c.toLowerCase().includes(qCategory.toLowerCase())) : all;
+  }, [qCategory]);
 
   if (!visible) return null;
 
@@ -73,11 +84,24 @@ export default function ProFiltersSheet({ visible, initial, resultCount, onClose
             </Section>
 
             <Section title="Catégorie">
-              <Row wrap>
-                {providerCategories.map(c=> (
-                  <Chip key={c} selected={f.category===c} onPress={()=>setF(s=>({...s, category: s.category===c?undefined:c}))} label={c}/>
-                ))}
+              <Row>
+                <Pill onPress={()=>{ setOpenCategory(true); setQCategory(''); }}>{f.category ?? 'Toutes catégories'}</Pill>
               </Row>
+            </Section>
+
+            <Section title="Budget (FCFA / mois)">
+              <View style={{ paddingHorizontal: 4 }}>
+                <RangeSlider
+                  min={0}
+                  max={10000000}
+                  values={[f.budgetMin ?? 0, f.budgetMax ?? 10000000]}
+                  onChange={([min, max])=>setF(s=>({...s, budgetMin: min===0?undefined:min, budgetMax: max===10000000?undefined:max}))}
+                />
+                <View style={{ flexDirection:'row', justifyContent:'space-between', marginTop:8 }}>
+                  <Text style={{ fontSize:14, color:'#6B7280' }}>{formatPrice(f.budgetMin ?? 0, 'XOF')}</Text>
+                  <Text style={{ fontSize:14, color:'#6B7280' }}>{formatPrice(f.budgetMax ?? 10000000, 'XOF')}</Text>
+                </View>
+              </View>
             </Section>
 
             <Section title="Note minimale">
@@ -133,6 +157,22 @@ export default function ProFiltersSheet({ visible, initial, resultCount, onClose
                 ))}
               </ScrollView>
               <Close onPress={()=>setOpenCity(false)} />
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={openCategory} transparent animationType="slide">
+          <View style={styles.pickerWrap}>
+            <View style={[styles.pickerSheet, { paddingBottom: insets.bottom+12 }]}>
+              <Text style={styles.pickerTitle}>Catégorie</Text>
+              <Search value={qCategory} onChange={setQCategory} placeholder="Rechercher une catégorie…" />
+              <ScrollView>
+                <Pressable onPress={()=>{ setF(s=>({...s, category:undefined })); setOpenCategory(false); }} style={styles.rowPick}><Text style={{ fontWeight:'700' }}>Toutes catégories</Text></Pressable>
+                {categories.map(c=> (
+                  <Pressable key={c} onPress={()=>{ setF(s=>({...s, category:c as any })); setOpenCategory(false); }} style={styles.rowPick}><Text>{c}</Text></Pressable>
+                ))}
+              </ScrollView>
+              <Close onPress={()=>setOpenCategory(false)} />
             </View>
           </View>
         </Modal>

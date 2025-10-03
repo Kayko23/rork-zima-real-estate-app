@@ -14,6 +14,8 @@ const INITIAL: ProFilters = {
   category: undefined,
   ratingMin: undefined,
   services: [],
+  budgetMin: undefined,
+  budgetMax: undefined,
 };
 
 export default function ProfessionalScreen(){
