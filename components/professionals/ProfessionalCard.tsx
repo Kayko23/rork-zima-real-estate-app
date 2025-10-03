@@ -36,7 +36,9 @@ type Props = {
 };
 
 export default function ProfessionalCard({ item, onPressProfile, onToggleFavorite }: Props) {
-  const imageUri = item.cover || item.avatar || `https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&sig=${item.id}`;
+  const imageUri = item.cover || item.avatar || `https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&auto=format&fit=crop&q=80`;
+
+  console.log('[ProfessionalCard] Rendering:', item.name, 'ID:', item.id, 'Image:', imageUri);
 
   const handleEmail = (e: any) => {
     e.stopPropagation();

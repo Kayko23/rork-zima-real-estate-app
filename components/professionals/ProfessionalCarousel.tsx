@@ -38,7 +38,10 @@ export default function ProfessionalCarousel({ title, category, data }: Props) {
           <View style={{ width: 248 }}>
             <ProfessionalCard
               item={item}
-              onPressProfile={(id) => router.push(`/professional/${id}`)}
+              onPressProfile={(id) => {
+                console.log('[ProfessionalCarousel] Navigating to profile:', id);
+                router.push(`/professional/${id}`);
+              }}
             />
           </View>
         )}
