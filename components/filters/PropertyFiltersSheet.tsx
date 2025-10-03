@@ -31,6 +31,7 @@ export type PropertyFilters = {
   category?: 'Appartement'|'Maison'|'Villa'|'Terrain'|'Immeuble'|'Bureau'|'Entrepôt'|'Commercial'|undefined;
   rooms?: number;
   baths?: number;
+  livingRooms?: number;
   surfaceMin?: number;
   priceMin?: number;
   priceMax?: number;
@@ -53,8 +54,11 @@ export default function PropertyFiltersSheet({
   const [f, setF] = useState<PropertyFilters>(initial);
   const [openCountry, setOpenCountry] = useState<boolean>(false);
   const [openCity, setOpenCity] = useState<boolean>(false);
+  const [openCategory, setOpenCategory] = useState<boolean>(false);
+  const [openTransaction, setOpenTransaction] = useState<boolean>(false);
   const [qCountry, setQCountry] = useState<string>('');
   const [qCity, setQCity] = useState<string>('');
+  const [qCategory, setQCategory] = useState<string>('');
 
   useEffect(()=>{ (async()=>{
     try { const raw = await AsyncStorage.getItem(presetKey); if (raw) setF(JSON.parse(raw) as PropertyFilters); } catch(e){ console.log('filters/preset read error', e); }
@@ -91,27 +95,22 @@ export default function PropertyFiltersSheet({
 
             <Section title="Transaction">
               <Row>
-                {(['sale','rent'] as const).map(t=> (
-                  <Chip key={t} selected={f.trade===t} onPress={()=>setF(s=>({...s, trade: t}))} label={t==='sale'?'À vendre':'À louer'} />
-                ))}
+                <Pill onPress={()=>setOpenTransaction(true)}>
+                  {f.trade === 'sale' ? 'À vendre' : f.trade === 'rent' ? 'À louer' : 'Type de transaction'}
+                </Pill>
+                {f.trade==='rent' && (
+                  <Pill onPress={()=>setF(s=>({...s, period: s.period==='monthly'?'daily':'monthly'}))}>
+                    {f.period==='monthly'?'Mensuel':'Journalier'}
+                  </Pill>
+                )}
               </Row>
-              {f.trade==='rent' && (
-                <Row style={{ marginTop:8 }}>
-                  {(['monthly','daily'] as const).map(p=> (
-                    <Chip key={p} selected={f.period===p} onPress={()=>setF(s=>({...s, period: p}))} label={p==='monthly'?'Mensuel':'Journalier'} />
-                  ))}
-                </Row>
-              )}
             </Section>
 
             <Section title="Catégorie">
-              <Row wrap>
-                {CATEGORIES.map((c)=> (
-                  <Chip key={c} selected={f.category===c} onPress={()=>setF((s)=>({
-                    ...s,
-                    category: s.category===c ? undefined : c,
-                  }))} label={c} />
-                ))}
+              <Row>
+                <Pill onPress={()=>{ setOpenCategory(true); setQCategory(''); }}>
+                  {f.category ?? 'Type de bien'}
+                </Pill>
               </Row>
             </Section>
 
@@ -119,6 +118,9 @@ export default function PropertyFiltersSheet({
               <Row>
                 <NumberInput label="Chambres" value={f.rooms} onChange={v=>setF(s=>({...s, rooms:v}))}/>
                 <NumberInput label="SDB" value={f.baths} onChange={v=>setF(s=>({...s, baths:v}))}/>
+              </Row>
+              <Row style={{ marginTop:8 }}>
+                <NumberInput label="Salons" value={f.livingRooms} onChange={v=>setF(s=>({...s, livingRooms:v}))}/>
                 <NumberInput label="Surface min (m²)" value={f.surfaceMin} onChange={v=>setF(s=>({...s, surfaceMin:v}))}/>
               </Row>
             </Section>
@@ -173,6 +175,34 @@ export default function PropertyFiltersSheet({
                 ))}
               </ScrollView>
               <Close onPress={()=>setOpenCity(false)} />
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={openCategory} transparent animationType="slide">
+          <View style={styles.pickerWrap}>
+            <View style={[styles.pickerSheet, { paddingBottom: insets.bottom+12 }]}>
+              <Text style={styles.pickerTitle}>Catégorie</Text>
+              <Search value={qCategory} onChange={setQCategory} placeholder="Rechercher une catégorie…" />
+              <ScrollView>
+                {(qCategory?CATEGORIES.filter(c=>c.toLowerCase().includes(qCategory.toLowerCase())):CATEGORIES).map(c=> (
+                  <Pressable key={c} onPress={()=>{ setF(s=>({...s, category:c })); setOpenCategory(false); }} style={styles.rowPick}><Text>{c}</Text></Pressable>
+                ))}
+              </ScrollView>
+              <Close onPress={()=>setOpenCategory(false)} />
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={openTransaction} transparent animationType="slide">
+          <View style={styles.pickerWrap}>
+            <View style={[styles.pickerSheet, { paddingBottom: insets.bottom+12 }]}>
+              <Text style={styles.pickerTitle}>Type de transaction</Text>
+              <ScrollView>
+                <Pressable onPress={()=>{ setF(s=>({...s, trade:'sale', period:undefined })); setOpenTransaction(false); }} style={styles.rowPick}><Text>À vendre</Text></Pressable>
+                <Pressable onPress={()=>{ setF(s=>({...s, trade:'rent', period:'monthly' })); setOpenTransaction(false); }} style={styles.rowPick}><Text>À louer</Text></Pressable>
+              </ScrollView>
+              <Close onPress={()=>setOpenTransaction(false)} />
             </View>
           </View>
         </Modal>
