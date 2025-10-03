@@ -557,10 +557,22 @@ function PropertyDetailScreen() {
         <View style={{ paddingHorizontal: CARD, marginTop: 24 }}>
           <View style={styles.rowBetween}>
             <Text style={styles.sectionTitle}>{data.rating.toFixed(1)} • {data.reviewsCount} avis</Text>
-            <Pressable testID="all-reviews" onPress={() => {
-            console.log("Opening all reviews for property:", data.id);
-            // TODO: Create reviews page or implement modal
-          }}><Text style={styles.linkText}>Tous les avis</Text></Pressable>
+            <Pressable 
+              testID="all-reviews" 
+              onPress={() => {
+                console.log("Opening all reviews for property:", data.id);
+                Alert.alert(
+                  'Tous les avis',
+                  `Consultez tous les ${data.reviewsCount} avis pour ce bien. Cette fonctionnalité sera bientôt disponible.`,
+                  [
+                    { text: 'OK', style: 'default' }
+                  ]
+                );
+              }}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text style={styles.linkText}>Tous les avis</Text>
+            </Pressable>
           </View>
           <ReviewCard name="Moussa Ba" date="15/11/2024" text="Excellent appartement, très bien situé et l’agent était très professionnel. Je recommande vivement !" />
         </View>
