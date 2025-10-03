@@ -706,8 +706,12 @@ function AgentCard({ agent, onProfile, onAll }: { agent: Agent; onProfile: () =>
         <Stat label="Année D’activité" value={String(agent.stats.years)} />
       </View>
       <View style={{ flexDirection: "row", gap: 10, marginTop: 8 }}>
-        <ButtonOutline label="Voir le profil" onPress={onProfile} />
-        <Button label="Rendez-vous" onPress={onAll} />
+        <Pressable style={styles.btnOutline} onPress={onProfile} testID="view-profile">
+          <Text style={styles.btnOutlineText}>Voir le profil</Text>
+        </Pressable>
+        <Pressable style={styles.btn} onPress={onAll} testID="book-appointment">
+          <Text style={styles.btnText}>Rendez-vous</Text>
+        </Pressable>
       </View>
     </View>
   );
