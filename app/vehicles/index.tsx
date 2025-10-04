@@ -62,18 +62,17 @@ export default function VehiclesHome() {
 
       <View style={[styles.stickyHeader, { paddingTop: insets.top }]}>
         <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:16 }}>
-          <Pressable onPress={() => router.push('/(tabs)/home')} style={{ paddingVertical:8 }}>
+          <Pressable onPress={() => router.push('/(tabs)/home')} style={{ paddingVertical:6 }}>
             <ZimaBrand />
           </Pressable>
           <HeaderCountryButton />
         </View>
-        <View style={{ paddingHorizontal:16, paddingBottom:12, paddingTop:16 }}>
+        <View style={{ paddingHorizontal:16, paddingBottom:12, paddingTop:12 }}>
           <SegmentedTabs
             value="vehicles"
             onChange={(k)=>{
               if (k==='props') router.push('/(tabs)/properties');
               else if (k==='trips') router.push('/(tabs)/voyages');
-              else if (k==='vehicles') {/* stay */}
             }}
           />
         </View>
@@ -129,7 +128,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  stickyHeader: { backgroundColor: '#fff', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', zIndex: 10 },
+  stickyHeader: { backgroundColor: '#fff', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', zIndex: 20, shadowColor: '#000', shadowOpacity: 0.06, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10, elevation: 6 },
   section: {
     marginVertical: 14,
   },

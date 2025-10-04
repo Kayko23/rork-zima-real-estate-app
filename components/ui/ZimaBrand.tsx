@@ -1,10 +1,10 @@
 import React from "react";
-import { Text, StyleSheet, Pressable } from "react-native";
+import { Text, StyleSheet, Pressable, Platform } from "react-native";
 import { useRouter } from "expo-router";
 
 export default function ZimaBrand({ onPress }: { onPress?: () => void }) {
   const router = useRouter();
-  
+
   const handlePress = () => {
     if (onPress) {
       onPress();
@@ -14,7 +14,7 @@ export default function ZimaBrand({ onPress }: { onPress?: () => void }) {
   };
 
   return (
-    <Pressable onPress={handlePress} style={styles.wrap}>
+    <Pressable onPress={handlePress} style={styles.wrap} hitSlop={10} accessibilityRole="button" accessibilityLabel="Zima - Accueil" testID="brand-logo">
       <Text style={styles.wordmark}>ZIMA</Text>
     </Pressable>
   );
@@ -22,16 +22,20 @@ export default function ZimaBrand({ onPress }: { onPress?: () => void }) {
 
 const styles = StyleSheet.create({
   wrap: {
-    paddingTop: 12,       // un peu d'air en haut
+    paddingTop: 8,
     paddingHorizontal: 16,
     alignItems: "center",
   },
   wordmark: {
-    marginTop: 6,
     textAlign: "center",
-    fontSize: 34,
-    letterSpacing: 2,
-    fontWeight: "800",
-    color: "#1B4F45",   // vert sombre Zima
+    fontSize: 38,
+    letterSpacing: 3,
+    fontWeight: "900",
+    color: "#0B1720",
+    ...Platform.select({
+      ios: { textShadowColor: "rgba(0,0,0,0.06)", textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4 },
+      android: {},
+      web: {},
+    }),
   },
 });

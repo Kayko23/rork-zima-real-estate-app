@@ -248,8 +248,8 @@ export default function Home() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  stickyHeader: { backgroundColor: colors.bg, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', zIndex: 10 },
-  brand:{ textAlign:"center", fontSize:32, fontWeight:"800", color: colors.text, letterSpacing: 3, marginVertical: 10 },
+  stickyHeader: { backgroundColor: '#fff', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', zIndex: 20, shadowColor: '#000', shadowOpacity: 0.06, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10, elevation: 6 },
+  brand:{ textAlign:"center", fontSize:38, fontWeight:"900", color: '#0B1720', letterSpacing: 3, marginVertical: 8 },
   ctaRow:{ paddingHorizontal:12, flexDirection:"row", gap:12, marginTop:24, marginBottom:16 },
   cta:{ flex:1, backgroundColor: colors.primary, paddingVertical:16, borderRadius: radius.lg, alignItems:"center" },
   ctaOutline:{ backgroundColor: colors.panel, borderWidth:1, borderColor: colors.primary },
