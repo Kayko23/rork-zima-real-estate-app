@@ -105,7 +105,7 @@ function SelectField<T extends string | number>({ testID, placeholder, value, on
         <ChevronDown size={18} color={value != null ? emerald800 : gray700} />
       </Pressable>
       {opened && (
-        <View style={styles.selectList} testID={`${testID}-list`}>
+        <ScrollView style={styles.selectList} testID={`${testID}-list`} keyboardShouldPersistTaps="handled">
           {options.map((opt) => (
             <Pressable
               key={String(opt.value)}
@@ -121,7 +121,7 @@ function SelectField<T extends string | number>({ testID, placeholder, value, on
               </Text>
             </Pressable>
           ))}
-        </View>
+        </ScrollView>
       )}
     </View>
   );
@@ -162,7 +162,7 @@ export default function UnifiedFilterSheet(props: Props) {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={Platform.OS !== 'web'}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={Platform.OS !== 'web'} keyboardShouldPersistTaps="handled">
         <Text style={styles.sectionTitle}>Destination</Text>
         <View style={styles.pillWrap}>
           <Pill active={!!local?.destination?.country} onPress={() => console.log('open country picker')} testID="ufs-country">
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 18, fontWeight: '700', color: gray900 },
   resetRow: { paddingHorizontal: 16, paddingBottom: 8 },
   resetText: { color: emerald700, fontWeight: '600' },
-  content: { paddingHorizontal: 16, paddingBottom: 8, rowGap: 8 },
+  content: { paddingHorizontal: 16, paddingBottom: 120, rowGap: 8 },
   sectionTitle: { marginTop: 16, marginBottom: 8, fontSize: 16, fontWeight: '700', color: gray900 },
   pillWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   pill: { paddingHorizontal: ui.pillPadW, paddingVertical: ui.pillPadH, borderRadius: 999, borderWidth: 1, borderColor: gray300, backgroundColor: '#fff' },
@@ -406,6 +406,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     overflow: 'hidden',
+    maxHeight: 260,
+    elevation: 3,
+    zIndex: 10,
   },
   selectItem: { paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: gray200 },
   selectItemText: { color: gray700, fontWeight: '600' },

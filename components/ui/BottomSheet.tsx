@@ -14,13 +14,14 @@ type Props = {
   visible: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  maxHeight?: number;
+  maxHeight?: number; // 0..1 of screen height
 };
 
 export default function BottomSheet({ visible, onClose, children, maxHeight = 0.86 }: Props) {
   const insets = useSafeAreaInsets();
   const screenH = Dimensions.get('window').height;
   const openY = useMemo(() => screenH * (1 - maxHeight), [screenH, maxHeight]);
+  const sheetMaxH = useMemo(() => Math.max(0, screenH - openY), [screenH, openY]);
   const y = useSharedValue<number>(screenH);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function BottomSheet({ visible, onClose, children, maxHeight = 0.
 
   const pan = useMemo(() => {
     if (Platform.OS === 'web') return Gesture.Pan();
-    
+
     return Gesture.Pan()
       .onUpdate((e) => {
         try {
@@ -65,13 +66,13 @@ export default function BottomSheet({ visible, onClose, children, maxHeight = 0.
 
   const sheetStyle = useAnimatedStyle(() => {
     try {
-      if (!y || y.value === undefined) return {};
+      if (!y || y.value === undefined) return {} as any;
       return {
         transform: [{ translateY: y.value }],
-      };
+      } as any;
     } catch (error) {
       console.error('[BottomSheet] Animated style error:', error);
-      return {};
+      return {} as any;
     }
   }, [y]);
 
@@ -86,8 +87,8 @@ export default function BottomSheet({ visible, onClose, children, maxHeight = 0.
           <Animated.View
             style={[
               s.sheet,
+              { height: sheetMaxH, paddingBottom: insets.bottom + 12, borderTopLeftRadius: 22, borderTopRightRadius: 22 },
               sheetStyle,
-              { paddingBottom: insets.bottom + 12, borderTopLeftRadius: 22, borderTopRightRadius: 22 },
             ]}
           >
             <View style={s.handle} />
@@ -118,5 +119,5 @@ const s = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,.15)",
     marginVertical: 8,
   },
-  inner: { paddingHorizontal: 16, paddingTop: 8, gap: 12 },
+  inner: { flex: 1, paddingHorizontal: 16, paddingTop: 8, gap: 12 },
 });
