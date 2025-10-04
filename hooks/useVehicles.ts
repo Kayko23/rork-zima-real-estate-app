@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import type { Vehicle, VehicleKind } from '@/types/vehicle';
+import { useSettings } from '@/hooks/useSettings';
 
 const MOCK_VEHICLES: Vehicle[] = [
   {
@@ -109,16 +110,24 @@ const MOCK_VEHICLES: Vehicle[] = [
 export type VehicleFilter = Partial<{
   premium: boolean;
   kind: VehicleKind;
+  countryCode: string;
 }>;
 
 export function useVehicles(filter: VehicleFilter = {}) {
+  const { country, allowAllCountries } = useSettings();
+  const merged: VehicleFilter = {
+    ...filter,
+    countryCode: allowAllCountries ? filter.countryCode : (filter.countryCode ?? country?.code ?? undefined),
+  };
   return useQuery({
-    queryKey: ['vehicles', filter],
+    queryKey: ['vehicles', merged],
     queryFn: async () => {
       await new Promise((r) => setTimeout(r, 150));
       return MOCK_VEHICLES.filter((v) => {
-        if (filter.premium !== undefined && v.premium !== filter.premium) return false;
-        if (filter.kind && v.kind !== filter.kind) return false;
+        if (!allowAllCountries && merged.countryCode && v.countryCode !== merged.countryCode) return false;
+        if (allowAllCountries && merged.countryCode && v.countryCode !== merged.countryCode) return false;
+        if (merged.premium !== undefined && v.premium !== merged.premium) return false;
+        if (merged.kind && v.kind !== merged.kind) return false;
         return true;
       });
     },

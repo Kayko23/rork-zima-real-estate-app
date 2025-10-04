@@ -49,6 +49,7 @@ function OnboardingGate() {
       <Stack.Screen name="become-provider" options={{ headerShown: false }} />
       <Stack.Screen name="legal" options={{ headerShown: false }} />
       <Stack.Screen name="notifications" options={{ headerShown: false }} />
+      <Stack.Screen name="country/select" options={{ headerShown: true, title: 'Choisir un pays' }} />
       <Stack.Screen name="modal" options={{ presentation: "modal", headerShown: false }} />
     </Stack>
   );
