@@ -8,10 +8,13 @@ import { useSession } from "@/hooks/useSession";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CountryPicker from "@/components/inputs/CountryPicker";
+import { Calendar } from "lucide-react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default function SignupWizard() {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   // Étape 1 — Compte
   const f1 = useForm<AccountForm>({ 
@@ -308,13 +311,42 @@ export default function SignupWizard() {
                 control={f2.control} 
                 name="birthdate" 
                 render={({ field: { onChange, value } }) => (
-                  <TextInput 
-                    style={styles.input} 
-                    value={value ?? ""} 
-                    onChangeText={onChange} 
-                    placeholder="YYYY-MM-DD" 
-                    testID="signup-birthdate-input"
-                  />
+                  <View>
+                    <Pressable 
+                      onPress={() => setShowDatePicker(true)}
+                      style={styles.dateInputContainer}
+                    >
+                      <TextInput 
+                        style={styles.dateInput} 
+                        value={value ?? ""} 
+                        onChangeText={onChange} 
+                        placeholder="JJ/MM/AAAA" 
+                        testID="signup-birthdate-input"
+                        editable={false}
+                        pointerEvents="none"
+                      />
+                      <View style={styles.calendarIcon}>
+                        <Calendar size={20} color="#0B3C2F" />
+                      </View>
+                    </Pressable>
+                    {showDatePicker && (
+                      <DateTimePicker
+                        value={value ? new Date(value) : new Date()}
+                        mode="date"
+                        display={Platform.OS === "ios" ? "spinner" : "default"}
+                        onChange={(event, selectedDate) => {
+                          setShowDatePicker(Platform.OS === "ios");
+                          if (selectedDate) {
+                            const formatted = selectedDate.toISOString().split('T')[0];
+                            const [year, month, day] = formatted.split('-');
+                            onChange(`${day}/${month}/${year}`);
+                          }
+                        }}
+                        maximumDate={new Date()}
+                        testID="signup-date-picker"
+                      />
+                    )}
+                  </View>
                 )}
               />
 
@@ -497,6 +529,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, 
     height: 48, 
     marginTop: 6 
+  },
+  dateInputContainer: {
+    position: "relative" as const,
+    marginTop: 6,
+  },
+  dateInput: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E7EDF3",
+    paddingHorizontal: 12,
+    paddingRight: 44,
+    height: 48,
+    color: "#0B3C2F",
+  },
+  calendarIcon: {
+    position: "absolute" as const,
+    right: 12,
+    top: 14,
+    zIndex: 1,
   },
   segment: { 
     flexDirection: "row", 
