@@ -50,7 +50,6 @@ function OnboardingGate() {
       <Stack.Screen name="legal" options={{ headerShown: false }} />
       <Stack.Screen name="notifications" options={{ headerShown: false }} />
       <Stack.Screen name="modal" options={{ presentation: "modal", headerShown: false }} />
-      <Stack.Screen name="vehicles" options={{ headerShown: false }} />
     </Stack>
   );
 }
