@@ -12,7 +12,7 @@ export function openCategory(slug: CategorySlug, params: Record<string, any> = {
       ? '/(tabs)/properties'
       : def.domain === 'travel'
       ? '/(tabs)/voyages'
-      : '/(tabs)/professionals';
+      : '/professionals';
 
   const fullParams = { ...params, category: slug };
 
@@ -29,7 +29,7 @@ export function seeAllPremium(section: 'properties' | 'travel' | 'pros') {
       ? '/(tabs)/properties'
       : section === 'travel'
       ? '/(tabs)/voyages'
-      : '/(tabs)/professionals';
+      : '/professionals';
   router.push({ pathname: base as any, params: { premium: '1' } });
 }
 
