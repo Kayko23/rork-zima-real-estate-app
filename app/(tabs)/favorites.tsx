@@ -1,43 +1,78 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { View, Text, Pressable, FlatList, StyleSheet, Platform } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { View, Text, Pressable, SectionList, StyleSheet, Platform, SectionListData } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { Grid3X3, List, SlidersHorizontal } from 'lucide-react-native';
+import { ChevronDown, ChevronUp } from 'lucide-react-native';
 import * as Linking from 'expo-linking';
 import Colors from '@/constants/colors';
 import { mockProperties, mockProviders } from '@/constants/data';
-import { Property, Provider } from '@/types';
 import NotificationBell from '@/components/ui/NotificationBell';
 import { useApp } from '@/hooks/useAppStore';
 import { FavoritePropertyCard } from '@/components/favorites/FavoritePropertyCard';
 import { FavoriteProCard } from '@/components/favorites/FavoriteProCard';
+import VoyageCard from '@/components/voyages/VoyageCard';
+import type { TripItem } from '@/components/voyages/helpers';
 
-type TabType = 'properties' | 'providers';
-type ViewType = 'grid' | 'list';
 type SortType = 'recent' | 'rating' | 'priceAsc' | 'priceDesc';
+type SectionKey = 'properties' | 'providers' | 'voyages';
+
+const mockVoyages: TripItem[] = [
+  {
+    id: 'v1',
+    title: 'Suite Luxe Vue Mer',
+    city: 'Dakar',
+    country: 'Sénégal',
+    price: 85000,
+    currency: 'XOF',
+    rating: 4.8,
+    reviews: 156,
+    image: { uri: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800' },
+    type: 'hotel',
+    badge: 'Premium',
+  },
+  {
+    id: 'v2',
+    title: 'Villa Moderne Piscine',
+    city: 'Abidjan',
+    country: 'Côte d\'Ivoire',
+    price: 65000,
+    currency: 'XOF',
+    rating: 4.6,
+    reviews: 89,
+    image: { uri: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800' },
+    type: 'daily',
+  },
+  {
+    id: 'v3',
+    title: 'Appartement Centre Ville',
+    city: 'Accra',
+    country: 'Ghana',
+    price: 120,
+    currency: 'USD',
+    rating: 4.7,
+    reviews: 203,
+    image: { uri: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800' },
+    type: 'daily',
+    badge: 'Top',
+  },
+];
 
 const shadowMicro = Platform.select({
   ios: { shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
   android: { elevation: 2 },
   default: {},
 });
-const shadowSoft = Platform.select({
-  ios: { shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 12, shadowOffset: { width: 0, height: 6 } },
-  android: { elevation: 4 },
-  default: {},
-});
+
 
 export default function FavoritesScreen() {
   const { top } = useSafeAreaInsets();
   const router = useRouter();
   const { hasUnreadNotifications } = useApp();
 
-  const [activeTab, setActiveTab] = useState<TabType>('properties');
-  const [viewType, setViewType] = useState<ViewType>('list');
-  const [sort, setSort] = useState<SortType>('recent');
+  const [sort] = useState<SortType>('recent');
+  const [collapsedSections, setCollapsedSections] = useState<Set<SectionKey>>(new Set());
 
-  const { favoritePropertyIds, favoriteProviderIds } = useApp();
+  const { favoritePropertyIds, favoriteProviderIds, favoriteVoyageIds } = useApp();
 
   const premiumFirst = <T extends { isPremium?: boolean }>(a: T, b: T) => {
     if (!!a.isPremium === !!b.isPremium) return 0;
@@ -70,15 +105,69 @@ export default function FavoritesScreen() {
     return sorted;
   }, [sort, favoriteProviderIds]);
 
-  const onCycleSort = useCallback(() => {
-    const order: SortType[] = ['recent', 'rating', 'priceAsc', 'priceDesc'];
-    const i = order.indexOf(sort);
-    setSort(order[(i + 1) % order.length]);
-  }, [sort]);
+  const favoriteVoyages = useMemo(() => {
+    const base = mockVoyages.filter((t: TripItem) => favoriteVoyageIds.has(t.id));
+    const sorted = [...base].sort((a: TripItem, b: TripItem) => {
+      if (sort === 'rating') return (b.rating ?? 0) - (a.rating ?? 0);
+      if (sort === 'priceAsc') return a.price - b.price;
+      if (sort === 'priceDesc') return b.price - a.price;
+      return 0;
+    });
+    return sorted;
+  }, [sort, favoriteVoyageIds]);
 
-  const sortLabel = useMemo(() => {
-    return sort === 'recent' ? 'Plus récents' : sort === 'rating' ? 'Mieux notés' : sort === 'priceAsc' ? 'Prix ↑' : 'Prix ↓';
-  }, [sort]);
+  const toggleSection = useCallback((key: SectionKey) => {
+    setCollapsedSections(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  }, []);
+
+  type FavoriteSection = SectionListData<any, {
+    key: SectionKey;
+    title: string;
+    collapsed: boolean;
+  }>;
+
+  const sections = useMemo((): FavoriteSection[] => {
+    const result: FavoriteSection[] = [];
+    
+    if (favoriteProperties.length > 0) {
+      result.push({
+        key: 'properties' as SectionKey,
+        title: `Biens (${favoriteProperties.length})`,
+        data: collapsedSections.has('properties') ? [] : favoriteProperties,
+        collapsed: collapsedSections.has('properties'),
+      });
+    }
+    
+    if (favoriteProviders.length > 0) {
+      result.push({
+        key: 'providers' as SectionKey,
+        title: `Professionnels (${favoriteProviders.length})`,
+        data: collapsedSections.has('providers') ? [] : favoriteProviders,
+        collapsed: collapsedSections.has('providers'),
+      });
+    }
+    
+    if (favoriteVoyages.length > 0) {
+      result.push({
+        key: 'voyages' as SectionKey,
+        title: `Voyages (${favoriteVoyages.length})`,
+        data: collapsedSections.has('voyages') ? [] : favoriteVoyages,
+        collapsed: collapsedSections.has('voyages'),
+      });
+    }
+    
+    return result;
+  }, [favoriteProperties, favoriteProviders, favoriteVoyages, collapsedSections]);
+
+  const totalFavorites = favoriteProperties.length + favoriteProviders.length + favoriteVoyages.length;
 
   const handlePropertyPress = useCallback((id: string) => {
     console.log('[Favorites] Open property', id);
@@ -87,7 +176,7 @@ export default function FavoritesScreen() {
 
   const handleViewProfile = useCallback((id: string) => {
     console.log('[Favorites] Open pro profile', id);
-    router.push({ pathname: '/(tabs)/professionnels/profile/[id]', params: { id } });
+    router.push({ pathname: '/professional/[id]', params: { id } });
   }, [router]);
 
   const handleCall = useCallback((phone?: string) => {
@@ -112,72 +201,91 @@ export default function FavoritesScreen() {
     Linking.openURL(url).catch((e) => console.warn('Email failed', e));
   }, []);
 
+  const renderSectionHeader = useCallback(({ section }: any) => {
+    const isCollapsed = section.collapsed;
+    return (
+      <Pressable
+        style={styles.sectionHeader}
+        onPress={() => toggleSection(section.key)}
+        accessibilityRole="button"
+        accessibilityLabel={isCollapsed ? `Développer ${section.title}` : `Réduire ${section.title}`}
+      >
+        <Text style={styles.sectionTitle}>{section.title}</Text>
+        {isCollapsed ? (
+          <ChevronDown size={20} color={Colors.text.primary} />
+        ) : (
+          <ChevronUp size={20} color={Colors.text.primary} />
+        )}
+      </Pressable>
+    );
+  }, [toggleSection]);
+
+  const renderItem = useCallback(({ item, section }: any) => {
+    if (section.key === 'properties') {
+      return (
+        <View style={styles.itemWrapper}>
+          <FavoritePropertyCard
+            item={item}
+            layout="list"
+            onPress={() => handlePropertyPress(item.id)}
+          />
+        </View>
+      );
+    }
+    
+    if (section.key === 'providers') {
+      return (
+        <View style={styles.itemWrapper}>
+          <FavoriteProCard
+            pro={item}
+            onViewProfile={() => handleViewProfile(item.id)}
+            onCall={() => handleCall(item.phone)}
+            onWhatsApp={() => handleWhatsApp(item.whatsapp ?? item.phone)}
+            onEmail={() => handleEmail(item.email)}
+          />
+        </View>
+      );
+    }
+    
+    if (section.key === 'voyages') {
+      return (
+        <View style={styles.itemWrapper}>
+          <VoyageCard item={item} />
+        </View>
+      );
+    }
+    
+    return null;
+  }, [handlePropertyPress, handleViewProfile, handleCall, handleWhatsApp, handleEmail]);
+
   return (
     <View style={[styles.screen, { paddingTop: top + 8 }]} testID="favorites-screen">
       <View style={styles.headerRow}>
-        <Text style={styles.title} testID="favorites-title">Favoris</Text>
+        <View>
+          <Text style={styles.title} testID="favorites-title">Favoris</Text>
+          <Text style={styles.subtitle}>{totalFavorites} élément{totalFavorites > 1 ? 's' : ''}</Text>
+        </View>
         <NotificationBell hasUnread={hasUnreadNotifications} onPress={() => {
           console.log('[Favorites] Opening notifications');
           router.push('/notifications');
         }} />
       </View>
 
-      <BlurView intensity={30} tint="light" style={styles.tabsWrap}>
-        <View style={styles.tabsRow}>
-          <TabBtn active={activeTab === 'properties'} label={`Annonces (${favoriteProperties.length})`} onPress={() => setActiveTab('properties')} />
-          <TabBtn active={activeTab === 'providers'} label={`Pros (${favoriteProviders.length})`} onPress={() => setActiveTab('providers')} />
-        </View>
-      </BlurView>
-
-      <View style={styles.toolsRow}>
-        <View style={styles.leftTools}>
-          <IconPill active={viewType === 'grid'} onPress={() => setViewType('grid')}>
-            <Grid3X3 size={18} color={viewType === 'grid' ? Colors.primary : Colors.text.secondary} />
-          </IconPill>
-          <IconPill active={viewType === 'list'} onPress={() => setViewType('list')}>
-            <List size={18} color={viewType === 'list' ? Colors.primary : Colors.text.secondary} />
-          </IconPill>
-        </View>
-        <Pressable style={styles.sortBtn} onPress={onCycleSort} accessibilityRole="button" testID="favorites-sort">
-          <SlidersHorizontal size={18} color={Colors.text.primary} />
-          <Text style={styles.sortTxt}>{sortLabel}</Text>
-        </Pressable>
-      </View>
-
-      {activeTab === 'properties' ? (
-        <FlatList
-          testID="favorites-list-properties"
-          data={favoriteProperties}
-          key={viewType}
-          numColumns={viewType === 'grid' ? 2 : 1}
-          columnWrapperStyle={viewType === 'grid' ? { gap: 12 } : undefined}
-          contentContainerStyle={{ padding: 16, paddingBottom: 120, gap: 12 }}
-          keyExtractor={(item: Property) => item.id}
-          renderItem={({ item }) => (
-            <FavoritePropertyCard
-              item={item}
-              layout={viewType}
-              onPress={() => handlePropertyPress(item.id)}
-            />
-          )}
-          ListEmptyComponent={<Empty title="Aucun favori" subtitle="Ajoutez des propriétés à vos favoris pour les retrouver ici" />}
+      {totalFavorites === 0 ? (
+        <Empty 
+          title="Aucun favori" 
+          subtitle="Ajoutez des biens, professionnels ou voyages à vos favoris pour les retrouver ici" 
         />
       ) : (
-        <FlatList
-          testID="favorites-list-pros"
-          data={favoriteProviders}
-          contentContainerStyle={{ padding: 16, paddingBottom: 120, gap: 12 }}
-          keyExtractor={(item: Provider) => item.id}
-          renderItem={({ item }) => (
-            <FavoriteProCard
-              pro={item}
-              onViewProfile={() => handleViewProfile(item.id)}
-              onCall={() => handleCall(item.phone)}
-              onWhatsApp={() => handleWhatsApp(item.whatsapp ?? item.phone)}
-              onEmail={() => handleEmail(item.email)}
-            />
-          )}
-          ListEmptyComponent={<Empty title="Aucun professionnel favori" subtitle="Ajoutez des professionnels à vos favoris pour les retrouver ici" />}
+        <SectionList
+          testID="favorites-section-list"
+          sections={sections}
+          keyExtractor={(item: any, index) => `${item.id}-${index}`}
+          renderSectionHeader={renderSectionHeader}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContent}
+          stickySectionHeadersEnabled={false}
+          showsVerticalScrollIndicator={false}
         />
       )}
     </View>
@@ -193,41 +301,36 @@ function Empty({ title, subtitle }: { title: string; subtitle: string }) {
   );
 }
 
-function TabBtn({ active, label, onPress }: { active: boolean; label: string; onPress: () => void }) {
-  return (
-    <Pressable onPress={onPress} style={[styles.tabBtn, active && styles.tabBtnActive]} accessibilityRole="button">
-      <Text style={[styles.tabTxt, active && styles.tabTxtActive]}>{label}</Text>
-      {active ? <View style={styles.tabUnderline} /> : null}
-    </Pressable>
-  );
-}
 
-function IconPill({ active, onPress, children }: { active?: boolean; onPress: () => void; children: React.ReactNode }) {
-  return (
-    <Pressable onPress={onPress} style={[styles.iconPill, active ? styles.iconPillActive : null]} accessibilityRole="button">
-      {children}
-    </Pressable>
-  );
-}
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: Colors.background.secondary },
-  headerRow: { paddingHorizontal: 16, paddingBottom: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  headerRow: { paddingHorizontal: 16, paddingBottom: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   title: { fontSize: 28, fontWeight: '800', letterSpacing: 0.5, color: Colors.text.primary },
-  tabsWrap: { marginHorizontal: 16, borderRadius: 24, overflow: 'hidden', ...(shadowSoft as object) },
-  tabsRow: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.7)' },
-  tabBtn: { flex: 1, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' },
-  tabBtnActive: {},
-  tabTxt: { fontSize: 15, color: Colors.text.secondary, fontWeight: '600' },
-  tabTxtActive: { color: Colors.text.primary },
-  tabUnderline: { height: 3, width: 36, borderRadius: 2, backgroundColor: Colors.primary, marginTop: 8 },
-  toolsRow: { marginTop: 12, paddingHorizontal: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  leftTools: { flexDirection: 'row', gap: 8 },
-  iconPill: { height: 36, width: 36, borderRadius: 18, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', ...(shadowMicro as object) },
-  iconPillActive: { backgroundColor: '#F0F7F5' },
-  sortBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#fff', paddingHorizontal: 14, height: 36, borderRadius: 18, ...(shadowMicro as object) },
-  sortTxt: { fontSize: 14, fontWeight: '700', color: Colors.text.primary },
-  emptyWrap: { alignItems: 'center', paddingVertical: 60, paddingHorizontal: 24 },
+  subtitle: { fontSize: 14, color: Colors.text.secondary, marginTop: 4, fontWeight: '600' },
+  listContent: { paddingHorizontal: 16, paddingBottom: 120 },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 16,
+    marginTop: 12,
+    marginBottom: 8,
+    ...(shadowMicro as object),
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: Colors.text.primary,
+    letterSpacing: 0.3,
+  },
+  itemWrapper: {
+    marginBottom: 12,
+  },
+  emptyWrap: { alignItems: 'center', paddingVertical: 60, paddingHorizontal: 24, flex: 1, justifyContent: 'center' },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: Colors.text.primary },
   emptySub: { marginTop: 6, fontSize: 14, color: Colors.text.secondary, textAlign: 'center', lineHeight: 20 },
 });
