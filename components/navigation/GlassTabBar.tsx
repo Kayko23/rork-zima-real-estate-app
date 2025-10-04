@@ -1,14 +1,13 @@
 import React from "react";
 import { View, Pressable, Text, StyleSheet, Platform } from "react-native";
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+export default function GlassTabBar({ state, descriptors, navigation }: any) {
   const { bottom } = useSafeAreaInsets();
 
   return (
     <View style={[styles.wrap, { paddingBottom: Math.max(bottom, 12) }]}>
-      {state.routes.map((route, index) => {
+      {(state.routes as any[]).map((route: any, index: number) => {
         const { options } = descriptors[route.key];
         const label =
           options.tabBarLabel !== undefined
@@ -40,7 +39,7 @@ export default function GlassTabBar({ state, descriptors, navigation }: BottomTa
             {Icon ? (
               <Icon color={isFocused ? "#0e5a43" : "#6b7280"} size={isCenter ? 24 : 22} />
             ) : null}
-            <Text style={[styles.label, isFocused && styles.labelActive]} numberOfLines={1}>
+            <Text style={[styles.label, isFocused && styles.labelActive]} numberOfLines={1} testID={`tab-label-${route.name}`}>
               {label}
             </Text>
           </Pressable>
