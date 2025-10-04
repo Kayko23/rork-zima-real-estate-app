@@ -8,7 +8,6 @@ import { t } from '@/lib/i18n';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
-import ActiveCountryBadge from '@/components/ui/ActiveCountryBadge';
 import CompanyLogoRow from '@/components/vehicles/CompanyLogoRow';
 
 function Section({
@@ -84,10 +83,6 @@ export default function VehiclesHome() {
         data={[0]}
         renderItem={() => (
           <View>
-            <View style={{ paddingHorizontal:16, marginTop: 8 }}>
-              <ActiveCountryBadge />
-            </View>
-
             <View style={{ marginTop: 16 }}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Sociétés</Text>
