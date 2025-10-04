@@ -8,23 +8,23 @@ import { X } from 'lucide-react-native';
 import { CATEGORIES, CategorySlug } from '@/types/taxonomy';
 import { openCategory } from '@/lib/navigation';
 import { useQuery } from '@tanstack/react-query';
-import TravelFiltersSheet, { TravelFilters } from '@/components/travel/TravelFiltersSheet';
+import UnifiedFilterSheet, { TripFilters } from '@/components/filters/UnifiedFilterSheet';
+import { buildTripQuery } from '@/utils/filters';
 import { api } from '@/lib/api';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
 import { useSettings } from '@/hooks/useSettings';
 
-const INITIAL: TravelFilters = {
-  country: undefined,
-  city: undefined,
+const INITIAL: TripFilters = {
+  destination: { country: undefined, city: undefined },
   checkIn: null,
   checkOut: null,
   guests: 1,
-  priceMin: 10000,
-  priceMax: 105000,
-  ratingMin: undefined,
+  budget: { min: 10000, max: 105000 },
+  ratingMin: 0,
   amenities: [],
+  sort: 'recent',
 };
 
 export default function VoyagesTab() {
@@ -35,7 +35,7 @@ export default function VoyagesTab() {
   const { preset, reset: resetPreset } = useSearchPreset();
   const { country: activeCountry, allowAllCountries } = useSettings();
   const [open, setOpen] = useState<boolean>(false);
-  const [filters, setFilters] = useState<TravelFilters>(INITIAL);
+  const [filters, setFilters] = useState<TripFilters>(INITIAL);
 
   useEffect(() => {
     const cat = params.category as CategorySlug;
@@ -46,29 +46,23 @@ export default function VoyagesTab() {
 
   useEffect(() => {
     if (preset?.domain === 'travel' && preset.premium) {
-      const newFilters: TravelFilters = { ...INITIAL };
+      const newFilters: TripFilters = { ...INITIAL };
       setFilters(newFilters);
     }
   }, [preset]);
 
   useEffect(() => {
     if (!allowAllCountries && activeCountry?.name_fr) {
-      setFilters(prev => ({ ...prev, country: prev.country ?? activeCountry.name_fr }));
+      setFilters(prev => ({ ...prev, destination: { country: prev.destination?.country ?? activeCountry.name_fr, city: prev.destination?.city } }));
     }
   }, [allowAllCountries, activeCountry?.name_fr]);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['trips', filters],
-    queryFn: () =>
-      api.listProperties({
-        category: 'travel',
-        country: filters.country,
-        city: filters.city,
-        priceMin: filters.priceMin,
-        priceMax: filters.priceMax,
-        ratingMin: filters.ratingMin,
-        guests: filters.guests,
-      }),
+    queryFn: () => api.listProperties({
+      category: 'travel',
+      ...buildTripQuery(filters),
+    }),
   });
 
   const resultCount = data.length;
@@ -111,11 +105,10 @@ export default function VoyagesTab() {
           )}
           <Pressable testID="openFilters" onPress={() => setOpen(true)} style={styles.searchStub}>
             <Text style={styles.searchTitle}>
-              {filters.country ?? 'Pays'}, {filters.city ?? 'Ville'} • {filters.guests} voyageur(s)
+              {(filters.destination?.country) ?? 'Pays'}, {(filters.destination?.city) ?? 'Ville'} • {filters.guests} voyageur(s)
             </Text>
             <Text style={styles.searchSub}>
-              Budget: {fmt(filters.priceMin)} – {fmt(filters.priceMax)} •{' '}
-              {filters.ratingMin ? `${filters.ratingMin}+ ★` : 'Toutes notes'}
+              Budget: {fmt(filters.budget?.min ?? 0)} – {fmt(filters.budget?.max ?? 0)} • {filters.ratingMin ? `${filters.ratingMin}+ ★` : 'Toutes notes'}
             </Text>
           </Pressable>
         </View>
@@ -142,14 +135,13 @@ export default function VoyagesTab() {
         scrollIndicatorInsets={{ bottom: bottomInset }}
       />
 
-      <TravelFiltersSheet
-        visible={open}
+      <UnifiedFilterSheet
+        kind="trip"
+        open={open}
         initial={filters}
-        resultCount={resultCount}
         onClose={() => setOpen(false)}
         onReset={() => setFilters(INITIAL)}
         onApply={(f) => { setFilters(f); setOpen(false); }}
-        presetKey="zima/travel/lastFilters"
       />
     </View>
   );

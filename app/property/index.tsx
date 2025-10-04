@@ -10,7 +10,8 @@ import { openCategory } from '@/lib/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { sortPremiumFirst } from '@/utils/sortProperties';
 import { api } from '@/lib/api';
-import PropertyFiltersSheet, { type PropertyFilters } from '@/components/filters/PropertyFiltersSheet';
+import UnifiedFilterSheet, { type PropertyFilters } from '@/components/filters/UnifiedFilterSheet';
+import { buildPropertyQuery } from '@/utils/filters';
 import { useSettings } from '@/hooks/useSettings';
 import { useMoney } from '@/lib/money';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
@@ -19,12 +20,19 @@ import HeaderCountryButton from '@/components/HeaderCountryButton';
 import ActiveCountryBadge from '@/components/ui/ActiveCountryBadge';
 
 const INITIAL: PropertyFilters = {
-  country: undefined, city: undefined,
-  trade: undefined, period: undefined,
+  destination: { country: undefined, city: undefined },
+  transaction: undefined,
   category: undefined,
-  rooms: undefined, baths: undefined, surfaceMin: undefined,
-  priceMin: undefined, priceMax: undefined,
-  sort: 'recent',
+  type: undefined,
+  bedrooms: undefined,
+  bathrooms: undefined,
+  livingrooms: undefined,
+  surfaceMin: undefined,
+  furnished: undefined,
+  titleDeed: undefined,
+  budget: { min: undefined, max: undefined },
+  ratingMin: undefined,
+  amenities: [],
 };
 
 export default function PropertyScreen(){
@@ -48,34 +56,19 @@ export default function PropertyScreen(){
   useEffect(() => {
     if (preset?.domain === 'properties') {
       const newFilters: PropertyFilters = { ...INITIAL };
-      if (preset.premium) {
-        newFilters.sort = 'recent';
-      }
       setFilters(newFilters);
     }
   }, [preset]);
 
   useEffect(() => {
     if (!allowAllCountries && activeCountry?.name_fr) {
-      setFilters(prev => ({ ...prev, country: prev.country ?? activeCountry.name_fr }));
+      setFilters(prev => ({ ...prev, destination: { country: prev.destination?.country ?? activeCountry.name_fr, city: prev.destination?.city } }));
     }
   }, [allowAllCountries, activeCountry?.name_fr]);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['properties', filters],
-    queryFn: () => api.listProperties({
-      country: filters.country,
-      city: filters.city,
-      type: filters.trade === 'sale' ? 'sale' : (filters.trade==='rent' ? 'rent' : undefined),
-      period: filters.period,
-      category: filters.category,
-      rooms: filters.rooms,
-      baths: filters.baths,
-      surfaceMin: filters.surfaceMin,
-      priceMin: filters.priceMin,
-      priceMax: filters.priceMax,
-      sort: filters.sort,
-    }),
+    queryFn: () => api.listProperties(buildPropertyQuery(filters) as any),
     select: (items) => sortPremiumFirst(items as any[])
   });
 
@@ -144,10 +137,10 @@ export default function PropertyScreen(){
             }]}
           >
             <Text style={{ fontWeight: '800', fontSize: 15, color: '#0B6B53' }}>
-              {filters.country ?? 'Pays'}, {filters.city ?? 'Ville'} • {filters.category ?? 'Catégorie'} {filters.trade ? `• ${filters.trade==='sale'?'Vente':'Location'}` : ''}
+              {(filters.destination?.country) ?? 'Pays'}, {(filters.destination?.city) ?? 'Ville'} • {filters.category ?? 'Catégorie'} {filters.transaction ? `• ${filters.transaction==='sale'?'Vente':'Location'}` : ''}
             </Text>
             <Text style={{ color: '#6B7280', marginTop: 4, fontSize: 13, fontWeight: '600' }}>
-              Budget {fmt(filters.priceMin)} – {fmt(filters.priceMax)}
+              Budget {fmt(filters.budget?.min)} – {fmt(filters.budget?.max)}
             </Text>
           </Pressable>
         </View>
@@ -170,13 +163,13 @@ export default function PropertyScreen(){
         scrollIndicatorInsets={{ bottom: insets.bottom + tabBarH }}
       />
 
-      <PropertyFiltersSheet
-        visible={open}
+      <UnifiedFilterSheet
+        kind="property"
+        open={open}
         initial={filters}
-        resultCount={resultCount}
         onClose={()=>setOpen(false)}
+        onReset={()=>setFilters({ ...INITIAL, destination: { country: activeCountry?.name_fr, city: undefined } })}
         onApply={(f)=>{ setFilters(f); setOpen(false); }}
-        presetKey="zima/property/lastFilters"
       />
     </View>
   );
