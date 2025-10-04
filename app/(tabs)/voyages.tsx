@@ -124,7 +124,7 @@ export default function VoyagesTab() {
       <FlatList
         data={data as any[]}
         keyExtractor={(i: any) => String(i.id)}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomInset + 80, paddingTop: 8 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomInset + 120, paddingTop: 8 }}
         ListEmptyComponent={!isLoading ? (
           <View style={{ paddingHorizontal: 16 }}>
             <Text style={styles.empty}>Aucun résultat.</Text>

@@ -49,6 +49,20 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="voyages"
+        options={{
+          title: 'Voyages',
+          tabBarIcon: ({ color, size }) => <Building2 color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="vehicles"
+        options={{
+          title: 'Véhicules',
+          tabBarIcon: ({ color, size }) => <Building2 color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
         name="messages"
         options={{
           title: 'Messages',
