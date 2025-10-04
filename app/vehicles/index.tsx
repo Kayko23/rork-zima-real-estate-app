@@ -7,6 +7,7 @@ import { useSettings } from '@/hooks/useSettings';
 import { t } from '@/lib/i18n';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
+import HeaderCountryButton from '@/components/HeaderCountryButton';
 
 function Section({
   title,
@@ -60,16 +61,19 @@ export default function VehiclesHome() {
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={[styles.stickyHeader, { paddingTop: insets.top }]}>
-        <Pressable onPress={() => router.push('/(tabs)/home')} style={{ alignSelf: 'center' }}>
-          <ZimaBrand />
-        </Pressable>
+        <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:16 }}>
+          <Pressable onPress={() => router.push('/(tabs)/home')} style={{ paddingVertical:8 }}>
+            <ZimaBrand />
+          </Pressable>
+          <HeaderCountryButton />
+        </View>
         <View style={{ paddingHorizontal:16, paddingBottom:12, paddingTop:16 }}>
           <SegmentedTabs
             value="vehicles"
             onChange={(k)=>{
               if (k==='props') router.push('/(tabs)/properties');
-              if (k==='trips') router.push('/(tabs)/voyages');
-              if (k==='vehicles') {/* stay */}
+              else if (k==='trips') router.push('/(tabs)/voyages');
+              else if (k==='vehicles') {/* stay */}
             }}
           />
         </View>

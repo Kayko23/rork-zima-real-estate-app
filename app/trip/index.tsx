@@ -12,6 +12,8 @@ import TravelFiltersSheet, { TravelFilters } from '@/components/travel/TravelFil
 import { api } from '@/lib/api';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
+import HeaderCountryButton from '@/components/HeaderCountryButton';
+import { useSettings } from '@/hooks/useSettings';
 
 const INITIAL: TravelFilters = {
   country: undefined,
@@ -31,6 +33,7 @@ export default function TripScreen() {
   const params = useLocalSearchParams<{ category?: string }>();
   const { bottom: bottomInset } = useContentInsets();
   const { preset, reset: resetPreset } = useSearchPreset();
+  const { country: activeCountry, allowAllCountries } = useSettings();
   const [open, setOpen] = useState<boolean>(false);
   const [filters, setFilters] = useState<TravelFilters>(INITIAL);
 
@@ -47,6 +50,12 @@ export default function TripScreen() {
       setFilters(newFilters);
     }
   }, [preset]);
+
+  useEffect(() => {
+    if (!allowAllCountries && activeCountry?.name_fr) {
+      setFilters(prev => ({ ...prev, country: prev.country ?? activeCountry.name_fr }));
+    }
+  }, [allowAllCountries, activeCountry?.name_fr]);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['trips', filters],
@@ -67,14 +76,17 @@ export default function TripScreen() {
   return (
     <View style={styles.container}>
       <View style={[styles.stickyHeader, { paddingTop: insets.top, position: 'relative', zIndex: 10 }]}>
-        <ZimaBrand />
+        <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:16 }}>
+          <ZimaBrand />
+          <HeaderCountryButton />
+        </View>
         
         <View style={{ paddingHorizontal:16, paddingTop:16, paddingBottom:12 }}>
           <SegmentedTabs 
             value="trips" 
             onChange={(k)=>{
               if (k==='props') router.push('/(tabs)/properties');
-              else if (k==='pros') router.push('/(tabs)/professionals');
+              else if (k==='vehicles') router.push('/vehicles');
             }} 
           />
         </View>

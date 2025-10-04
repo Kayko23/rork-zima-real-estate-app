@@ -15,6 +15,7 @@ import { useSettings } from '@/hooks/useSettings';
 import { useMoney } from '@/lib/money';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
+import HeaderCountryButton from '@/components/HeaderCountryButton';
 
 const INITIAL: PropertyFilters = {
   country: undefined, city: undefined,
@@ -30,7 +31,7 @@ export default function PropertyScreen(){
   const tabBarH = 56;
   const router = useRouter();
   const params = useLocalSearchParams<{ category?: string }>();
-  const { currency } = useSettings();
+  const { country: activeCountry, allowAllCountries } = useSettings();
   const { format } = useMoney();
   const { preset, reset: resetPreset } = useSearchPreset();
   const [open, setOpen] = useState<boolean>(false);
@@ -52,6 +53,12 @@ export default function PropertyScreen(){
       setFilters(newFilters);
     }
   }, [preset]);
+
+  useEffect(() => {
+    if (!allowAllCountries && activeCountry?.name_fr) {
+      setFilters(prev => ({ ...prev, country: prev.country ?? activeCountry.name_fr }));
+    }
+  }, [allowAllCountries, activeCountry?.name_fr]);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ['properties', filters],
@@ -76,14 +83,17 @@ export default function PropertyScreen(){
   return (
     <View style={{ flex:1, backgroundColor:'#fff' }}>
       <View style={{ position: 'absolute', top: 0, left: 0, right: 0, paddingTop: insets.top, backgroundColor:'#fff', borderBottomWidth:0.5, borderBottomColor:'#E5E7EB', zIndex: 10 }}>
-        <ZimaBrand />
+        <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:16 }}>
+          <ZimaBrand />
+          <HeaderCountryButton />
+        </View>
         
         <View style={{ paddingHorizontal:16, paddingTop:16, paddingBottom:12 }}>
           <SegmentedTabs 
             value="props" 
             onChange={(k)=>{
-              if (k==='pros') router.push('/(tabs)/professionals');
-              else if (k==='trips') router.push('/(tabs)/voyages');
+              if (k==='trips') router.push('/(tabs)/voyages');
+              else if (k==='vehicles') router.push('/vehicles');
             }} 
           />
         </View>
@@ -149,7 +159,7 @@ export default function PropertyScreen(){
             <View style={{ padding:14 }}>
               <Text style={{ fontWeight:'800' }}>{item.title ?? 'Annonce'}</Text>
               <Text style={{ color:'#6B7280', marginTop:2 }}>{item.city}, {item.country}</Text>
-              <Text style={{ marginTop:8, fontWeight:'700' }}>{format(item.price, currency)}{item.period==='daily'?' / jour': item.period==='monthly'?' / mois':''}</Text>
+              <Text style={{ marginTop:8, fontWeight:'700' }}>{format(item.price)}{item.period==='daily'?' / jour': item.period==='monthly'?' / mois':''}</Text>
             </View>
           </View>
         )}
