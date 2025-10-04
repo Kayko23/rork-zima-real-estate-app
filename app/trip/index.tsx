@@ -127,7 +127,6 @@ export default function TripScreen() {
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomInset, paddingTop: 8 }}
         ListEmptyComponent={!isLoading ? (
           <View style={{ paddingHorizontal: 16 }}>
-            <ActiveCountryBadge />
             <Text style={styles.empty}>Aucun résultat.</Text>
           </View>
         ) : null}
