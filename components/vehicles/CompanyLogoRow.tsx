@@ -53,7 +53,7 @@ function CompanyLogoRowBase({
           onPress={() => {
             if (onPress) return onPress(item);
             try {
-              router.push({ pathname: '/companies/[id]', params: { id: item.id } });
+              router.push({ pathname: '/vehicles/list', params: { companyId: item.id } });
             } catch (e) {
               console.log('CompanyLogoRow navigation error', e);
             }
