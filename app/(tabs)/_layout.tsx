@@ -1,7 +1,7 @@
 import { Tabs, useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import { Platform, StyleSheet, View, Pressable, Text } from 'react-native';
-import { Home as HomeIcon, Heart, Building2, MessageCircle, User, Car } from 'lucide-react-native';
+import { Home as HomeIcon, Heart, Building2, MessageCircle, User } from 'lucide-react-native';
 import { useApp } from '@/hooks/useAppStore';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -56,13 +56,6 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="vehicles"
-        options={{
-          title: 'Véhicules',
-          tabBarIcon: ({ color, size }) => <Car color={color} size={size} />,
-        }}
-      />
-      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profil',
@@ -78,7 +71,6 @@ const ICONS: Record<string, { label: string }> = {
   favorites: { label: 'Favoris' },
   properties: { label: 'Biens' },
   messages: { label: 'Messages' },
-  vehicles: { label: 'Véhicules' },
   profile: { label: 'Profil' },
 };
 
@@ -175,12 +167,12 @@ const styles = StyleSheet.create({
       android: { backgroundColor: 'rgba(255,255,255,0.80)' },
     }),
   },
-  row: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 8 },
-  item: { alignItems: 'center', justifyContent: 'center', gap: 2, flex: 1 },
+  row: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14 },
+  item: { alignItems: 'center', justifyContent: 'center', gap: 2, width: '19%' },
   label: { fontSize: 11, fontWeight: '700' },
   iconWrap: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   iconActive: { backgroundColor: 'rgba(14,96,73,0.10)' },
-  centerItem: { flex: 1.2 },
+  centerItem: { width: '24%' },
   centerIconWrap: {
     width: 54,
     height: 54,

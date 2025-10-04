@@ -77,7 +77,7 @@ export default function Home() {
   const router = useRouter();
   const { setPreset } = useSearchPreset();
 
-  const goVehicles = () => router.push("/(tabs)/vehicles");
+  const goVehicles = () => router.push("/vehicles" as any);
   const goTrips = () => router.push("/(tabs)/voyages");
   
   const { data: premiumVehicles } = useVehicles({ premium: true });
@@ -93,7 +93,7 @@ export default function Home() {
           <SegmentedTabs value={tab} onChange={(k)=>{
             setTab(k);
             if (k==="props") router.push("/(tabs)/properties");
-            if (k==="vehicles") router.push("/(tabs)/vehicles");
+            if (k==="vehicles") goVehicles();
             if (k==="trips") goTrips();
           }}/>
         </View>
@@ -178,7 +178,7 @@ export default function Home() {
               <Pressable 
                 onPress={()=>{
                   if (category.key === 'vehicules') {
-                    router.push('/(tabs)/vehicles');
+                    router.push('/vehicles' as any);
                   } else {
                     seeAllCategory(category.key as CategorySlug);
                   }
