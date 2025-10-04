@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { View, Text, FlatList, Pressable, TextInput, Switch, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useSegments } from 'expo-router';
 import { COUNTRIES } from '@/data/countries';
 import { useSettings } from '@/hooks/useSettings';
 
@@ -8,6 +8,7 @@ export default function CountrySelect() {
   const { country, setCountry, allowAllCountries, setAllowAllCountries } = useSettings();
   const [q, setQ] = useState<string>('');
   const router = useRouter();
+  const segments = useSegments();
 
   const data = useMemo(() => COUNTRIES.filter((c) => c.name_fr.toLowerCase().includes(q.toLowerCase()) || c.name_en.toLowerCase().includes(q.toLowerCase())), [q]);
 
@@ -16,10 +17,19 @@ export default function CountrySelect() {
       const c = COUNTRIES.find((x) => x.code === code);
       if (c) {
         await setCountry(c);
-        router.back();
+        const seg0 = segments[0];
+        if (seg0 === '(onboarding)' || seg0 === 'country') {
+          router.replace('/');
+        } else {
+          try {
+            router.back();
+          } catch (_) {
+            router.replace('/');
+          }
+        }
       }
     },
-    [router, setCountry]
+    [router, setCountry, segments]
   );
 
   return (

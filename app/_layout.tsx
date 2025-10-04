@@ -30,9 +30,19 @@ function OnboardingGate() {
 
   useEffect(() => {
     if (!ready) return;
-    const inOnboarding = segments[0] === '(onboarding)';
-    if ((!locale || !country) && !inOnboarding) {
-      router.replace('/(onboarding)/language');
+    const seg0 = segments[0];
+    const inOnboarding = seg0 === '(onboarding)';
+    const inCountry = seg0 === 'country';
+
+    if (!locale || !country) {
+      if (!(inOnboarding || inCountry)) {
+        router.replace('/(onboarding)/language');
+      }
+      return;
+    }
+
+    if (inOnboarding || inCountry) {
+      router.replace('/');
     }
   }, [ready, locale, country, segments, router]);
 
