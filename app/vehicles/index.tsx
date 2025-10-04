@@ -9,6 +9,9 @@ import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
 import CompanyLogoRow from '@/components/vehicles/CompanyLogoRow';
+import VehicleFiltersSheet, { VehicleFilters } from '@/components/filters/VehicleFiltersSheet';
+import type { VehicleKind } from '@/types/vehicle';
+import React from "react";
 
 function Section({
   title,
@@ -51,10 +54,13 @@ export default function VehiclesHome() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
-  const vip = useVehicles({ kind: 'vip' });
-  const sale = useVehicles({ kind: 'sale' });
-  const loc = useVehicles({ kind: 'rent' });
-  const drv = useVehicles({ kind: 'driver' });
+  const [filtersOpen, setFiltersOpen] = React.useState<boolean>(false);
+  const [filters, setFilters] = React.useState<VehicleFilters>({ kind: undefined, premium: undefined });
+
+  const vip = useVehicles({ kind: 'vip', premium: filters.premium });
+  const sale = useVehicles({ kind: 'sale', premium: filters.premium });
+  const loc = useVehicles({ kind: 'rent', premium: filters.premium });
+  const drv = useVehicles({ kind: 'driver', premium: filters.premium });
 
   return (
     <View style={styles.container}>
@@ -73,9 +79,16 @@ export default function VehiclesHome() {
             onChange={(k)=>{
               if (k==='props') router.push('/(tabs)/properties');
               else if (k==='trips') router.push('/(tabs)/voyages');
-              else if (k==='vehicles') {/* stay */}
             }}
           />
+        </View>
+        <View style={{ paddingHorizontal:16, paddingBottom:12 }}>
+          <Pressable testID="openVehicleFilters" onPress={() => setFiltersOpen(true)} style={styles.searchStub}>
+            <Text style={styles.searchTitle}>
+              {filters.kind ? labelKind(filters.kind) : 'Type'} • {filters.premium === true ? 'Premium' : filters.premium === false ? 'Standard' : 'Tous'}
+            </Text>
+            <Text style={styles.searchSub}>Filtrer les véhicules et chauffeurs</Text>
+          </Pressable>
         </View>
       </View>
 
@@ -120,8 +133,26 @@ export default function VehiclesHome() {
         contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 16) }}
         showsVerticalScrollIndicator={false}
       />
+
+      <VehicleFiltersSheet
+        visible={filtersOpen}
+        initial={filters}
+        resultCount={(vip.data?.length ?? 0) + (sale.data?.length ?? 0) + (loc.data?.length ?? 0) + (drv.data?.length ?? 0)}
+        onClose={() => setFiltersOpen(false)}
+        onApply={(f) => { setFilters(f); setFiltersOpen(false); }}
+      />
     </View>
   );
+}
+
+function labelKind(k: VehicleKind): string {
+  switch (k) {
+    case 'vip': return 'VIP';
+    case 'rent': return 'À louer';
+    case 'sale': return 'En vente';
+    case 'driver': return 'Chauffeurs';
+    default: return 'Type';
+  }
 }
 
 const styles = StyleSheet.create({
@@ -155,4 +186,7 @@ const styles = StyleSheet.create({
   loader: {
     marginVertical: 20,
   },
+  searchStub: { height: 48, borderRadius: 12, borderWidth: 1, borderColor: '#E5E7EB', paddingHorizontal: 14, justifyContent: 'center' },
+  searchTitle: { fontWeight: '700' },
+  searchSub: { color: '#6B7280', marginTop: 2 },
 });
