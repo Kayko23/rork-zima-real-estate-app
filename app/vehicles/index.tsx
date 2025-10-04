@@ -1,10 +1,12 @@
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link, Stack } from 'expo-router';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Link, Stack, useRouter } from 'expo-router';
 import { useVehicles } from '@/hooks/useVehicles';
 import VehicleCard from '@/components/vehicles/VehicleCard';
 import { useSettings } from '@/hooks/useSettings';
 import { t } from '@/lib/i18n';
+import SegmentedTabs from '@/components/home/SegmentedTabs';
+import ZimaBrand from '@/components/ui/ZimaBrand';
 
 function Section({
   title,
@@ -44,6 +46,8 @@ function Section({
 export default function VehiclesHome() {
   const { locale } = useSettings();
   const L = t(locale ?? 'fr');
+  const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   const prem = useVehicles({ premium: true });
   const loc = useVehicles({ kind: 'rent' });
@@ -52,8 +56,25 @@ export default function VehiclesHome() {
   const drv = useVehicles({ kind: 'driver' });
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
+
+      <View style={[styles.stickyHeader, { paddingTop: insets.top }]}>
+        <Pressable onPress={() => router.push('/(tabs)/home')} style={{ alignSelf: 'center' }}>
+          <ZimaBrand />
+        </Pressable>
+        <View style={{ paddingHorizontal:16, paddingBottom:12, paddingTop:16 }}>
+          <SegmentedTabs
+            value="vehicles"
+            onChange={(k)=>{
+              if (k==='props') router.push('/(tabs)/properties');
+              if (k==='trips') router.push('/(tabs)/voyages');
+              if (k==='vehicles') {/* stay */}
+            }}
+          />
+        </View>
+      </View>
+
       <FlatList
         data={[0]}
         renderItem={() => (
@@ -91,8 +112,10 @@ export default function VehiclesHome() {
           </View>
         )}
         keyExtractor={() => 'vehicles'}
+        contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 16) }}
+        showsVerticalScrollIndicator={false}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -101,6 +124,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  stickyHeader: { backgroundColor: '#fff', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', zIndex: 10 },
   section: {
     marginVertical: 14,
   },
