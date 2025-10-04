@@ -28,7 +28,7 @@ export default function VoyageCard({ item, onPress }:{ item:TripItem; onPress?:(
         <Text style={c.badgeTxt}>{item.badge}</Text>
       </View>}
       <TouchableOpacity style={c.like} onPress={handleToggleFavorite} activeOpacity={0.8}>
-        <Heart size={18} color={isFav ? '#EF4444' : '#fff'} fill={isFav ? '#EF4444' : 'transparent'}/>
+        <Heart size={18} color={isFav ? '#EF4444' : '#fff'} fill={isFav ? '#EF4444' : 'transparent'} strokeWidth={2.5} />
       </TouchableOpacity>
 
       <View style={c.body}>
@@ -43,7 +43,7 @@ export default function VoyageCard({ item, onPress }:{ item:TripItem; onPress?:(
 const c = StyleSheet.create({
   card:{ width:300, marginRight:14, borderRadius:16, overflow:"hidden", backgroundColor:"#fff" },
   img:{ width:"100%", height:180 },
-  like:{ position:"absolute", top:12, right:12, backgroundColor:"rgba(0,0,0,.35)", borderRadius:999, padding:6 },
+  like:{ position:"absolute", top:12, right:12, backgroundColor:"rgba(255,255,255,.95)", borderRadius:999, padding:6, shadowColor:"#000", shadowOpacity:0.2, shadowRadius:10, shadowOffset:{width:0, height:3}, elevation:4 },
   badge:{ position:"absolute", left:12, top:12, borderRadius:999, paddingHorizontal:10, paddingVertical:6 },
   badgeTxt:{ color:"#fff", fontWeight:"900", letterSpacing:0.3 },
   body:{ padding:12, gap:4 },

@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   badge:{ backgroundColor:"rgba(17,24,39,.85)", paddingHorizontal:12, paddingVertical:6, borderRadius:999 },
   badgeTxt:{ color:"#fff", fontWeight:"700" },
   heart:{ marginLeft:"auto", height:40, width:40, borderRadius:20, alignItems:"center", justifyContent:"center",
-          backgroundColor:"rgba(255,255,255,.95)", shadowColor:"#000", shadowOpacity:0.15, shadowRadius:8, shadowOffset:{width:0, height:2}, elevation:3 },
+          backgroundColor:"rgba(255,255,255,.95)", shadowColor:"#000", shadowOpacity:0.2, shadowRadius:10, shadowOffset:{width:0, height:3}, elevation:4 },
   bottom:{ position:"absolute", left:12, right:12, bottom:12 },
   title:{ color:"#fff", fontSize:16, fontWeight:"700", marginBottom:8 },
   pricePill:{ alignSelf:"flex-start", backgroundColor:"rgba(255,255,255,.9)", paddingHorizontal:12, paddingVertical:6, borderRadius:999 },

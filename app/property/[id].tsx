@@ -44,6 +44,7 @@ import LiquidGlassView from "@/components/ui/LiquidGlassView";
 import WhatsAppChoiceSheet from "@/components/ui/WhatsAppChoiceSheet";
 import { fetchListings } from "@/services/annonces.api";
 import { mockProperties } from "@/constants/data";
+import { useApp } from "@/hooks/useAppStore";
 
 const { width } = Dimensions.get("window");
 const CARD = 16;
@@ -268,11 +269,13 @@ function PropertyDetailScreen() {
     }
   }, [id]);
 
+  const { isFavoriteProperty, toggleFavoriteProperty } = useApp();
   const [imgIndex, setImgIndex] = useState<number>(0);
   const [showAllAmenities, setShowAllAmenities] = useState<boolean>(false);
   const [showWhatsAppChoice, setShowWhatsAppChoice] = useState<boolean>(false);
-  const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const listRef = useRef<FlatList<string> | null>(null);
+  
+  const isFavorite = data ? isFavoriteProperty(String(data.id)) : false;
   const heroH = Math.min(420, Math.round(width * 0.72));
 
   const allAmenities = [
@@ -408,19 +411,21 @@ function PropertyDetailScreen() {
                 <Pressable 
                   testID="fav" 
                   onPress={() => {
-                    console.log("Favorite button pressed");
-                    setIsFavorite(!isFavorite);
-                    Alert.alert(
-                      isFavorite ? 'Retiré des favoris' : 'Ajouté aux favoris',
-                      isFavorite 
-                        ? 'Ce bien a été retiré de vos favoris' 
-                        : 'Ce bien a été ajouté à vos favoris'
-                    );
+                    if (data) {
+                      console.log("Favorite button pressed");
+                      toggleFavoriteProperty(String(data.id));
+                      Alert.alert(
+                        isFavorite ? 'Retiré des favoris' : 'Ajouté aux favoris',
+                        isFavorite 
+                          ? 'Ce bien a été retiré de vos favoris' 
+                          : 'Ce bien a été ajouté à vos favoris'
+                      );
+                    }
                   }} 
                   style={styles.roundBtn}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <Heart size={18} color="#0b3b35" fill={isFavorite ? "#0b3b35" : "transparent"} />
+                  <Heart size={18} color={isFavorite ? "#EF4444" : "#0b3b35"} fill={isFavorite ? "#EF4444" : "transparent"} strokeWidth={2.5} />
                 </Pressable>
               </LiquidGlassView>
             </View>
@@ -759,6 +764,8 @@ function ReviewCard({ name, date, text }: { name: string; date: string; text: st
 }
 
 function PopularCard({ item }: { item: PopularItem }) {
+  const { isFavoriteProperty, toggleFavoriteProperty } = useApp();
+  const isFav = isFavoriteProperty(item.id);
   const propertyImages = [
     "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?q=80&w=400&auto=format&fit=crop",
     "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=400&auto=format&fit=crop",
@@ -777,11 +784,12 @@ function PopularCard({ item }: { item: PopularItem }) {
         <Text style={styles.popBadge}>{item.info1}</Text>
         <Text style={styles.popBadge}>{item.info2}</Text>
       </View>
-      <Pressable style={styles.likeBtn} testID={`like-${item.id}`} onPress={() => {
+      <Pressable style={styles.likeBtn} testID={`like-${item.id}`} onPress={(e) => {
+        e.stopPropagation();
         console.log("Toggling favorite for property:", item.id);
-        // Could implement favorite toggle functionality
+        toggleFavoriteProperty(item.id);
       }}>
-        <Heart size={16} color="#fff" />
+        <Heart size={16} color={isFav ? "#EF4444" : "#fff"} fill={isFav ? "#EF4444" : "none"} strokeWidth={2.5} />
       </Pressable>
     </View>
   );

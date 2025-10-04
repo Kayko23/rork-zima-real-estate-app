@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, ImageBackground, StyleSheet, Pressable, Linking } from "react-native";
 import { Heart, Mail, Phone } from "lucide-react-native";
+import { useApp } from "@/hooks/useAppStore";
 
 export type Provider = {
   id: string;
@@ -32,10 +33,11 @@ const ROLE_LABELS: Record<Provider["category"], string> = {
 type Props = {
   item: Provider;
   onPressProfile?: (id: string) => void;
-  onToggleFavorite?: (id: string) => void;
 };
 
-export default function ProfessionalCard({ item, onPressProfile, onToggleFavorite }: Props) {
+export default function ProfessionalCard({ item, onPressProfile }: Props) {
+  const { isFavoriteProvider, toggleFavoriteProvider } = useApp();
+  const isFav = isFavoriteProvider(item.id);
   const imageUri = item.cover || item.avatar || `https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&auto=format&fit=crop&q=80`;
 
   console.log('[ProfessionalCard] Rendering:', item.name, 'ID:', item.id, 'Image:', imageUri);
@@ -81,13 +83,13 @@ export default function ProfessionalCard({ item, onPressProfile, onToggleFavorit
           )}
           <Pressable
             style={s.favoriteBtn}
-            accessibilityLabel="Ajouter aux favoris"
+            accessibilityLabel={isFav ? "Retirer des favoris" : "Ajouter aux favoris"}
             onPress={(e) => {
               e.stopPropagation();
-              onToggleFavorite?.(item.id);
+              toggleFavoriteProvider(item.id);
             }}
           >
-            <Heart size={18} color="#fff" fill="none" />
+            <Heart size={18} color={isFav ? "#EF4444" : "#fff"} fill={isFav ? "#EF4444" : "none"} strokeWidth={2.5} />
           </Pressable>
         </View>
 
@@ -175,9 +177,14 @@ const s = StyleSheet.create({
     fontSize: 12,
   },
   favoriteBtn: {
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(255,255,255,0.95)",
     padding: 8,
     borderRadius: 999,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 4,
   },
   bottomInfo: {
     padding: 12,
