@@ -11,7 +11,7 @@ export default function LanguageScreen() {
 
   const pick = async (lng: Locale) => {
     await setLocale(lng);
-    router.replace('/country' as any);
+    router.replace('/(onboarding)/country');
   };
 
   return (
