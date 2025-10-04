@@ -112,11 +112,27 @@ export default function PropertyScreen(){
               </Pressable>
             </View>
           )}
-          <Pressable onPress={()=>setOpen(true)} style={{ height:48, borderRadius:12, borderWidth:1, borderColor:'#E5E7EB', justifyContent:'center', paddingHorizontal:14 }}>
-            <Text style={{ fontWeight:'700' }}>
+          <Pressable 
+            onPress={()=>setOpen(true)} 
+            style={({ pressed }) => [{
+              height: 56,
+              borderRadius: 16,
+              borderWidth: 1.5,
+              borderColor: '#0B6B53',
+              backgroundColor: pressed ? '#F0F9F6' : '#fff',
+              justifyContent: 'center',
+              paddingHorizontal: 16,
+              shadowColor: '#0B6B53',
+              shadowOpacity: 0.08,
+              shadowRadius: 12,
+              shadowOffset: { width: 0, height: 4 },
+              elevation: 3
+            }]}
+          >
+            <Text style={{ fontWeight: '800', fontSize: 15, color: '#0B6B53' }}>
               {filters.country ?? 'Pays'}, {filters.city ?? 'Ville'} • {filters.category ?? 'Catégorie'} {filters.trade ? `• ${filters.trade==='sale'?'Vente':'Location'}` : ''}
             </Text>
-            <Text style={{ color:'#6B7280', marginTop:2 }}>
+            <Text style={{ color: '#6B7280', marginTop: 4, fontSize: 13, fontWeight: '600' }}>
               Budget {fmt(filters.priceMin)} – {fmt(filters.priceMax)}
             </Text>
           </Pressable>

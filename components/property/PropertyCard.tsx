@@ -34,7 +34,7 @@ export default function PropertyCard({ item }: { item: Property }) {
           <View style={styles.badge}><Text style={styles.badgeTxt}>{item.badge}</Text></View>
         )}
         <Pressable onPress={() => toggleFavoriteProperty(String(item.id))} style={styles.heart} hitSlop={10} accessibilityLabel="Ajouter aux favoris" testID={`favorite-toggle-${item.id}`}>
-          <Heart size={20} color="#fff" fill={fav ? "#EC4899" : "transparent"} />
+          <Heart size={22} color={fav ? "#EF4444" : "#9CA3AF"} fill={fav ? "#EF4444" : "transparent"} strokeWidth={2.5} />
         </Pressable>
       </View>
       <View style={styles.bottom}>
@@ -93,8 +93,8 @@ const styles = StyleSheet.create({
   badges:{ position:"absolute", top:12, left:12, right:12, flexDirection:"row", alignItems:"center" },
   badge:{ backgroundColor:"rgba(17,24,39,.85)", paddingHorizontal:12, paddingVertical:6, borderRadius:999 },
   badgeTxt:{ color:"#fff", fontWeight:"700" },
-  heart:{ marginLeft:"auto", height:36, width:36, borderRadius:18, alignItems:"center", justifyContent:"center",
-          backgroundColor:"rgba(0,0,0,.35)" },
+  heart:{ marginLeft:"auto", height:40, width:40, borderRadius:20, alignItems:"center", justifyContent:"center",
+          backgroundColor:"rgba(255,255,255,.95)", shadowColor:"#000", shadowOpacity:0.15, shadowRadius:8, shadowOffset:{width:0, height:2}, elevation:3 },
   bottom:{ position:"absolute", left:12, right:12, bottom:12 },
   title:{ color:"#fff", fontSize:16, fontWeight:"700", marginBottom:8 },
   pricePill:{ alignSelf:"flex-start", backgroundColor:"rgba(255,255,255,.9)", paddingHorizontal:12, paddingVertical:6, borderRadius:999 },
