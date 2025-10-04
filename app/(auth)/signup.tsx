@@ -343,6 +343,7 @@ export default function SignupWizard() {
                           }
                         }}
                         maximumDate={new Date()}
+                        minimumDate={new Date(1900, 0, 1)}
                         testID="signup-date-picker"
                       />
                     )}
