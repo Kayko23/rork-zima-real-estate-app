@@ -90,7 +90,7 @@ export default function VoyagesTab() {
             value="trips" 
             onChange={(k)=>{
               if (k==='props') router.push('/(tabs)/properties');
-              else if (k==='vehicles') router.push('/vehicles');
+              else if (k==='vehicles') router.push('/(tabs)/vehicles');
             }} 
           />
         </View>
