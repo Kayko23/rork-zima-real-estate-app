@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert, KeyboardAvoidingView, Platform } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert, KeyboardAvoidingView, Platform, FlatList } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { AccountForm, ProfileForm, DocsForm, accountSchema, createProfileSchemaForRole, createDocsSchemaForRole } from "@/lib/signupSchema";
 import DocItem from "@/components/upload/DocItem";
@@ -8,13 +8,19 @@ import { useSession } from "@/hooks/useSession";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CountryPicker from "@/components/inputs/CountryPicker";
-import { Calendar } from "lucide-react-native";
+import { Calendar, ChevronDown } from "lucide-react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import BottomSheet from "@/components/BottomSheet";
+import { loadCitiesByCountry, CityItem } from "@/data/cities";
+import { normalize } from "@/utils/text";
 
 export default function SignupWizard() {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showCityPicker, setShowCityPicker] = useState(false);
+  const [cities, setCities] = useState<CityItem[]>([]);
+  const [cityQuery, setCityQuery] = useState("");
 
   // Étape 1 — Compte
   const f1 = useForm<AccountForm>({ 
@@ -45,6 +51,34 @@ export default function SignupWizard() {
   });
 
   const { setSession } = useSession();
+
+  const selectedCountry = f2.watch("country");
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      if (!selectedCountry) {
+        setCities([]);
+        return;
+      }
+      try {
+        const data = await loadCitiesByCountry(selectedCountry);
+        if (mounted) setCities(data);
+      } catch (error) {
+        console.error("Error loading cities:", error);
+        if (mounted) setCities([]);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [selectedCountry]);
+
+  const filteredCities = React.useMemo(() => {
+    const q = normalize(cityQuery);
+    if (!q) return cities.slice(0, 50);
+    return cities
+      .filter(c => normalize(c.n).includes(q) || (c.a && normalize(c.a).includes(q)))
+      .slice(0, 100);
+  }, [cityQuery, cities]);
 
   const next = async () => {
     try {
@@ -296,13 +330,22 @@ export default function SignupWizard() {
                 name="city"
                 rules={{ required: true, minLength: 1 }} 
                 render={({ field: { onChange, value } }) => (
-                  <TextInput 
-                    style={styles.input} 
-                    value={value ?? ""} 
-                    onChangeText={onChange} 
-                    placeholder="Abidjan…" 
-                    testID="signup-city-input"
-                  />
+                  <Pressable 
+                    onPress={() => {
+                      if (selectedCountry) {
+                        setShowCityPicker(true);
+                      } else {
+                        Alert.alert("Sélectionnez d'abord un pays", "Veuillez choisir un pays avant de sélectionner une ville.");
+                      }
+                    }}
+                    style={styles.cityPickerButton}
+                    testID="signup-city-picker-button"
+                  >
+                    <Text style={[styles.cityPickerText, !value && styles.cityPickerPlaceholder]}>
+                      {value || "Sélectionner une ville"}
+                    </Text>
+                    <ChevronDown size={20} color="#6B7280" />
+                  </Pressable>
                 )}
               />
 
@@ -454,6 +497,46 @@ export default function SignupWizard() {
               </Text>
             </View>
           )}
+
+          {/* City Picker Bottom Sheet */}
+          <BottomSheet visible={showCityPicker} onClose={() => setShowCityPicker(false)} height={0.75}>
+            <View style={styles.sheetContent}>
+              <Text style={styles.sheetTitle}>Sélectionner une ville</Text>
+              <TextInput
+                placeholder="Rechercher une ville..."
+                value={cityQuery}
+                onChangeText={setCityQuery}
+                style={styles.searchInput}
+                autoFocus
+              />
+              <FlatList
+                data={filteredCities}
+                keyExtractor={(item, idx) => item.n + idx}
+                renderItem={({ item }) => (
+                  <Pressable
+                    onPress={() => {
+                      f2.setValue("city", item.n);
+                      setShowCityPicker(false);
+                      setCityQuery("");
+                    }}
+                    style={styles.cityRow}
+                  >
+                    <Text style={styles.cityName}>{item.n}</Text>
+                    {!!item.a && <Text style={styles.cityAlt}>{item.a}</Text>}
+                  </Pressable>
+                )}
+                style={styles.cityList}
+                keyboardShouldPersistTaps="handled"
+                ListEmptyComponent={
+                  <View style={styles.emptyState}>
+                    <Text style={styles.emptyText}>
+                      {selectedCountry ? "Aucune ville trouvée" : "Sélectionnez d'abord un pays"}
+                    </Text>
+                  </View>
+                }
+              />
+            </View>
+          </BottomSheet>
 
           {/* Boutons bas */}
           <View style={styles.footer}>
@@ -660,5 +743,76 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#92400E",
     lineHeight: 20,
+  },
+  cityPickerButton: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E7EDF3",
+    paddingHorizontal: 12,
+    height: 48,
+    marginTop: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  cityPickerText: {
+    fontSize: 16,
+    color: "#0B3C2F",
+    fontWeight: "600",
+  },
+  cityPickerPlaceholder: {
+    color: "#9CA3AF",
+    fontWeight: "400",
+  },
+  sheetContent: {
+    flex: 1,
+    paddingTop: 8,
+  },
+  sheetTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#0B3C2F",
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  searchInput: {
+    backgroundColor: "#F9FAFB",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    marginBottom: 12,
+  },
+  cityList: {
+    flex: 1,
+  },
+  cityRow: {
+    paddingVertical: 14,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F3F4F6",
+  },
+  cityName: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#0B3C2F",
+  },
+  cityAlt: {
+    fontSize: 14,
+    color: "#6B7280",
+    marginTop: 2,
+    fontWeight: "500",
+  },
+  emptyState: {
+    paddingVertical: 40,
+    alignItems: "center",
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#9CA3AF",
+    fontWeight: "600",
   },
 });
