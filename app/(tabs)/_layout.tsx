@@ -42,9 +42,9 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="properties"
+        name="publish"
         options={{
-          title: 'Biens',
+          title: 'Publier',
           tabBarIcon: ({ color, size }) => <Building2 color={color} size={size} />,
         }}
       />
@@ -56,17 +56,34 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="voyages"
-        options={{
-          title: 'Voyages',
-          tabBarIcon: ({ color, size }) => <Building2 color={color} size={size} />,
-        }}
-      />
-      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profil',
           tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="properties"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="voyages"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="professionals"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="search"
+        options={{
+          href: null,
         }}
       />
     </Tabs>
@@ -76,8 +93,7 @@ export default function TabsLayout() {
 const ICONS: Record<string, { label: string }> = {
   home: { label: 'Accueil' },
   favorites: { label: 'Favoris' },
-  properties: { label: 'Biens' },
-  voyages: { label: 'Voyages' },
+  publish: { label: 'Publier' },
   messages: { label: 'Messages' },
   profile: { label: 'Profil' },
 };
@@ -101,7 +117,7 @@ function GlassTabBar({ state, descriptors, navigation }: any) {
                 };
                 const Icon = descriptors[route.key].options.tabBarIcon;
                 const meta = ICONS[route.name] ?? { label: route.name };
-                const isCenter = route.name === 'properties';
+                const isCenter = route.name === 'publish';
 
                 return (
                   <Pressable
@@ -134,7 +150,7 @@ function GlassTabBar({ state, descriptors, navigation }: any) {
                 };
                 const Icon = descriptors[route.key].options.tabBarIcon;
                 const meta = ICONS[route.name] ?? { label: route.name };
-                const isCenter = route.name === 'properties';
+                const isCenter = route.name === 'publish';
 
                 return (
                   <Pressable
