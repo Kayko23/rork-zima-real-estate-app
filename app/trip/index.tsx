@@ -13,7 +13,6 @@ import { api } from '@/lib/api';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
-import ActiveCountryBadge from '@/components/ui/ActiveCountryBadge';
 import { useSettings } from '@/hooks/useSettings';
 
 const INITIAL: TravelFilters = {
@@ -93,9 +92,7 @@ export default function TripScreen() {
         </View>
 
         <View style={styles.controls}>
-          <View style={{ marginBottom: 10 }}>
-            <ActiveCountryBadge />
-          </View>
+
           {preset?.domain === 'travel' && (
             <View style={{ flexDirection:'row', flexWrap:'wrap', gap:8, marginBottom:12 }}>
               {preset.premium && (
