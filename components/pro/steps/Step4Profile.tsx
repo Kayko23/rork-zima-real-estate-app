@@ -53,15 +53,15 @@ export function Step4Profile() {
             <Text style={s.hint}>Minimum 30 caractères</Text>
             <TextInput
               style={[s.input, s.textArea, fieldState.error && s.inputError]}
-              value={field.value}
+              value={field.value ?? ""}
               onChangeText={field.onChange}
               placeholder="Décrivez votre expérience, vos spécialités..."
               placeholderTextColor="#9ca3af"
               multiline
               numberOfLines={5}
             />
-            {field.value && (
-              <Text style={s.charCount}>{field.value.length} / 30 min</Text>
+            {(field.value ?? "").length > 0 && (
+              <Text style={s.charCount}>{(field.value ?? "").length} / 30 min</Text>
             )}
             {fieldState.error && <Text style={s.error}>{fieldState.error.message}</Text>}
           </View>
@@ -78,7 +78,7 @@ export function Step4Profile() {
                 <Text style={s.label}>Nom commercial *</Text>
                 <TextInput
                   style={[s.input, fieldState.error && s.inputError]}
-                  value={field.value}
+                  value={field.value ?? ""}
                   onChangeText={field.onChange}
                   placeholder="Nom de votre agence"
                   placeholderTextColor="#9ca3af"
@@ -96,7 +96,7 @@ export function Step4Profile() {
                 <Text style={s.label}>RCCM (optionnel)</Text>
                 <TextInput
                   style={s.input}
-                  value={field.value}
+                  value={field.value ?? ""}
                   onChangeText={field.onChange}
                   placeholder="Numéro RCCM"
                   placeholderTextColor="#9ca3af"
@@ -113,7 +113,7 @@ export function Step4Profile() {
                 <Text style={s.label}>NIF (optionnel)</Text>
                 <TextInput
                   style={s.input}
-                  value={field.value}
+                  value={field.value ?? ""}
                   onChangeText={field.onChange}
                   placeholder="Numéro d'identification fiscale"
                   placeholderTextColor="#9ca3af"

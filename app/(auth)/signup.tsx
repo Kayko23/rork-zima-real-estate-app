@@ -268,7 +268,7 @@ export default function SignupWizard() {
                   <TextInput 
                     style={styles.input} 
                     secureTextEntry 
-                    value={value} 
+                    value={value ?? ""} 
                     onChangeText={onChange} 
                     placeholder="••••••••" 
                     testID="signup-password-input"

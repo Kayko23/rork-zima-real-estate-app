@@ -58,7 +58,7 @@ export function Step1Identity() {
             <Text style={s.hint}>Tel qu&apos;indiqué sur votre pièce d&apos;identité</Text>
             <TextInput
               style={[s.input, fieldState.error && s.inputError]}
-              value={field.value}
+              value={field.value ?? ""}
               onChangeText={field.onChange}
               placeholder="Prénom(s) et nom(s)"
               placeholderTextColor="#9ca3af"
@@ -76,7 +76,7 @@ export function Step1Identity() {
             <Text style={s.label}>Date de naissance *</Text>
             <TextInput
               style={[s.input, fieldState.error && s.inputError]}
-              value={field.value}
+              value={field.value ?? ""}
               onChangeText={field.onChange}
               placeholder="JJ/MM/AAAA"
               placeholderTextColor="#9ca3af"
@@ -128,7 +128,7 @@ export function Step1Identity() {
             <Text style={s.label}>Ville *</Text>
             <TextInput
               style={[s.input, fieldState.error && s.inputError]}
-              value={field.value}
+              value={field.value ?? ""}
               onChangeText={field.onChange}
               placeholder="Votre ville"
               placeholderTextColor="#9ca3af"
@@ -146,7 +146,7 @@ export function Step1Identity() {
             <Text style={s.label}>Adresse complète *</Text>
             <TextInput
               style={[s.input, s.textArea, fieldState.error && s.inputError]}
-              value={field.value}
+              value={field.value ?? ""}
               onChangeText={field.onChange}
               placeholder="Numéro, rue, quartier..."
               placeholderTextColor="#9ca3af"
@@ -209,7 +209,7 @@ export function Step1Identity() {
             <Text style={s.label}>Date d&apos;expiration (optionnel)</Text>
             <TextInput
               style={s.input}
-              value={field.value}
+              value={field.value ?? ""}
               onChangeText={field.onChange}
               placeholder="JJ/MM/AAAA"
               placeholderTextColor="#9ca3af"

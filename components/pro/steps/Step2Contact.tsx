@@ -16,7 +16,7 @@ export function Step2Contact() {
             <Text style={s.label}>Email *</Text>
             <TextInput
               style={[s.input, fieldState.error && s.inputError]}
-              value={field.value}
+              value={field.value ?? ""}
               onChangeText={field.onChange}
               placeholder="votre@email.com"
               placeholderTextColor="#9ca3af"
@@ -36,7 +36,7 @@ export function Step2Contact() {
             <Text style={s.label}>Téléphone WhatsApp</Text>
             <TextInput
               style={[s.input, fieldState.error && s.inputError]}
-              value={field.value}
+              value={field.value ?? ""}
               onChangeText={field.onChange}
               placeholder="+221 XX XXX XX XX"
               placeholderTextColor="#9ca3af"
@@ -56,7 +56,7 @@ export function Step2Contact() {
             <Text style={s.hint}>Au moins un numéro (WhatsApp ou mobile) est requis</Text>
             <TextInput
               style={[s.input, fieldState.error && s.inputError]}
-              value={field.value}
+              value={field.value ?? ""}
               onChangeText={field.onChange}
               placeholder="+221 XX XXX XX XX"
               placeholderTextColor="#9ca3af"
@@ -75,7 +75,7 @@ export function Step2Contact() {
             <Text style={s.label}>Site web (optionnel)</Text>
             <TextInput
               style={s.input}
-              value={field.value}
+              value={field.value ?? ""}
               onChangeText={field.onChange}
               placeholder="https://..."
               placeholderTextColor="#9ca3af"
