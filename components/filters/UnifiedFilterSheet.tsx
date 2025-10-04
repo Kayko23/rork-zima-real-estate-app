@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, Platform } from 'react-native';
-import { X } from 'lucide-react-native';
+import { X, ChevronDown } from 'lucide-react-native';
 import BottomSheet from '@/components/ui/BottomSheet';
 import { colors as themeColors } from '@/theme/tokens';
 
@@ -55,11 +55,7 @@ type Props =
   | { kind: 'trip'; open: boolean; initial: TripFilters; onClose: () => void; onReset: () => void; onApply: (values: TripFilters) => void }
   | { kind: 'vehicle'; open: boolean; initial: VehicleFilters; onClose: () => void; onReset: () => void; onApply: (values: VehicleFilters) => void };
 
-const ui = {
-  headerH: 56,
-  pillPadH: 10,
-  pillPadW: 14,
-};
+const ui = { headerH: 56, pillPadH: 10, pillPadW: 14 } as const;
 
 const gray700 = '#4B5563' as const;
 const gray900 = '#111827' as const;
@@ -76,9 +72,65 @@ const Pill = React.memo(function Pill({ children, onPress, active, testID }: { c
   );
 });
 
+function useOpenKey() {
+  const [openKey, setOpenKey] = useState<string | null>(null);
+  const toggle = useCallback((key: string) => setOpenKey((k) => (k === key ? null : key)), []);
+  const close = useCallback(() => setOpenKey(null), []);
+  const isOpen = useCallback((key: string) => openKey === key, [openKey]);
+  return { openKey, toggle, close, isOpen };
+}
+
+type SelectFieldProps<T extends string | number> = {
+  testID?: string;
+  placeholder: string;
+  value?: T;
+  onChange: (v: T) => void;
+  options: { label: string; value: T }[];
+  fieldKey: string;
+  openKey: { isOpen: (key: string) => boolean; toggle: (key: string) => void; close: () => void };
+};
+
+function SelectField<T extends string | number>({ testID, placeholder, value, onChange, options, fieldKey, openKey }: SelectFieldProps<T>) {
+  const selected = options.find((o) => o.value === value)?.label ?? placeholder;
+  const opened = openKey.isOpen(fieldKey);
+  return (
+    <View style={{ width: '100%' }}>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => openKey.toggle(fieldKey)}
+        testID={testID}
+        style={[styles.selectTrigger, opened && styles.selectTriggerOpen]}
+      >
+        <Text style={[styles.pillText, value != null && styles.pillTextActive]} numberOfLines={1}>{selected}</Text>
+        <ChevronDown size={18} color={value != null ? emerald800 : gray700} />
+      </Pressable>
+      {opened && (
+        <View style={styles.selectList} testID={`${testID}-list`}>
+          {options.map((opt) => (
+            <Pressable
+              key={String(opt.value)}
+              onPress={() => {
+                onChange(opt.value);
+                openKey.close();
+              }}
+              style={styles.selectItem}
+              accessibilityRole="button"
+            >
+              <Text style={[styles.selectItemText, value === opt.value && styles.selectItemTextActive]} numberOfLines={1}>
+                {opt.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+}
+
 export default function UnifiedFilterSheet(props: Props) {
   const { open, onClose, onReset, kind } = props as { open: boolean; onClose: () => void; onReset: () => void; kind: 'property' | 'trip' | 'vehicle' };
   const [local, setLocal] = useState<any>(props.initial);
+  const openKey = useOpenKey();
 
   useEffect(() => {
     if (open) setLocal(props.initial);
@@ -133,22 +185,42 @@ export default function UnifiedFilterSheet(props: Props) {
             </View>
 
             <Text style={styles.sectionTitle}>Catégorie</Text>
-            <View style={styles.pillWrap}>
-              {['residential', 'hotel', 'events', 'land', 'commercial', 'office'].map((c) => (
-                <Pill key={c} active={local.category === c} onPress={() => setLocal((p: any) => ({ ...p, category: c }))}>
-                  {labelCategory(c)}
-                </Pill>
-              ))}
-            </View>
+            <SelectField
+              testID="ufs-category"
+              placeholder="Sélectionner la catégorie"
+              value={local.category}
+              onChange={(v) => setLocal((p: any) => ({ ...p, category: v }))}
+              options={[
+                { label: 'Résidentiel', value: 'residential' },
+                { label: 'Hôtel', value: 'hotel' },
+                { label: "Espaces événementiels", value: 'events' },
+                { label: 'Terrains', value: 'land' },
+                { label: 'Commerces', value: 'commercial' },
+                { label: 'Bureaux', value: 'office' },
+              ]}
+              fieldKey="category"
+              openKey={openKey}
+            />
 
             <Text style={styles.sectionTitle}>Type</Text>
-            <View style={styles.pillWrap}>
-              {['villa', 'maison', 'appartement', 'studio', 'boutique', 'magasin', 'entrepot', 'bureau'].map((t) => (
-                <Pill key={t} active={local.type === t} onPress={() => setLocal((p: any) => ({ ...p, type: t }))}>
-                  {labelType(t)}
-                </Pill>
-              ))}
-            </View>
+            <SelectField
+              testID="ufs-type"
+              placeholder="Sélectionner le type"
+              value={local.type}
+              onChange={(v) => setLocal((p: any) => ({ ...p, type: v }))}
+              options={[
+                { label: 'Villa', value: 'villa' },
+                { label: 'Maison', value: 'maison' },
+                { label: 'Appartement', value: 'appartement' },
+                { label: 'Studio', value: 'studio' },
+                { label: 'Boutique', value: 'boutique' },
+                { label: 'Magasin', value: 'magasin' },
+                { label: 'Entrepôt', value: 'entrepot' },
+                { label: 'Bureau', value: 'bureau' },
+              ]}
+              fieldKey="type"
+              openKey={openKey}
+            />
 
             <Text style={styles.sectionTitle}>Caractéristiques</Text>
             <View style={styles.pillWrap}>
@@ -178,48 +250,89 @@ export default function UnifiedFilterSheet(props: Props) {
             </View>
 
             <Text style={styles.sectionTitle}>Tri</Text>
-            <View style={styles.pillWrap}>
-              {[
-                { k: 'recent', l: 'Plus récents' },
-                { k: 'priceAsc', l: 'Prix ↑' },
-                { k: 'priceDesc', l: 'Prix ↓' },
-              ].map((o) => (
-                <Pill key={o.k} active={local?.sort === o.k} onPress={() => setLocal((p: any) => ({ ...p, sort: o.k }))}>
-                  {o.l}
-                </Pill>
-              ))}
-            </View>
+            <SelectField
+              testID="ufs-sort"
+              placeholder="Choisir le tri"
+              value={local.sort}
+              onChange={(v) => setLocal((p: any) => ({ ...p, sort: v }))}
+              options={[
+                { label: 'Plus récents', value: 'recent' },
+                { label: 'Prix ↑', value: 'priceAsc' },
+                { label: 'Prix ↓', value: 'priceDesc' },
+              ]}
+              fieldKey="sort"
+              openKey={openKey}
+            />
           </View>
         )}
 
         {kind === 'vehicle' && (
           <View>
             <Text style={styles.sectionTitle}>Intention</Text>
-            <View style={styles.pillWrap}>
-              {[
-                { k: 'vip', l: 'VIP avec chauffeur' },
-                { k: 'rent', l: 'Location' },
-                { k: 'sale', l: 'Vente' },
-                { k: 'driver', l: 'Chauffeurs Pro' },
-              ].map((o) => (
-                <Pill key={o.k} active={local?.intent === o.k} onPress={() => setLocal((p: any) => ({ ...p, intent: o.k }))}>
-                  {o.l}
-                </Pill>
-              ))}
-            </View>
+            <SelectField
+              testID="ufs-intent"
+              placeholder="Choisir l'intention"
+              value={local.intent}
+              onChange={(v) => setLocal((p: any) => ({ ...p, intent: v }))}
+              options={[
+                { label: 'VIP avec chauffeur', value: 'vip' },
+                { label: 'Location', value: 'rent' },
+                { label: 'Vente', value: 'sale' },
+                { label: 'Chauffeurs Pro', value: 'driver' },
+              ]}
+              fieldKey="intent"
+              openKey={openKey}
+            />
 
             <Text style={styles.sectionTitle}>Véhicule</Text>
+            <View style={{ gap: 8 }}>
+              <SelectField
+                testID="ufs-brand"
+                placeholder="Marque"
+                value={local.brand}
+                onChange={(v) => setLocal((p: any) => ({ ...p, brand: v }))}
+                options={getBrandsOptions()}
+                fieldKey="brand"
+                openKey={openKey}
+              />
+              <SelectField
+                testID="ufs-model"
+                placeholder="Modèle"
+                value={local.model}
+                onChange={(v) => setLocal((p: any) => ({ ...p, model: v }))}
+                options={getModelsOptions(local.brand)}
+                fieldKey="model"
+                openKey={openKey}
+              />
+            </View>
+
             <View style={styles.pillWrap}>
-              <Pill active={!!local?.brand} onPress={() => console.log('open brand picker')}>{local?.brand || 'Marque'}</Pill>
-              <Pill active={!!local?.model} onPress={() => console.log('open model picker')}>{local?.model || 'Modèle'}</Pill>
               <Pill onPress={() => setLocal((p: any) => ({ ...p, seats: step(p.seats, 1, 2, 20) }))}>{`Places ${local?.seats ?? 2}+`}</Pill>
-              <Pill active={!!local?.fuel} onPress={() => toggleEnum(setLocal, 'fuel', ['essence', 'diesel', 'hybride', 'electrique'], local?.fuel)}>
-                {local?.fuel ? cap(local.fuel) : 'Carburant'}
-              </Pill>
-              <Pill active={!!local?.gearbox} onPress={() => toggleEnum(setLocal, 'gearbox', ['auto', 'manuelle'], local?.gearbox)}>
-                {local?.gearbox ? (local?.gearbox === 'auto' ? 'Auto' : 'Manuelle') : 'Boîte'}
-              </Pill>
-              <Pill active={!!local?.withDriver} onPress={() => setLocal((p: any) => ({ ...p, withDriver: !p.withDriver }))}>Avec chauffeur</Pill>
+            </View>
+
+            <Text style={styles.sectionTitle}>Motorisation</Text>
+            <SelectField
+              testID="ufs-fuel"
+              placeholder="Carburant"
+              value={local.fuel}
+              onChange={(v) => setLocal((p: any) => ({ ...p, fuel: v }))}
+              options={[
+                { label: 'Essence', value: 'essence' },
+                { label: 'Diesel', value: 'diesel' },
+                { label: 'Hybride', value: 'hybride' },
+                { label: 'Électrique', value: 'electrique' },
+              ]}
+              fieldKey="fuel"
+              openKey={openKey}
+            />
+
+            <Text style={styles.sectionTitle}>Boîte</Text>
+            <View style={styles.pillWrap}>
+              {(['auto', 'manuelle'] as const).map((g) => (
+                <Pill key={g} active={local?.gearbox === g} onPress={() => setLocal((p: any) => ({ ...p, gearbox: g }))}>
+                  {g === 'auto' ? 'Auto' : 'Manuelle'}
+                </Pill>
+              ))}
             </View>
 
             <Text style={styles.sectionTitle}>Période (location)</Text>
@@ -237,13 +350,15 @@ export default function UnifiedFilterSheet(props: Props) {
         </View>
 
         <Text style={styles.sectionTitle}>Note minimale</Text>
-        <View style={styles.pillWrap}>
-          {[0, 3, 3.5, 4, 4.5, 5].map((n) => (
-            <Pill key={String(n)} active={(local?.ratingMin ?? 0) === n} onPress={() => setLocal((p: any) => ({ ...p, ratingMin: n }))}>
-              {n === 0 ? 'Tous' : `${n}+`}
-            </Pill>
-          ))}
-        </View>
+        <SelectField
+          testID="ufs-rating"
+          placeholder="Tous"
+          value={typeof local?.ratingMin === 'number' ? (local.ratingMin as number) : 0}
+          onChange={(v) => setLocal((p: any) => ({ ...p, ratingMin: v }))}
+          options={[0, 3, 3.5, 4, 4.5, 5].map((n) => ({ label: n === 0 ? 'Tous' : `${n}+`, value: n }))}
+          fieldKey="ratingMin"
+          openKey={openKey}
+        />
 
         <View style={{ height: 24 }} />
       </ScrollView>
@@ -262,7 +377,7 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 18, fontWeight: '700', color: gray900 },
   resetRow: { paddingHorizontal: 16, paddingBottom: 8 },
   resetText: { color: emerald700, fontWeight: '600' },
-  content: { paddingHorizontal: 16, paddingBottom: 8 },
+  content: { paddingHorizontal: 16, paddingBottom: 8, rowGap: 8 },
   sectionTitle: { marginTop: 16, marginBottom: 8, fontSize: 16, fontWeight: '700', color: gray900 },
   pillWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   pill: { paddingHorizontal: ui.pillPadW, paddingVertical: ui.pillPadH, borderRadius: 999, borderWidth: 1, borderColor: gray300, backgroundColor: '#fff' },
@@ -272,6 +387,29 @@ const styles = StyleSheet.create({
   footer: { paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#fff', borderTopWidth: 1, borderColor: gray200 },
   cta: { backgroundColor: emerald800, paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
   ctaText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  selectTrigger: {
+    paddingHorizontal: ui.pillPadW,
+    paddingVertical: ui.pillPadH,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: gray300,
+    backgroundColor: '#fff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  selectTriggerOpen: { borderColor: emerald800, backgroundColor: themeColors.primarySoft },
+  selectList: {
+    marginTop: 6,
+    borderWidth: 1,
+    borderColor: gray300,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  selectItem: { paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: gray200 },
+  selectItemText: { color: gray700, fontWeight: '600' },
+  selectItemTextActive: { color: emerald800 },
 });
 
 function step(current: number | undefined, amount: number, min: number, max: number) {
@@ -279,18 +417,37 @@ function step(current: number | undefined, amount: number, min: number, max: num
   return v > max ? min : v;
 }
 function cycle(n?: number) { return typeof n === 'number' ? (n + 1 > 6 ? 0 : n + 1) : 1; }
-function cap(s: string) { return s.charAt(0).toUpperCase() + s.slice(1); }
 function fmt(n?: number) { return n != null ? `${new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(n)} XOF` : '— — —'; }
-function toggleEnum(set: React.Dispatch<any>, key: string, values: string[], cur?: string) {
-  const idx = values.indexOf(cur || '');
-  const next = values[(idx + 1) % values.length];
-  set((p: any) => ({ ...p, [key]: next }));
+function getBrandsOptions(): { label: string; value: string }[] {
+  return [
+    { label: 'Toyota', value: 'Toyota' },
+    { label: 'Hyundai', value: 'Hyundai' },
+    { label: 'Kia', value: 'Kia' },
+    { label: 'Mercedes', value: 'Mercedes' },
+    { label: 'BMW', value: 'BMW' },
+    { label: 'Audi', value: 'Audi' },
+  ];
 }
-function labelCategory(c: string) {
-  const map: Record<string, string> = { residential: 'Résidentiel', hotel: 'Hôtel', events: 'Espaces événementiels', land: 'Terrains', commercial: 'Commerces', office: 'Bureaux' };
-  return map[c] || c;
-}
-function labelType(t: string) {
-  const map: Record<string, string> = { villa: 'Villa', maison: 'Maison', appartement: 'Appartement', studio: 'Studio', boutique: 'Boutique', magasin: 'Magasin', entrepot: 'Entrepôt', bureau: 'Bureau' };
-  return map[t] || t;
+function getModelsOptions(brand?: string): { label: string; value: string }[] {
+  switch (brand) {
+    case 'Toyota':
+      return [
+        { label: 'Corolla', value: 'Corolla' },
+        { label: 'RAV4', value: 'RAV4' },
+        { label: 'Prado', value: 'Prado' },
+      ];
+    case 'Hyundai':
+      return [
+        { label: 'i10', value: 'i10' },
+        { label: 'i20', value: 'i20' },
+        { label: 'Tucson', value: 'Tucson' },
+      ];
+    case 'Kia':
+      return [
+        { label: 'Picanto', value: 'Picanto' },
+        { label: 'Sportage', value: 'Sportage' },
+      ];
+    default:
+      return [];
+  }
 }
