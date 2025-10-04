@@ -374,14 +374,22 @@ export default function SignupWizard() {
                     </Pressable>
                     {showDatePicker && (
                       <DateTimePicker
-                        value={value ? new Date(value) : new Date()}
+                        value={value ? (() => {
+                          const parts = value.split('/');
+                          if (parts.length === 3) {
+                            const [day, month, year] = parts;
+                            return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+                          }
+                          return new Date(2000, 0, 1);
+                        })() : new Date(2000, 0, 1)}
                         mode="date"
                         display={Platform.OS === "ios" ? "spinner" : "default"}
                         onChange={(event, selectedDate) => {
                           setShowDatePicker(Platform.OS === "ios");
-                          if (selectedDate) {
-                            const formatted = selectedDate.toISOString().split('T')[0];
-                            const [year, month, day] = formatted.split('-');
+                          if (event.type === 'set' && selectedDate) {
+                            const day = String(selectedDate.getDate()).padStart(2, '0');
+                            const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                            const year = selectedDate.getFullYear();
                             onChange(`${day}/${month}/${year}`);
                           }
                         }}
