@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 16,
     right: 60,
-    backgroundColor: Colors.gold,
+    backgroundColor: '#D4AF37',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 16,

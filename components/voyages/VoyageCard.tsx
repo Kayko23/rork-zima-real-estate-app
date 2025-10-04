@@ -24,7 +24,7 @@ export default function VoyageCard({ item, onPress }:{ item:TripItem; onPress?:(
   return (
     <TouchableOpacity style={c.card} activeOpacity={0.9} onPress={handlePress} testID={`voyage-card-${item.id}`}>
       <Image source={item.image} style={c.img}/>
-      {!!item.badge && <View style={[c.badge, item.badge==="Top"?{backgroundColor:"#0EA5A3"}:{backgroundColor:"#0B3B36"}]}> 
+      {!!item.badge && <View style={[c.badge, item.badge==="Premium"?{backgroundColor:"#D4AF37"}:item.badge==="Top"?{backgroundColor:"#0EA5A3"}:{backgroundColor:"#0B3B36"}]}> 
         <Text style={c.badgeTxt}>{item.badge}</Text>
       </View>}
       <TouchableOpacity style={c.like} onPress={handleToggleFavorite} activeOpacity={0.8}>

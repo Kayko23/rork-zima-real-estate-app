@@ -166,7 +166,7 @@ const s = StyleSheet.create({
     padding: 12,
   },
   premiumBadge: {
-    backgroundColor: "#0E2F26",
+    backgroundColor: "#D4AF37",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,

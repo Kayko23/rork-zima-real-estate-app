@@ -75,7 +75,7 @@ const s = StyleSheet.create({
   card:{ borderRadius:20, overflow:"hidden", backgroundColor:"#fff", marginHorizontal:16, marginBottom:18 },
   imageWrap:{ height:240, position:"relative" },
   image:{ width:"100%", height:"100%" },
-  premium:{ position:"absolute", top:14, right:14, backgroundColor:"#b45309", paddingHorizontal:10, paddingVertical:6, borderRadius:999 },
+  premium:{ position:"absolute", top:14, right:14, backgroundColor:"#D4AF37", paddingHorizontal:10, paddingVertical:6, borderRadius:999 },
   premiumTxt:{ color:"#fff", fontWeight:"700" },
   badges:{ position:"absolute", left:14, top:14 },
   tag:{ color:"#fff", backgroundColor:"#111827", paddingHorizontal:10, paddingVertical:6, borderRadius:999, fontWeight:"700" },
