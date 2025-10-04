@@ -56,6 +56,13 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="voyages"
+        options={{
+          title: 'Voyages',
+          tabBarIcon: ({ color, size }) => <Building2 color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profil',
@@ -70,6 +77,7 @@ const ICONS: Record<string, { label: string }> = {
   home: { label: 'Accueil' },
   favorites: { label: 'Favoris' },
   properties: { label: 'Biens' },
+  voyages: { label: 'Voyages' },
   messages: { label: 'Messages' },
   profile: { label: 'Profil' },
 };
@@ -168,11 +176,11 @@ const styles = StyleSheet.create({
     }),
   },
   row: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14 },
-  item: { alignItems: 'center', justifyContent: 'center', gap: 2, width: '19%' },
+  item: { alignItems: 'center', justifyContent: 'center', gap: 2, width: '15%' },
   label: { fontSize: 11, fontWeight: '700' },
   iconWrap: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   iconActive: { backgroundColor: 'rgba(14,96,73,0.10)' },
-  centerItem: { width: '24%' },
+  centerItem: { width: '20%' },
   centerIconWrap: {
     width: 54,
     height: 54,

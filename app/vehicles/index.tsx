@@ -60,14 +60,14 @@ export default function VehiclesHome() {
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <View style={[styles.stickyHeader, { paddingTop: insets.top }]}>
-        <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:16 }}>
-          <Pressable onPress={() => router.push('/(tabs)/home')} style={{ paddingVertical:6 }}>
+      <View style={[styles.stickyHeader, { paddingTop: insets.top + 8 }]}>
+        <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:16, paddingBottom:8 }}>
+          <Pressable onPress={() => router.push('/(tabs)/home')}>
             <ZimaBrand />
           </Pressable>
           <HeaderCountryButton />
         </View>
-        <View style={{ paddingHorizontal:16, paddingBottom:12, paddingTop:12 }}>
+        <View style={{ paddingHorizontal:16, paddingBottom:8 }}>
           <SegmentedTabs
             value="vehicles"
             onChange={(k)=>{
@@ -116,7 +116,7 @@ export default function VehiclesHome() {
           </View>
         )}
         keyExtractor={() => 'vehicles'}
-        contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 16) }}
+        contentContainerStyle={{ paddingBottom: Math.max(insets.bottom + 80, 96) }}
         showsVerticalScrollIndicator={false}
       />
     </View>

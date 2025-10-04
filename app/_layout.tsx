@@ -56,11 +56,12 @@ function OnboardingGate() {
       <Stack.Screen name="services" options={{ headerShown: false }} />
       <Stack.Screen name="property/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="provider/[id]" options={{ headerShown: false }} />
-      <Stack.Screen name="become-provider" options={{ headerShown: false }} />
       <Stack.Screen name="legal" options={{ headerShown: false }} />
       <Stack.Screen name="notifications" options={{ headerShown: false }} />
       <Stack.Screen name="country/select" options={{ headerShown: true, title: 'Choisir un pays' }} />
-      <Stack.Screen name="modal" options={{ presentation: "modal", headerShown: false }} />
+      <Stack.Screen name="vehicles" options={{ headerShown: false }} />
+      <Stack.Screen name="pro/onboarding" options={{ headerShown: false }} />
+      <Stack.Screen name="pro/status" options={{ headerShown: false }} />
     </Stack>
   );
 }
