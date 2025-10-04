@@ -8,6 +8,7 @@ import PropertyCard, { type Property } from "@/components/property/PropertyCard"
 import VehicleCard from "@/components/vehicles/VehicleCard";
 import { useVehicles } from "@/hooks/useVehicles";
 import ResidentialChips from "@/components/home/ResidentialChips";
+import VehiclesChips from "@/components/home/VehiclesChips";
 import CommercialChips from "@/components/home/CommercialChips";
 import { colors, radius } from "@/theme/tokens";
 import { useRouter } from "expo-router";
@@ -61,6 +62,12 @@ const categoriesData: { key: string; title: string; items: Property[] }[] = [
   { key: "bureaux", title: "Bureaux", items: [
     { id:"b1", title:"Bureau moderne", city:"Abidjan", price:150000000, currency:"XOF", beds:0, baths:0, area:120, rating:4.5,
       photos:["https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-09T10:00:00Z" },
+  ]},
+  { key: "vehicules", title: "Véhicules", items: [
+    { id:"v-promo-1", title:"Van VIP 7 places", city:"Abidjan", price:90000, currency:"XOF", beds:0, baths:0, area:0, rating:4.8,
+      photos:["https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1400"], badge:'Premium', isPremium: true, createdAt: "2025-01-10T10:00:00Z" },
+    { id:"v-promo-2", title:"Chauffeur Pro", city:"Dakar", price:60000, currency:"XOF", beds:0, baths:0, area:0, rating:4.5,
+      photos:["https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-08T10:00:00Z" },
   ]},
 ];
 
@@ -170,7 +177,11 @@ export default function Home() {
               <Text style={styles.categoryTitle}>{category.title}</Text>
               <Pressable 
                 onPress={()=>{
-                  seeAllCategory(category.key as CategorySlug);
+                  if (category.key === 'vehicules') {
+                    router.push('/vehicles' as any);
+                  } else {
+                    seeAllCategory(category.key as CategorySlug);
+                  }
                 }} 
                 style={({pressed})=>[styles.categoryLink, pressed && { opacity:.7 }]}
                 testID={`see-all-${category.key}`}
@@ -186,6 +197,11 @@ export default function Home() {
             {category.key === 'commerces' && (
               <View style={{ marginBottom: 12 }}>
                 <CommercialChips />
+              </View>
+            )}
+            {category.key === 'vehicules' && (
+              <View style={{ marginBottom: 12 }}>
+                <VehiclesChips />
               </View>
             )}
             <FlatList
