@@ -1,13 +1,13 @@
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Link, Stack } from 'expo-router';
+import { Link, Stack, useRouter } from 'expo-router';
 import { useVehicles } from '@/hooks/useVehicles';
 import VehicleCard from '@/components/vehicles/VehicleCard';
 import { useSettings } from '@/hooks/useSettings';
 import { t } from '@/lib/i18n';
-
-
-
+import SegmentedTabs from '@/components/home/SegmentedTabs';
+import ZimaBrand from '@/components/ui/ZimaBrand';
+import HeaderCountryButton from '@/components/HeaderCountryButton';
 import CompanyLogoRow from '@/components/vehicles/CompanyLogoRow';
 
 function Section({
@@ -49,7 +49,7 @@ export default function VehiclesHome() {
   const { locale } = useSettings();
   const L = t(locale ?? 'fr');
   const insets = useSafeAreaInsets();
-
+  const router = useRouter();
 
   const vip = useVehicles({ kind: 'vip' });
   const sale = useVehicles({ kind: 'sale' });
@@ -60,6 +60,23 @@ export default function VehiclesHome() {
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
 
+      <View style={[styles.stickyHeader, { paddingTop: insets.top + 8 }]}>
+        <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:16, paddingBottom:8 }}>
+          <Pressable onPress={() => router.push('/(tabs)/home')}>
+            <ZimaBrand />
+          </Pressable>
+          <HeaderCountryButton />
+        </View>
+        <View style={{ paddingHorizontal:16, paddingBottom:8 }}>
+          <SegmentedTabs
+            value="vehicles"
+            onChange={(k)=>{
+              if (k==='props') router.push('/(tabs)/properties');
+              else if (k==='trips') router.push('/(tabs)/voyages');
+            }}
+          />
+        </View>
+      </View>
 
       <FlatList
         data={[0]}
@@ -99,7 +116,7 @@ export default function VehiclesHome() {
           </View>
         )}
         keyExtractor={() => 'vehicles'}
-        contentContainerStyle={{ paddingTop: 8, paddingBottom: Math.max(insets.bottom + 80, 96) }}
+        contentContainerStyle={{ paddingBottom: Math.max(insets.bottom + 80, 96) }}
         showsVerticalScrollIndicator={false}
       />
     </View>
@@ -111,7 +128,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-
+  stickyHeader: { backgroundColor: '#fff', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', zIndex: 20, shadowColor: '#000', shadowOpacity: 0.06, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10, elevation: 6 },
   section: {
     marginVertical: 14,
   },
