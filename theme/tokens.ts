@@ -14,6 +14,9 @@ export const colors = {
   shadow: "rgba(0,0,0,0.15)",
   tabActive: "#0E6049",
   tabInactive: "#8391A1",
+  premium: "#D4AF37",
+  premiumBg: "#FEF9E7",
+  premiumSoft: "#FFF8DC",
 };
 
 export const radius = { sm: 10, md: 14, lg: 18, xl: 22 } as const;
