@@ -4,14 +4,26 @@ export type IdDocType = 'CNI' | 'PASSEPORT' | 'RESIDENCE';
 
 export type AccountType = 'INDEPENDANT' | 'AGENCE';
 
-export type ProCategory = 'AGENT' | 'AGENCE' | 'GESTIONNAIRE' | 'CONSEIL' | 'HOTELLERIE';
+export type ProCategory =
+  | 'AGENT'
+  | 'AGENCE'
+  | 'GESTIONNAIRE'
+  | 'CONSEIL'
+  | 'HOTELLERIE'
+  | 'AGENT_IMMOBILIER'
+  | 'GESTIONNAIRE_BIENS'
+  | 'AGENCE_IMMOBILIERE'
+  | 'RESP_RESERVATION_HOTEL'
+  | 'RESP_RESERVATION_RESIDENCE'
+  | 'GESTIONNAIRE_EVENEMENTIEL'
+  | 'CHAUFFEUR_PRO';
 
 export interface ProKyc {
   accountType: AccountType;
   legalName: string;
   birthDate: string;
-  nationality: string;
-  country: string;
+  nationality: string; // ISO2
+  country: string; // ISO2
   city: string;
   addressLine: string;
 
@@ -40,6 +52,11 @@ export interface ProKyc {
   consentAccepted: boolean;
   status: ProStatus;
   rejectionReason?: string;
+
+  // Extensions (non bloquantes)
+  services?: string[];
+  rating?: number;
+  verifiedAt?: string | null;
 }
 
 export interface ProKycDraft extends Partial<ProKyc> {
