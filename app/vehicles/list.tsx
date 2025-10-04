@@ -8,6 +8,7 @@ import { t } from '@/lib/i18n';
 import type { VehicleKind } from '@/types/vehicle';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
 import RequireCountry from '@/src/guards/RequireCountry';
+import ActiveCountryBadge from '@/components/ui/ActiveCountryBadge';
 
 export default function VehicleList() {
   const { locale } = useSettings();
@@ -47,34 +48,37 @@ export default function VehicleList() {
             )}
             contentContainerStyle={styles.listContent}
             ListHeaderComponent={
-              <View style={styles.pillsRow} testID="vehicles-pills-row">
-                <Link href="/vehicles/list?kind=vip" asChild>
-                  <Pressable style={styles.pill} testID="pill-vip">
-                    <Text style={styles.pillText}>VIP</Text>
-                  </Pressable>
-                </Link>
-                <Link href="/vehicles/list?kind=driver" asChild>
-                  <Pressable style={styles.pill} testID="pill-driver">
-                    <Text style={styles.pillText}>Chauffeurs</Text>
-                  </Pressable>
-                </Link>
-                <Link href="/vehicles/list?kind=rent" asChild>
-                  <Pressable style={styles.pill} testID="pill-rent">
-                    <Text style={styles.pillText}>Location</Text>
-                  </Pressable>
-                </Link>
-                <Link href="/vehicles/list?kind=sale" asChild>
-                  <Pressable style={styles.pill} testID="pill-sale">
-                    <Text style={styles.pillText}>Vente</Text>
-                  </Pressable>
-                </Link>
-                {hasFilter && (
-                  <Link href="/vehicles/list" asChild>
-                    <Pressable style={[styles.pill, styles.pillReset]} testID="pill-reset">
-                      <Text style={[styles.pillText, styles.pillResetText]}>Réinitialiser</Text>
+              <View style={{ gap: 10 }}>
+                <ActiveCountryBadge />
+                <View style={styles.pillsRow} testID="vehicles-pills-row">
+                  <Link href="/vehicles/list?kind=vip" asChild>
+                    <Pressable style={styles.pill} testID="pill-vip">
+                      <Text style={styles.pillText}>VIP</Text>
                     </Pressable>
                   </Link>
-                )}
+                  <Link href="/vehicles/list?kind=driver" asChild>
+                    <Pressable style={styles.pill} testID="pill-driver">
+                      <Text style={styles.pillText}>Chauffeurs</Text>
+                    </Pressable>
+                  </Link>
+                  <Link href="/vehicles/list?kind=rent" asChild>
+                    <Pressable style={styles.pill} testID="pill-rent">
+                      <Text style={styles.pillText}>Location</Text>
+                    </Pressable>
+                  </Link>
+                  <Link href="/vehicles/list?kind=sale" asChild>
+                    <Pressable style={styles.pill} testID="pill-sale">
+                      <Text style={styles.pillText}>Vente</Text>
+                    </Pressable>
+                  </Link>
+                  {hasFilter && (
+                    <Link href="/vehicles/list" asChild>
+                      <Pressable style={[styles.pill, styles.pillReset]} testID="pill-reset">
+                        <Text style={[styles.pillText, styles.pillResetText]}>Réinitialiser</Text>
+                      </Pressable>
+                    </Link>
+                  )}
+                </View>
               </View>
             }
             ListEmptyComponent={

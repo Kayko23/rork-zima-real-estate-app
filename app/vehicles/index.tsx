@@ -8,6 +8,7 @@ import { t } from '@/lib/i18n';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
+import ActiveCountryBadge from '@/components/ui/ActiveCountryBadge';
 
 function Section({
   title,
@@ -83,6 +84,9 @@ export default function VehiclesHome() {
         data={[0]}
         renderItem={() => (
           <View>
+            <View style={{ paddingHorizontal:16, marginTop: 8 }}>
+              <ActiveCountryBadge />
+            </View>
             <Section
               title={L.vehiclesPremium}
               data={prem.data ?? []}

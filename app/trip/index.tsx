@@ -13,6 +13,7 @@ import { api } from '@/lib/api';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
+import ActiveCountryBadge from '@/components/ui/ActiveCountryBadge';
 import { useSettings } from '@/hooks/useSettings';
 
 const INITIAL: TravelFilters = {
@@ -92,6 +93,9 @@ export default function TripScreen() {
         </View>
 
         <View style={styles.controls}>
+          <View style={{ marginBottom: 10 }}>
+            <ActiveCountryBadge />
+          </View>
           {preset?.domain === 'travel' && (
             <View style={{ flexDirection:'row', flexWrap:'wrap', gap:8, marginBottom:12 }}>
               {preset.premium && (
@@ -120,8 +124,13 @@ export default function TripScreen() {
       <FlatList
         data={data as any[]}
         keyExtractor={(i: any) => String(i.id)}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomInset }}
-        ListEmptyComponent={!isLoading ? <Text style={styles.empty}>Aucun résultat.</Text> : null}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomInset, paddingTop: 8 }}
+        ListEmptyComponent={!isLoading ? (
+          <View style={{ paddingHorizontal: 16 }}>
+            <ActiveCountryBadge />
+            <Text style={styles.empty}>Aucun résultat.</Text>
+          </View>
+        ) : null}
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.cardInner}>
