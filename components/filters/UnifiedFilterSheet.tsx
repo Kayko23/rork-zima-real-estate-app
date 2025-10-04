@@ -162,7 +162,7 @@ export default function UnifiedFilterSheet(props: Props) {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={Platform.OS !== 'web'} keyboardShouldPersistTaps="handled">
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={Platform.OS !== 'web'} keyboardShouldPersistTaps="handled">
         <Text style={styles.sectionTitle}>Destination</Text>
         <View style={styles.pillWrap}>
           <Pill active={!!local?.destination?.country} onPress={() => console.log('open country picker')} testID="ufs-country">
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 18, fontWeight: '700', color: gray900 },
   resetRow: { paddingHorizontal: 16, paddingBottom: 8 },
   resetText: { color: emerald700, fontWeight: '600' },
-  content: { paddingHorizontal: 16, paddingBottom: 120, rowGap: 8 },
+  content: { paddingHorizontal: 16, paddingBottom: 200, rowGap: 8 },
   sectionTitle: { marginTop: 16, marginBottom: 8, fontSize: 16, fontWeight: '700', color: gray900 },
   pillWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   pill: { paddingHorizontal: ui.pillPadW, paddingVertical: ui.pillPadH, borderRadius: 999, borderWidth: 1, borderColor: gray300, backgroundColor: '#fff' },
@@ -413,6 +413,7 @@ const styles = StyleSheet.create({
   selectItem: { paddingHorizontal: 14, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: gray200 },
   selectItemText: { color: gray700, fontWeight: '600' },
   selectItemTextActive: { color: emerald800 },
+  scroll: { flex: 1 },
 });
 
 function step(current: number | undefined, amount: number, min: number, max: number) {
