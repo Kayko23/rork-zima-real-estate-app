@@ -111,6 +111,7 @@ export default function ProTabsLayout() {
       <Tabs.Screen name="listings" />
       <Tabs.Screen name="messages" />
       <Tabs.Screen name="profile" />
+      <Tabs.Screen name="vehicles" options={{ href: null }} />
     </Tabs>
   );
 }
