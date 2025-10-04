@@ -1,0 +1,25 @@
+import type { Country } from '@/hooks/useSettings';
+
+export const COUNTRIES: Country[] = [
+  { code: 'BJ', name_fr: 'Bénin', name_en: 'Benin', flag: '🇧🇯', region: 'ECOWAS' },
+  { code: 'BF', name_fr: 'Burkina Faso', name_en: 'Burkina Faso', flag: '🇧🇫', region: 'ECOWAS' },
+  { code: 'CI', name_fr: "Côte d'Ivoire", name_en: "Côte d'Ivoire", flag: '🇨🇮', region: 'ECOWAS' },
+  { code: 'CV', name_fr: 'Cap-Vert', name_en: 'Cabo Verde', flag: '🇨🇻', region: 'ECOWAS' },
+  { code: 'GM', name_fr: 'Gambie', name_en: 'Gambia', flag: '🇬🇲', region: 'ECOWAS' },
+  { code: 'GH', name_fr: 'Ghana', name_en: 'Ghana', flag: '🇬🇭', region: 'ECOWAS' },
+  { code: 'GN', name_fr: 'Guinée', name_en: 'Guinea', flag: '🇬🇳', region: 'ECOWAS' },
+  { code: 'GW', name_fr: 'Guinée-Bissau', name_en: 'Guinea-Bissau', flag: '🇬🇼', region: 'ECOWAS' },
+  { code: 'LR', name_fr: 'Libéria', name_en: 'Liberia', flag: '🇱🇷', region: 'ECOWAS' },
+  { code: 'ML', name_fr: 'Mali', name_en: 'Mali', flag: '🇲🇱', region: 'ECOWAS' },
+  { code: 'NE', name_fr: 'Niger', name_en: 'Niger', flag: '🇳🇪', region: 'ECOWAS' },
+  { code: 'NG', name_fr: 'Nigéria', name_en: 'Nigeria', flag: '🇳🇬', region: 'ECOWAS' },
+  { code: 'SN', name_fr: 'Sénégal', name_en: 'Senegal', flag: '🇸🇳', region: 'ECOWAS' },
+  { code: 'SL', name_fr: 'Sierra Leone', name_en: 'Sierra Leone', flag: '🇸🇱', region: 'ECOWAS' },
+  { code: 'TG', name_fr: 'Togo', name_en: 'Togo', flag: '🇹🇬', region: 'ECOWAS' },
+  { code: 'CM', name_fr: 'Cameroun', name_en: 'Cameroon', flag: '🇨🇲', region: 'CEMAC' },
+  { code: 'CF', name_fr: 'Rép. centrafricaine', name_en: 'Central African Rep.', flag: '🇨🇫', region: 'CEMAC' },
+  { code: 'TD', name_fr: 'Tchad', name_en: 'Chad', flag: '🇹🇩', region: 'CEMAC' },
+  { code: 'CG', name_fr: 'Congo (Brazzaville)', name_en: 'Congo', flag: '🇨🇬', region: 'CEMAC' },
+  { code: 'GQ', name_fr: 'Guinée équatoriale', name_en: 'Equatorial Guinea', flag: '🇬🇶', region: 'CEMAC' },
+  { code: 'GA', name_fr: 'Gabon', name_en: 'Gabon', flag: '🇬🇦', region: 'CEMAC' },
+];

@@ -1,13 +1,13 @@
 import React from "react";
 import { View, Text, Pressable, StyleSheet, Animated } from "react-native";
-import { Home, Briefcase, BedDouble } from "lucide-react-native";
+import { Home, Car, BedDouble } from "lucide-react-native";
 import { colors, radius } from "@/theme/tokens";
 
-type TabKey = "props" | "pros" | "trips";
+type TabKey = "props" | "vehicles" | "trips";
 const tabs: { key: TabKey; label: string; Icon: any }[] = [
   { key: "props", label: "Propriétés", Icon: Home },
   { key: "trips", label: "Voyages", Icon: BedDouble },
-  { key: "pros",  label: "Professionnels", Icon: Briefcase },
+  { key: "vehicles",  label: "Véhicules", Icon: Car },
 ];
 
 export default function SegmentedTabs({ value, onChange }: { value: TabKey; onChange: (k:TabKey)=>void }) {

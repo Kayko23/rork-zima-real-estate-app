@@ -4,7 +4,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SegmentedTabs from "@/components/home/SegmentedTabs";
 import SectionHeader from "@/components/home/SectionHeader";
 import PropertyCard, { type Property } from "@/components/property/PropertyCard";
-import ProfessionalCard, { type Provider } from "@/components/professionals/ProfessionalCard";
+
+import VehicleCard from "@/components/vehicles/VehicleCard";
+import { useVehicles } from "@/hooks/useVehicles";
 import ResidentialChips from "@/components/home/ResidentialChips";
 import CommercialChips from "@/components/home/CommercialChips";
 import { colors, radius } from "@/theme/tokens";
@@ -32,16 +34,7 @@ const premiumTrips: Property[] = [
     photos:["https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=1400"], badge:'Premium' as const, isPremium: true, createdAt: "2025-01-11T10:00:00Z" },
 ];
 
-const premiumPros: Provider[] = [
-  { id:"pr1", name:"Architecte Kofi", city:"Accra", country:"Ghana", rating:4.9,
-    cover:"https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1400", 
-    badges:["premium"], category: "agent" as const, reviews: 45, listings: 12,
-    email: "kofi@example.com", phone: "+233123456789", whatsapp: "+233123456789" },
-  { id:"pr2", name:"Agent Amina", city:"Lagos", country:"Nigeria", rating:4.8,
-    cover:"https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1400", 
-    badges:["premium"], category: "property_manager" as const, reviews: 38, listings: 8,
-    email: "amina@example.com", phone: "+234123456789", whatsapp: "+234123456789" },
-];
+
 
 const categoriesData: { key: string; title: string; items: Property[] }[] = [
   { key: "residentiel", title: "Résidentiel", items: [
@@ -72,13 +65,15 @@ const categoriesData: { key: string; title: string; items: Property[] }[] = [
 ];
 
 export default function Home() {
-  const [tab,setTab] = React.useState<"props"|"pros"|"trips">("props");
+  const [tab,setTab] = React.useState<"props"|"vehicles"|"trips">("props");
   const { bottom, top } = useSafeAreaInsets();
   const router = useRouter();
   const { setPreset } = useSearchPreset();
 
-  const goPros = () => router.push("/(tabs)/professionals");
+  const goVehicles = () => router.push("/vehicles" as any);
   const goTrips = () => router.push("/(tabs)/voyages");
+  
+  const { data: premiumVehicles } = useVehicles({ premium: true });
 
   return (
     <View style={styles.container}>
@@ -91,7 +86,7 @@ export default function Home() {
           <SegmentedTabs value={tab} onChange={(k)=>{
             setTab(k);
             if (k==="props") router.push("/(tabs)/properties");
-            if (k==="pros") goPros();
+            if (k==="vehicles") goVehicles();
             if (k==="trips") goTrips();
           }}/>
         </View>
@@ -147,13 +142,12 @@ export default function Home() {
           testID="premium-trips-slider"
         />
 
-        <SectionHeader title="Professionnels premium" onSeeAll={()=>{
-          setPreset(premiumPreset('pros'));
-          router.push("/(tabs)/professionals");
+        <SectionHeader title="Véhicules premium" onSeeAll={()=>{
+          router.push("/vehicles/list?premium=1" as any);
         }} />
         <FlatList
           horizontal
-          data={premiumPros}
+          data={premiumVehicles ?? []}
           keyExtractor={(i)=>i.id}
           showsHorizontalScrollIndicator={false}
           pagingEnabled
@@ -163,16 +157,10 @@ export default function Home() {
           ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
           renderItem={({item}) => (
             <View style={{ width: Math.round(W*0.86) }}>
-              <ProfessionalCard 
-                item={item}
-                onPressProfile={(id) => {
-                  console.log('[Home] Navigating to professional profile:', id);
-                  router.push(`/professional/${id}`);
-                }}
-              />
+              <VehicleCard vehicle={item} />
             </View>
           )}
-          testID="premium-pros-slider"
+          testID="premium-vehicles-slider"
         />
 
         <SectionHeader title="Par catégories" />
@@ -229,12 +217,12 @@ export default function Home() {
           </Pressable>
 
           <Pressable
-            onPress={goPros}
+            onPress={goVehicles}
             android_ripple={{ color: colors.primarySoft }}
             style={({pressed})=>[styles.cta, styles.ctaOutline, pressed && { opacity:.85 }]}
-            testID="cta-find-pro"
+            testID="cta-find-vehicle"
           >
-            <Text style={[styles.ctaTxt, { color: colors.primary }]}>Trouver un pro</Text>
+            <Text style={[styles.ctaTxt, { color: colors.primary }]}>Voir véhicules</Text>
           </Pressable>
         </View>
       </ScrollView>

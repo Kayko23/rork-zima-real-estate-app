@@ -1,65 +1,58 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import createContextHook from '@nkzw/create-context-hook';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/api';
-import { ALLOWED_COUNTRY_CODES, DEFAULT_COUNTRY, CfaCountryCode } from '@/constants/cfa';
+import type { Locale } from '@/lib/i18n';
 
-export type Settings = {
-  language: string;
-  currency: string;
-  allowedCountries: readonly CfaCountryCode[];
-  defaultCountry: CfaCountryCode;
-  setLanguage: (lang: string) => void;
-  setCurrency: (cur: string) => void;
-  isLoading: boolean;
-  error?: string;
+export type Country = {
+  code: string;
+  name_fr: string;
+  name_en: string;
+  flag: string;
+  region: 'ECOWAS' | 'CEMAC';
 };
 
-export const [SettingsProvider, useSettings] = createContextHook<Settings>(() => {
-  const qc = useQueryClient();
-  const [language, setLanguageState] = useState<string>('fr');
-  const [currency, setCurrencyState] = useState<string>('XOF');
+type SettingsContextValue = {
+  locale: Locale | null;
+  country: Country | null;
+  setLocale: (v: Locale) => Promise<void>;
+  setCountry: (c: Country) => Promise<void>;
+  ready: boolean;
+};
 
-  const settingsQuery = useQuery({
-    queryKey: ['settings'],
-    queryFn: () => api.getSettings(),
-  });
+export const [SettingsProvider, useSettings] = createContextHook<SettingsContextValue>(() => {
+  const [locale, setLocaleState] = useState<Locale | null>(null);
+  const [country, setCountryState] = useState<Country | null>(null);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (settingsQuery.data) {
-      console.log('[Settings] Loaded', settingsQuery.data);
-      setLanguageState(settingsQuery.data.language ?? 'fr');
-      setCurrencyState(settingsQuery.data.currency ?? 'XOF');
-    }
-  }, [settingsQuery.data]);
+    (async () => {
+      try {
+        const [L, C] = await Promise.all([
+          AsyncStorage.getItem('zima.locale'),
+          AsyncStorage.getItem('zima.country'),
+        ]);
+        if (L) setLocaleState(L as Locale);
+        if (C) setCountryState(JSON.parse(C));
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      } finally {
+        setReady(true);
+      }
+    })();
+  }, []);
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: (patch: Partial<{ language: string; currency: string }>) => api.setSettings(patch),
-    onSuccess: (data) => {
-      setLanguageState(data.language);
-      setCurrencyState(data.currency);
-      qc.invalidateQueries({ queryKey: ['settings'] });
-    },
-    onError: (e: unknown) => {
-      console.log('[Settings] Save error', e);
-    },
-  });
+  const setLocale = useCallback(async (v: Locale) => {
+    setLocaleState(v);
+    await AsyncStorage.setItem('zima.locale', v);
+  }, []);
 
-  const setLanguage = useCallback((lang: string) => {
-    mutate({ language: lang });
-  }, [mutate]);
-  const setCurrency = useCallback((cur: string) => {
-    mutate({ currency: cur });
-  }, [mutate]);
+  const setCountry = useCallback(async (c: Country) => {
+    setCountryState(c);
+    await AsyncStorage.setItem('zima.country', JSON.stringify(c));
+  }, []);
 
-  return useMemo<Settings>(() => ({
-    language,
-    currency,
-    allowedCountries: ALLOWED_COUNTRY_CODES,
-    defaultCountry: DEFAULT_COUNTRY,
-    setLanguage,
-    setCurrency,
-    isLoading: settingsQuery.isLoading || isPending,
-    error: settingsQuery.error ? String(settingsQuery.error) : undefined,
-  }), [language, currency, setLanguage, setCurrency, settingsQuery.isLoading, settingsQuery.error, isPending]);
+  return useMemo(
+    () => ({ locale, country, setLocale, setCountry, ready }),
+    [locale, country, setLocale, setCountry, ready]
+  );
 });
