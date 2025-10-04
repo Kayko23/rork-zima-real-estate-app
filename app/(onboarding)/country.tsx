@@ -6,8 +6,11 @@ import { t } from '@/lib/i18n';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 
+import { useApp } from '@/hooks/useAppStore';
+
 export default function CountryScreen() {
   const { locale, setCountry } = useSettings();
+  const { completeOnboarding } = useApp();
   const L = t(locale ?? 'fr');
   const [q, setQ] = useState('');
   const [sel, setSel] = useState<string | null>(null);
@@ -54,9 +57,11 @@ export default function CountryScreen() {
         <Pressable
           disabled={!sel}
           onPress={async () => {
-            const country = COUNTRIES.find((c) => c.code === sel)!;
+            const country = COUNTRIES.find((c) => c.code === sel);
+            if (!country) return;
             await setCountry(country);
-            router.replace('/' as any);
+            await completeOnboarding();
+            router.replace('/(tabs)/home');
           }}
           style={[styles.nextButton, !sel && styles.nextButtonDisabled]}
         >
