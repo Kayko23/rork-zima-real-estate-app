@@ -9,6 +9,7 @@ import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
 import ActiveCountryBadge from '@/components/ui/ActiveCountryBadge';
+import CompanyLogoRow from '@/components/vehicles/CompanyLogoRow';
 
 function Section({
   title,
@@ -26,7 +27,7 @@ function Section({
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>{title}</Text>
         <Link href={link as any} asChild>
-          <Text style={styles.viewAllLink}>Voir tout ›</Text>
+          <Text style={styles.viewAllLink} testID="seeAllLink">Voir tout ›</Text>
         </Link>
       </View>
       {loading ? (
@@ -51,10 +52,9 @@ export default function VehiclesHome() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
-  const prem = useVehicles({ premium: true });
-  const loc = useVehicles({ kind: 'rent' });
-  const sale = useVehicles({ kind: 'sale' });
   const vip = useVehicles({ kind: 'vip' });
+  const sale = useVehicles({ kind: 'sale' });
+  const loc = useVehicles({ kind: 'rent' });
   const drv = useVehicles({ kind: 'driver' });
 
   return (
@@ -87,17 +87,19 @@ export default function VehiclesHome() {
             <View style={{ paddingHorizontal:16, marginTop: 8 }}>
               <ActiveCountryBadge />
             </View>
+
+            <View style={{ marginTop: 16 }}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Sociétés</Text>
+              </View>
+              <CompanyLogoRow />
+            </View>
+
             <Section
-              title={L.vehiclesPremium}
-              data={prem.data ?? []}
-              link="/vehicles/list?premium=1"
-              loading={prem.isLoading}
-            />
-            <Section
-              title={L.vehiclesRent}
-              data={loc.data ?? []}
-              link="/vehicles/list?kind=rent"
-              loading={loc.isLoading}
+              title={L.vehiclesVip}
+              data={vip.data ?? []}
+              link="/vehicles/list?kind=vip"
+              loading={vip.isLoading}
             />
             <Section
               title={L.vehiclesSale}
@@ -106,10 +108,10 @@ export default function VehiclesHome() {
               loading={sale.isLoading}
             />
             <Section
-              title={L.vehiclesVip}
-              data={vip.data ?? []}
-              link="/vehicles/list?kind=vip"
-              loading={vip.isLoading}
+              title={L.vehiclesRent}
+              data={loc.data ?? []}
+              link="/vehicles/list?kind=rent"
+              loading={loc.isLoading}
             />
             <Section
               title={L.vehiclesDriver}

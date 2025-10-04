@@ -3,6 +3,12 @@ import { Link } from 'expo-router';
 import type { Vehicle } from '@/types/vehicle';
 import { Star } from 'lucide-react-native';
 
+const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=1200&auto=format&fit=crop';
+function getSafeImage(uri?: string) {
+  const safe = (uri ?? '').trim();
+  return safe ? { uri: safe } : { uri: PLACEHOLDER_IMAGE };
+}
+
 export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
   const kindLabel = {
     vip: 'VIP',
@@ -13,8 +19,8 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
 
   return (
     <Link href={`/vehicles/${vehicle.id}` as any} asChild>
-      <Pressable style={styles.card}>
-        <Image source={{ uri: vehicle.image }} style={styles.image} />
+      <Pressable style={styles.card} testID={`vehicle-card-${vehicle.id}`}>
+        <Image source={getSafeImage(vehicle.image)} style={styles.image} />
         {vehicle.premium && (
           <View style={styles.premiumBadge}>
             <Text style={styles.premiumText}>Premium</Text>
