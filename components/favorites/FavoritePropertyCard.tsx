@@ -39,7 +39,7 @@ export function FavoritePropertyCard({ item, layout, onPress }: Props) {
       activeOpacity={0.95}
     >
       <View style={styles.imageContainer}>
-        <Image source={{ uri: item.images[0] }} style={styles.cover} />
+        <Image source={{ uri: item.images?.[0] && item.images[0].trim() !== '' ? item.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800' }} style={styles.cover} />
         
         {/* Status Badge */}
         <View style={styles.statusBadge}>

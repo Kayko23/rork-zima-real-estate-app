@@ -22,7 +22,7 @@ export default function ProviderCard({
   return (
     <View style={styles.container} testID="provider-card">
       <View style={styles.header}>
-        <Image source={{ uri: provider.avatar }} style={styles.avatar} />
+        <Image source={{ uri: provider.avatar && provider.avatar.trim() !== '' ? provider.avatar : 'https://i.pravatar.cc/100' }} style={styles.avatar} />
         
         <View style={styles.headerInfo}>
           <View style={styles.nameRow}>
@@ -69,7 +69,7 @@ export default function ProviderCard({
       {provider.images.length > 0 && (
         <View style={styles.mediaContainer}>
           {provider.images.slice(0, 3).map((image, index) => (
-            <Image key={`image-${image}-${index}`} source={{ uri: image }} style={styles.mediaImage} />
+            <Image key={`image-${image}-${index}`} source={{ uri: image && image.trim() !== '' ? image : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800' }} style={styles.mediaImage} />
           ))}
           {provider.images.length > 3 && (
             <View style={styles.moreMedia}>

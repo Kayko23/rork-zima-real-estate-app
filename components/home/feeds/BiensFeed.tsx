@@ -281,7 +281,7 @@ export default function BiensFeed() {
           testID={`home-category-image-${category.id}`}
         >
           <Image 
-            source={{ uri: category.image }}
+            source={{ uri: category.image && category.image.trim() !== '' ? category.image : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800' }}
             style={styles.categoryImage}
             resizeMode="cover"
             accessibilityLabel={category.name}

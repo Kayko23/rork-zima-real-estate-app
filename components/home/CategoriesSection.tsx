@@ -39,20 +39,25 @@ function CategoriesSection({
           showsHorizontalScrollIndicator={false}
           data={data}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Pressable
-              onPress={() => router.push(item.href as any)}
-              style={s.card}
-              android_ripple={{ color: "#dde7e2" }}
-              accessibilityRole="button"
-              testID={`category-card-${item.id}`}
-            >
-              <Image source={{ uri: item.image }} style={s.image} />
-              <View style={s.badgeWrap}>
-                <Text style={s.badgeText}>{item.title}</Text>
-              </View>
-            </Pressable>
-          )}
+          renderItem={({ item }) => {
+            const imageUri = item.image && item.image.trim() !== '' 
+              ? item.image 
+              : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800';
+            return (
+              <Pressable
+                onPress={() => router.push(item.href as any)}
+                style={s.card}
+                android_ripple={{ color: "#dde7e2" }}
+                accessibilityRole="button"
+                testID={`category-card-${item.id}`}
+              >
+                <Image source={{ uri: imageUri }} style={s.image} />
+                <View style={s.badgeWrap}>
+                  <Text style={s.badgeText}>{item.title}</Text>
+                </View>
+              </Pressable>
+            );
+          }}
           ListEmptyComponent={!loading ? (
             <View style={{ paddingHorizontal: 12 }}>
               <Text style={{ color: "#6B7280" }}>Aucune catégorie</Text>

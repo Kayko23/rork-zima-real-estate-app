@@ -38,7 +38,7 @@ export default function PropertyCard({ property, onPress, onToggleFavorite, widt
       activeOpacity={0.95}
     >
       <View style={styles.imageContainer}>
-        <Image source={{ uri: property.images[0] }} style={styles.image} />
+        <Image source={{ uri: property.images?.[0] && property.images[0].trim() !== '' ? property.images[0] : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800' }} style={styles.image} />
         
         {/* Status Badge */}
         <View style={styles.statusBadge}>

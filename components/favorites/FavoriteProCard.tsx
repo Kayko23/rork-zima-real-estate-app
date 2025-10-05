@@ -22,7 +22,7 @@ export function FavoriteProCard({ pro, onViewProfile, onCall, onWhatsApp, onEmai
   return (
     <View style={styles.card} testID={`fav-pro-${pro.id}`}>
       <View style={styles.topRow}>
-        <Image source={{ uri: pro.avatar }} style={styles.avatar} />
+        <Image source={{ uri: pro.avatar && pro.avatar.trim() !== '' ? pro.avatar : 'https://i.pravatar.cc/100' }} style={styles.avatar} />
         <View style={{ flex: 1 }}>
           <Text numberOfLines={1} style={styles.name}>{pro.name}</Text>
           <View style={styles.metaRow}>

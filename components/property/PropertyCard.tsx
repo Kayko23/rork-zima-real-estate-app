@@ -25,9 +25,13 @@ export default function PropertyCard({ item }: { item: Property }) {
   const router = useRouter();
   const go = () => router.push({ pathname: "/property/[id]", params: { id: item.id }} as any);
 
+  const imageUri = item.photos?.[0] && item.photos[0].trim() !== '' 
+    ? item.photos[0] 
+    : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800';
+
   return (
     <Pressable onPress={go} style={({pressed})=>[styles.card, pressed && { transform:[{scale:.995}] }]} testID={`property-card-${item.id}`}>
-      <Image source={{ uri: item.photos[0] }} style={styles.img} />
+      <Image source={{ uri: imageUri }} style={styles.img} />
       <View style={styles.overlay} />
       <View style={styles.badges}>
         {item.badge && (
