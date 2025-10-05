@@ -8,7 +8,6 @@ import { CATEGORIES, CategorySlug } from '@/types/taxonomy';
 import { openCategory } from '@/lib/navigation';
 
 import { sortPremiumFirst } from '@/utils/sortProperties';
-import { api } from '@/lib/api';
 import UnifiedFilterSheet, { type PropertyFilters } from '@/components/filters/UnifiedFilterSheet';
 import { useSettings } from '@/hooks/useSettings';
 import { useMoney } from '@/lib/money';
@@ -79,7 +78,7 @@ export default function PropertyScreen(){
       item.surface ? `${item.surface} m²` : ''
     ].filter(Boolean),
     rating: item.rating,
-    isPremium: item.premium ?? false
+    isPremium: item.isPremium ?? item.premium ?? false
   });
 
   return (
@@ -167,10 +166,16 @@ export default function PropertyScreen(){
             { label: 'Logements étudiants', value: 'student' },
             { label: 'Immeubles & copro', value: 'condo' },
           ]}
-          queryKey={['properties-residential', activeCountry?.name_fr]}
+          queryKey={['properties-residential', activeCountry?.code]}
           queryFn={async () => {
-            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'residential', limit: 10 } as any);
-            return sortPremiumFirst(items).map(transformProperty);
+            await new Promise((r) => setTimeout(r, 150));
+            const properties = [
+              { id: 'p1', title: 'Villa moderne 4 chambres', city: 'Abidjan', countryCode: 'CI', price: 85000000, currency: 'XOF', isPremium: true, transaction: 'sale', category: 'residential', bedrooms: 4, bathrooms: 3, surface: 250, image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900&h=600&fit=crop', rating: 4.8 },
+              { id: 'p2', title: 'Appartement 3 pièces', city: 'Dakar', countryCode: 'SN', price: 450000, currency: 'XOF', isPremium: false, transaction: 'rent', category: 'residential', bedrooms: 3, bathrooms: 2, surface: 120, image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=900&h=600&fit=crop', rating: 4.5 },
+              { id: 'p3', title: 'Maison familiale', city: 'Douala', countryCode: 'CM', price: 65000000, currency: 'XAF', isPremium: true, transaction: 'sale', category: 'residential', bedrooms: 5, bathrooms: 4, surface: 300, image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&h=600&fit=crop', rating: 4.9 },
+            ];
+            const filtered = properties.filter(p => !activeCountry?.code || p.countryCode === activeCountry.code);
+            return sortPremiumFirst(filtered).slice(0, 10).map(transformProperty);
           }}
           renderItem={(item) => <PropertyCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/property/index', params: { category: 'residential' } } as any)}
@@ -184,10 +189,16 @@ export default function PropertyScreen(){
             { label: 'Restaurants', value: 'restaurants' },
             { label: 'Magasins & entrepôts', value: 'warehouses' },
           ]}
-          queryKey={['properties-commercial', activeCountry?.name_fr]}
+          queryKey={['properties-commercial', activeCountry?.code]}
           queryFn={async () => {
-            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'commercial', limit: 10 } as any);
-            return sortPremiumFirst(items).map(transformProperty);
+            await new Promise((r) => setTimeout(r, 150));
+            const properties = [
+              { id: 'c1', title: 'Boutique centre-ville', city: 'Abidjan', countryCode: 'CI', price: 1200000, currency: 'XOF', isPremium: true, transaction: 'rent', category: 'commercial', surface: 80, image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=900&h=600&fit=crop', rating: 4.6 },
+              { id: 'c2', title: 'Restaurant équipé', city: 'Lomé', countryCode: 'TG', price: 45000000, currency: 'XOF', isPremium: false, transaction: 'sale', category: 'commercial', surface: 150, image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=900&h=600&fit=crop', rating: 4.3 },
+              { id: 'c3', title: 'Entrepôt logistique', city: 'Cotonou', countryCode: 'BJ', price: 2500000, currency: 'XOF', isPremium: true, transaction: 'rent', category: 'commercial', surface: 500, image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=900&h=600&fit=crop', rating: 4.7 },
+            ];
+            const filtered = properties.filter(p => !activeCountry?.code || p.countryCode === activeCountry.code);
+            return sortPremiumFirst(filtered).slice(0, 10).map(transformProperty);
           }}
           renderItem={(item) => <PropertyCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/property/index', params: { category: 'commercial' } } as any)}
@@ -196,10 +207,16 @@ export default function PropertyScreen(){
 
         <CategoryRail
           title="Bureaux"
-          queryKey={['properties-office', activeCountry?.name_fr]}
+          queryKey={['properties-office', activeCountry?.code]}
           queryFn={async () => {
-            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'office', limit: 10 } as any);
-            return sortPremiumFirst(items).map(transformProperty);
+            await new Promise((r) => setTimeout(r, 150));
+            const properties = [
+              { id: 'o1', title: 'Bureau moderne 200m²', city: 'Abidjan', countryCode: 'CI', price: 1800000, currency: 'XOF', isPremium: true, transaction: 'rent', category: 'office', surface: 200, image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=900&h=600&fit=crop', rating: 4.8 },
+              { id: 'o2', title: 'Espace coworking', city: 'Dakar', countryCode: 'SN', price: 850000, currency: 'XOF', isPremium: false, transaction: 'rent', category: 'office', surface: 120, image: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=900&h=600&fit=crop', rating: 4.5 },
+              { id: 'o3', title: 'Immeuble de bureaux', city: 'Libreville', countryCode: 'GA', price: 350000000, currency: 'XAF', isPremium: true, transaction: 'sale', category: 'office', surface: 1200, image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=900&h=600&fit=crop', rating: 4.9 },
+            ];
+            const filtered = properties.filter(p => !activeCountry?.code || p.countryCode === activeCountry.code);
+            return sortPremiumFirst(filtered).slice(0, 10).map(transformProperty);
           }}
           renderItem={(item) => <PropertyCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/property/index', params: { category: 'office' } } as any)}
@@ -207,10 +224,16 @@ export default function PropertyScreen(){
 
         <CategoryRail
           title="Terrains"
-          queryKey={['properties-land', activeCountry?.name_fr]}
+          queryKey={['properties-land', activeCountry?.code]}
           queryFn={async () => {
-            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'land', limit: 10 } as any);
-            return sortPremiumFirst(items).map(transformProperty);
+            await new Promise((r) => setTimeout(r, 150));
+            const properties = [
+              { id: 'l1', title: 'Terrain 1000m² viabilisé', city: 'Abidjan', countryCode: 'CI', price: 45000000, currency: 'XOF', isPremium: true, transaction: 'sale', category: 'land', surface: 1000, image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=900&h=600&fit=crop', rating: 4.6 },
+              { id: 'l2', title: 'Parcelle agricole 5ha', city: 'Bamako', countryCode: 'ML', price: 120000000, currency: 'XOF', isPremium: false, transaction: 'sale', category: 'land', surface: 50000, image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=900&h=600&fit=crop', rating: 4.2 },
+              { id: 'l3', title: 'Terrain bord de mer', city: 'Lomé', countryCode: 'TG', price: 95000000, currency: 'XOF', isPremium: true, transaction: 'sale', category: 'land', surface: 2500, image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=900&h=600&fit=crop', rating: 4.9 },
+            ];
+            const filtered = properties.filter(p => !activeCountry?.code || p.countryCode === activeCountry.code);
+            return sortPremiumFirst(filtered).slice(0, 10).map(transformProperty);
           }}
           renderItem={(item) => <PropertyCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/property/index', params: { category: 'land' } } as any)}
@@ -218,10 +241,16 @@ export default function PropertyScreen(){
 
         <CategoryRail
           title="Espaces événementiels"
-          queryKey={['properties-venue', activeCountry?.name_fr]}
+          queryKey={['properties-venue', activeCountry?.code]}
           queryFn={async () => {
-            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'venue', limit: 10 } as any);
-            return sortPremiumFirst(items).map(transformProperty);
+            await new Promise((r) => setTimeout(r, 150));
+            const properties = [
+              { id: 'v1', title: 'Salle de réception 300 pers', city: 'Abidjan', countryCode: 'CI', price: 2500000, currency: 'XOF', isPremium: true, transaction: 'rent', category: 'venue', surface: 400, image: 'https://images.unsplash.com/photo-1519167758481-83f29da8c2b0?w=900&h=600&fit=crop', rating: 4.8 },
+              { id: 'v2', title: 'Espace événementiel jardin', city: 'Dakar', countryCode: 'SN', price: 1800000, currency: 'XOF', isPremium: false, transaction: 'rent', category: 'venue', surface: 600, image: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?w=900&h=600&fit=crop', rating: 4.6 },
+              { id: 'v3', title: 'Villa événementielle', city: 'Douala', countryCode: 'CM', price: 3500000, currency: 'XAF', isPremium: true, transaction: 'rent', category: 'venue', surface: 500, image: 'https://images.unsplash.com/photo-1478146896981-b80fe463b330?w=900&h=600&fit=crop', rating: 4.9 },
+            ];
+            const filtered = properties.filter(p => !activeCountry?.code || p.countryCode === activeCountry.code);
+            return sortPremiumFirst(filtered).slice(0, 10).map(transformProperty);
           }}
           renderItem={(item) => <PropertyCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/property/index', params: { category: 'venue' } } as any)}
@@ -229,10 +258,16 @@ export default function PropertyScreen(){
 
         <CategoryRail
           title="Hôtels"
-          queryKey={['properties-hotel', activeCountry?.name_fr]}
+          queryKey={['properties-hotel', activeCountry?.code]}
           queryFn={async () => {
-            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'hotel', limit: 10 } as any);
-            return sortPremiumFirst(items).map(transformProperty);
+            await new Promise((r) => setTimeout(r, 150));
+            const properties = [
+              { id: 'h1', title: 'Hôtel 4 étoiles 50 chambres', city: 'Abidjan', countryCode: 'CI', price: 850000000, currency: 'XOF', isPremium: true, transaction: 'sale', category: 'hotel', surface: 2500, image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&h=600&fit=crop', rating: 4.7 },
+              { id: 'h2', title: 'Auberge 15 chambres', city: 'Lomé', countryCode: 'TG', price: 180000000, currency: 'XOF', isPremium: false, transaction: 'sale', category: 'hotel', surface: 800, image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=900&h=600&fit=crop', rating: 4.3 },
+              { id: 'h3', title: 'Resort bord de mer', city: 'Saly', countryCode: 'SN', price: 1200000000, currency: 'XOF', isPremium: true, transaction: 'sale', category: 'hotel', surface: 5000, image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=900&h=600&fit=crop', rating: 4.9 },
+            ];
+            const filtered = properties.filter(p => !activeCountry?.code || p.countryCode === activeCountry.code);
+            return sortPremiumFirst(filtered).slice(0, 10).map(transformProperty);
           }}
           renderItem={(item) => <PropertyCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/property/index', params: { category: 'hotel' } } as any)}
