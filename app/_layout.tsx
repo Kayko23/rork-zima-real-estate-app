@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack, useRouter, useSegments } from "expo-router";
+import { trpc, trpcClient } from "@/lib/trpc";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useCallback, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
@@ -85,8 +86,9 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <QueryClientProvider client={queryClient}>
-        <SettingsProvider>
+      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+        <QueryClientProvider client={queryClient}>
+          <SettingsProvider>
           <SessionProvider>
             <AppProvider>
               <SearchPresetProvider>
@@ -102,8 +104,9 @@ export default function RootLayout() {
               </SearchPresetProvider>
             </AppProvider>
           </SessionProvider>
-        </SettingsProvider>
-      </QueryClientProvider>
+          </SettingsProvider>
+        </QueryClientProvider>
+      </trpc.Provider>
     </SafeAreaProvider>
   );
 }
