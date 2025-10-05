@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, Text, SectionList, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Link, Stack, useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useVehicles } from '@/hooks/useVehicles';
 import VehicleCard from '@/components/vehicles/VehicleCard';
 import { useSettings } from '@/hooks/useSettings';
-import { t } from '@/lib/i18n';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
@@ -13,44 +12,8 @@ import CompanyLogoRow from '@/components/vehicles/CompanyLogoRow';
 import UnifiedFilterSheet, { VehicleFilters } from '@/components/filters/UnifiedFilterSheet';
 import { buildVehicleQuery } from '@/utils/filters';
 
-function Section({
-  title,
-  data,
-  link,
-  loading,
-}: {
-  title: string;
-  data: any[];
-  link: string;
-  loading?: boolean;
-}) {
-  return (
-    <View style={styles.section}>
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>{title}</Text>
-        <Link href={link as any} asChild>
-          <Text style={styles.viewAllLink} testID="seeAllLink">Voir tout ›</Text>
-        </Link>
-      </View>
-      {loading ? (
-        <ActivityIndicator size="large" color="#0e5a43" style={styles.loader} />
-      ) : (
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={data}
-          keyExtractor={(it: any) => it.id}
-          renderItem={({ item }) => <VehicleCard vehicle={item} />}
-          contentContainerStyle={styles.listContent}
-        />
-      )}
-    </View>
-  );
-}
-
 export default function VehiclesTab() {
-  const { locale, country } = useSettings();
-  const L = t(locale ?? 'fr');
+  const { country } = useSettings();
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
@@ -77,12 +40,14 @@ export default function VehiclesTab() {
   const loc = useVehicles({ kind: 'rent' });
   const drv = useVehicles({ kind: 'driver' });
 
-  const allVehicles = [
-    ...(vip.data ?? []),
-    ...(sale.data ?? []),
-    ...(loc.data ?? []),
-    ...(drv.data ?? [])
-  ];
+  const sections = useMemo(() => {
+    const result = [];
+    if (vip.data && vip.data.length > 0) result.push({ title: 'VIP avec chauffeur', data: vip.data });
+    if (loc.data && loc.data.length > 0) result.push({ title: 'Location', data: loc.data });
+    if (sale.data && sale.data.length > 0) result.push({ title: 'Vente', data: sale.data });
+    if (drv.data && drv.data.length > 0) result.push({ title: 'Chauffeurs Pro', data: drv.data });
+    return result;
+  }, [vip.data, sale.data, loc.data, drv.data]);
 
   const isLoadingAny = vip.isLoading || sale.isLoading || loc.isLoading || drv.isLoading;
 
@@ -115,12 +80,10 @@ export default function VehiclesTab() {
         </View>
       </View>
 
-      <FlatList
-        data={allVehicles}
+      <SectionList
+        sections={sections}
         keyExtractor={(item) => item.id}
-        numColumns={2}
-        columnWrapperStyle={{ gap: 12 }}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: Math.max(insets.bottom + 80, 96), gap: 12 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: Math.max(insets.bottom + 80, 96) }}
         ListHeaderComponent={
           <View style={{ marginBottom: 16 }}>
             <View style={styles.sectionHeader}>
@@ -136,11 +99,20 @@ export default function VehiclesTab() {
             <Text style={{ color: '#64748B', textAlign: 'center', marginTop: 32 }}>Aucun véhicule disponible.</Text>
           )
         }
-        renderItem={({ item }) => (
-          <View style={{ flex: 1 }}>
-            <VehicleCard vehicle={item} />
+        renderSectionHeader={({ section: { title } }) => (
+          <View style={{ paddingVertical: 16, backgroundColor: '#fff' }}>
+            <Text style={{ fontSize: 20, fontWeight: '800', color: '#0B6B53' }}>{title}</Text>
           </View>
         )}
+        renderItem={({ item, index, section }) => {
+          const isLeft = index % 2 === 0;
+          const isLast = index === section.data.length - 1;
+          return (
+            <View style={{ width: '48%', marginLeft: isLeft ? 0 : '4%', marginBottom: isLast && !isLeft ? 0 : 12 }}>
+              <VehicleCard vehicle={item} />
+            </View>
+          );
+        }}
         showsVerticalScrollIndicator={false}
       />
 

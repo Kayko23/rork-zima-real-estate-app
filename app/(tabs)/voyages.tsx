@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, Text, SectionList, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams, Stack } from 'expo-router';
 import { useContentInsets } from '@/hooks/useContentInsets';
@@ -66,6 +66,18 @@ export default function VoyagesTab() {
     }),
   });
 
+  const sections = useMemo(() => {
+    const grouped: Record<string, any[]> = {};
+    
+    data.forEach((item: any) => {
+      const cat = item.type === 'hotel' ? 'Hôtels' : item.type === 'resort' ? 'Resorts' : item.type === 'lodge' ? 'Lodges' : 'Autres';
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(item);
+    });
+
+    return Object.entries(grouped).map(([title, data]) => ({ title, data }));
+  }, [data]);
+
   const resultCount = data.length;
 
   return (
@@ -115,12 +127,10 @@ export default function VoyagesTab() {
         </View>
       </View>
 
-      <FlatList
-        data={data as any[]}
+      <SectionList
+        sections={sections}
         keyExtractor={(i: any) => String(i.id)}
-        numColumns={2}
-        columnWrapperStyle={{ gap: 12 }}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomInset + 120, paddingTop: 8, gap: 12 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomInset + 120, paddingTop: 8 }}
         ListEmptyComponent={
           isLoading ? (
             <ActivityIndicator size="large" color="#0B6B53" style={{ marginTop: 32 }} />
@@ -130,23 +140,32 @@ export default function VoyagesTab() {
             </View>
           )
         }
-        renderItem={({ item }) => (
-          <View style={{ flex: 1 }}>
-            <VoyageCard item={{
-              id: item.id,
-              title: item.title ?? 'Séjour',
-              city: item.city ?? 'Ville',
-              country: item.country ?? 'Pays',
-              price: item.price ?? 0,
-              currency: item.currency ?? 'XOF',
-              rating: item.rating ?? 4.5,
-              reviews: item.reviews ?? 0,
-              image: { uri: item.photos?.[0] ?? item.image ?? 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800' },
-              badge: item.premium ? 'Premium' : undefined,
-              type: item.type ?? 'hotel'
-            }} />
+        renderSectionHeader={({ section: { title } }) => (
+          <View style={{ paddingVertical: 16, backgroundColor: '#fff' }}>
+            <Text style={{ fontSize: 20, fontWeight: '800', color: '#0B6B53' }}>{title}</Text>
           </View>
         )}
+        renderItem={({ item, index, section }) => {
+          const isLeft = index % 2 === 0;
+          const isLast = index === section.data.length - 1;
+          return (
+            <View style={{ width: '48%', marginLeft: isLeft ? 0 : '4%', marginBottom: isLast && !isLeft ? 0 : 12 }}>
+              <VoyageCard item={{
+                id: item.id,
+                title: item.title ?? 'Séjour',
+                city: item.city ?? 'Ville',
+                country: item.country ?? 'Pays',
+                price: item.price ?? 0,
+                currency: item.currency ?? 'XOF',
+                rating: item.rating ?? 4.5,
+                reviews: item.reviews ?? 0,
+                image: { uri: item.photos?.[0] ?? item.image ?? 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800' },
+                badge: item.premium ? 'Premium' : undefined,
+                type: item.type ?? 'hotel'
+              }} />
+            </View>
+          );
+        }}
         scrollIndicatorInsets={{ bottom: bottomInset }}
       />
 

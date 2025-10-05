@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useMemo } from 'react';
+import { View, Text, SectionList, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSearchPreset } from '@/hooks/useSearchPreset';
@@ -72,6 +72,18 @@ export default function PropertyScreen(){
     queryFn: () => api.listProperties(buildPropertyQuery(filters) as any),
     select: (items) => sortPremiumFirst(items as any[])
   });
+
+  const sections = useMemo(() => {
+    const grouped: Record<string, any[]> = {};
+    
+    data.forEach((item: any) => {
+      const cat = item.category || 'Autres';
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(item);
+    });
+
+    return Object.entries(grouped).map(([title, data]) => ({ title, data }));
+  }, [data]);
 
   const resultCount = data.length;
 
@@ -147,29 +159,36 @@ export default function PropertyScreen(){
         </View>
       </View>
 
-      <FlatList
-        data={data}
+      <SectionList
+        sections={sections}
         keyExtractor={(i:any)=>String(i.id)}
-        contentContainerStyle={{ paddingTop: insets.top + 200, paddingHorizontal:16, paddingBottom: insets.bottom + tabBarH + 16, gap: 16 }}
+        contentContainerStyle={{ paddingTop: insets.top + 200, paddingHorizontal:16, paddingBottom: insets.bottom + tabBarH + 16 }}
         ListEmptyComponent={!isLoading ? <Text style={{ color:'#64748B', textAlign:'center', marginTop:32 }}>Aucun résultat.</Text> : null}
+        renderSectionHeader={({ section: { title } }) => (
+          <View style={{ paddingVertical: 16, backgroundColor: '#fff' }}>
+            <Text style={{ fontSize: 20, fontWeight: '800', color: '#0B6B53' }}>{title}</Text>
+          </View>
+        )}
         renderItem={({item})=>(
-          <PropertyCard item={{
-            id: item.id,
-            title: item.title ?? 'Annonce',
-            city: item.city ?? 'Ville',
-            country: item.country ?? 'Pays',
-            price: item.price ?? 0,
-            currency: item.currency ?? 'XOF',
-            beds: item.bedrooms,
-            baths: item.bathrooms,
-            area: item.surface,
-            livingRooms: item.livingrooms,
-            rating: item.rating ?? 4.5,
-            photos: item.photos ?? [item.image ?? 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800'],
-            badge: item.transaction === 'sale' ? 'À VENDRE' : item.transaction === 'rent' ? 'À LOUER' : undefined,
-            isPremium: item.premium ?? false,
-            category: item.category
-          }} />
+          <View style={{ marginBottom: 16 }}>
+            <PropertyCard item={{
+              id: item.id,
+              title: item.title ?? 'Annonce',
+              city: item.city ?? 'Ville',
+              country: item.country ?? 'Pays',
+              price: item.price ?? 0,
+              currency: item.currency ?? 'XOF',
+              beds: item.bedrooms,
+              baths: item.bathrooms,
+              area: item.surface,
+              livingRooms: item.livingrooms,
+              rating: item.rating ?? 4.5,
+              photos: item.photos ?? [item.image ?? 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800'],
+              badge: item.transaction === 'sale' ? 'À VENDRE' : item.transaction === 'rent' ? 'À LOUER' : undefined,
+              isPremium: item.premium ?? false,
+              category: item.category
+            }} />
+          </View>
         )}
         scrollIndicatorInsets={{ bottom: insets.bottom + tabBarH }}
       />
