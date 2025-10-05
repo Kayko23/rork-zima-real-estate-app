@@ -14,7 +14,6 @@ import { useMoney } from '@/lib/money';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
-import ActiveCountryBadge from '@/components/ui/ActiveCountryBadge';
 import PropertyStripSection from '@/components/home/PropertyStripSection';
 import { PropertyItem } from '@/components/cards/PropertyCard';
 import { Pill } from '@/components/home/SubcatPills';
@@ -227,9 +226,6 @@ export default function PropertyScreen(){
         </View>
 
         <View style={{ paddingHorizontal:16, paddingBottom:16 }}>
-          <View style={{ marginBottom: 10 }}>
-            <ActiveCountryBadge />
-          </View>
           {preset?.domain === 'properties' && (
             <View style={{ flexDirection:'row', flexWrap:'wrap', gap:8, marginBottom:12 }}>
               {preset.premium && (
