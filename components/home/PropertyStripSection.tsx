@@ -30,14 +30,14 @@ export default function PropertyStripSection({
 
   return (
     <View style={styles.section}>
-      <SubcatPills data={pills} activeKey={activeKey} onChange={handleChange} />
-
       <View style={styles.headerRow}>
         <Text style={styles.sectionTitle}>{title}</Text>
         <TouchableOpacity onPress={() => onSeeAll(activeKey)}>
           <Text style={styles.seeAll}>Voir tout</Text>
         </TouchableOpacity>
       </View>
+
+      <SubcatPills data={pills} activeKey={activeKey} onChange={handleChange} />
 
       <FlatList
         horizontal
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   section: { marginTop: 6 },
   headerRow: {
     paddingHorizontal: 16,
-    marginBottom: 8,
+    marginBottom: 4,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
