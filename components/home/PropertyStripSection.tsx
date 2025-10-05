@@ -64,15 +64,15 @@ export default function PropertyStripSection({
 }
 
 const styles = StyleSheet.create({
-  section: { marginTop: 6 },
+  section: { marginTop: 32, marginBottom: 16 },
   headerRow: {
     paddingHorizontal: 16,
-    marginBottom: 4,
+    marginBottom: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  sectionTitle: { fontSize: 16, fontWeight: '700' as const, color: colors.text },
+  sectionTitle: { fontSize: 22, fontWeight: '800' as const, color: colors.text },
   seeAll: { fontSize: 14, textDecorationLine: 'underline', color: colors.primary, fontWeight: '700' as const },
   emptyContainer: { paddingHorizontal: 16, paddingVertical: 40 },
   empty: { paddingHorizontal: 16, color: colors.sub, paddingVertical: 12 },
