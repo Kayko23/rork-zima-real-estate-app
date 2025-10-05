@@ -9,7 +9,8 @@ import HeaderCountryButton from '@/components/HeaderCountryButton';
 import CompanyLogoRow from '@/components/vehicles/CompanyLogoRow';
 import UnifiedFilterSheet, { VehicleFilters } from '@/components/filters/UnifiedFilterSheet';
 import CategoryRail from '@/components/home/CategoryRail';
-import VehicleCard, { VehicleItem } from '@/components/cards/VehicleCard';
+import VehicleCard from '@/components/cards/VehicleCard';
+import type { VehicleItem } from '@/components/cards/VehicleCard';
 import { useMoney } from '@/lib/money';
 
 

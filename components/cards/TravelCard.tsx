@@ -1,14 +1,14 @@
 import React from 'react';
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import { TouchableOpacity, Image, View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { colors } from '@/theme/tokens';
+import { colors, radius } from '@/theme/tokens';
 
 export type TravelItem = {
-  id: string | number;
+  id: string;
   title: string;
   city: string;
   priceLabel: string;
-  cover: string;
+  cover?: string;
   badges?: string[];
   rating?: number;
   isPremium?: boolean;
@@ -16,61 +16,68 @@ export type TravelItem = {
 
 export default function TravelCard({ item }: { item: TravelItem }) {
   const router = useRouter();
-  const imageSource = item.cover && item.cover.trim() !== '' 
-    ? { uri: item.cover } 
-    : { uri: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800' };
-  
+  const validUri = item.cover && item.cover.trim().length > 0 ? item.cover : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
+
   return (
-    <Pressable
+    <TouchableOpacity
+      onPress={() => router.push({ pathname: '/trip/[id]', params: { id: item.id } } as any)}
       style={styles.card}
-      onPress={() => router.push(`/trip/${item.id}` as any)}
     >
-      <Image source={imageSource} style={styles.img} />
+      <Image source={{ uri: validUri }} style={styles.img} resizeMode="cover" />
       <View style={styles.overlay} />
-      <View style={styles.badgesRow}>
+
+      <View style={styles.badges}>
         {item.isPremium && (
           <View style={[styles.badge, styles.premiumBadge]}>
-            <Text style={styles.premiumBadgeTxt}>Premium</Text>
+            <Text style={styles.badgeText}>Premium</Text>
           </View>
         )}
         {item.badges?.map((b) => (
           <View key={b} style={styles.badge}>
-            <Text style={styles.badgeTxt}>{b}</Text>
+            <Text style={styles.badgeText}>{b}</Text>
           </View>
         ))}
       </View>
-      <View style={styles.meta}>
-        <Text numberOfLines={1} style={styles.title}>
+
+      <View style={styles.bottom}>
+        <Text numberOfLines={2} style={styles.title}>
           {item.title}
         </Text>
         <Text style={styles.city}>{item.city}</Text>
         <View style={styles.pricePill}>
-          <Text style={styles.priceTxt}>{item.priceLabel}</Text>
+          <Text style={styles.price}>{item.priceLabel}</Text>
         </View>
-        {item.rating ? (
+        {item.rating != null && (
           <Text style={styles.rating}>★ {item.rating}</Text>
-        ) : null}
+        )}
       </View>
-    </Pressable>
+    </TouchableOpacity>
   );
 }
 
+const CARD_H = 220;
 const styles = StyleSheet.create({
-  card: { borderRadius: 18, overflow: 'hidden', height: 220, backgroundColor: '#111' },
+  card: {
+    borderRadius: radius.lg,
+    overflow: 'hidden',
+    height: CARD_H,
+    backgroundColor: '#111',
+  },
   img: { width: '100%', height: '100%' },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.cardOverlay,
+    backgroundColor: 'rgba(0,0,0,0.28)',
   },
-  badgesRow: {
+  badges: {
     position: 'absolute',
     top: 10,
     left: 10,
     flexDirection: 'row',
     gap: 8,
+    zIndex: 2,
   },
   badge: {
-    backgroundColor: colors.chip,
+    backgroundColor: '#111827AA',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -78,17 +85,10 @@ const styles = StyleSheet.create({
   premiumBadge: {
     backgroundColor: colors.premium,
   },
-  badgeTxt: { color: '#fff', fontWeight: '800', fontSize: 11 },
-  premiumBadgeTxt: { color: '#000', fontWeight: '800', fontSize: 11 },
-  meta: {
-    position: 'absolute',
-    left: 12,
-    right: 12,
-    bottom: 12,
-    gap: 6,
-  },
-  title: { color: '#fff', fontWeight: '900', fontSize: 16 },
-  city: { color: '#E2E8F0', fontWeight: '700', fontSize: 13 },
+  badgeText: { color: '#fff', fontSize: 12, fontWeight: '800' as const },
+  bottom: { position: 'absolute', left: 12, right: 12, bottom: 12, gap: 6 },
+  title: { color: '#fff', fontSize: 16, fontWeight: '900' as const },
+  city: { color: '#E2E8F0', fontWeight: '700' as const },
   pricePill: {
     alignSelf: 'flex-start',
     backgroundColor: '#fff',
@@ -96,6 +96,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 22,
   },
-  priceTxt: { fontWeight: '900', fontSize: 14 },
-  rating: { color: '#FDE68A', fontWeight: '800', fontSize: 13 },
+  price: { fontWeight: '900' as const },
+  rating: { color: '#FDE68A', fontWeight: '800' as const, fontSize: 12, marginTop: 4 },
 });

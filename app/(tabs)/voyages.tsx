@@ -15,7 +15,8 @@ import HeaderCountryButton from '@/components/HeaderCountryButton';
 import { useSettings } from '@/hooks/useSettings';
 import { useMoney } from '@/lib/money';
 import CategoryRail from '@/components/home/CategoryRail';
-import TravelCard, { TravelItem } from '@/components/cards/TravelCard';
+import TravelCard from '@/components/cards/TravelCard';
+import type { TravelItem } from '@/components/cards/TravelCard';
 
 const INITIAL: TripFilters = {
   destination: { country: undefined, city: undefined },

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, ScrollView, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -7,8 +7,7 @@ import { X } from 'lucide-react-native';
 import { CATEGORIES, CategorySlug } from '@/types/taxonomy';
 import { openCategory } from '@/lib/navigation';
 
-import { sortPremiumFirst } from '@/utils/sortProperties';
-import { api } from '@/lib/api';
+
 import UnifiedFilterSheet, { type PropertyFilters } from '@/components/filters/UnifiedFilterSheet';
 import { useSettings } from '@/hooks/useSettings';
 import { useMoney } from '@/lib/money';
@@ -16,8 +15,9 @@ import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
 import ActiveCountryBadge from '@/components/ui/ActiveCountryBadge';
-import CategoryRail from '@/components/home/CategoryRail';
-import PropertyCard, { PropertyItem } from '@/components/cards/PropertyCard';
+import PropertyStripSection from '@/components/home/PropertyStripSection';
+import { PropertyItem } from '@/components/cards/PropertyCard';
+import { Pill } from '@/components/home/SubcatPills';
 
 const INITIAL: PropertyFilters = {
   destination: { country: undefined, city: undefined },
@@ -66,21 +66,63 @@ export default function PropertyScreen(){
     }
   }, [allowAllCountries, activeCountry?.name_fr]);
 
-  const transformProperty = (item: any): PropertyItem => ({
-    id: item.id,
-    title: item.title ?? 'Annonce',
-    city: item.city ?? 'Ville',
-    priceLabel: format(item.price ?? 0, item.currency ?? 'XOF'),
-    cover: item.photos?.[0] ?? item.image ?? 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800',
-    badges: item.transaction === 'sale' ? ['À VENDRE'] : item.transaction === 'rent' ? ['À LOUER'] : [],
-    facts: [
-      item.bedrooms ? `${item.bedrooms} ch` : '',
-      item.bathrooms ? `${item.bathrooms} sdb` : '',
-      item.surface ? `${item.surface} m²` : ''
-    ].filter(Boolean),
-    rating: item.rating,
-    isPremium: item.premium ?? false
-  });
+  const RES_PILLS: Pill[] = useMemo(() => [
+    { key: 'maisons', label: 'Maisons individuelles' },
+    { key: 'cites', label: 'Cités résidentielles' },
+    { key: 'colocation', label: 'Colocation' },
+    { key: 'etudiants', label: 'Logements étudiants' },
+    { key: 'immeubles', label: 'Immeubles & copro' },
+  ], []);
+
+  const COM_PILLS: Pill[] = useMemo(() => [
+    { key: 'boutiques', label: 'Boutiques' },
+    { key: 'galeries', label: 'Galeries' },
+    { key: 'hangars', label: 'Hangars' },
+    { key: 'depots', label: 'Dépôts' },
+    { key: 'restos', label: 'Restaurants' },
+  ], []);
+
+  const residentialItems = useMemo<PropertyItem[]>(() => {
+    const mockData: PropertyItem[] = [];
+    RES_PILLS.forEach((pill) => {
+      for (let i = 0; i < 5; i++) {
+        mockData.push({
+          id: `res-${pill.key}-${i}`,
+          title: `${pill.label} ${i + 1}`,
+          city: activeCountry?.name_fr ?? 'Ville',
+          priceLabel: format(Math.floor(Math.random() * 500000) + 100000, 'XOF'),
+          cover: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800',
+          badges: Math.random() > 0.5 ? ['À VENDRE'] : ['À LOUER'],
+          facts: ['3 ch', '2 sdb', '120 m²'],
+          rating: 4.5,
+          isPremium: Math.random() > 0.7,
+          subcategory: pill.key,
+        } as any);
+      }
+    });
+    return mockData;
+  }, [activeCountry?.name_fr, RES_PILLS, format]);
+
+  const commerceItems = useMemo<PropertyItem[]>(() => {
+    const mockData: PropertyItem[] = [];
+    COM_PILLS.forEach((pill) => {
+      for (let i = 0; i < 5; i++) {
+        mockData.push({
+          id: `com-${pill.key}-${i}`,
+          title: `${pill.label} ${i + 1}`,
+          city: activeCountry?.name_fr ?? 'Ville',
+          priceLabel: format(Math.floor(Math.random() * 800000) + 200000, 'XOF'),
+          cover: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800',
+          badges: Math.random() > 0.5 ? ['À VENDRE'] : ['À LOUER'],
+          facts: ['200 m²'],
+          rating: 4.3,
+          isPremium: Math.random() > 0.7,
+          subcategory: pill.key,
+        } as any);
+      }
+    });
+    return mockData;
+  }, [activeCountry?.name_fr, COM_PILLS, format]);
 
   return (
     <View style={{ flex:1, backgroundColor:'#fff' }}>
@@ -158,84 +200,26 @@ export default function PropertyScreen(){
         contentContainerStyle={{ paddingTop: insets.top + 200, paddingBottom: insets.bottom + tabBarH + 16 }}
         scrollIndicatorInsets={{ bottom: insets.bottom + tabBarH }}
       >
-        <CategoryRail
+        <PropertyStripSection
           title="Résidentiel"
-          subcategories={[
-            { label: 'Maisons individuelles', value: 'single_family' },
-            { label: 'Cités résidentielles', value: 'gated' },
-            { label: 'Colocation', value: 'colocation' },
-            { label: 'Logements étudiants', value: 'student' },
-            { label: 'Immeubles & copro', value: 'condo' },
-          ]}
-          queryKey={['properties-residential', activeCountry?.name_fr]}
-          queryFn={async () => {
-            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'residential', limit: 10 } as any);
-            return sortPremiumFirst(items).map(transformProperty);
-          }}
-          renderItem={(item) => <PropertyCard item={item} />}
-          onSeeAll={() => router.push({ pathname: '/property/index', params: { category: 'residential' } } as any)}
-          onPickSubcategory={(chip) => router.push({ pathname: '/property/index', params: { category: 'residential', sub: chip.value } } as any)}
+          pills={RES_PILLS}
+          items={residentialItems}
+          initialSubcatKey="maisons"
+          onSeeAll={(activeSubcatKey) =>
+            router.push({ pathname: '/property/index', params: { category: 'residential', sub: activeSubcatKey } } as any)
+          }
+          onOpenItem={(item) => router.push({ pathname: '/property/[id]', params: { id: item.id } } as any)}
         />
 
-        <CategoryRail
+        <PropertyStripSection
           title="Commerces"
-          subcategories={[
-            { label: 'Boutiques', value: 'boutiques' },
-            { label: 'Restaurants', value: 'restaurants' },
-            { label: 'Magasins & entrepôts', value: 'warehouses' },
-          ]}
-          queryKey={['properties-commercial', activeCountry?.name_fr]}
-          queryFn={async () => {
-            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'commercial', limit: 10 } as any);
-            return sortPremiumFirst(items).map(transformProperty);
-          }}
-          renderItem={(item) => <PropertyCard item={item} />}
-          onSeeAll={() => router.push({ pathname: '/property/index', params: { category: 'commercial' } } as any)}
-          onPickSubcategory={(chip) => router.push({ pathname: '/property/index', params: { category: 'commercial', sub: chip.value } } as any)}
-        />
-
-        <CategoryRail
-          title="Bureaux"
-          queryKey={['properties-office', activeCountry?.name_fr]}
-          queryFn={async () => {
-            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'office', limit: 10 } as any);
-            return sortPremiumFirst(items).map(transformProperty);
-          }}
-          renderItem={(item) => <PropertyCard item={item} />}
-          onSeeAll={() => router.push({ pathname: '/property/index', params: { category: 'office' } } as any)}
-        />
-
-        <CategoryRail
-          title="Terrains"
-          queryKey={['properties-land', activeCountry?.name_fr]}
-          queryFn={async () => {
-            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'land', limit: 10 } as any);
-            return sortPremiumFirst(items).map(transformProperty);
-          }}
-          renderItem={(item) => <PropertyCard item={item} />}
-          onSeeAll={() => router.push({ pathname: '/property/index', params: { category: 'land' } } as any)}
-        />
-
-        <CategoryRail
-          title="Espaces événementiels"
-          queryKey={['properties-venue', activeCountry?.name_fr]}
-          queryFn={async () => {
-            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'venue', limit: 10 } as any);
-            return sortPremiumFirst(items).map(transformProperty);
-          }}
-          renderItem={(item) => <PropertyCard item={item} />}
-          onSeeAll={() => router.push({ pathname: '/property/index', params: { category: 'venue' } } as any)}
-        />
-
-        <CategoryRail
-          title="Hôtels"
-          queryKey={['properties-hotel', activeCountry?.name_fr]}
-          queryFn={async () => {
-            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'hotel', limit: 10 } as any);
-            return sortPremiumFirst(items).map(transformProperty);
-          }}
-          renderItem={(item) => <PropertyCard item={item} />}
-          onSeeAll={() => router.push({ pathname: '/property/index', params: { category: 'hotel' } } as any)}
+          pills={COM_PILLS}
+          items={commerceItems}
+          initialSubcatKey="boutiques"
+          onSeeAll={(activeSubcatKey) =>
+            router.push({ pathname: '/property/index', params: { category: 'commercial', sub: activeSubcatKey } } as any)
+          }
+          onOpenItem={(item) => router.push({ pathname: '/property/[id]', params: { id: item.id } } as any)}
         />
       </ScrollView>
 
