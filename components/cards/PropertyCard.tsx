@@ -17,12 +17,16 @@ export type PropertyItem = {
 
 export default function PropertyCard({ item }: { item: PropertyItem }) {
   const router = useRouter();
+  const imageSource = item.cover && item.cover.trim() !== '' 
+    ? { uri: item.cover } 
+    : { uri: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800' };
+  
   return (
     <Pressable
       style={styles.card}
       onPress={() => router.push(`/property/${item.id}` as any)}
     >
-      <Image source={{ uri: item.cover }} style={styles.img} />
+      <Image source={imageSource} style={styles.img} />
       <View style={styles.overlay} />
       <View style={styles.badgesRow}>
         {item.isPremium && (

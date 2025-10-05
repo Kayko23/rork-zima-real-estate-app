@@ -16,12 +16,16 @@ export type TravelItem = {
 
 export default function TravelCard({ item }: { item: TravelItem }) {
   const router = useRouter();
+  const imageSource = item.cover && item.cover.trim() !== '' 
+    ? { uri: item.cover } 
+    : { uri: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800' };
+  
   return (
     <Pressable
       style={styles.card}
       onPress={() => router.push(`/trip/${item.id}` as any)}
     >
-      <Image source={{ uri: item.cover }} style={styles.img} />
+      <Image source={imageSource} style={styles.img} />
       <View style={styles.overlay} />
       <View style={styles.badgesRow}>
         {item.isPremium && (
