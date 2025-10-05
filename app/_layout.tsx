@@ -60,6 +60,9 @@ function OnboardingGate() {
       <Stack.Screen name="notifications" options={{ headerShown: false }} />
       <Stack.Screen name="country/select" options={{ headerShown: true, title: 'Choisir un pays' }} />
       <Stack.Screen name="vehicles" options={{ headerShown: false }} />
+      <Stack.Screen name="property/detail/[id]" options={{ headerShown: true, title: 'Détail du bien' }} />
+      <Stack.Screen name="travel/detail/[id]" options={{ headerShown: true, title: 'Détail du séjour' }} />
+      <Stack.Screen name="vehicle/detail/[id]" options={{ headerShown: true, title: 'Détail du véhicule' }} />
       <Stack.Screen name="pro/onboarding" options={{ headerShown: false }} />
       <Stack.Screen name="pro/status" options={{ headerShown: false }} />
     </Stack>
