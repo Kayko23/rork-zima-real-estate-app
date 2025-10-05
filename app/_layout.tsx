@@ -42,7 +42,7 @@ function OnboardingGate() {
       return;
     }
 
-    if (inOnboarding || inCountry) {
+    if (inOnboarding) {
       router.replace('/');
     }
   }, [ready, locale, country, segments, router]);
