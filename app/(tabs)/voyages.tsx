@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, SectionList, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams, Stack } from 'expo-router';
 import { useContentInsets } from '@/hooks/useContentInsets';
@@ -7,15 +7,15 @@ import { useSearchPreset } from '@/hooks/useSearchPreset';
 import { X } from 'lucide-react-native';
 import { CATEGORIES, CategorySlug } from '@/types/taxonomy';
 import { openCategory } from '@/lib/navigation';
-import { useQuery } from '@tanstack/react-query';
 import UnifiedFilterSheet, { TripFilters } from '@/components/filters/UnifiedFilterSheet';
-import { buildTripQuery } from '@/utils/filters';
 import { api } from '@/lib/api';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
-import VoyageCard from '@/components/voyages/VoyageCard';
 import { useSettings } from '@/hooks/useSettings';
+import { useMoney } from '@/lib/money';
+import CategoryRail from '@/components/home/CategoryRail';
+import TravelCard, { TravelItem } from '@/components/cards/TravelCard';
 
 const INITIAL: TripFilters = {
   destination: { country: undefined, city: undefined },
@@ -58,27 +58,18 @@ export default function VoyagesTab() {
     }
   }, [allowAllCountries, activeCountry?.name_fr]);
 
-  const { data = [], isLoading } = useQuery({
-    queryKey: ['trips', filters],
-    queryFn: () => api.listProperties({
-      category: 'travel',
-      ...buildTripQuery(filters),
-    }),
+  const { format } = useMoney();
+
+  const transformTrip = (item: any): TravelItem => ({
+    id: item.id,
+    title: item.title ?? 'Séjour',
+    city: item.city ?? 'Ville',
+    priceLabel: format(item.price ?? 0, item.currency ?? 'XOF'),
+    cover: item.photos?.[0] ?? item.image ?? 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
+    badges: [],
+    rating: item.rating,
+    isPremium: item.premium ?? false
   });
-
-  const sections = useMemo(() => {
-    const grouped: Record<string, any[]> = {};
-    
-    data.forEach((item: any) => {
-      const cat = item.type === 'hotel' ? 'Hôtels' : item.type === 'resort' ? 'Resorts' : item.type === 'lodge' ? 'Lodges' : 'Autres';
-      if (!grouped[cat]) grouped[cat] = [];
-      grouped[cat].push(item);
-    });
-
-    return Object.entries(grouped).map(([title, data]) => ({ title, data }));
-  }, [data]);
-
-  const resultCount = data.length;
 
   return (
     <View style={styles.container}>
@@ -127,47 +118,76 @@ export default function VoyagesTab() {
         </View>
       </View>
 
-      <SectionList
-        sections={sections}
-        keyExtractor={(i: any) => String(i.id)}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomInset + 120, paddingTop: 8 }}
-        ListEmptyComponent={
-          isLoading ? (
-            <ActivityIndicator size="large" color="#0B6B53" style={{ marginTop: 32 }} />
-          ) : (
-            <View style={{ paddingHorizontal: 16 }}>
-              <Text style={styles.empty}>Aucun résultat.</Text>
-            </View>
-          )
-        }
-        renderSectionHeader={({ section: { title } }) => (
-          <View style={{ paddingVertical: 16, backgroundColor: '#fff' }}>
-            <Text style={{ fontSize: 20, fontWeight: '800', color: '#0B6B53' }}>{title}</Text>
-          </View>
-        )}
-        renderItem={({ item, index, section }) => {
-          const isLeft = index % 2 === 0;
-          const isLast = index === section.data.length - 1;
-          return (
-            <View style={{ width: '48%', marginLeft: isLeft ? 0 : '4%', marginBottom: isLast && !isLeft ? 0 : 12 }}>
-              <VoyageCard item={{
-                id: item.id,
-                title: item.title ?? 'Séjour',
-                city: item.city ?? 'Ville',
-                country: item.country ?? 'Pays',
-                price: item.price ?? 0,
-                currency: item.currency ?? 'XOF',
-                rating: item.rating ?? 4.5,
-                reviews: item.reviews ?? 0,
-                image: { uri: item.photos?.[0] ?? item.image ?? 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800' },
-                badge: item.premium ? 'Premium' : undefined,
-                type: item.type ?? 'hotel'
-              }} />
-            </View>
-          );
-        }}
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: bottomInset + 120, paddingTop: 8 }}
         scrollIndicatorInsets={{ bottom: bottomInset }}
-      />
+      >
+        <CategoryRail
+          title="Hôtels"
+          queryKey={['trips-hotels', activeCountry?.name_fr]}
+          queryFn={async () => {
+            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'travel', type: 'hotel', limit: 10 } as any);
+            return items.map(transformTrip);
+          }}
+          renderItem={(item) => <TravelCard item={item} />}
+          onSeeAll={() => router.push({ pathname: '/voyages/all', params: { type: 'hotel' } } as any)}
+        />
+
+        <CategoryRail
+          title="Résidences journalières"
+          queryKey={['trips-residences', activeCountry?.name_fr]}
+          queryFn={async () => {
+            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'travel', type: 'residence', limit: 10 } as any);
+            return items.map(transformTrip);
+          }}
+          renderItem={(item) => <TravelCard item={item} />}
+          onSeeAll={() => router.push({ pathname: '/voyages/all', params: { type: 'residence' } } as any)}
+        />
+
+        <CategoryRail
+          title="Villas de vacances"
+          queryKey={['trips-villas', activeCountry?.name_fr]}
+          queryFn={async () => {
+            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'travel', type: 'villa', limit: 10 } as any);
+            return items.map(transformTrip);
+          }}
+          renderItem={(item) => <TravelCard item={item} />}
+          onSeeAll={() => router.push({ pathname: '/voyages/all', params: { type: 'villa' } } as any)}
+        />
+
+        <CategoryRail
+          title="Resorts"
+          queryKey={['trips-resorts', activeCountry?.name_fr]}
+          queryFn={async () => {
+            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'travel', type: 'resort', limit: 10 } as any);
+            return items.map(transformTrip);
+          }}
+          renderItem={(item) => <TravelCard item={item} />}
+          onSeeAll={() => router.push({ pathname: '/voyages/all', params: { type: 'resort' } } as any)}
+        />
+
+        <CategoryRail
+          title="Lodges"
+          queryKey={['trips-lodges', activeCountry?.name_fr]}
+          queryFn={async () => {
+            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'travel', type: 'lodge', limit: 10 } as any);
+            return items.map(transformTrip);
+          }}
+          renderItem={(item) => <TravelCard item={item} />}
+          onSeeAll={() => router.push({ pathname: '/voyages/all', params: { type: 'lodge' } } as any)}
+        />
+
+        <CategoryRail
+          title="Auberges"
+          queryKey={['trips-hostels', activeCountry?.name_fr]}
+          queryFn={async () => {
+            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'travel', type: 'hostel', limit: 10 } as any);
+            return items.map(transformTrip);
+          }}
+          renderItem={(item) => <TravelCard item={item} />}
+          onSeeAll={() => router.push({ pathname: '/voyages/all', params: { type: 'hostel' } } as any)}
+        />
+      </ScrollView>
 
       <UnifiedFilterSheet
         kind="trip"

@@ -1,16 +1,17 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, SectionList, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
-import { useVehicles } from '@/hooks/useVehicles';
-import VehicleCard from '@/components/vehicles/VehicleCard';
 import { useSettings } from '@/hooks/useSettings';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
 import CompanyLogoRow from '@/components/vehicles/CompanyLogoRow';
 import UnifiedFilterSheet, { VehicleFilters } from '@/components/filters/UnifiedFilterSheet';
-import { buildVehicleQuery } from '@/utils/filters';
+import CategoryRail from '@/components/home/CategoryRail';
+import VehicleCard, { VehicleItem } from '@/components/cards/VehicleCard';
+import { useMoney } from '@/lib/money';
+import { useVehicles } from '@/hooks/useVehicles';
 
 export default function VehiclesTab() {
   const { country } = useSettings();
@@ -35,21 +36,23 @@ export default function VehiclesTab() {
     amenities: [],
   });
 
-  const vip = useVehicles({ kind: 'vip' });
-  const sale = useVehicles({ kind: 'sale' });
-  const loc = useVehicles({ kind: 'rent' });
-  const drv = useVehicles({ kind: 'driver' });
+  const { format } = useMoney();
 
-  const sections = useMemo(() => {
-    const result = [];
-    if (vip.data && vip.data.length > 0) result.push({ title: 'VIP avec chauffeur', data: vip.data });
-    if (loc.data && loc.data.length > 0) result.push({ title: 'Location', data: loc.data });
-    if (sale.data && sale.data.length > 0) result.push({ title: 'Vente', data: sale.data });
-    if (drv.data && drv.data.length > 0) result.push({ title: 'Chauffeurs Pro', data: drv.data });
-    return result;
-  }, [vip.data, sale.data, loc.data, drv.data]);
+  const vip = useVehicles({ kind: 'vip', countryCode: country?.code });
+  const rent = useVehicles({ kind: 'rent', countryCode: country?.code });
+  const sale = useVehicles({ kind: 'sale', countryCode: country?.code });
+  const driver = useVehicles({ kind: 'driver', countryCode: country?.code });
 
-  const isLoadingAny = vip.isLoading || sale.isLoading || loc.isLoading || drv.isLoading;
+  const transformVehicle = (item: any): VehicleItem => ({
+    id: item.id,
+    title: item.title ?? item.brand ?? 'Véhicule',
+    city: item.city ?? 'Ville',
+    priceLabel: format(item.pricePerDay ?? item.price ?? 0, item.currency ?? 'XOF'),
+    cover: item.photos?.[0] ?? item.image ?? 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800',
+    badges: [],
+    rating: item.rating,
+    isPremium: item.premium ?? false
+  });
 
   return (
     <View style={styles.container}>
@@ -80,41 +83,57 @@ export default function VehiclesTab() {
         </View>
       </View>
 
-      <SectionList
-        sections={sections}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: Math.max(insets.bottom + 80, 96) }}
-        ListHeaderComponent={
-          <View style={{ marginBottom: 16 }}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Sociétés</Text>
-            </View>
-            <CompanyLogoRow />
-          </View>
-        }
-        ListEmptyComponent={
-          isLoadingAny ? (
-            <ActivityIndicator size="large" color="#0e5a43" style={{ marginTop: 32 }} />
-          ) : (
-            <Text style={{ color: '#64748B', textAlign: 'center', marginTop: 32 }}>Aucun véhicule disponible.</Text>
-          )
-        }
-        renderSectionHeader={({ section: { title } }) => (
-          <View style={{ paddingVertical: 16, backgroundColor: '#fff' }}>
-            <Text style={{ fontSize: 20, fontWeight: '800', color: '#0B6B53' }}>{title}</Text>
-          </View>
-        )}
-        renderItem={({ item, index, section }) => {
-          const isLeft = index % 2 === 0;
-          const isLast = index === section.data.length - 1;
-          return (
-            <View style={{ width: '48%', marginLeft: isLeft ? 0 : '4%', marginBottom: isLast && !isLeft ? 0 : 12 }}>
-              <VehicleCard vehicle={item} />
-            </View>
-          );
-        }}
+      <ScrollView
+        contentContainerStyle={{ paddingTop: 16, paddingBottom: Math.max(insets.bottom + 80, 96) }}
         showsVerticalScrollIndicator={false}
-      />
+      >
+        <View style={{ marginBottom: 16, paddingHorizontal: 16 }}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Sociétés</Text>
+          </View>
+          <CompanyLogoRow />
+        </View>
+
+        <CategoryRail
+          title="VIP avec chauffeur"
+          queryKey={['vehicles-vip', country?.name_fr]}
+          queryFn={async () => {
+            return (vip.data ?? []).slice(0, 10).map(transformVehicle);
+          }}
+          renderItem={(item) => <VehicleCard item={item} />}
+          onSeeAll={() => router.push({ pathname: '/vehicles/list', params: { intent: 'vip' } } as any)}
+        />
+
+        <CategoryRail
+          title="Location"
+          queryKey={['vehicles-rent', country?.name_fr]}
+          queryFn={async () => {
+            return (rent.data ?? []).slice(0, 10).map(transformVehicle);
+          }}
+          renderItem={(item) => <VehicleCard item={item} />}
+          onSeeAll={() => router.push({ pathname: '/vehicles/list', params: { intent: 'rent' } } as any)}
+        />
+
+        <CategoryRail
+          title="Vente"
+          queryKey={['vehicles-sale', country?.name_fr]}
+          queryFn={async () => {
+            return (sale.data ?? []).slice(0, 10).map(transformVehicle);
+          }}
+          renderItem={(item) => <VehicleCard item={item} />}
+          onSeeAll={() => router.push({ pathname: '/vehicles/list', params: { intent: 'sale' } } as any)}
+        />
+
+        <CategoryRail
+          title="Chauffeurs Pro"
+          queryKey={['vehicles-driver', country?.name_fr]}
+          queryFn={async () => {
+            return (driver.data ?? []).slice(0, 10).map(transformVehicle);
+          }}
+          renderItem={(item) => <VehicleCard item={item} />}
+          onSeeAll={() => router.push({ pathname: '/vehicles/list', params: { intent: 'driver' } } as any)}
+        />
+      </ScrollView>
 
       <UnifiedFilterSheet
         kind="vehicle"
@@ -131,8 +150,6 @@ export default function VehiclesTab() {
         onApply={(values)=>{
           setFilters(values);
           setOpenFilters(false);
-          const q = buildVehicleQuery(values);
-          console.log('[vehicles] apply filters =>', q);
         }}
       />
     </View>
