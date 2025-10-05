@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   },
   badgeGold: { backgroundColor: '#E4B200' },
   badgeDark: { backgroundColor: '#1F2937' },
-  badgeText: { color: '#fff', fontWeight: '700' as const },
+  badgeText: { fontSize: 11, color: '#fff', fontWeight: '700' as const },
 
   overlay: {
     position: 'absolute',
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#fff',
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '800' as const,
     marginBottom: 8,
   },
@@ -158,8 +158,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 10,
   },
-  price: { fontSize: 18, fontWeight: '900' as const, color: '#0F172A' },
-  perDay: { marginLeft: 6, color: '#475569', fontWeight: '600' as const },
+  price: { fontSize: 15, fontWeight: '900' as const, color: '#0F172A' },
+  perDay: { fontSize: 12, marginLeft: 4, color: '#475569', fontWeight: '600' as const },
 
   metaRow: { flexDirection: 'row', gap: 10 },
   chip: {
@@ -168,5 +168,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
   },
-  chipText: { color: '#fff', fontWeight: '700' as const },
+  chipText: { fontSize: 11, color: '#fff', fontWeight: '700' as const },
 });
