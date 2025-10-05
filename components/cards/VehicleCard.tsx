@@ -1,22 +1,55 @@
 import React from 'react';
 import { TouchableOpacity, Image, View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { colors, radius } from '@/theme/tokens';
+
+export type FuelType = 'diesel' | 'essence' | 'electrique' | 'hybride' | 'gpl' | 'autre';
+export type Transmission = 'auto' | 'manuelle';
 
 export type VehicleItem = {
   id: string;
   title: string;
   city: string;
-  priceLabel: string;
+  imageUrl?: string;
+  isPremium?: boolean;
+  isVip?: boolean;
+
+  forRent?: boolean;
+  pricePerDay?: number;
+  currency?: 'XOF' | 'FCFA' | 'USD' | 'EUR';
+
+  seats?: number;
+  fuel?: FuelType;
+  transmission?: Transmission;
+  rating?: number;
+
+  // Legacy support
+  priceLabel?: string;
   cover?: string;
   badges?: string[];
-  rating?: number;
-  isPremium?: boolean;
+};
+
+const fuelLabel: Record<FuelType, string> = {
+  diesel: 'Diesel',
+  essence: 'Essence',
+  electrique: 'Électrique',
+  hybride: 'Hybride',
+  gpl: 'GPL',
+  autre: 'Autre',
+};
+
+const transLabel: Record<Transmission, string> = {
+  auto: 'Auto',
+  manuelle: 'Manuelle',
 };
 
 export default function VehicleCard({ item }: { item: VehicleItem }) {
   const router = useRouter();
-  const validUri = item.cover && item.cover.trim().length > 0 ? item.cover : 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800';
+  const imageSource = item.imageUrl || item.cover;
+  const validUri = imageSource && imageSource.trim().length > 0 ? imageSource : 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800';
+  
+  const currency = item.currency ?? 'XOF';
+  const showPrice = item.forRent !== false && typeof item.pricePerDay === 'number';
+  const displayPrice = item.priceLabel || (showPrice ? `${new Intl.NumberFormat('fr-FR').format(item.pricePerDay!)} ${currency}` : '');
 
   return (
     <TouchableOpacity
@@ -24,78 +57,117 @@ export default function VehicleCard({ item }: { item: VehicleItem }) {
       style={styles.card}
     >
       <Image source={{ uri: validUri }} style={styles.img} resizeMode="cover" />
-      <View style={styles.overlay} />
 
-      <View style={styles.badges}>
-        {item.isPremium && (
-          <View style={[styles.badge, styles.premiumBadge]}>
-            <Text style={styles.badgeText}>Premium</Text>
-          </View>
-        )}
-        {item.badges?.map((b) => (
-          <View key={b} style={styles.badge}>
-            <Text style={styles.badgeText}>{b}</Text>
-          </View>
-        ))}
+      <View style={styles.badgesLeft}>
+        {item.isPremium && <Badge text="Premium" tone="gold" />}
+        {item.isVip && <Badge text="VIP" tone="dark" />}
+        {item.badges?.map((b) => <Badge key={b} text={b} tone="dark" />)}
       </View>
 
-      <View style={styles.bottom}>
-        <Text numberOfLines={2} style={styles.title}>
-          {item.title}
+      <View style={styles.overlay}>
+        <Text numberOfLines={1} style={styles.title}>
+          {item.title} • {item.city}
         </Text>
-        <Text style={styles.city}>{item.city}</Text>
-        <View style={styles.pricePill}>
-          <Text style={styles.price}>{item.priceLabel}</Text>
+
+        {displayPrice ? (
+          <View style={styles.pricePill}>
+            <Text style={styles.price}>{displayPrice}</Text>
+            {showPrice && <Text style={styles.perDay}> / jour</Text>}
+          </View>
+        ) : null}
+
+        <View style={styles.metaRow}>
+          {!!item.seats && <Chip icon="👥" label={`${item.seats}`} />}
+          {!!item.fuel && <Chip icon="🛢️" label={fuelLabel[item.fuel]} />}
+          {!!item.transmission && <Chip icon="⚙️" label={transLabel[item.transmission]} />}
+          {!!item.rating && <Chip icon="⭐" label={item.rating.toFixed(1)} />}
         </View>
-        {item.rating != null && (
-          <Text style={styles.rating}>★ {item.rating}</Text>
-        )}
       </View>
     </TouchableOpacity>
   );
 }
 
-const CARD_H = 220;
+function Badge({ text, tone }: { text: string; tone: 'gold' | 'dark' }) {
+  return (
+    <View style={[styles.badge, tone === 'gold' ? styles.badgeGold : styles.badgeDark]}>
+      <Text style={styles.badgeText}>{text}</Text>
+    </View>
+  );
+}
+
+function Chip({ icon, label }: { icon: string; label: string }) {
+  return (
+    <View style={styles.chip}>
+      <Text style={styles.chipText}>{icon} {label}</Text>
+    </View>
+  );
+}
+
+const CARD_W = 340;
+const CARD_H = 210;
+const RADIUS = 18;
+
 const styles = StyleSheet.create({
   card: {
-    borderRadius: radius.lg,
-    overflow: 'hidden',
+    width: CARD_W,
     height: CARD_H,
-    backgroundColor: '#111',
+    borderRadius: RADIUS,
+    overflow: 'hidden',
+    backgroundColor: '#000',
   },
   img: { width: '100%', height: '100%' },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.28)',
-  },
-  badges: {
+
+  badgesLeft: {
     position: 'absolute',
-    top: 10,
-    left: 10,
+    top: 12,
+    left: 12,
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
     zIndex: 2,
   },
   badge: {
-    backgroundColor: '#111827AA',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
   },
-  premiumBadge: {
-    backgroundColor: colors.premium,
+  badgeGold: { backgroundColor: '#E4B200' },
+  badgeDark: { backgroundColor: '#1F2937' },
+  badgeText: { color: '#fff', fontWeight: '700' as const },
+
+  overlay: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: 12,
+    backgroundColor: 'rgba(0,0,0,0.28)',
   },
-  badgeText: { color: '#fff', fontSize: 12, fontWeight: '800' as const },
-  bottom: { position: 'absolute', left: 12, right: 12, bottom: 12, gap: 6 },
-  title: { color: '#fff', fontSize: 16, fontWeight: '900' as const },
-  city: { color: '#E2E8F0', fontWeight: '700' as const },
+  title: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '800' as const,
+    marginBottom: 8,
+  },
+
   pricePill: {
     alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'baseline',
     backgroundColor: '#fff',
     paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 22,
+    borderRadius: 16,
+    marginBottom: 10,
   },
-  price: { fontWeight: '900' as const },
-  rating: { color: '#FDE68A', fontWeight: '800' as const, fontSize: 12, marginTop: 4 },
+  price: { fontSize: 18, fontWeight: '900' as const, color: '#0F172A' },
+  perDay: { marginLeft: 6, color: '#475569', fontWeight: '600' as const },
+
+  metaRow: { flexDirection: 'row', gap: 10 },
+  chip: {
+    backgroundColor: 'rgba(15,23,42,0.55)',
+    borderRadius: 18,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  chipText: { color: '#fff', fontWeight: '700' as const },
 });

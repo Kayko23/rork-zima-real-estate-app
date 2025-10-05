@@ -10,7 +10,6 @@ import UnifiedFilterSheet, { VehicleFilters } from '@/components/filters/Unified
 import CategoryRail from '@/components/home/CategoryRail';
 import VehicleCard from '@/components/cards/VehicleCard';
 import type { VehicleItem } from '@/components/cards/VehicleCard';
-import { useMoney } from '@/lib/money';
 
 
 export default function VehiclesTab() {
@@ -36,17 +35,20 @@ export default function VehiclesTab() {
     amenities: [],
   });
 
-  const { format } = useMoney();
-
   const transformVehicle = (item: any): VehicleItem => ({
     id: item.id,
     title: item.title ?? item.brand ?? 'Véhicule',
     city: item.city ?? 'Ville',
-    priceLabel: format(item.pricePerDay ?? item.price ?? 0, item.currency ?? 'XOF'),
-    cover: item.photos?.[0] ?? item.image ?? 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800',
-    badges: [],
-    rating: item.rating,
-    isPremium: item.premium ?? false
+    imageUrl: item.photos?.[0] ?? item.image ?? 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800',
+    isPremium: item.premium ?? false,
+    isVip: item.kind === 'vip',
+    forRent: item.kind !== 'sale',
+    pricePerDay: item.price ?? item.pricePerDay ?? 0,
+    currency: item.currency ?? 'XOF',
+    seats: item.seats ?? 5,
+    fuel: item.fuel ?? 'diesel',
+    transmission: item.transmission ?? 'auto',
+    rating: item.rating
   });
 
   return (
