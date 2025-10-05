@@ -66,7 +66,11 @@ function Rail<T>({
   onSeeAll,
   onPickSubcategory,
 }: CategoryRailProps<T>) {
-  const { data = [], isLoading } = useQuery({ queryKey, queryFn });
+  const { data = [], isLoading, isError } = useQuery({ 
+    queryKey, 
+    queryFn,
+    staleTime: 1000 * 60 * 5,
+  });
 
   if (isLoading) {
     return (
@@ -79,7 +83,27 @@ function Rail<T>({
     );
   }
 
-  if (!data.length) return null;
+  if (isError) {
+    return (
+      <View style={styles.section}>
+        <SectionHeader title={title} onSeeAll={onSeeAll} />
+        <View style={styles.loadingContainer}>
+          <Text style={styles.errorText}>Erreur de chargement</Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (!data.length) {
+    return (
+      <View style={styles.section}>
+        <SectionHeader title={title} onSeeAll={onSeeAll} />
+        <View style={styles.loadingContainer}>
+          <Text style={styles.emptyText}>Aucun résultat</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.section}>
@@ -133,4 +157,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: { color: colors.sub, fontSize: 14 },
+  errorText: { color: colors.danger, fontSize: 14 },
+  emptyText: { color: colors.sub, fontSize: 14, fontStyle: 'italic' },
 });

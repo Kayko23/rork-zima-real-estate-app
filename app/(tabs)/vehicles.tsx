@@ -11,7 +11,7 @@ import UnifiedFilterSheet, { VehicleFilters } from '@/components/filters/Unified
 import CategoryRail from '@/components/home/CategoryRail';
 import VehicleCard, { VehicleItem } from '@/components/cards/VehicleCard';
 import { useMoney } from '@/lib/money';
-import { useVehicles } from '@/hooks/useVehicles';
+
 
 export default function VehiclesTab() {
   const { country } = useSettings();
@@ -37,11 +37,6 @@ export default function VehiclesTab() {
   });
 
   const { format } = useMoney();
-
-  const vip = useVehicles({ kind: 'vip', countryCode: country?.code });
-  const rent = useVehicles({ kind: 'rent', countryCode: country?.code });
-  const sale = useVehicles({ kind: 'sale', countryCode: country?.code });
-  const driver = useVehicles({ kind: 'driver', countryCode: country?.code });
 
   const transformVehicle = (item: any): VehicleItem => ({
     id: item.id,
@@ -96,9 +91,16 @@ export default function VehiclesTab() {
 
         <CategoryRail
           title="VIP avec chauffeur"
-          queryKey={['vehicles-vip', country?.name_fr]}
+          queryKey={['vehicles-vip', country?.code]}
           queryFn={async () => {
-            return (vip.data ?? []).slice(0, 10).map(transformVehicle);
+            await new Promise((r) => setTimeout(r, 150));
+            const vehicles = [
+              { id: 'v1', title: 'Mercedes V-Class', city: 'Abidjan', countryCode: 'CI', price: 120000, currency: 'XOF', premium: true, kind: 'vip', image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=900&h=600&fit=crop', rating: 4.9 },
+              { id: 'v5', title: 'BMW X5', city: 'Douala', countryCode: 'CM', price: 150000, currency: 'XAF', premium: true, kind: 'vip', image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=900&h=600&fit=crop', rating: 4.8 },
+              { id: 'v9', title: 'Audi A6', city: 'Abidjan', countryCode: 'CI', price: 95000, currency: 'XOF', premium: true, kind: 'vip', image: 'https://images.unsplash.com/photo-1610768764270-790fbec18178?w=900&h=600&fit=crop', rating: 4.7 },
+            ];
+            const filtered = vehicles.filter(v => !country?.code || v.countryCode === country.code);
+            return filtered.slice(0, 10).map(transformVehicle);
           }}
           renderItem={(item) => <VehicleCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/vehicles/list', params: { intent: 'vip' } } as any)}
@@ -106,9 +108,16 @@ export default function VehiclesTab() {
 
         <CategoryRail
           title="Location"
-          queryKey={['vehicles-rent', country?.name_fr]}
+          queryKey={['vehicles-rent', country?.code]}
           queryFn={async () => {
-            return (rent.data ?? []).slice(0, 10).map(transformVehicle);
+            await new Promise((r) => setTimeout(r, 150));
+            const vehicles = [
+              { id: 'v2', title: 'Toyota Corolla', city: 'Lomé', countryCode: 'TG', price: 35000, currency: 'XOF', premium: false, kind: 'rent', image: 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=900&h=600&fit=crop', rating: 4.6 },
+              { id: 'v6', title: 'Peugeot 508', city: 'Abidjan', countryCode: 'CI', price: 45000, currency: 'XOF', premium: false, kind: 'rent', image: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=900&h=600&fit=crop', rating: 4.3 },
+              { id: 'v11', title: 'Renault Clio', city: 'Lomé', countryCode: 'TG', price: 28000, currency: 'XOF', premium: false, kind: 'rent', image: 'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=900&h=600&fit=crop', rating: 4.1 },
+            ];
+            const filtered = vehicles.filter(v => !country?.code || v.countryCode === country.code);
+            return filtered.slice(0, 10).map(transformVehicle);
           }}
           renderItem={(item) => <VehicleCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/vehicles/list', params: { intent: 'rent' } } as any)}
@@ -116,9 +125,16 @@ export default function VehiclesTab() {
 
         <CategoryRail
           title="Vente"
-          queryKey={['vehicles-sale', country?.name_fr]}
+          queryKey={['vehicles-sale', country?.code]}
           queryFn={async () => {
-            return (sale.data ?? []).slice(0, 10).map(transformVehicle);
+            await new Promise((r) => setTimeout(r, 150));
+            const vehicles = [
+              { id: 'v3', title: 'Hyundai H1', city: 'Cotonou', countryCode: 'BJ', price: 9000000, currency: 'XOF', premium: false, kind: 'sale', image: 'https://images.unsplash.com/photo-1527786356703-4b100091cd2c?w=900&h=600&fit=crop', rating: 4.2 },
+              { id: 'v7', title: 'Range Rover Sport', city: 'Libreville', countryCode: 'GA', price: 25000000, currency: 'XAF', premium: true, kind: 'sale', image: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=900&h=600&fit=crop', rating: 4.9 },
+              { id: 'v10', title: 'Nissan Patrol', city: 'Dakar', countryCode: 'SN', price: 18000000, currency: 'XOF', premium: true, kind: 'sale', image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=900&h=600&fit=crop', rating: 4.5 },
+            ];
+            const filtered = vehicles.filter(v => !country?.code || v.countryCode === country.code);
+            return filtered.slice(0, 10).map(transformVehicle);
           }}
           renderItem={(item) => <VehicleCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/vehicles/list', params: { intent: 'sale' } } as any)}
@@ -126,9 +142,16 @@ export default function VehiclesTab() {
 
         <CategoryRail
           title="Chauffeurs Pro"
-          queryKey={['vehicles-driver', country?.name_fr]}
+          queryKey={['vehicles-driver', country?.code]}
           queryFn={async () => {
-            return (driver.data ?? []).slice(0, 10).map(transformVehicle);
+            await new Promise((r) => setTimeout(r, 150));
+            const vehicles = [
+              { id: 'v4', title: 'Chauffeur Pro Paul', city: 'Dakar', countryCode: 'SN', price: 60000, currency: 'XOF', premium: true, kind: 'driver', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&h=600&fit=crop', rating: 5 },
+              { id: 'v8', title: 'Chauffeur Pro Marie', city: 'Abidjan', countryCode: 'CI', price: 55000, currency: 'XOF', premium: false, kind: 'driver', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=900&h=600&fit=crop', rating: 4.7 },
+              { id: 'v12', title: 'Chauffeur Pro Amadou', city: 'Douala', countryCode: 'CM', price: 65000, currency: 'XAF', premium: true, kind: 'driver', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=900&h=600&fit=crop', rating: 4.9 },
+            ];
+            const filtered = vehicles.filter(v => !country?.code || v.countryCode === country.code);
+            return filtered.slice(0, 10).map(transformVehicle);
           }}
           renderItem={(item) => <VehicleCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/vehicles/list', params: { intent: 'driver' } } as any)}
