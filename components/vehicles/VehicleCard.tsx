@@ -3,7 +3,7 @@ import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import type { Vehicle } from '@/types/vehicle';
 import { Star, Heart, Users, Fuel, Settings } from 'lucide-react-native';
-import { colors, radius, shadow } from '@/theme/tokens';
+import { radius, shadow } from '@/theme/tokens';
 import { useApp } from '@/hooks/useAppStore';
 
 const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=1200&auto=format&fit=crop';
@@ -23,6 +23,16 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
     rent: 'Location',
     sale: 'Vente',
   }[vehicle.kind];
+
+  const fuelLabel: Record<string, string> = {
+    Diesel: 'Diesel',
+    Essence: 'Essence',
+    Electrique: 'Électrique',
+    Hybride: 'Hybride',
+    GPL: 'GPL',
+  };
+
+  const pricePerDay = vehicle.kind === 'rent' || vehicle.kind === 'vip' || vehicle.kind === 'driver';
 
   const handlePress = () => {
     router.push(`/vehicles/${vehicle.id}` as any);
@@ -44,17 +54,19 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
       <Image source={getSafeImage(vehicle.image)} style={styles.image} />
       <View style={styles.overlay} />
       
-      <View style={styles.badges}>
-        {vehicle.premium && (
-          <View style={styles.premiumBadge}>
-            <Text style={styles.premiumText}>Premium</Text>
-          </View>
-        )}
-        {kindLabel && (
-          <View style={styles.kindBadge}>
-            <Text style={styles.kindText}>{kindLabel}</Text>
-          </View>
-        )}
+      <View style={styles.badgesRow}>
+        <View style={styles.badges}>
+          {vehicle.premium && (
+            <View style={styles.premiumBadge}>
+              <Text style={styles.premiumText}>Premium</Text>
+            </View>
+          )}
+          {kindLabel && (
+            <View style={styles.kindBadge}>
+              <Text style={styles.kindText}>{kindLabel}</Text>
+            </View>
+          )}
+        </View>
         <Pressable 
           onPress={handleToggleFavorite} 
           style={styles.heart} 
@@ -64,7 +76,7 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
         >
           <Heart 
             size={22} 
-            color={isFav ? '#EF4444' : '#9CA3AF'} 
+            color={isFav ? '#EF4444' : '#fff'} 
             fill={isFav ? '#EF4444' : 'transparent'} 
             strokeWidth={2.5} 
           />
@@ -75,11 +87,20 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
         <Text numberOfLines={1} style={styles.title}>
           {vehicle.title} • {vehicle.city}
         </Text>
-        <View style={styles.pricePill}>
-          <Text style={styles.price}>
-            {vehicle.price.toLocaleString()} {vehicle.currency}
-          </Text>
-        </View>
+        {pricePerDay ? (
+          <View style={styles.pricePill}>
+            <Text style={styles.price}>
+              {vehicle.price.toLocaleString('fr-FR')} {vehicle.currency}
+            </Text>
+            <Text style={styles.perDay}> / jour</Text>
+          </View>
+        ) : (
+          <View style={styles.pricePill}>
+            <Text style={styles.price}>
+              {vehicle.price.toLocaleString('fr-FR')} {vehicle.currency}
+            </Text>
+          </View>
+        )}
         <View style={styles.meta}>
           {vehicle.seats && (
             <View style={styles.metaItem}>
@@ -90,19 +111,19 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
           {vehicle.fuel && (
             <View style={styles.metaItem}>
               <Fuel size={14} color="#fff" />
-              <Text style={styles.metaTxt}>{vehicle.fuel}</Text>
+              <Text style={styles.metaTxt}>{fuelLabel[vehicle.fuel] || vehicle.fuel}</Text>
             </View>
           )}
           {vehicle.gearbox && (
             <View style={styles.metaItem}>
               <Settings size={14} color="#fff" />
-              <Text style={styles.metaTxt}>{vehicle.gearbox === 'auto' ? 'Auto' : 'Man'}</Text>
+              <Text style={styles.metaTxt}>{vehicle.gearbox === 'auto' ? 'Auto' : 'Manuelle'}</Text>
             </View>
           )}
           {vehicle.rating && (
-            <View style={[styles.metaItem, { marginLeft: 'auto' }]}>
+            <View style={styles.metaItem}>
               <Star size={14} color="#FFD166" fill="#FFD166" />
-              <Text style={styles.metaTxt}>{vehicle.rating}</Text>
+              <Text style={styles.metaTxt}>{vehicle.rating.toFixed(1)}</Text>
             </View>
           )}
         </View>
@@ -115,31 +136,36 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: radius.lg,
     overflow: 'hidden',
-    backgroundColor: colors.panel,
+    backgroundColor: '#000',
     ...(shadow.card as any),
   },
   image: {
     width: '100%',
-    height: 220,
+    height: 210,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.cardOverlay,
+    backgroundColor: 'rgba(0,0,0,0.28)',
   },
-  badges: {
+  badgesRow: {
     position: 'absolute',
     top: 12,
     left: 12,
     right: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'space-between',
+  },
+  badges: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   premiumBadge: {
-    backgroundColor: '#D4AF37',
-    paddingHorizontal: 12,
+    backgroundColor: '#E4B200',
+    paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 999,
+    borderRadius: 16,
   },
   premiumText: {
     color: '#fff',
@@ -147,10 +173,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   kindBadge: {
-    backgroundColor: 'rgba(17,24,39,.85)',
-    paddingHorizontal: 12,
+    backgroundColor: '#1F2937',
+    paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 999,
+    borderRadius: 16,
   },
   kindText: {
     color: '#fff',
@@ -158,18 +184,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   heart: {
-    marginLeft: 'auto',
-    height: 40,
-    width: 40,
-    borderRadius: 20,
+    height: 36,
+    width: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,.95)',
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 4,
+    backgroundColor: 'rgba(0,0,0,.4)',
   },
   bottom: {
     position: 'absolute',
@@ -179,42 +199,49 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '800',
     marginBottom: 8,
   },
   pricePill: {
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,.9)',
-    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    backgroundColor: '#fff',
+    paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 999,
+    borderRadius: 16,
+    marginBottom: 10,
   },
   price: {
-    color: colors.chip,
-    fontWeight: '800',
-    letterSpacing: 0.2,
-    fontSize: 13,
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#0F172A',
+  },
+  perDay: {
+    marginLeft: 6,
+    color: '#475569',
+    fontWeight: '600',
+    fontSize: 14,
   },
   meta: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    marginTop: 10,
+    gap: 10,
     flexWrap: 'wrap',
   },
   metaItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    backgroundColor: 'rgba(17,24,39,.35)',
-    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(15,23,42,0.55)',
+    borderRadius: 18,
   },
   metaTxt: {
     color: '#fff',
-    fontWeight: '600',
+    fontWeight: '700',
     fontSize: 12,
   },
 });
