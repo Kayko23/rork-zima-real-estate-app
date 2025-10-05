@@ -31,11 +31,18 @@ export default function HeaderCountryButton() {
 const styles = StyleSheet.create({
   button: {
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: '#ffffffaa',
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   flag: {
-    fontSize: 18,
+    fontSize: 20,
   },
 });
