@@ -8,7 +8,7 @@ import { X } from 'lucide-react-native';
 import { CATEGORIES, CategorySlug } from '@/types/taxonomy';
 import { openCategory } from '@/lib/navigation';
 import UnifiedFilterSheet, { TripFilters } from '@/components/filters/UnifiedFilterSheet';
-
+import { api } from '@/lib/api';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
@@ -68,7 +68,7 @@ export default function VoyagesTab() {
     cover: item.photos?.[0] ?? item.image ?? 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800',
     badges: [],
     rating: item.rating,
-    isPremium: item.isPremium ?? item.premium ?? false
+    isPremium: item.premium ?? false
   });
 
   return (
@@ -124,16 +124,10 @@ export default function VoyagesTab() {
       >
         <CategoryRail
           title="Hôtels"
-          queryKey={['trips-hotels', activeCountry?.code]}
+          queryKey={['trips-hotels', activeCountry?.name_fr]}
           queryFn={async () => {
-            await new Promise((r) => setTimeout(r, 150));
-            const trips = [
-              { id: 't1', title: 'Hôtel Ivoire', city: 'Abidjan', countryCode: 'CI', price: 85000, currency: 'XOF', isPremium: true, type: 'hotel', image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=900&h=600&fit=crop', rating: 4.8 },
-              { id: 't2', title: 'Radisson Blu', city: 'Dakar', countryCode: 'SN', price: 120000, currency: 'XOF', isPremium: true, type: 'hotel', image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=900&h=600&fit=crop', rating: 4.7 },
-              { id: 't3', title: 'Pullman Douala', city: 'Douala', countryCode: 'CM', price: 95000, currency: 'XAF', isPremium: false, type: 'hotel', image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=900&h=600&fit=crop', rating: 4.6 },
-            ];
-            const filtered = trips.filter(t => !activeCountry?.code || t.countryCode === activeCountry.code);
-            return filtered.slice(0, 10).map(transformTrip);
+            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'travel', type: 'hotel', limit: 10 } as any);
+            return items.map(transformTrip);
           }}
           renderItem={(item) => <TravelCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/voyages/all', params: { type: 'hotel' } } as any)}
@@ -141,16 +135,10 @@ export default function VoyagesTab() {
 
         <CategoryRail
           title="Résidences journalières"
-          queryKey={['trips-residences', activeCountry?.code]}
+          queryKey={['trips-residences', activeCountry?.name_fr]}
           queryFn={async () => {
-            await new Promise((r) => setTimeout(r, 150));
-            const trips = [
-              { id: 'r1', title: 'Résidence Cocody', city: 'Abidjan', countryCode: 'CI', price: 45000, currency: 'XOF', isPremium: false, type: 'residence', image: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=900&h=600&fit=crop', rating: 4.5 },
-              { id: 'r2', title: 'Appartement Almadies', city: 'Dakar', countryCode: 'SN', price: 55000, currency: 'XOF', isPremium: true, type: 'residence', image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=900&h=600&fit=crop', rating: 4.7 },
-              { id: 'r3', title: 'Studio Bonapriso', city: 'Douala', countryCode: 'CM', price: 38000, currency: 'XAF', isPremium: false, type: 'residence', image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=900&h=600&fit=crop', rating: 4.3 },
-            ];
-            const filtered = trips.filter(t => !activeCountry?.code || t.countryCode === activeCountry.code);
-            return filtered.slice(0, 10).map(transformTrip);
+            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'travel', type: 'residence', limit: 10 } as any);
+            return items.map(transformTrip);
           }}
           renderItem={(item) => <TravelCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/voyages/all', params: { type: 'residence' } } as any)}
@@ -158,16 +146,10 @@ export default function VoyagesTab() {
 
         <CategoryRail
           title="Villas de vacances"
-          queryKey={['trips-villas', activeCountry?.code]}
+          queryKey={['trips-villas', activeCountry?.name_fr]}
           queryFn={async () => {
-            await new Promise((r) => setTimeout(r, 150));
-            const trips = [
-              { id: 'v1', title: 'Villa Assinie', city: 'Assinie', countryCode: 'CI', price: 150000, currency: 'XOF', isPremium: true, type: 'villa', image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=900&h=600&fit=crop', rating: 4.9 },
-              { id: 'v2', title: 'Villa Saly', city: 'Saly', countryCode: 'SN', price: 180000, currency: 'XOF', isPremium: true, type: 'villa', image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900&h=600&fit=crop', rating: 4.8 },
-              { id: 'v3', title: 'Villa Kribi', city: 'Kribi', countryCode: 'CM', price: 165000, currency: 'XAF', isPremium: true, type: 'villa', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=900&h=600&fit=crop', rating: 4.7 },
-            ];
-            const filtered = trips.filter(t => !activeCountry?.code || t.countryCode === activeCountry.code);
-            return filtered.slice(0, 10).map(transformTrip);
+            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'travel', type: 'villa', limit: 10 } as any);
+            return items.map(transformTrip);
           }}
           renderItem={(item) => <TravelCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/voyages/all', params: { type: 'villa' } } as any)}
@@ -175,16 +157,10 @@ export default function VoyagesTab() {
 
         <CategoryRail
           title="Resorts"
-          queryKey={['trips-resorts', activeCountry?.code]}
+          queryKey={['trips-resorts', activeCountry?.name_fr]}
           queryFn={async () => {
-            await new Promise((r) => setTimeout(r, 150));
-            const trips = [
-              { id: 'rs1', title: 'Resort Cap Skirring', city: 'Cap Skirring', countryCode: 'SN', price: 200000, currency: 'XOF', isPremium: true, type: 'resort', image: 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=900&h=600&fit=crop', rating: 4.9 },
-              { id: 'rs2', title: 'Resort Grand-Bassam', city: 'Grand-Bassam', countryCode: 'CI', price: 175000, currency: 'XOF', isPremium: true, type: 'resort', image: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=900&h=600&fit=crop', rating: 4.8 },
-              { id: 'rs3', title: 'Resort Limbé', city: 'Limbé', countryCode: 'CM', price: 190000, currency: 'XAF', isPremium: true, type: 'resort', image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?w=900&h=600&fit=crop', rating: 4.7 },
-            ];
-            const filtered = trips.filter(t => !activeCountry?.code || t.countryCode === activeCountry.code);
-            return filtered.slice(0, 10).map(transformTrip);
+            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'travel', type: 'resort', limit: 10 } as any);
+            return items.map(transformTrip);
           }}
           renderItem={(item) => <TravelCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/voyages/all', params: { type: 'resort' } } as any)}
@@ -192,16 +168,10 @@ export default function VoyagesTab() {
 
         <CategoryRail
           title="Lodges"
-          queryKey={['trips-lodges', activeCountry?.code]}
+          queryKey={['trips-lodges', activeCountry?.name_fr]}
           queryFn={async () => {
-            await new Promise((r) => setTimeout(r, 150));
-            const trips = [
-              { id: 'l1', title: 'Lodge Parc Banco', city: 'Abidjan', countryCode: 'CI', price: 65000, currency: 'XOF', isPremium: false, type: 'lodge', image: 'https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=900&h=600&fit=crop', rating: 4.4 },
-              { id: 'l2', title: 'Lodge Niokolo-Koba', city: 'Tambacounda', countryCode: 'SN', price: 75000, currency: 'XOF', isPremium: true, type: 'lodge', image: 'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=900&h=600&fit=crop', rating: 4.6 },
-              { id: 'l3', title: 'Lodge Waza', city: 'Maroua', countryCode: 'CM', price: 70000, currency: 'XAF', isPremium: false, type: 'lodge', image: 'https://images.unsplash.com/photo-1602002418082-a4443e081dd1?w=900&h=600&fit=crop', rating: 4.5 },
-            ];
-            const filtered = trips.filter(t => !activeCountry?.code || t.countryCode === activeCountry.code);
-            return filtered.slice(0, 10).map(transformTrip);
+            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'travel', type: 'lodge', limit: 10 } as any);
+            return items.map(transformTrip);
           }}
           renderItem={(item) => <TravelCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/voyages/all', params: { type: 'lodge' } } as any)}
@@ -209,16 +179,10 @@ export default function VoyagesTab() {
 
         <CategoryRail
           title="Auberges"
-          queryKey={['trips-hostels', activeCountry?.code]}
+          queryKey={['trips-hostels', activeCountry?.name_fr]}
           queryFn={async () => {
-            await new Promise((r) => setTimeout(r, 150));
-            const trips = [
-              { id: 'h1', title: 'Auberge Plateau', city: 'Abidjan', countryCode: 'CI', price: 25000, currency: 'XOF', isPremium: false, type: 'hostel', image: 'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=900&h=600&fit=crop', rating: 4.2 },
-              { id: 'h2', title: 'Auberge Gorée', city: 'Dakar', countryCode: 'SN', price: 30000, currency: 'XOF', isPremium: false, type: 'hostel', image: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=900&h=600&fit=crop', rating: 4.3 },
-              { id: 'h3', title: 'Auberge Bassa', city: 'Douala', countryCode: 'CM', price: 28000, currency: 'XAF', isPremium: false, type: 'hostel', image: 'https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=900&h=600&fit=crop', rating: 4.1 },
-            ];
-            const filtered = trips.filter(t => !activeCountry?.code || t.countryCode === activeCountry.code);
-            return filtered.slice(0, 10).map(transformTrip);
+            const items = await api.listProperties({ country: activeCountry?.name_fr, category: 'travel', type: 'hostel', limit: 10 } as any);
+            return items.map(transformTrip);
           }}
           renderItem={(item) => <TravelCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/voyages/all', params: { type: 'hostel' } } as any)}
