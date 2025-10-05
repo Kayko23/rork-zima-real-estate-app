@@ -6,6 +6,7 @@ import SectionHeader from "@/components/home/SectionHeader";
 import PropertyCard, { type Property } from "@/components/property/PropertyCard";
 
 import VehicleCard from "@/components/vehicles/VehicleCard";
+import VehicleCardStandard from "@/components/cards/VehicleCard";
 import { useVehicles } from "@/hooks/useVehicles";
 import ResidentialChips from "@/components/home/ResidentialChips";
 import VehiclesChips from "@/components/home/VehiclesChips";
@@ -64,12 +65,7 @@ const categoriesData: { key: string; title: string; items: Property[] }[] = [
     { id:"b1", title:"Bureau moderne", city:"Abidjan", price:150000000, currency:"XOF", beds:0, baths:0, area:120, rating:4.5,
       photos:["https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-09T10:00:00Z" },
   ]},
-  { key: "vehicules", title: "Véhicules", items: [
-    { id:"v-promo-1", title:"Van VIP 7 places", city:"Abidjan", price:90000, currency:"XOF", beds:0, baths:0, area:0, rating:4.8,
-      photos:["https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1400"], badge:'Premium', isPremium: true, createdAt: "2025-01-10T10:00:00Z" },
-    { id:"v-promo-2", title:"Chauffeur Pro", city:"Dakar", price:60000, currency:"XOF", beds:0, baths:0, area:0, rating:4.5,
-      photos:["https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?q=80&w=1400"], badge:'À LOUER', isPremium: false, createdAt: "2025-01-08T10:00:00Z" },
-  ]},
+  { key: "vehicules", title: "Véhicules", items: [] },
 ];
 
 export default function Home() {
@@ -210,20 +206,45 @@ export default function Home() {
                 <VehiclesChips />
               </View>
             )}
-            <FlatList
-              horizontal
-              data={category.items}
-              keyExtractor={(i)=>i.id}
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal:12 }}
-              ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
-              renderItem={({item}) => (
-                <View style={{ width: Math.round(W*0.72) }}>
-                  <PropertyCard item={item}/>
-                </View>
-              )}
-              testID={`category-${category.key}-slider`}
-            />
+            {category.key === 'vehicules' ? (
+              <FlatList
+                horizontal
+                data={premiumVehicles ?? []}
+                keyExtractor={(i)=>i.id}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal:12 }}
+                ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
+                renderItem={({item}) => (
+                  <View style={{ width: Math.round(W*0.72) }}>
+                    <VehicleCardStandard item={{
+                      id: item.id,
+                      title: item.title,
+                      city: item.city,
+                      priceLabel: `${new Intl.NumberFormat('fr-FR').format(item.price ?? 0)} ${item.currency} / jour`,
+                      cover: item.image,
+                      isPremium: item.premium,
+                      rating: item.rating,
+                    }} />
+                  </View>
+                )}
+                testID={`category-${category.key}-slider`}
+              />
+            ) : (
+              <FlatList
+                horizontal
+                data={category.items}
+                keyExtractor={(i)=>i.id}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingHorizontal:12 }}
+                ItemSeparatorComponent={() => <View style={{ width: 12 }} />}
+                renderItem={({item}) => (
+                  <View style={{ width: Math.round(W*0.72) }}>
+                    <PropertyCard item={item}/>
+                  </View>
+                )}
+                testID={`category-${category.key}-slider`}
+              />
+            )}
           </View>
         ))}
 
