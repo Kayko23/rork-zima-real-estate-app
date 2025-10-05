@@ -113,11 +113,9 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
 
 const styles = StyleSheet.create({
   card: {
-    width: 300,
     borderRadius: radius.lg,
     overflow: 'hidden',
     backgroundColor: colors.panel,
-    marginRight: 14,
     ...(shadow.card as any),
   },
   image: {

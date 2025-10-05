@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams, Stack } from 'expo-router';
 import { useContentInsets } from '@/hooks/useContentInsets';
@@ -14,6 +14,7 @@ import { api } from '@/lib/api';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
+import VoyageCard from '@/components/voyages/VoyageCard';
 import { useSettings } from '@/hooks/useSettings';
 
 const INITIAL: TripFilters = {
@@ -117,19 +118,33 @@ export default function VoyagesTab() {
       <FlatList
         data={data as any[]}
         keyExtractor={(i: any) => String(i.id)}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomInset + 120, paddingTop: 8 }}
-        ListEmptyComponent={!isLoading ? (
-          <View style={{ paddingHorizontal: 16 }}>
-            <Text style={styles.empty}>Aucun résultat.</Text>
-          </View>
-        ) : null}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <View style={styles.cardInner}>
-              <Text style={styles.cardTitle}>{item.title ?? 'Séjour'}</Text>
-              <Text style={styles.cardMeta}>{item.city}, {item.country}</Text>
-              <Text style={styles.cardPrice}>{fmt(item.price)} / nuit</Text>
+        numColumns={2}
+        columnWrapperStyle={{ gap: 12 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomInset + 120, paddingTop: 8, gap: 12 }}
+        ListEmptyComponent={
+          isLoading ? (
+            <ActivityIndicator size="large" color="#0B6B53" style={{ marginTop: 32 }} />
+          ) : (
+            <View style={{ paddingHorizontal: 16 }}>
+              <Text style={styles.empty}>Aucun résultat.</Text>
             </View>
+          )
+        }
+        renderItem={({ item }) => (
+          <View style={{ flex: 1 }}>
+            <VoyageCard item={{
+              id: item.id,
+              title: item.title ?? 'Séjour',
+              city: item.city ?? 'Ville',
+              country: item.country ?? 'Pays',
+              price: item.price ?? 0,
+              currency: item.currency ?? 'XOF',
+              rating: item.rating ?? 4.5,
+              reviews: item.reviews ?? 0,
+              image: { uri: item.photos?.[0] ?? item.image ?? 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800' },
+              badge: item.premium ? 'Premium' : undefined,
+              type: item.type ?? 'hotel'
+            }} />
           </View>
         )}
         scrollIndicatorInsets={{ bottom: bottomInset }}
@@ -155,11 +170,7 @@ const styles = StyleSheet.create({
   searchTitle: { fontWeight: '700' },
   searchSub: { color: '#6B7280', marginTop: 2 },
   empty: { color: '#64748B', padding: 16 },
-  card: { borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 16, overflow: 'hidden', marginBottom: 12, backgroundColor: '#fff' },
-  cardInner: { padding: 14 },
-  cardTitle: { fontWeight: '800' },
-  cardMeta: { color: '#6B7280', marginTop: 2 },
-  cardPrice: { marginTop: 8, fontWeight: '700' },
+
 });
 
 const fmt = (n: number) => new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 }).format(n);

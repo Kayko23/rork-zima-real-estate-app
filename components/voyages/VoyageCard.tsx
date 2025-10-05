@@ -41,7 +41,7 @@ export default function VoyageCard({ item, onPress }:{ item:TripItem; onPress?:(
   );
 }
 const c = StyleSheet.create({
-  card:{ width:300, marginRight:14, borderRadius:16, overflow:"hidden", backgroundColor:"#fff" },
+  card:{ borderRadius:16, overflow:"hidden", backgroundColor:"#fff" },
   img:{ width:"100%", height:180 },
   like:{ position:"absolute", top:12, right:12, backgroundColor:"rgba(255,255,255,.95)", borderRadius:999, padding:6, shadowColor:"#000", shadowOpacity:0.2, shadowRadius:10, shadowOffset:{width:0, height:3}, elevation:4 },
   badge:{ position:"absolute", left:12, top:12, borderRadius:999, paddingHorizontal:10, paddingVertical:6 },

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Pressable } from 'react-native';
+import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSearchPreset } from '@/hooks/useSearchPreset';
@@ -18,6 +18,7 @@ import SegmentedTabs from '@/components/home/SegmentedTabs';
 import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
 import ActiveCountryBadge from '@/components/ui/ActiveCountryBadge';
+import PropertyCard from '@/components/property/PropertyCard';
 
 const INITIAL: PropertyFilters = {
   destination: { country: undefined, city: undefined },
@@ -149,16 +150,26 @@ export default function PropertyScreen(){
       <FlatList
         data={data}
         keyExtractor={(i:any)=>String(i.id)}
-        contentContainerStyle={{ paddingTop: insets.top + 200, paddingHorizontal:16, paddingBottom: insets.bottom + tabBarH + 16 }}
-        ListEmptyComponent={!isLoading ? <Text style={{ color:'#64748B' }}>Aucun résultat.</Text> : null}
+        contentContainerStyle={{ paddingTop: insets.top + 200, paddingHorizontal:16, paddingBottom: insets.bottom + tabBarH + 16, gap: 16 }}
+        ListEmptyComponent={!isLoading ? <Text style={{ color:'#64748B', textAlign:'center', marginTop:32 }}>Aucun résultat.</Text> : null}
         renderItem={({item})=>(
-          <View style={{ borderWidth:1, borderColor:'#E5E7EB', borderRadius:16, overflow:'hidden', marginBottom:12 }}>
-            <View style={{ padding:14 }}>
-              <Text style={{ fontWeight:'800' }}>{item.title ?? 'Annonce'}</Text>
-              <Text style={{ color:'#6B7280', marginTop:2 }}>{item.city}, {item.country}</Text>
-              <Text style={{ marginTop:8, fontWeight:'700' }}>{format(item.price)}{item.period==='daily'?' / jour': item.period==='monthly'?' / mois':''}</Text>
-            </View>
-          </View>
+          <PropertyCard item={{
+            id: item.id,
+            title: item.title ?? 'Annonce',
+            city: item.city ?? 'Ville',
+            country: item.country ?? 'Pays',
+            price: item.price ?? 0,
+            currency: item.currency ?? 'XOF',
+            beds: item.bedrooms,
+            baths: item.bathrooms,
+            area: item.surface,
+            livingRooms: item.livingrooms,
+            rating: item.rating ?? 4.5,
+            photos: item.photos ?? [item.image ?? 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800'],
+            badge: item.transaction === 'sale' ? 'À VENDRE' : item.transaction === 'rent' ? 'À LOUER' : undefined,
+            isPremium: item.premium ?? false,
+            category: item.category
+          }} />
         )}
         scrollIndicatorInsets={{ bottom: insets.bottom + tabBarH }}
       />

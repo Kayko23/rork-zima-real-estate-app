@@ -77,6 +77,15 @@ export default function VehiclesTab() {
   const loc = useVehicles({ kind: 'rent' });
   const drv = useVehicles({ kind: 'driver' });
 
+  const allVehicles = [
+    ...(vip.data ?? []),
+    ...(sale.data ?? []),
+    ...(loc.data ?? []),
+    ...(drv.data ?? [])
+  ];
+
+  const isLoadingAny = vip.isLoading || sale.isLoading || loc.isLoading || drv.isLoading;
+
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
@@ -107,44 +116,31 @@ export default function VehiclesTab() {
       </View>
 
       <FlatList
-        data={[0]}
-        renderItem={() => (
-          <View>
-            <View style={{ marginTop: 16 }}>
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Sociétés</Text>
-              </View>
-              <CompanyLogoRow />
+        data={allVehicles}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={{ gap: 12 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 16, paddingBottom: Math.max(insets.bottom + 80, 96), gap: 12 }}
+        ListHeaderComponent={
+          <View style={{ marginBottom: 16 }}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Sociétés</Text>
             </View>
-
-            <Section
-              title={L.vehiclesVip}
-              data={vip.data ?? []}
-              link="/vehicles/list?kind=vip"
-              loading={vip.isLoading}
-            />
-            <Section
-              title={L.vehiclesSale}
-              data={sale.data ?? []}
-              link="/vehicles/list?kind=sale"
-              loading={sale.isLoading}
-            />
-            <Section
-              title={L.vehiclesRent}
-              data={loc.data ?? []}
-              link="/vehicles/list?kind=rent"
-              loading={loc.isLoading}
-            />
-            <Section
-              title={L.vehiclesDriver}
-              data={drv.data ?? []}
-              link="/vehicles/list?kind=driver"
-              loading={drv.isLoading}
-            />
+            <CompanyLogoRow />
+          </View>
+        }
+        ListEmptyComponent={
+          isLoadingAny ? (
+            <ActivityIndicator size="large" color="#0e5a43" style={{ marginTop: 32 }} />
+          ) : (
+            <Text style={{ color: '#64748B', textAlign: 'center', marginTop: 32 }}>Aucun véhicule disponible.</Text>
+          )
+        }
+        renderItem={({ item }) => (
+          <View style={{ flex: 1 }}>
+            <VehicleCard vehicle={item} />
           </View>
         )}
-        keyExtractor={() => 'vehicles'}
-        contentContainerStyle={{ paddingBottom: Math.max(insets.bottom + 80, 96) }}
         showsVerticalScrollIndicator={false}
       />
 

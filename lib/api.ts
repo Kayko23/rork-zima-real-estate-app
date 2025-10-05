@@ -31,9 +31,30 @@ async function write<T>(key: string, val: T): Promise<T> {
   return val;
 }
 
+const MOCK_PROPERTIES = [
+  { id: 'p1', title: 'Villa moderne avec piscine', city: 'Abidjan', country: 'Côte d\'Ivoire', price: 450000, currency: 'XOF', bedrooms: 4, bathrooms: 3, surface: 280, livingrooms: 2, rating: 4.8, photos: ['https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800'], transaction: 'sale', category: 'residential', premium: true, visible: true },
+  { id: 'p2', title: 'Appartement 2 pièces centre-ville', city: 'Dakar', country: 'Sénégal', price: 185000, currency: 'XOF', bedrooms: 2, bathrooms: 2, surface: 85, livingrooms: 1, rating: 4.6, photos: ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800'], transaction: 'rent', category: 'residential', premium: false, visible: true },
+  { id: 'p3', title: 'Penthouse de luxe avec vue mer', city: 'Lomé', country: 'Togo', price: 520000, currency: 'XOF', bedrooms: 3, bathrooms: 3, surface: 180, livingrooms: 2, rating: 4.9, photos: ['https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800'], transaction: 'sale', category: 'residential', premium: true, visible: true },
+  { id: 'p4', title: 'Studio moderne centre', city: 'Abidjan', country: 'Côte d\'Ivoire', price: 88000, currency: 'XOF', bedrooms: 1, bathrooms: 1, surface: 45, livingrooms: 0, rating: 4.3, photos: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800'], transaction: 'rent', category: 'residential', premium: false, visible: true },
+  { id: 'p5', title: 'Maison familiale avec jardin', city: 'Cotonou', country: 'Bénin', price: 320000, currency: 'XOF', bedrooms: 4, bathrooms: 2, surface: 200, livingrooms: 2, rating: 4.7, photos: ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800'], transaction: 'sale', category: 'residential', premium: true, visible: true },
+  { id: 't1', title: 'Suite Luxe Hôtel Ivoire', city: 'Abidjan', country: 'Côte d\'Ivoire', price: 75000, currency: 'XOF', rating: 4.8, reviews: 156, photos: ['https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'], category: 'travel', type: 'hotel', premium: true, visible: true },
+  { id: 't2', title: 'Résidence Almadies', city: 'Dakar', country: 'Sénégal', price: 65000, currency: 'XOF', rating: 4.6, reviews: 89, photos: ['https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800'], category: 'travel', type: 'daily', premium: false, visible: true },
+  { id: 't3', title: 'Villa Bord de Mer', city: 'Lomé', country: 'Togo', price: 95000, currency: 'XOF', rating: 4.9, reviews: 203, photos: ['https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800'], category: 'travel', type: 'hotel', premium: true, visible: true },
+  { id: 't4', title: 'Appartement Cocody', city: 'Abidjan', country: 'Côte d\'Ivoire', price: 55000, currency: 'XOF', rating: 4.4, reviews: 67, photos: ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800'], category: 'travel', type: 'daily', premium: false, visible: true },
+  { id: 't5', title: 'Resort Plage Assinie', city: 'Assinie', country: 'Côte d\'Ivoire', price: 120000, currency: 'XOF', rating: 4.9, reviews: 312, photos: ['https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800'], category: 'travel', type: 'hotel', premium: true, visible: true },
+  { id: 't6', title: 'Chambre Plateau', city: 'Abidjan', country: 'Côte d\'Ivoire', price: 45000, currency: 'XOF', rating: 4.2, reviews: 45, photos: ['https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800'], category: 'travel', type: 'daily', premium: false, visible: true },
+];
+
+async function seedPropertiesIfEmpty() {
+  const arr = await read<any[]>(KEYS.properties, []);
+  if (arr.length) return arr;
+  await write(KEYS.properties, MOCK_PROPERTIES);
+  return MOCK_PROPERTIES;
+}
+
 export const api = {
   async listProperties(params?: Record<string, string | number | undefined>) {
-    const all = await read<any[]>(KEYS.properties, []);
+    const all = await seedPropertiesIfEmpty();
     return all.filter((p) => {
       if (p.deletedAt) return false;
       if (params?.category && p.category !== params.category) return false;
