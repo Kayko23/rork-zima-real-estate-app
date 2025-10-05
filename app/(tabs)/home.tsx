@@ -16,6 +16,7 @@ import { useSearchPreset } from "@/hooks/useSearchPreset";
 import { premiumPreset } from "@/lib/filters";
 import { seeAllCategory } from "@/lib/navigation";
 import { CategorySlug } from "@/types/taxonomy";
+import HeaderCountryButton from "@/components/HeaderCountryButton";
 
 import { sortPremiumFirst } from "@/utils/sortProperties";
 
@@ -85,9 +86,14 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <View style={[styles.stickyHeader, { paddingTop: top }]}>
-        <Pressable onPress={() => router.push('/(tabs)/home')} style={{ alignSelf: 'center' }}>
-          <Text style={styles.brand}>ZIMA</Text>
-        </Pressable>
+        <View style={styles.headerRow}>
+          <Pressable onPress={() => router.push('/(tabs)/home')} style={{ flex: 1, alignItems: 'center' }}>
+            <Text style={styles.brand}>ZIMA</Text>
+          </Pressable>
+          <View style={styles.countryButtonWrapper}>
+            <HeaderCountryButton />
+          </View>
+        </View>
 
         <View style={{ paddingHorizontal:16, paddingBottom:12 }}>
           <SegmentedTabs value={tab} onChange={(k)=>{
@@ -249,7 +255,9 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   stickyHeader: { backgroundColor: '#fff', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E7EB', zIndex: 20, shadowColor: '#000', shadowOpacity: 0.06, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10, elevation: 6 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, position: 'relative' },
   brand:{ textAlign:"center", fontSize:38, fontWeight:"900", color: '#0B1720', letterSpacing: 3, marginVertical: 8 },
+  countryButtonWrapper: { position: 'absolute', right: 16, top: 0, bottom: 0, justifyContent: 'center' },
   ctaRow:{ paddingHorizontal:12, flexDirection:"row", gap:12, marginTop:24, marginBottom:16 },
   cta:{ flex:1, backgroundColor: colors.primary, paddingVertical:16, borderRadius: radius.lg, alignItems:"center" },
   ctaOutline:{ backgroundColor: colors.panel, borderWidth:1, borderColor: colors.primary },
