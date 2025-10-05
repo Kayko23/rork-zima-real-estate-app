@@ -103,13 +103,12 @@ function Chip({ icon, label }: { icon: string; label: string }) {
   );
 }
 
-const CARD_W = 340;
 const CARD_H = 210;
 const RADIUS = 18;
 
 const styles = StyleSheet.create({
   card: {
-    width: CARD_W,
+    width: '100%',
     height: CARD_H,
     borderRadius: RADIUS,
     overflow: 'hidden',

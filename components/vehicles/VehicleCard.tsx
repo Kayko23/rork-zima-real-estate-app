@@ -138,10 +138,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#000',
     ...(shadow.card as any),
+    width: '100%',
   },
   image: {
     width: '100%',
-    height: 210,
+    height: 240,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,

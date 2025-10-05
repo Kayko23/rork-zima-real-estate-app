@@ -9,7 +9,9 @@ import CompanyLogoRow from '@/components/vehicles/CompanyLogoRow';
 import UnifiedFilterSheet, { VehicleFilters } from '@/components/filters/UnifiedFilterSheet';
 import CategoryRail from '@/components/home/CategoryRail';
 import VehicleCard from '@/components/cards/VehicleCard';
+import DriverCard from '@/components/cards/DriverCard';
 import type { VehicleItem } from '@/components/cards/VehicleCard';
+import type { DriverItem } from '@/components/cards/DriverCard';
 
 
 export default function VehiclesTab() {
@@ -49,6 +51,20 @@ export default function VehiclesTab() {
     fuel: item.fuel ?? 'diesel',
     transmission: item.transmission ?? 'auto',
     rating: item.rating
+  });
+
+  const transformDriver = (item: any): DriverItem => ({
+    id: item.id,
+    name: item.title ?? 'Chauffeur',
+    city: item.city ?? 'Ville',
+    imageUrl: item.image ?? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800',
+    isPremium: item.premium ?? false,
+    pricePerDay: item.price ?? 0,
+    currency: item.currency ?? 'XOF',
+    rating: item.rating,
+    experience: item.experience ?? 5,
+    languages: item.languages ?? ['Français'],
+    verified: item.verified ?? true
   });
 
   return (
@@ -149,15 +165,15 @@ export default function VehiclesTab() {
           queryKey={['vehicles-driver', country?.code]}
           queryFn={async () => {
             await new Promise((r) => setTimeout(r, 150));
-            const vehicles = [
-              { id: 'v4', title: 'Chauffeur Pro Paul', city: 'Dakar', countryCode: 'SN', price: 60000, currency: 'XOF', premium: true, kind: 'driver', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&h=600&fit=crop', rating: 5 },
-              { id: 'v8', title: 'Chauffeur Pro Marie', city: 'Abidjan', countryCode: 'CI', price: 55000, currency: 'XOF', premium: false, kind: 'driver', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=900&h=600&fit=crop', rating: 4.7 },
-              { id: 'v12', title: 'Chauffeur Pro Amadou', city: 'Douala', countryCode: 'CM', price: 65000, currency: 'XAF', premium: true, kind: 'driver', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=900&h=600&fit=crop', rating: 4.9 },
+            const drivers = [
+              { id: 'v4', title: 'Paul Diop', city: 'Dakar', countryCode: 'SN', price: 60000, currency: 'XOF', premium: true, kind: 'driver', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=900&h=600&fit=crop', rating: 5, experience: 8, languages: ['Français', 'Wolof', 'Anglais'], verified: true },
+              { id: 'v8', title: 'Marie Kouassi', city: 'Abidjan', countryCode: 'CI', price: 55000, currency: 'XOF', premium: false, kind: 'driver', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=900&h=600&fit=crop', rating: 4.7, experience: 6, languages: ['Français', 'Baoulé'], verified: true },
+              { id: 'v12', title: 'Amadou Ndiaye', city: 'Douala', countryCode: 'CM', price: 65000, currency: 'XAF', premium: true, kind: 'driver', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=900&h=600&fit=crop', rating: 4.9, experience: 10, languages: ['Français', 'Anglais', 'Douala'], verified: true },
             ];
-            const filtered = vehicles.filter(v => !country?.code || v.countryCode === country.code);
-            return filtered.slice(0, 10).map(transformVehicle);
+            const filtered = drivers.filter(v => !country?.code || v.countryCode === country.code);
+            return filtered.slice(0, 10).map(transformDriver);
           }}
-          renderItem={(item) => <VehicleCard item={item} />}
+          renderItem={(item) => <DriverCard item={item} />}
           onSeeAll={() => router.push({ pathname: '/vehicles/list', params: { intent: 'driver' } } as any)}
         />
       </ScrollView>
