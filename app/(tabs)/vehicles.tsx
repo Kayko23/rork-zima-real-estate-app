@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { useSettings } from '@/hooks/useSettings';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
-import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
 import CompanyLogoRow from '@/components/vehicles/CompanyLogoRow';
 import UnifiedFilterSheet, { VehicleFilters } from '@/components/filters/UnifiedFilterSheet';
@@ -54,12 +53,14 @@ export default function VehiclesTab() {
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
 
-      <View style={[styles.stickyHeader, { paddingTop: insets.top + 8 }]}>
-        <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:16, paddingBottom:8 }}>
-          <Pressable onPress={() => router.push('/(tabs)/home')}>
-            <ZimaBrand />
+      <View style={[styles.stickyHeader, { paddingTop: insets.top }]}>
+        <View style={{ flexDirection:'row', alignItems:'center', paddingHorizontal:16, position:'relative' }}>
+          <Pressable onPress={() => router.push('/(tabs)/home')} style={{ flex: 1, alignItems: 'center' }}>
+            <Text style={{ textAlign:'center', fontSize:38, fontWeight:'900', color: '#0B1720', letterSpacing: 3, marginVertical: 8 }}>ZIMA</Text>
           </Pressable>
-          <HeaderCountryButton />
+          <View style={{ position: 'absolute', right: 16, top: 0, bottom: 0, justifyContent: 'center' }}>
+            <HeaderCountryButton />
+          </View>
         </View>
         <View style={{ paddingHorizontal:16, paddingBottom:8 }}>
           <SegmentedTabs

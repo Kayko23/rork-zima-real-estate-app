@@ -12,7 +12,6 @@ import UnifiedFilterSheet, { type PropertyFilters } from '@/components/filters/U
 import { useSettings } from '@/hooks/useSettings';
 import { useMoney } from '@/lib/money';
 import SegmentedTabs from '@/components/home/SegmentedTabs';
-import ZimaBrand from '@/components/ui/ZimaBrand';
 import HeaderCountryButton from '@/components/HeaderCountryButton';
 import PropertyStripSection from '@/components/home/PropertyStripSection';
 import { PropertyItem } from '@/components/cards/PropertyCard';
@@ -210,9 +209,13 @@ export default function PropertyScreen(){
   return (
     <View style={{ flex:1, backgroundColor:'#fff' }}>
       <View style={{ position: 'absolute', top: 0, left: 0, right: 0, paddingTop: insets.top, backgroundColor:'#fff', borderBottomWidth:0.5, borderBottomColor:'#E5E7EB', zIndex: 10 }}>
-        <View style={{ flexDirection:'row', alignItems:'center', justifyContent:'space-between', paddingHorizontal:16 }}>
-          <ZimaBrand />
-          <HeaderCountryButton />
+        <View style={{ flexDirection:'row', alignItems:'center', paddingHorizontal:16, position:'relative' }}>
+          <Pressable onPress={() => router.push('/(tabs)/home')} style={{ flex: 1, alignItems: 'center' }}>
+            <Text style={{ textAlign:'center', fontSize:38, fontWeight:'900', color: '#0B1720', letterSpacing: 3, marginVertical: 8 }}>ZIMA</Text>
+          </Pressable>
+          <View style={{ position: 'absolute', right: 16, top: 0, bottom: 0, justifyContent: 'center' }}>
+            <HeaderCountryButton />
+          </View>
         </View>
         
         <View style={{ paddingHorizontal:16, paddingTop:16, paddingBottom:12 }}>
