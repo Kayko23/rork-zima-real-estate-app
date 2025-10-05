@@ -82,6 +82,27 @@ export default function PropertyScreen(){
     { key: 'restos', label: 'Restaurants' },
   ], []);
 
+  const OFFICE_PILLS: Pill[] = useMemo(() => [
+    { key: 'bureaux', label: 'Bureaux' },
+    { key: 'plateaux', label: 'Plateaux' },
+    { key: 'coworking', label: 'Coworking' },
+    { key: 'centres', label: 'Centres d\'affaires' },
+  ], []);
+
+  const LAND_PILLS: Pill[] = useMemo(() => [
+    { key: 'residentiel', label: 'Résidentiel' },
+    { key: 'commercial', label: 'Commercial' },
+    { key: 'agricole', label: 'Agricole' },
+    { key: 'lotissement', label: 'Lotissement' },
+  ], []);
+
+  const EVENT_PILLS: Pill[] = useMemo(() => [
+    { key: 'salles', label: 'Salles de réception' },
+    { key: 'jardins', label: 'Jardins' },
+    { key: 'terrasses', label: 'Terrasses' },
+    { key: 'complexes', label: 'Complexes' },
+  ], []);
+
   const residentialItems = useMemo<PropertyItem[]>(() => {
     const mockData: PropertyItem[] = [];
     RES_PILLS.forEach((pill) => {
@@ -123,6 +144,69 @@ export default function PropertyScreen(){
     });
     return mockData;
   }, [activeCountry?.name_fr, COM_PILLS, format]);
+
+  const officeItems = useMemo<PropertyItem[]>(() => {
+    const mockData: PropertyItem[] = [];
+    OFFICE_PILLS.forEach((pill) => {
+      for (let i = 0; i < 5; i++) {
+        mockData.push({
+          id: `office-${pill.key}-${i}`,
+          title: `${pill.label} ${i + 1}`,
+          city: activeCountry?.name_fr ?? 'Ville',
+          priceLabel: format(Math.floor(Math.random() * 600000) + 150000, 'XOF'),
+          cover: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800',
+          badges: Math.random() > 0.5 ? ['À VENDRE'] : ['À LOUER'],
+          facts: ['150 m²', '5 postes'],
+          rating: 4.4,
+          isPremium: Math.random() > 0.7,
+          subcategory: pill.key,
+        } as any);
+      }
+    });
+    return mockData;
+  }, [activeCountry?.name_fr, OFFICE_PILLS, format]);
+
+  const landItems = useMemo<PropertyItem[]>(() => {
+    const mockData: PropertyItem[] = [];
+    LAND_PILLS.forEach((pill) => {
+      for (let i = 0; i < 5; i++) {
+        mockData.push({
+          id: `land-${pill.key}-${i}`,
+          title: `Terrain ${pill.label} ${i + 1}`,
+          city: activeCountry?.name_fr ?? 'Ville',
+          priceLabel: format(Math.floor(Math.random() * 1000000) + 300000, 'XOF'),
+          cover: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800',
+          badges: ['À VENDRE'],
+          facts: ['500 m²'],
+          rating: 4.2,
+          isPremium: Math.random() > 0.7,
+          subcategory: pill.key,
+        } as any);
+      }
+    });
+    return mockData;
+  }, [activeCountry?.name_fr, LAND_PILLS, format]);
+
+  const eventItems = useMemo<PropertyItem[]>(() => {
+    const mockData: PropertyItem[] = [];
+    EVENT_PILLS.forEach((pill) => {
+      for (let i = 0; i < 5; i++) {
+        mockData.push({
+          id: `event-${pill.key}-${i}`,
+          title: `${pill.label} ${i + 1}`,
+          city: activeCountry?.name_fr ?? 'Ville',
+          priceLabel: format(Math.floor(Math.random() * 400000) + 100000, 'XOF'),
+          cover: 'https://images.unsplash.com/photo-1519167758481-83f29da8c2b0?w=800',
+          badges: ['À LOUER'],
+          facts: ['300 m²', '200 pers'],
+          rating: 4.6,
+          isPremium: Math.random() > 0.7,
+          subcategory: pill.key,
+        } as any);
+      }
+    });
+    return mockData;
+  }, [activeCountry?.name_fr, EVENT_PILLS, format]);
 
   return (
     <View style={{ flex:1, backgroundColor:'#fff' }}>
@@ -218,6 +302,39 @@ export default function PropertyScreen(){
           initialSubcatKey="boutiques"
           onSeeAll={(activeSubcatKey) =>
             router.push({ pathname: '/property/index', params: { category: 'commercial', sub: activeSubcatKey } } as any)
+          }
+          onOpenItem={(item) => router.push({ pathname: '/property/[id]', params: { id: item.id } } as any)}
+        />
+
+        <PropertyStripSection
+          title="Bureaux"
+          pills={OFFICE_PILLS}
+          items={officeItems}
+          initialSubcatKey="bureaux"
+          onSeeAll={(activeSubcatKey) =>
+            router.push({ pathname: '/property/index', params: { category: 'office', sub: activeSubcatKey } } as any)
+          }
+          onOpenItem={(item) => router.push({ pathname: '/property/[id]', params: { id: item.id } } as any)}
+        />
+
+        <PropertyStripSection
+          title="Terrains"
+          pills={LAND_PILLS}
+          items={landItems}
+          initialSubcatKey="residentiel"
+          onSeeAll={(activeSubcatKey) =>
+            router.push({ pathname: '/property/index', params: { category: 'land', sub: activeSubcatKey } } as any)
+          }
+          onOpenItem={(item) => router.push({ pathname: '/property/[id]', params: { id: item.id } } as any)}
+        />
+
+        <PropertyStripSection
+          title="Espaces événementiels"
+          pills={EVENT_PILLS}
+          items={eventItems}
+          initialSubcatKey="salles"
+          onSeeAll={(activeSubcatKey) =>
+            router.push({ pathname: '/property/index', params: { category: 'event', sub: activeSubcatKey } } as any)
           }
           onOpenItem={(item) => router.push({ pathname: '/property/[id]', params: { id: item.id } } as any)}
         />
