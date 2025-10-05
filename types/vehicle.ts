@@ -12,4 +12,6 @@ export type Vehicle = {
   seats?: number;
   image: string;
   rating?: number;
+  fuel?: string;
+  gearbox?: 'auto' | 'manuelle';
 };

@@ -99,6 +99,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
   const [favoritePropertyIds, setFavoritePropertyIds] = useState<Set<string>>(new Set());
   const [favoriteProviderIds, setFavoriteProviderIds] = useState<Set<string>>(new Set());
   const [favoriteVoyageIds, setFavoriteVoyageIds] = useState<Set<string>>(new Set());
+  const [favoriteVehicleIds, setFavoriteVehicleIds] = useState<Set<string>>(new Set());
   const [subscription, setSubscription] = useState<SubscriptionState>({
     plan: 'none',
     nextBillingAt: null,
@@ -144,6 +145,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
       const savedFavProperties = await storage.getItem('favoriteProperties');
       const savedFavProviders = await storage.getItem('favoriteProviders');
       const savedFavVoyages = await storage.getItem('favoriteVoyages');
+      const savedFavVehicles = await storage.getItem('favoriteVehicles');
       const savedSubscription = await storage.getItem('subscription');
       
       if (savedMode && savedMode.trim()) {
@@ -197,6 +199,14 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
           setFavoriteVoyageIds(new Set(parsed));
         } catch (e) {
           console.log('Error parsing favorite voyages', e);
+        }
+      }
+      if (savedFavVehicles) {
+        try {
+          const parsed = JSON.parse(savedFavVehicles);
+          setFavoriteVehicleIds(new Set(parsed));
+        } catch (e) {
+          console.log('Error parsing favorite vehicles', e);
         }
       }
       if (savedSubscription) {
@@ -344,9 +354,25 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     });
   }, []);
 
+  const toggleFavoriteVehicle = useCallback(async (id: string) => {
+    setFavoriteVehicleIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+        console.log('[Favorites] Removed vehicle', id);
+      } else {
+        next.add(id);
+        console.log('[Favorites] Added vehicle', id);
+      }
+      storage.setItem('favoriteVehicles', JSON.stringify(Array.from(next)));
+      return next;
+    });
+  }, []);
+
   const isFavoriteProperty = useCallback((id: string) => favoritePropertyIds.has(id), [favoritePropertyIds]);
   const isFavoriteProvider = useCallback((id: string) => favoriteProviderIds.has(id), [favoriteProviderIds]);
   const isFavoriteVoyage = useCallback((id: string) => favoriteVoyageIds.has(id), [favoriteVoyageIds]);
+  const isFavoriteVehicle = useCallback((id: string) => favoriteVehicleIds.has(id), [favoriteVehicleIds]);
 
   const setPlan = useCallback(async (plan: Plan, nextBillingAt?: string | null) => {
     const updated = { ...subscription, plan, nextBillingAt: nextBillingAt ?? subscription.nextBillingAt };
@@ -440,6 +466,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     favoritePropertyIds,
     favoriteProviderIds,
     favoriteVoyageIds,
+    favoriteVehicleIds,
     subscription,
     switchMode,
     toggleAppMode,
@@ -456,9 +483,11 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     toggleFavoriteProperty,
     toggleFavoriteProvider,
     toggleFavoriteVoyage,
+    toggleFavoriteVehicle,
     isFavoriteProperty,
     isFavoriteProvider,
     isFavoriteVoyage,
+    isFavoriteVehicle,
     setPlan,
     addPaymentMethod,
     removePaymentMethod,
@@ -466,7 +495,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     setPaymentMethods,
     subscribeWithDefault,
     cancelSubscription
-  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, activeHomeTab, currency, fxBase, fxRates, favoritePropertyIds, favoriteProviderIds, favoriteVoyageIds, subscription, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding, setHomeTab, setCurrency, setFx, hydrate, toggleFavoriteProperty, toggleFavoriteProvider, toggleFavoriteVoyage, isFavoriteProperty, isFavoriteProvider, isFavoriteVoyage, setPlan, addPaymentMethod, removePaymentMethod, setDefaultPaymentMethod, setPaymentMethods, subscribeWithDefault, cancelSubscription]);
+  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, activeHomeTab, currency, fxBase, fxRates, favoritePropertyIds, favoriteProviderIds, favoriteVoyageIds, favoriteVehicleIds, subscription, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding, setHomeTab, setCurrency, setFx, hydrate, toggleFavoriteProperty, toggleFavoriteProvider, toggleFavoriteVoyage, toggleFavoriteVehicle, isFavoriteProperty, isFavoriteProvider, isFavoriteVoyage, isFavoriteVehicle, setPlan, addPaymentMethod, removePaymentMethod, setDefaultPaymentMethod, setPaymentMethods, subscribeWithDefault, cancelSubscription]);
 });
 
 // Export a safe version of the hook that always returns a valid object
@@ -491,6 +520,7 @@ export const useApp = () => {
       favoritePropertyIds: new Set<string>(),
       favoriteProviderIds: new Set<string>(),
       favoriteVoyageIds: new Set<string>(),
+      favoriteVehicleIds: new Set<string>(),
       subscription: { plan: 'none' as const, nextBillingAt: null, paymentMethods: [] },
       switchMode: async () => {},
       toggleAppMode: async () => {},
@@ -507,9 +537,11 @@ export const useApp = () => {
       toggleFavoriteProperty: async () => {},
       toggleFavoriteProvider: async () => {},
       toggleFavoriteVoyage: async () => {},
+      toggleFavoriteVehicle: async () => {},
       isFavoriteProperty: () => false,
       isFavoriteProvider: () => false,
       isFavoriteVoyage: () => false,
+      isFavoriteVehicle: () => false,
       setPlan: async () => {},
       addPaymentMethod: async () => {},
       removePaymentMethod: async () => {},
