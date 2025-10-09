@@ -1,29 +1,85 @@
 export type ProStatus = 'none' | 'draft' | 'pending_review' | 'verified' | 'rejected';
 
+export type Sector = 'property' | 'travel' | 'vehicles';
+
 export type IdDocType = 'CNI' | 'PASSEPORT' | 'RESIDENCE';
 
 export type AccountType = 'INDEPENDANT' | 'AGENCE';
 
 export type ProCategory =
-  | 'AGENT'
-  | 'AGENCE'
-  | 'GESTIONNAIRE'
-  | 'CONSEIL'
-  | 'HOTELLERIE'
-  | 'AGENT_IMMOBILIER'
-  | 'GESTIONNAIRE_BIENS'
-  | 'AGENCE_IMMOBILIERE'
-  | 'RESP_RESERVATION_HOTEL'
-  | 'RESP_RESERVATION_RESIDENCE'
-  | 'GESTIONNAIRE_EVENEMENTIEL'
-  | 'CHAUFFEUR_PRO';
+  | 'agent'
+  | 'agency'
+  | 'property_manager'
+  | 'consulting'
+  | 'hospitality'
+  | 'hotel'
+  | 'daily_residence'
+  | 'holiday_villa'
+  | 'travel_agency'
+  | 'vip_with_driver'
+  | 'vehicle_rental'
+  | 'vehicle_sales'
+  | 'pro_driver';
+
+export interface ProKycIdentity {
+  accountType: AccountType;
+  legalName: string;
+  birthDate?: string;
+  nationality: string;
+  country: string;
+  city: string;
+  addressLine: string;
+  idType: IdDocType;
+  idNumber: string;
+  idExpiry?: string;
+}
+
+export interface ProKycContacts {
+  email: string;
+  phoneWhatsApp?: string;
+  phoneMobile?: string;
+  website?: string;
+}
+
+export interface ProKycDocuments {
+  idFrontUrl: string;
+  idBackUrl?: string;
+  selfieWithIdUrl: string;
+  avatarUrl: string;
+
+  businessRegistryUrl?: string;
+  operationLicenseUrl?: string;
+  drivingLicenseFrontUrl?: string;
+  drivingLicenseBackUrl?: string;
+  driverExperienceYears?: number;
+  fleetInsuranceUrl?: string;
+}
+
+export interface ProProfile {
+  sectors: Sector[];
+  categories: ProCategory[];
+  servedAreas: { country: string; city?: string }[];
+  bio: string;
+  languages: string[];
+  businessName?: string;
+  rccm?: string;
+  nif?: string;
+}
+
+export interface ProKycPayload {
+  identity: ProKycIdentity;
+  contacts: ProKycContacts;
+  documents: ProKycDocuments;
+  profile: ProProfile;
+  acceptedTerms: boolean;
+}
 
 export interface ProKyc {
   accountType: AccountType;
   legalName: string;
-  birthDate: string;
-  nationality: string; // ISO2
-  country: string; // ISO2
+  birthDate?: string;
+  nationality: string;
+  country: string;
   city: string;
   addressLine: string;
 
@@ -41,7 +97,15 @@ export interface ProKyc {
   idBackUrl?: string;
   avatarUrl: string;
 
-  category: ProCategory;
+  businessRegistryUrl?: string;
+  operationLicenseUrl?: string;
+  drivingLicenseFrontUrl?: string;
+  drivingLicenseBackUrl?: string;
+  driverExperienceYears?: number;
+  fleetInsuranceUrl?: string;
+
+  sectors: Sector[];
+  categories: ProCategory[];
   bio: string;
   businessName?: string;
   rccm?: string;
@@ -53,7 +117,6 @@ export interface ProKyc {
   status: ProStatus;
   rejectionReason?: string;
 
-  // Extensions (non bloquantes)
   services?: string[];
   rating?: number;
   verifiedAt?: string | null;

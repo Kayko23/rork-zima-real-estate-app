@@ -1,4 +1,42 @@
 import { Provider } from "@/components/professionals/ProfessionalCard";
+import { Sector, ProCategory } from "@/types/pro";
+
+export const SECTOR_OPTIONS: { key: Sector; label: string; icon: string }[] = [
+  { key: 'property', label: 'Immobilier', icon: 'home' },
+  { key: 'travel', label: 'Voyages', icon: 'bed' },
+  { key: 'vehicles', label: 'Véhicules', icon: 'car' },
+];
+
+export const CATEGORY_BY_SECTOR: Record<Sector, { key: ProCategory; label: string }[]> = {
+  property: [
+    { key: 'agent', label: 'Agent immobilier' },
+    { key: 'agency', label: 'Agence immobilière' },
+    { key: 'property_manager', label: 'Gestionnaire' },
+    { key: 'consulting', label: 'Conseil' },
+    { key: 'hospitality', label: 'Hôtellerie' },
+  ],
+  travel: [
+    { key: 'hotel', label: 'Hôtel / Resort' },
+    { key: 'daily_residence', label: 'Résidence journalière' },
+    { key: 'holiday_villa', label: 'Villa de vacances' },
+    { key: 'travel_agency', label: 'Agence de voyage' },
+  ],
+  vehicles: [
+    { key: 'vip_with_driver', label: 'Société VIP (chauffeur)' },
+    { key: 'vehicle_rental', label: 'Location de véhicules' },
+    { key: 'vehicle_sales', label: 'Vente auto' },
+    { key: 'pro_driver', label: 'Chauffeur Pro' },
+  ],
+};
+
+export const LANGUAGES = [
+  { code: 'fr', label: 'Français' },
+  { code: 'en', label: 'Anglais' },
+  { code: 'wo', label: 'Wolof' },
+  { code: 'ar', label: 'Arabe' },
+  { code: 'pt', label: 'Portugais' },
+  { code: 'es', label: 'Espagnol' },
+];
 
 export const CATEGORY_ORDER: {
   key: Provider["category"];
