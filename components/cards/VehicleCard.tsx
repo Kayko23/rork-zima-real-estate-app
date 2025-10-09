@@ -1,6 +1,7 @@
 import React from 'react';
-import { TouchableOpacity, Image, View, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
+import ListingCover from '@/components/common/ListingCover';
 
 export type FuelType = 'diesel' | 'essence' | 'electrique' | 'hybride' | 'gpl' | 'autre';
 export type Transmission = 'auto' | 'manuelle';
@@ -45,7 +46,6 @@ const transLabel: Record<Transmission, string> = {
 export default function VehicleCard({ item }: { item: VehicleItem }) {
   const router = useRouter();
   const imageSource = item.imageUrl || item.cover;
-  const validUri = imageSource && imageSource.trim().length > 0 ? imageSource : 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800';
   
   const currency = item.currency ?? 'XOF';
   const showPrice = item.forRent !== false && typeof item.pricePerDay === 'number';
@@ -56,7 +56,7 @@ export default function VehicleCard({ item }: { item: VehicleItem }) {
       onPress={() => router.push({ pathname: '/vehicles/[id]', params: { id: item.id } } as any)}
       style={styles.card}
     >
-      <Image source={{ uri: validUri }} style={styles.img} resizeMode="cover" />
+      <ListingCover url={imageSource} style={styles.img} />
 
       <View style={styles.badgesLeft}>
         {item.isPremium && <Badge text="Premium" tone="gold" />}

@@ -1,7 +1,8 @@
 import React from 'react';
-import { TouchableOpacity, Image, View, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors, radius } from '@/theme/tokens';
+import ListingCover from '@/components/common/ListingCover';
 
 export type PropertyItem = {
   id: string;
@@ -17,14 +18,13 @@ export type PropertyItem = {
 
 export default function PropertyCard({ item }: { item: PropertyItem }) {
   const router = useRouter();
-  const validUri = item.cover && item.cover.trim().length > 0 ? item.cover : 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800';
 
   return (
     <TouchableOpacity
       onPress={() => router.push({ pathname: '/property/[id]', params: { id: item.id } } as any)}
       style={styles.card}
     >
-      <Image source={{ uri: validUri }} style={styles.img} resizeMode="cover" />
+      <ListingCover url={item.cover} style={styles.img} />
       <View style={styles.overlay} />
 
       <View style={styles.badges}>

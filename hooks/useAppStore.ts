@@ -450,8 +450,11 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     await storage.setItem('subscription', JSON.stringify(updated));
   }, [subscription]);
 
+  const isPro = useMemo(() => userMode === 'provider', [userMode]);
+
   return useMemo(() => ({
     userMode,
+    isPro,
     user,
     filters,
     hasUnreadNotifications,
@@ -495,7 +498,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     setPaymentMethods,
     subscribeWithDefault,
     cancelSubscription
-  }), [userMode, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, activeHomeTab, currency, fxBase, fxRates, favoritePropertyIds, favoriteProviderIds, favoriteVoyageIds, favoriteVehicleIds, subscription, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding, setHomeTab, setCurrency, setFx, hydrate, toggleFavoriteProperty, toggleFavoriteProvider, toggleFavoriteVoyage, toggleFavoriteVehicle, isFavoriteProperty, isFavoriteProvider, isFavoriteVoyage, isFavoriteVehicle, setPlan, addPaymentMethod, removePaymentMethod, setDefaultPaymentMethod, setPaymentMethods, subscribeWithDefault, cancelSubscription]);
+  }), [userMode, isPro, user, filters, hasUnreadNotifications, isHydrated, language, hasCompletedOnboarding, isInitialized, activeHomeTab, currency, fxBase, fxRates, favoritePropertyIds, favoriteProviderIds, favoriteVoyageIds, favoriteVehicleIds, subscription, switchMode, toggleAppMode, updateUser, updateFilters, clearFilters, markNotificationsAsRead, setLanguage, completeOnboarding, setHomeTab, setCurrency, setFx, hydrate, toggleFavoriteProperty, toggleFavoriteProvider, toggleFavoriteVoyage, toggleFavoriteVehicle, isFavoriteProperty, isFavoriteProvider, isFavoriteVoyage, isFavoriteVehicle, setPlan, addPaymentMethod, removePaymentMethod, setDefaultPaymentMethod, setPaymentMethods, subscribeWithDefault, cancelSubscription]);
 });
 
 // Export a safe version of the hook that always returns a valid object
@@ -506,6 +509,7 @@ export const useApp = () => {
   if (!store) {
     return {
       userMode: 'user' as const,
+      isPro: false,
       user: defaultUser,
       filters: defaultFilters,
       hasUnreadNotifications: false,

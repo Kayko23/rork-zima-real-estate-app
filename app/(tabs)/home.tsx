@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import SegmentedTabs from "@/components/home/SegmentedTabs";
 import SectionHeader from "@/components/home/SectionHeader";
 import PropertyCard, { type Property } from "@/components/property/PropertyCard";
+import HomeCTA from "@/components/home/HomeCTA";
 
 import VehicleCard from "@/components/vehicles/VehicleCard";
 import VehicleCardStandard from "@/components/cards/VehicleCard";
@@ -11,7 +12,7 @@ import { useVehicles } from "@/hooks/useVehicles";
 import ResidentialChips from "@/components/home/ResidentialChips";
 import VehiclesChips from "@/components/home/VehiclesChips";
 import CommercialChips from "@/components/home/CommercialChips";
-import { colors, radius } from "@/theme/tokens";
+import { colors } from "@/theme/tokens";
 import { useRouter } from "expo-router";
 import { useSearchPreset } from "@/hooks/useSearchPreset";
 import { premiumPreset } from "@/lib/filters";
@@ -106,6 +107,7 @@ export default function Home() {
         showsVerticalScrollIndicator={false}
         bounces
       >
+        <HomeCTA />
 
         <SectionHeader title="Propriétés premium" onSeeAll={()=>{
           setPreset(premiumPreset('properties'));
@@ -247,27 +249,6 @@ export default function Home() {
             )}
           </View>
         ))}
-
-        <View style={styles.ctaRow}>
-          <Pressable
-            onPress={()=>router.push("/property/new")}
-            android_ripple={{ color: colors.primarySoft }}
-            style={({pressed})=>[styles.cta, pressed && { transform:[{scale:.98}] }]}
-            testID="cta-publish"
-          >
-            <Text style={styles.ctaIcon}>＋</Text>
-            <Text style={styles.ctaTxt}>Publier un bien</Text>
-          </Pressable>
-
-          <Pressable
-            onPress={goVehicles}
-            android_ripple={{ color: colors.primarySoft }}
-            style={({pressed})=>[styles.cta, styles.ctaOutline, pressed && { opacity:.85 }]}
-            testID="cta-find-vehicle"
-          >
-            <Text style={[styles.ctaTxt, { color: colors.primary }]}>Voir véhicules</Text>
-          </Pressable>
-        </View>
       </ScrollView>
     </View>
   );
@@ -279,11 +260,6 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, position: 'relative' },
   brand:{ textAlign:"center", fontSize:38, fontWeight:"900", color: '#0B1720', letterSpacing: 3, marginVertical: 8 },
   countryButtonWrapper: { position: 'absolute', right: 16, top: 0, bottom: 0, justifyContent: 'center' },
-  ctaRow:{ paddingHorizontal:12, flexDirection:"row", gap:12, marginTop:24, marginBottom:16 },
-  cta:{ flex:1, backgroundColor: colors.primary, paddingVertical:16, borderRadius: radius.lg, alignItems:"center" },
-  ctaOutline:{ backgroundColor: colors.panel, borderWidth:1, borderColor: colors.primary },
-  ctaIcon:{ color:"#fff", fontWeight:"900", fontSize:18, marginBottom:2 },
-  ctaTxt:{ color:"#fff", fontWeight:"800", fontSize:16 },
   categoryHeader:{ flexDirection:"row", justifyContent:"space-between", alignItems:"center", paddingHorizontal:12, marginTop:12, marginBottom:8 },
   categoryTitle:{ fontSize:20, fontWeight:"700", color:"#0b1720" },
   categoryLink:{ padding:6, borderRadius:10 },
