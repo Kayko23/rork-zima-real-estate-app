@@ -16,6 +16,7 @@ type Plan = 'pro-monthly' | 'pro-yearly' | 'none';
 
 import type { PaymentMethod } from '@/types';
 import { startMobileMoneyCharge, currencyForCountry } from '@/utils/mobileMoney';
+import type { CurrencyCode as CfaCurrencyCode } from '@/constants/cfa';
 
 type SubscriptionState = {
   plan: Plan;
@@ -416,10 +417,11 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     const amount = plan === 'pro-monthly' ? 15000 : 150000;
     
     if (def.type === 'mobile_money') {
-      const currency = def.currency || currencyForCountry(def.country);
+      const detectedCurrency = currencyForCountry(def.countryCode);
+      const currency: CfaCurrencyCode = (def.currency || detectedCurrency) as CfaCurrencyCode;
       const res = await startMobileMoneyCharge({
         provider: def.provider!,
-        country: def.country!,
+        countryCode: def.countryCode! as any,
         phone: def.phone!,
         amount,
         currency,
