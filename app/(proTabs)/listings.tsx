@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Plus } from 'lucide-react-native';
 import { router } from 'expo-router';
@@ -8,12 +8,17 @@ import { useApp } from '@/hooks/useAppStore';
 import Colors from '@/constants/colors';
 import { Listing, ListingStatus, fetchListings } from '@/services/annonces.api';
 import ListingCard from '@/components/provider/ListingCard';
+import CreateMenu from '@/components/pro/CreateMenu';
+
+type DomainFilter = 'all' | 'property' | 'trip' | 'vehicle';
 
 export default function ListingsScreen() {
   const { hasUnreadNotifications, markNotificationsAsRead } = useApp();
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<ListingStatus>('active');
+  const [domainFilter, setDomainFilter] = useState<DomainFilter>('all');
   const [data, setData] = useState<Listing[]|null>(null);
+  const [showCreateMenu, setShowCreateMenu] = useState(false);
 
   async function loadListings() {
     setData(null);
@@ -26,7 +31,7 @@ export default function ListingsScreen() {
   }, [activeTab]);
 
   const handleCreateListing = () => {
-    router.push('/provider/annonces/new');
+    setShowCreateMenu(true);
   };
 
   const handleNotificationPress = () => {
@@ -38,6 +43,13 @@ export default function ListingsScreen() {
     { id: 'active' as ListingStatus, label: 'Actives', count: data?.length ?? 0 },
     { id: 'pending' as ListingStatus, label: 'En attente', count: 0 },
     { id: 'expired' as ListingStatus, label: 'Expirées', count: 0 },
+  ];
+
+  const domainFilters = [
+    { id: 'all' as DomainFilter, label: 'Toutes' },
+    { id: 'property' as DomainFilter, label: 'Propriétés' },
+    { id: 'trip' as DomainFilter, label: 'Voyages' },
+    { id: 'vehicle' as DomainFilter, label: 'Véhicules' },
   ];
 
   return (
@@ -72,6 +84,32 @@ export default function ListingsScreen() {
         ))}
       </View>
 
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.domainFilters}
+      >
+        {domainFilters.map((filter) => (
+          <TouchableOpacity
+            key={filter.id}
+            style={[
+              styles.domainChip,
+              domainFilter === filter.id && styles.domainChipActive,
+            ]}
+            onPress={() => setDomainFilter(filter.id)}
+          >
+            <Text
+              style={[
+                styles.domainChipText,
+                domainFilter === filter.id && styles.domainChipTextActive,
+              ]}
+            >
+              {filter.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
       {!data ? (
         <View style={styles.loading}>
           <ActivityIndicator size="large" color={Colors.primary} />
@@ -104,6 +142,7 @@ export default function ListingsScreen() {
           )}
         </View>
       )}
+      <CreateMenu visible={showCreateMenu} onClose={() => setShowCreateMenu(false)} />
     </View>
   );
 }
@@ -197,5 +236,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-
+  domainFilters: {
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    gap: 8,
+  },
+  domainChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
+  },
+  domainChipActive: {
+    backgroundColor: Colors.primary,
+  },
+  domainChipText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    color: '#64748B',
+  },
+  domainChipTextActive: {
+    color: '#fff',
+  },
 });

@@ -1,10 +1,25 @@
 export type ProStatus = 'none' | 'draft' | 'pending_review' | 'verified' | 'rejected';
 
+export type ProDomain = 'property' | 'trip' | 'vehicle';
 export type Sector = 'property' | 'travel' | 'vehicles';
 
 export type IdDocType = 'CNI' | 'PASSEPORT' | 'RESIDENCE';
 
 export type AccountType = 'INDEPENDANT' | 'AGENCE';
+
+export type ProRole =
+  | 'agent'
+  | 'property_manager'
+  | 'hotel'
+  | 'host'
+  | 'vehicle_agency'
+  | 'pro_driver'
+  | 'private_owner';
+
+export type RentUnit = 'night' | 'day' | 'week' | 'month';
+export type CurrencyCode = 'XOF' | 'GHS' | 'NGN' | 'USD' | 'EUR';
+export type FuelType = 'diesel' | 'essence' | 'hybride' | 'electrique';
+export type Transmission = 'auto' | 'manuel';
 
 export type ProCategory =
   | 'agent'

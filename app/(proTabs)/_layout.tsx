@@ -1,6 +1,7 @@
 import { Tabs, useRouter } from 'expo-router';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Platform, StyleSheet, View, Pressable } from 'react-native';
+import CreateMenu from '@/components/pro/CreateMenu';
 import { 
   BarChart3, 
   Calendar, 
@@ -18,6 +19,7 @@ export default function ProTabsLayout() {
   const { userMode } = useApp();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const [showCreateMenu, setShowCreateMenu] = useState(false);
 
   useEffect(() => {
     if (userMode === 'user') {
@@ -59,6 +61,10 @@ export default function ProTabsLayout() {
               const Icon = tab.icon;
 
               const onPress = () => {
+                if (tab.name === 'listings') {
+                  setShowCreateMenu(true);
+                  return;
+                }
                 const event = navigation.emit({
                   type: 'tabPress',
                   target: route.key,
@@ -99,19 +105,22 @@ export default function ProTabsLayout() {
   };
 
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-      }}
-      tabBar={(props) => <CustomTabBar {...props} />}
-      initialRouteName="dashboard"
-    >
-      <Tabs.Screen name="dashboard" />
-      <Tabs.Screen name="agenda" />
-      <Tabs.Screen name="listings" />
-      <Tabs.Screen name="messages" />
-      <Tabs.Screen name="profile" />
-    </Tabs>
+    <>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+        }}
+        tabBar={(props) => <CustomTabBar {...props} />}
+        initialRouteName="dashboard"
+      >
+        <Tabs.Screen name="dashboard" />
+        <Tabs.Screen name="agenda" />
+        <Tabs.Screen name="listings" />
+        <Tabs.Screen name="messages" />
+        <Tabs.Screen name="profile" />
+      </Tabs>
+      <CreateMenu visible={showCreateMenu} onClose={() => setShowCreateMenu(false)} />
+    </>
   );
 }
 
