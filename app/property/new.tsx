@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, Alert, ScrollView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -7,19 +7,28 @@ import { router } from 'expo-router';
 import { assertCanPublish, PublicationGuardError } from '@/lib/proGuards';
 import { PublicationGuardModal } from '@/components/pro/PublicationGuardModal';
 import { ProStatus } from '@/types/pro';
+import { PropertyListingSchema, PropertyListing } from '@/lib/listingSchemas';
+import { CheckCircle2 } from 'lucide-react-native';
 
- type FormState = {
+type FormState = {
   title: string;
-  type: 'sale' | 'rent';
+  transaction: 'sale' | 'rent' | 'lease';
   price: string;
-  currency: string;
+  currency: 'XOF' | 'GHS' | 'NGN' | 'USD' | 'EUR';
   country: string;
   city: string;
-  rooms?: string;
-  baths?: string;
-  surface?: string;
-  description?: string;
-  photos: string;
+  address: string;
+  categoryPath: string[];
+  bedrooms?: string;
+  bathrooms?: string;
+  livingrooms?: string;
+  areaM2?: string;
+  description: string;
+  coverUrl: string;
+  gallery: string;
+  amenities: string[];
+  orientation?: string;
+  landmark?: string;
 };
 
 export default function NewPropertyScreen() {
@@ -27,16 +36,23 @@ export default function NewPropertyScreen() {
   const qc = useQueryClient();
   const [form, setForm] = useState<FormState>({
     title: '',
-    type: 'rent',
+    transaction: 'rent',
     price: '',
     currency: 'XOF',
     country: '',
     city: '',
-    rooms: '',
-    baths: '',
-    surface: '',
+    address: '',
+    categoryPath: ['residential', 'appartement'],
+    bedrooms: '',
+    bathrooms: '',
+    livingrooms: '',
+    areaM2: '',
     description: '',
-    photos: ''
+    coverUrl: '',
+    gallery: '',
+    amenities: [],
+    orientation: '',
+    landmark: ''
   });
 
   const [guardModal, setGuardModal] = useState<{
@@ -63,25 +79,36 @@ export default function NewPropertyScreen() {
         throw error;
       }
 
-      const priceNum = Number(form.price);
-      if (!form.title || !form.country || !form.city || !priceNum) {
-        throw new Error('Veuillez renseigner titre, pays, ville et prix.');
-      }
-      const body = {
+      const payload: Partial<PropertyListing> = {
         title: form.title,
-        type: form.type,
-        price: priceNum,
-        currency: form.currency,
+        transaction: form.transaction,
+        price: {
+          amount: Number(form.price),
+          currency: form.currency
+        },
         country: form.country,
         city: form.city,
-        rooms: form.rooms ? Number(form.rooms) : undefined,
-        baths: form.baths ? Number(form.baths) : undefined,
-        surface: form.surface ? Number(form.surface) : undefined,
-        description: form.description ?? '',
-        photos: form.photos ? form.photos.split(/\s*,\s*/).filter(Boolean) : [],
+        address: form.address,
+        categoryPath: form.categoryPath,
+        bedrooms: form.bedrooms ? Number(form.bedrooms) : undefined,
+        bathrooms: form.bathrooms ? Number(form.bathrooms) : undefined,
+        livingrooms: form.livingrooms ? Number(form.livingrooms) : undefined,
+        areaM2: form.areaM2 ? Number(form.areaM2) : undefined,
+        description: form.description,
+        media: {
+          coverUrl: form.coverUrl,
+          gallery: form.gallery ? form.gallery.split(/\s*,\s*/).filter(Boolean) : []
+        },
+        amenities: form.amenities,
+        orientation: form.orientation,
+        isPremium: false,
+        isVip: false,
+        documents: []
       };
-      console.log('[NewProperty] create payload', body);
-      return api.createProperty(body);
+
+      const validated = PropertyListingSchema.parse(payload);
+      console.log('[NewProperty] create payload', validated);
+      return api.createProperty(validated);
     },
     onSuccess: async (doc: any) => {
       console.log('[NewProperty] created', doc?.id);
@@ -96,7 +123,16 @@ export default function NewPropertyScreen() {
     }
   });
 
-  const set = useCallback(<K extends keyof FormState>(k: K, v: FormState[K]) => setForm((s) => ({ ...s, [k]: v })), []);
+  const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((s) => ({ ...s, [k]: v }));
+
+  const toggleAmenity = (amenity: string) => {
+    setForm(s => ({
+      ...s,
+      amenities: s.amenities.includes(amenity)
+        ? s.amenities.filter(a => a !== amenity)
+        : [...s.amenities, amenity]
+    }));
+  };
 
   return (
     <View style={styles.screen} testID="property-new-screen">
@@ -106,7 +142,7 @@ export default function NewPropertyScreen() {
         message={guardModal.message}
         action={guardModal.action}
       />
-      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 20 }} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 20, paddingHorizontal: 16 }} showsVerticalScrollIndicator={false}>
         <Text style={[styles.h1, { paddingTop: insets.top + 8 }]}>Nouvelle annonce</Text>
 
         <Field label="Titre">
@@ -115,15 +151,23 @@ export default function NewPropertyScreen() {
 
         <Field label="Type">
           <View style={styles.row}>
-            <Toggle active={form.type === 'rent'} label="Location" onPress={() => set('type', 'rent')} />
-            <Toggle active={form.type === 'sale'} label="Vente" onPress={() => set('type', 'sale')} />
+            <Toggle active={form.transaction === 'rent'} label="Location" onPress={() => set('transaction', 'rent')} />
+            <Toggle active={form.transaction === 'sale'} label="Vente" onPress={() => set('transaction', 'sale')} />
           </View>
         </Field>
 
         <Field label="Prix">
           <View style={styles.row}>
-            <Input keyboardType={Platform.select({ ios: 'number-pad', android: 'numeric', default: 'numeric' })} value={form.price} onChangeText={(t) => set('price', t)} placeholder="Ex: 250000" style={{ flex: 1 }} />
-            <Input value={form.currency} onChangeText={(t) => set('currency', t)} style={{ width: 90, textAlign: 'center' }} />
+            <Input 
+              keyboardType={Platform.select({ ios: 'number-pad', android: 'numeric', default: 'numeric' })} 
+              value={form.price} 
+              onChangeText={(t) => set('price', t)} 
+              placeholder="Ex: 250000" 
+              style={{ flex: 1 }} 
+            />
+            <View style={styles.currencyBox}>
+              <Text style={styles.currencyText}>{form.currency}</Text>
+            </View>
           </View>
         </Field>
 
@@ -132,26 +176,92 @@ export default function NewPropertyScreen() {
             <Input value={form.country} onChangeText={(t) => set('country', t)} placeholder="Pays" style={{ flex: 1 }} />
             <Input value={form.city} onChangeText={(t) => set('city', t)} placeholder="Ville" style={{ flex: 1 }} />
           </View>
+          <Input 
+            value={form.address} 
+            onChangeText={(t) => set('address', t)} 
+            placeholder="Adresse complète" 
+            style={{ marginTop: 8 }} 
+          />
         </Field>
 
         <Field label="Détails">
           <View style={styles.row}>
-            <Input value={form.rooms} onChangeText={(t) => set('rooms', t)} placeholder="Pièces" keyboardType="number-pad" style={{ flex: 1 }} />
-            <Input value={form.baths} onChangeText={(t) => set('baths', t)} placeholder="SDB" keyboardType="number-pad" style={{ flex: 1 }} />
-            <Input value={form.surface} onChangeText={(t) => set('surface', t)} placeholder="Surface (m²)" keyboardType="number-pad" style={{ flex: 1 }} />
+            <Input 
+              value={form.bedrooms} 
+              onChangeText={(t) => set('bedrooms', t)} 
+              placeholder="Pièces" 
+              keyboardType="number-pad" 
+              style={{ flex: 1 }} 
+            />
+            <Input 
+              value={form.bathrooms} 
+              onChangeText={(t) => set('bathrooms', t)} 
+              placeholder="SDB" 
+              keyboardType="number-pad" 
+              style={{ flex: 1 }} 
+            />
           </View>
+          <Input 
+            value={form.areaM2} 
+            onChangeText={(t) => set('areaM2', t)} 
+            placeholder="Surface (m²)" 
+            keyboardType="number-pad" 
+            style={{ marginTop: 8 }} 
+          />
         </Field>
 
         <Field label="Description">
-          <Input value={form.description} onChangeText={(t) => set('description', t)} placeholder="Décrivez le bien" multiline />
+          <Input 
+            value={form.description} 
+            onChangeText={(t) => set('description', t)} 
+            placeholder="Décrivez le bien (min. 30 caractères)" 
+            multiline 
+            numberOfLines={4}
+            style={{ minHeight: 100, textAlignVertical: 'top' }}
+          />
         </Field>
 
         <Field label="Photos (URLs séparées par des virgules)">
-          <Input value={form.photos} onChangeText={(t) => set('photos', t)} placeholder="https://..., https://..." multiline />
+          <Input 
+            value={form.coverUrl} 
+            onChangeText={(t) => set('coverUrl', t)} 
+            placeholder="https://..." 
+            style={{ marginBottom: 8 }}
+          />
+          <Input 
+            value={form.gallery} 
+            onChangeText={(t) => set('gallery', t)} 
+            placeholder="https://..., https://..." 
+            multiline 
+          />
         </Field>
 
-        <Pressable disabled={createMutation.isPending} onPress={() => createMutation.mutate()} style={[styles.cta, createMutation.isPending && { opacity: 0.6 }]} testID="submit-new">
-          <Text style={styles.ctaTxt}>{createMutation.isPending ? 'Création…' : 'Publier l\'annonce'}</Text>
+        <Field label="Équipements">
+          <View style={styles.amenitiesGrid}>
+            {['Wifi', 'Parking', 'Piscine', 'Climatisation', 'Sécurité 24/7', 'Jardin'].map(amenity => (
+              <Pressable
+                key={amenity}
+                onPress={() => toggleAmenity(amenity)}
+                style={[styles.amenityChip, form.amenities.includes(amenity) && styles.amenityChipActive]}
+              >
+                {form.amenities.includes(amenity) && (
+                  <CheckCircle2 size={16} color="#fff" style={{ marginRight: 4 }} />
+                )}
+                <Text style={[styles.amenityText, form.amenities.includes(amenity) && styles.amenityTextActive]}>
+                  {amenity}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </Field>
+
+        <Pressable 
+          disabled={createMutation.isPending} 
+          onPress={() => createMutation.mutate()} 
+          style={[styles.cta, createMutation.isPending && { opacity: 0.6 }]} 
+          testID="submit-new"
+        >
+          <Text style={styles.ctaTxt}>{createMutation.isPending ? 'Création…' : "Publier l'annonce"}</Text>
         </Pressable>
       </ScrollView>
     </View>
@@ -160,7 +270,7 @@ export default function NewPropertyScreen() {
 
 function Field({ label, children }: React.PropsWithChildren<{ label: string }>) {
   return (
-    <View style={{ marginHorizontal: 16, marginBottom: 16 }}>
+    <View style={{ marginBottom: 16 }}>
       <Text style={styles.label}>{label}</Text>
       {children}
     </View>
@@ -181,14 +291,82 @@ function Toggle({ active, label, onPress }: { active: boolean; label: string; on
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#F3F6F6' },
-  h1: { fontSize: 24, fontWeight: '800', color: '#0B3B36', marginHorizontal: 16, marginBottom: 16 },
+  h1: { fontSize: 24, fontWeight: '800', color: '#0B3B36', marginBottom: 16 },
   label: { fontSize: 13, color: '#475569', marginBottom: 8, fontWeight: '700' },
-  input: { backgroundColor: '#fff', borderWidth: 1, borderColor: '#E6EFEC', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 12, color: '#0B3B36' },
+  input: { 
+    backgroundColor: '#fff', 
+    borderWidth: 1, 
+    borderColor: '#E6EFEC', 
+    borderRadius: 12, 
+    paddingHorizontal: 14, 
+    paddingVertical: 12, 
+    color: '#0B3B36',
+    fontSize: 15
+  },
   row: { flexDirection: 'row', gap: 10 },
-  toggle: { flex: 1, height: 44, borderRadius: 12, borderWidth: 1, borderColor: '#E6EFEC', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fff' },
+  toggle: { 
+    flex: 1, 
+    height: 44, 
+    borderRadius: 12, 
+    borderWidth: 1, 
+    borderColor: '#E6EFEC', 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    backgroundColor: '#fff' 
+  },
   toggleOn: { backgroundColor: '#0B6B53', borderColor: '#0B6B53' },
-  toggleTxt: { fontWeight: '700', color: '#0B3B36' },
+  toggleTxt: { fontWeight: '700', color: '#0B3B36', fontSize: 14 },
   toggleOnTxt: { color: '#fff' },
-  cta: { marginHorizontal: 16, marginTop: 8, marginBottom: 24, height: 52, backgroundColor: '#0B6B53', borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  currencyBox: {
+    width: 90,
+    height: 44,
+    backgroundColor: '#F8FAFB',
+    borderWidth: 1,
+    borderColor: '#E6EFEC',
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  currencyText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0B3B36'
+  },
+  amenitiesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8
+  },
+  amenityChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E6EFEC'
+  },
+  amenityChipActive: {
+    backgroundColor: '#0B6B53',
+    borderColor: '#0B6B53'
+  },
+  amenityText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#0B3B36'
+  },
+  amenityTextActive: {
+    color: '#fff'
+  },
+  cta: { 
+    marginTop: 8, 
+    marginBottom: 24, 
+    height: 52, 
+    backgroundColor: '#0B6B53', 
+    borderRadius: 14, 
+    alignItems: 'center', 
+    justifyContent: 'center' 
+  },
   ctaTxt: { color: '#fff', fontWeight: '800', fontSize: 16 },
 });
