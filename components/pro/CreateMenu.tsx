@@ -1,35 +1,41 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, Pressable } from 'react-native';
-import { router } from 'expo-router';
-import { Home, Plane, Car, X } from 'lucide-react-native';
+import { View, Text, Modal, Pressable, StyleSheet, ScrollView } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Home, Bed, Car, X } from 'lucide-react-native';
+import { colors, radius } from '@/theme/tokens';
 
-interface CreateMenuProps {
+type CreateMenuProps = {
   visible: boolean;
   onClose: () => void;
-}
+};
 
 export default function CreateMenu({ visible, onClose }: CreateMenuProps) {
-  const items = [
+  const router = useRouter();
+
+  const options = [
     {
-      label: 'Propriété',
-      description: 'Maison, appartement, terrain, commerce',
-      route: '/pro/create/property',
+      id: 'property',
+      title: 'Propriété',
+      description: 'Maison, appartement, commerce, terrain...',
       icon: Home,
-      color: '#10B981' as const,
+      route: '/property/new' as const,
+      color: '#0E9F6E',
     },
     {
-      label: 'Hébergement',
-      description: 'Hôtel, résidence, villa de vacances',
-      route: '/pro/create/trip',
-      icon: Plane,
-      color: '#3B82F6' as const,
+      id: 'trip',
+      title: 'Hébergement',
+      description: 'Hôtel, résidence, villa de vacances...',
+      icon: Bed,
+      route: '/trip/index' as const,
+      color: '#3B82F6',
     },
     {
-      label: 'Véhicule',
-      description: 'Location, vente, chauffeur',
-      route: '/pro/create/vehicle',
+      id: 'vehicle',
+      title: 'Véhicule',
+      description: 'Location, vente, avec chauffeur...',
       icon: Car,
-      color: '#F59E0B' as const,
+      route: '/vehicles/index' as const,
+      color: '#8B5CF6',
     },
   ];
 
@@ -39,65 +45,64 @@ export default function CreateMenu({ visible, onClose }: CreateMenuProps) {
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <Pressable style={styles.backdrop} onPress={onClose}>
-        <View style={styles.container}>
-          <Pressable onPress={(e) => e.stopPropagation()}>
-            <View style={styles.sheet}>
-              <View style={styles.header}>
-                <Text style={styles.title}>Créer une annonce</Text>
-                <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-                  <X size={24} color="#64748B" />
-                </TouchableOpacity>
-              </View>
+    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+      <View style={styles.overlay}>
+        <Pressable style={styles.backdrop} onPress={onClose} />
+        <View style={styles.sheet}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Créer une annonce</Text>
+            <Pressable onPress={onClose} style={styles.closeButton} testID="close-create-menu">
+              <X size={24} color="#64748B" />
+            </Pressable>
+          </View>
 
-              <View style={styles.items}>
-                {items.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <TouchableOpacity
-                      key={item.route}
-                      style={styles.item}
-                      onPress={() => handleSelect(item.route)}
-                    >
-                      <View style={[styles.iconBox, { backgroundColor: item.color }]}>
-                        <Icon size={28} color="#fff" />
-                      </View>
-                      <View style={styles.itemText}>
-                        <Text style={styles.itemLabel}>{item.label}</Text>
-                        <Text style={styles.itemDesc}>{item.description}</Text>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
-          </Pressable>
+          <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+            {options.map((option) => {
+              const Icon = option.icon;
+              return (
+                <Pressable
+                  key={option.id}
+                  testID={`create-option-${option.id}`}
+                  onPress={() => handleSelect(option.route)}
+                  style={({ pressed }) => [styles.option, pressed && styles.optionPressed]}
+                >
+                  <View style={[styles.iconWrap, { backgroundColor: `${option.color}15` }]}>
+                    <Icon size={28} color={option.color} strokeWidth={2.5} />
+                  </View>
+                  <View style={styles.optionText}>
+                    <Text style={styles.optionTitle}>{option.title}</Text>
+                    <Text style={styles.optionDescription}>{option.description}</Text>
+                  </View>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
         </View>
-      </Pressable>
+      </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
+  overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  container: {
-    justifyContent: 'flex-end',
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
   },
   sheet: {
     backgroundColor: '#fff',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: radius.xl,
+    borderTopRightRadius: radius.xl,
     paddingBottom: 32,
+    maxHeight: '80%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 8,
   },
   header: {
     flexDirection: 'row',
@@ -105,48 +110,58 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingTop: 20,
-    paddingBottom: 16,
+    paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: '#E5E7EB',
   },
   title: {
     fontSize: 20,
     fontWeight: '800' as const,
     color: '#0F172A',
   },
-  closeBtn: {
-    padding: 4,
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F1F5F9',
   },
-  items: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
+  content: {
+    padding: 20,
     gap: 12,
   },
-  item: {
+  option: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
+    borderRadius: radius.lg,
     backgroundColor: '#F8FAFC',
-    borderRadius: 16,
-    gap: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    gap: 14,
   },
-  iconBox: {
+  optionPressed: {
+    backgroundColor: '#F1F5F9',
+    transform: [{ scale: 0.98 }],
+  },
+  iconWrap: {
     width: 56,
     height: 56,
-    borderRadius: 16,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  itemText: {
+  optionText: {
     flex: 1,
   },
-  itemLabel: {
+  optionTitle: {
     fontSize: 17,
     fontWeight: '700' as const,
     color: '#0F172A',
     marginBottom: 4,
   },
-  itemDesc: {
+  optionDescription: {
     fontSize: 14,
     color: '#64748B',
   },

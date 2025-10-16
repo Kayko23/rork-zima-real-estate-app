@@ -418,7 +418,7 @@ export const [AppProvider, useAppStore] = createContextHook(() => {
     
     if (def.type === 'mobile_money') {
       const detectedCurrency = currencyForCountry(def.countryCode);
-      const currency: CfaCurrencyCode = (def.currency || detectedCurrency) as CfaCurrencyCode;
+      const currency: CfaCurrencyCode = ((def.currency === 'XOF' || def.currency === 'XAF') ? def.currency : detectedCurrency) as CfaCurrencyCode;
       const res = await startMobileMoneyCharge({
         provider: def.provider!,
         countryCode: def.countryCode! as any,

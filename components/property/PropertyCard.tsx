@@ -23,7 +23,26 @@ export default function PropertyCard({ item }: { item: Property }) {
   const { isFavoriteProperty, toggleFavoriteProperty } = useApp();
   const fav = isFavoriteProperty(item.id);
   const router = useRouter();
-  const go = () => router.push({ pathname: "/property/[id]", params: { id: item.id }} as any);
+  const go = () => {
+    router.push({
+      pathname: "/property/detail/[id]" as any,
+      params: {
+        id: item.id,
+        title: item.title,
+        city: item.city,
+        country: item.country,
+        images: JSON.stringify(item.photos),
+        price: item.price,
+        currency: item.currency || 'XOF',
+        listingType: item.badge === 'À VENDRE' ? 'A_VENDRE' : 'A_LOUER',
+        area: item.area,
+        beds: item.beds,
+        baths: item.baths,
+        rooms: item.livingRooms,
+        rating: item.rating,
+      },
+    });
+  };
 
   const imageUri = item.photos?.[0] && item.photos[0].trim() !== '' 
     ? item.photos[0] 

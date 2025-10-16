@@ -102,7 +102,8 @@ export type PaymentMethod = {
   countryCode?: string;
   phone?: string;
   accountName?: string;
-  currency?: string;
+  currency?: 'XOF' | 'XAF' | 'GHS' | 'NGN' | 'USD' | 'EUR';
+  country?: string;
 };
 
 export interface Appointment {

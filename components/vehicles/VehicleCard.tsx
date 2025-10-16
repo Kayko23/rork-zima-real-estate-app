@@ -35,7 +35,25 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
   const pricePerDay = vehicle.kind === 'rent' || vehicle.kind === 'vip' || vehicle.kind === 'driver';
 
   const handlePress = () => {
-    router.push(`/vehicles/${vehicle.id}` as any);
+    router.push({
+      pathname: "/vehicle/detail/[id]" as any,
+      params: {
+        id: vehicle.id,
+        title: vehicle.title,
+        city: vehicle.city,
+        country: vehicle.countryCode,
+        images: vehicle.image ? JSON.stringify([vehicle.image]) : JSON.stringify([]),
+        rating: vehicle.rating,
+        forRent: vehicle.kind === 'rent' || vehicle.kind === 'vip' || vehicle.kind === 'driver' ? 'true' : 'false',
+        pricePerDay: vehicle.kind === 'rent' || vehicle.kind === 'vip' || vehicle.kind === 'driver' ? vehicle.price : undefined,
+        price: vehicle.kind === 'sale' ? vehicle.price : undefined,
+        currency: vehicle.currency || 'XOF',
+        seats: vehicle.seats,
+        fuel: vehicle.fuel,
+        transmission: vehicle.gearbox,
+        contact: JSON.stringify({ phone: vehicle.agency?.phone || vehicle.driver?.name }),
+      },
+    });
   };
 
   const handleToggleFavorite = (e: any) => {
